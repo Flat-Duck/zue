@@ -20,7 +20,10 @@ class TimeSheetUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value' => ['required', 'in:a,b,c,d,e,f,g,h,i,j,k,l,m,n'],
+            'value' => [
+                'required',
+                'in:a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z',
+            ],
             'day' => ['required', 'date'],
             'employee_id' => ['required', 'exists:employees,id'],
             'revised_at' => ['nullable', 'date'],

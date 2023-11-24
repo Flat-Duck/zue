@@ -44,6 +44,11 @@ class CenterEmployeesController extends Controller
             'location_id' => ['required', 'exists:locations,id'],
             'department_id' => ['required', 'exists:departments,id'],
             'transfered_balance' => ['nullable', 'numeric'],
+            'schedule' => ['nullable', 'max:255', 'string'],
+            'start_date' => ['nullable', 'date'],
+            'last_date' => ['nullable', 'date'],
+            'total_balance' => ['nullable', 'numeric'],
+            'archived_at' => ['nullable', 'date'],
         ]);
 
         $employee = $center->employees()->create($validated);

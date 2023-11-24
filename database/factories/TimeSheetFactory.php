@@ -23,7 +23,7 @@ class TimeSheetFactory extends Factory
     public function definition(): array
     {
         return [
-            'value' => 'A',
+            'value' => 'F',
             'day' => $this->faker->date(),
             'revised_at' => $this->faker->dateTime(),
             'old_value' => $this->faker->text(255),

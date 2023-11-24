@@ -1,8 +1,7 @@
 @extends('layouts.app', ['page' => 'stocks'])
 
 @section('content')
-@livewire('time-sheeter')
-{{-- <form method="POST" action="{{ route('stocks.store') }}" class="card">
+<form method="POST" action="{{ route('stocks.store') }}" class="card">
     @csrf
     <div class="card-header">
         <a href="{{ route('stocks.index') }}" class="mr-4"
@@ -20,12 +19,10 @@
                 class="btn btn-outline-secondary"
                 >@lang('crud.common.back')</a
             >
-
-
             <button type="submit" class="btn btn-primary">
                 <i class="ti ti-device-floppy"></i> @lang('crud.common.create')
             </button>
         </div>
     </div>
-</form> --}}
+</form>
 @endsection

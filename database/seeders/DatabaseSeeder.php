@@ -20,17 +20,17 @@ class DatabaseSeeder extends Seeder
             ]);
         $this->call(PermissionsSeeder::class);
 
-        $this->call(AdministrationSeeder::class);
-        $this->call(CenterSeeder::class);
-        $this->call(DepartmentSeeder::class);
-        $this->call(EmployeeSeeder::class);
-        $this->call(FlightSeeder::class);
-        $this->call(LocationSeeder::class);
-        $this->call(PassengerSeeder::class);
-        $this->call(ResidenceSeeder::class);
-        $this->call(RoomSeeder::class);
-        $this->call(StockSeeder::class);
-        $this->call(TimeSheetSeeder::class);
+        // $this->call(AdministrationSeeder::class);
+        // $this->call(CenterSeeder::class);
+        // $this->call(DepartmentSeeder::class);
+        // $this->call(EmployeeSeeder::class);
+        // $this->call(FlightSeeder::class);
+        // $this->call(LocationSeeder::class);
+        // $this->call(PassengerSeeder::class);
+        // $this->call(ResidenceSeeder::class);
+        // $this->call(RoomSeeder::class);
+        // $this->call(StockSeeder::class);
+        // $this->call(TimeSheetSeeder::class);
         $this->call(UserSeeder::class);
     }
 }

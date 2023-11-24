@@ -8,8 +8,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\FlightController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PassengerController;
 use App\Http\Controllers\ResidenceController;
 use App\Http\Controllers\TimeSheetController;
@@ -45,15 +45,16 @@ Route::prefix('/')
         Route::resource('administrations', AdministrationController::class);
         Route::resource('centers', CenterController::class);
         Route::resource('departments', DepartmentController::class);
-        Route::resource('employees', EmployeeController::class);
         Route::resource('flights', FlightController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('passengers', PassengerController::class);
         Route::resource('residences', ResidenceController::class);
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
+        Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
         Route::resource('time-sheets', TimeSheetController::class);
         Route::resource('users', UserController::class);
+        Route::resource('employees', EmployeeController::class);
         Route::get('profile', [
             \App\Http\Controllers\ProfileController::class,
             'show',

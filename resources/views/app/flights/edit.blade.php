@@ -43,4 +43,22 @@
     </div>
 </form>
 
-@endsection
+@can('view-any', App\Models\flight_passenger::class)
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">Passengers</h3>
+    </div>
+    <div class="card-body">
+        <livewire:flight-passengers-detail :flight="$flight" />
+    </div>
+</div>
+@endcan @can('view-any', App\Models\employee_flight::class)
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">Employees</h3>
+    </div>
+    <div class="card-body">
+        <livewire:flight-employees-detail :flight="$flight" />
+    </div>
+</div>
+@endcan @endsection

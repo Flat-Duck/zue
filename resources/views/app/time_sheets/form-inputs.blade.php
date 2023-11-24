@@ -3,7 +3,7 @@
 <div class="row">
     <x-inputs.group class="col-sm-12">
         <x-inputs.select name="value" label="Value">
-            @php $selected = old('value', ($editing ? $timeSheet->value : '')) @endphp
+            @php $selected = old('value', ($editing ? $timeSheet->value : 'F')) @endphp
             <option value="A" {{ $selected == 'A' ? 'selected' : '' }} >A</option>
             <option value="B" {{ $selected == 'B' ? 'selected' : '' }} >B</option>
             <option value="C" {{ $selected == 'C' ? 'selected' : '' }} >C</option>

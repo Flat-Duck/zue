@@ -9,23 +9,25 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\CenterController;
 use App\Http\Controllers\Api\FlightController;
-use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\PassengerController;
 use App\Http\Controllers\Api\ResidenceController;
 use App\Http\Controllers\Api\TimeSheetController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PermissionController;
-use App\Http\Controllers\Api\EmployeeRoomsController;
 use App\Http\Controllers\Api\RoomEmployeesController;
+use App\Http\Controllers\Api\EmployeeRoomsController;
 use App\Http\Controllers\Api\AdministrationController;
 use App\Http\Controllers\Api\ResidenceRoomsController;
 use App\Http\Controllers\Api\UserTimeSheetsController;
 use App\Http\Controllers\Api\CenterEmployeesController;
-use App\Http\Controllers\Api\EmployeeFlightsController;
 use App\Http\Controllers\Api\FlightEmployeesController;
+use App\Http\Controllers\Api\EmployeeFlightsController;
+use App\Http\Controllers\Api\employee_flightController;
 use App\Http\Controllers\Api\FlightPassengersController;
 use App\Http\Controllers\Api\PassengerFlightsController;
+use App\Http\Controllers\Api\flight_passengerController;
 use App\Http\Controllers\Api\LocationEmployeesController;
 use App\Http\Controllers\Api\EmployeeTimeSheetsController;
 use App\Http\Controllers\Api\DepartmentEmployeesController;
@@ -91,46 +93,6 @@ Route::name('api.')
             DepartmentEmployeesController::class,
             'store',
         ])->name('departments.employees.store');
-
-        Route::apiResource('employees', EmployeeController::class);
-
-        // Employee Time Sheets
-        Route::get('/employees/{employee}/time-sheets', [
-            EmployeeTimeSheetsController::class,
-            'index',
-        ])->name('employees.time-sheets.index');
-        Route::post('/employees/{employee}/time-sheets', [
-            EmployeeTimeSheetsController::class,
-            'store',
-        ])->name('employees.time-sheets.store');
-
-        // Employee Rooms
-        Route::get('/employees/{employee}/rooms', [
-            EmployeeRoomsController::class,
-            'index',
-        ])->name('employees.rooms.index');
-        Route::post('/employees/{employee}/rooms/{room}', [
-            EmployeeRoomsController::class,
-            'store',
-        ])->name('employees.rooms.store');
-        Route::delete('/employees/{employee}/rooms/{room}', [
-            EmployeeRoomsController::class,
-            'destroy',
-        ])->name('employees.rooms.destroy');
-
-        // Employee Flights
-        Route::get('/employees/{employee}/flights', [
-            EmployeeFlightsController::class,
-            'index',
-        ])->name('employees.flights.index');
-        Route::post('/employees/{employee}/flights/{flight}', [
-            EmployeeFlightsController::class,
-            'store',
-        ])->name('employees.flights.store');
-        Route::delete('/employees/{employee}/flights/{flight}', [
-            EmployeeFlightsController::class,
-            'destroy',
-        ])->name('employees.flights.destroy');
 
         Route::apiResource('flights', FlightController::class);
 
@@ -233,4 +195,44 @@ Route::name('api.')
             UserTimeSheetsController::class,
             'store',
         ])->name('users.time-sheets.store');
+
+        Route::apiResource('employees', EmployeeController::class);
+
+        // Employee Time Sheets
+        Route::get('/employees/{employee}/time-sheets', [
+            EmployeeTimeSheetsController::class,
+            'index',
+        ])->name('employees.time-sheets.index');
+        Route::post('/employees/{employee}/time-sheets', [
+            EmployeeTimeSheetsController::class,
+            'store',
+        ])->name('employees.time-sheets.store');
+
+        // Employee Rooms
+        Route::get('/employees/{employee}/rooms', [
+            EmployeeRoomsController::class,
+            'index',
+        ])->name('employees.rooms.index');
+        Route::post('/employees/{employee}/rooms/{room}', [
+            EmployeeRoomsController::class,
+            'store',
+        ])->name('employees.rooms.store');
+        Route::delete('/employees/{employee}/rooms/{room}', [
+            EmployeeRoomsController::class,
+            'destroy',
+        ])->name('employees.rooms.destroy');
+
+        // Employee Flights
+        Route::get('/employees/{employee}/flights', [
+            EmployeeFlightsController::class,
+            'index',
+        ])->name('employees.flights.index');
+        Route::post('/employees/{employee}/flights/{flight}', [
+            EmployeeFlightsController::class,
+            'store',
+        ])->name('employees.flights.store');
+        Route::delete('/employees/{employee}/flights/{flight}', [
+            EmployeeFlightsController::class,
+            'destroy',
+        ])->name('employees.flights.destroy');
     });

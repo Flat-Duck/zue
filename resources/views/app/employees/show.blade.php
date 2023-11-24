@@ -178,6 +178,61 @@
                                 disabled=""
                             />
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label"
+                                >@lang('crud.employees.inputs.schedule')</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $employee->schedule ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"
+                                >@lang('crud.employees.inputs.start_date')</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $employee->start_date ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"
+                                >@lang('crud.employees.inputs.last_date')</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $employee->last_date ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"
+                                >@lang('crud.employees.inputs.total_balance')</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $employee->total_balance ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"
+                                >@lang('crud.employees.inputs.archived_at')</label
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $employee->archived_at ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -12,27 +12,45 @@ return new class extends Migration {
     {
         Schema::create('time_sheets', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->enum('value', [
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F',
-                'G',
-                'H',
-                'I',
-                'J',
-                'K',
-                'L',
-                'M',
-                'N',
-            ]);
+            $table
+                ->enum('value', [
+                    'A',
+                    'B',
+                    'C',
+                    'D',
+                    'E',
+                    'F',
+                    'G',
+                    'H',
+                    'I',
+                    'J',
+                    'K',
+                    'L',
+                    'M',
+                    'N',
+                    'O',
+                    'P',
+                    'Q',
+                    'R',
+                    'S',
+                    'T',
+                    'U',
+                    'V',
+                    'W',
+                    'X',
+                    'Y',
+                    'Z',
+                ])
+                ->default('F');
             $table->date('day');
             $table->unsignedBigInteger('employee_id');
             $table->timestamp('revised_at')->nullable();
             $table->string('old_value')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+
+            $table->index('value');
+            $table->index('day');
+            $table->index('employee_id');
 
             $table->timestamps();
         });

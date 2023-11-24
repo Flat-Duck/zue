@@ -98,6 +98,21 @@
                     <th class="text-right">
                         @lang('crud.employees.inputs.transfered_balance')
                     </th>
+                    <th class="text-left">
+                        @lang('crud.employees.inputs.schedule')
+                    </th>
+                    <th class="text-left">
+                        @lang('crud.employees.inputs.start_date')
+                    </th>
+                    <th class="text-left">
+                        @lang('crud.employees.inputs.last_date')
+                    </th>
+                    <th class="text-right">
+                        @lang('crud.employees.inputs.total_balance')
+                    </th>
+                    <th class="text-left">
+                        @lang('crud.employees.inputs.archived_at')
+                    </th>
                     <th class="text-center">@lang('crud.common.actions')</th>
                 </tr>
             </thead>
@@ -119,6 +134,11 @@
                     <td>{{ optional($employee->department)->name ?? '-' }}</td>
                     <td>{{ optional($employee->center)->name ?? '-' }}</td>
                     <td>{{ $employee->transfered_balance ?? '-' }}</td>
+                    <td>{{ $employee->schedule ?? '-' }}</td>
+                    <td>{{ $employee->start_date ?? '-' }}</td>
+                    <td>{{ $employee->last_date ?? '-' }}</td>
+                    <td>{{ $employee->total_balance ?? '-' }}</td>
+                    <td>{{ $employee->archived_at ?? '-' }}</td>
                     <td class="text-center" style="width: 134px;">
                         <div
                             role="group"
@@ -160,7 +180,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="16">@lang('crud.common.no_items_found')</td>
+                    <td colspan="21">@lang('crud.common.no_items_found')</td>
                 </tr>
                 @endforelse
             </tbody>

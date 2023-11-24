@@ -21,22 +21,34 @@ class TimeSheetController extends Controller
      */
     public function index(Request $request): View
     {
+        
+        // $search = $request->get('search', '');
+        
+        // $timeSheets = TimeSheet::search($search)
+        //     ->latest()
+        //     ->paginate(5)
+        //     ->withQueryString();
+        
         $this->authorize('view-any', TimeSheet::class);
+        $this->authorize('view-any', Employee::class);
 
         $search = $request->get('search', '');
 
-        $timeSheets = TimeSheet::search($search)
+        $employees = Employee::search($search)
             ->latest()
             ->paginate(5)
             ->withQueryString();
 
-        return view('app.time_sheets.index', compact('timeSheets', 'search'));
+        //return view('app.employees.index', compact('employees', 'search'));
+
+        return view('app.time_sheets.index',compact('employees', 'search'));
+        //return view('app.time_sheets.index', compact('timeSheets', 'search'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request): View
+    public function create(Request $request,Employee $employee): View
     {
         // $this->authorize('create', TimeSheet::class);
 
@@ -59,7 +71,7 @@ class TimeSheetController extends Controller
                 
         //     }
         // }
-        return view('app.time_sheets.create');//, compact('employees', 'users'));
+        return view('app.time_sheets.create',compact('employee'));//, compact('employees', 'users'));
     }
 
     /**

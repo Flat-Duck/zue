@@ -85,6 +85,11 @@ class EmployeeTest extends TestCase
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->email(),
             'transfered_balance' => $this->faker->randomNumber(0),
+            'schedule' => $this->faker->text(255),
+            'start_date' => $this->faker->date(),
+            'last_date' => $this->faker->date(),
+            'total_balance' => $this->faker->randomNumber(0),
+            'archived_at' => $this->faker->dateTime(),
             'user_id' => $user->id,
             'department_id' => $department->id,
             'location_id' => $location->id,
@@ -114,7 +119,7 @@ class EmployeeTest extends TestCase
             route('api.employees.destroy', $employee)
         );
 
-        $this->assertModelMissing($employee);
+        $this->assertSoftDeleted($employee);
 
         $response->assertNoContent();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Carbon\CarbonPeriod;
 use DateTime;
 use stdClass;
 
@@ -10,6 +11,11 @@ class MomentsJs
    public $months;
 
 
+   public static function getRange($dates)
+   {
+        $range = explode(" to ", $dates);
+        return  CarbonPeriod::create($range[0], $range[1]);
+   }
    public static function isLeapYear($year)
    {
        return ($year % 4 == 0 && $year % 100 != 0) || ($year % 400 == 0);

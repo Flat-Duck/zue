@@ -148,4 +148,51 @@
             placeholder="Transfered Balance"
         ></x-inputs.number>
     </x-inputs.group>
+
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.text
+            name="schedule"
+            label="Schedule"
+            :value="old('schedule', ($editing ? $employee->schedule : ''))"
+            maxlength="255"
+            placeholder="Schedule"
+        ></x-inputs.text>
+    </x-inputs.group>
+
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.date
+            name="start_date"
+            label="Start Date"
+            value="{{ old('start_date', ($editing ? optional($employee->start_date)->format('Y-m-d') : '')) }}"
+            max="255"
+        ></x-inputs.date>
+    </x-inputs.group>
+
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.date
+            name="last_date"
+            label="Last Date"
+            value="{{ old('last_date', ($editing ? optional($employee->last_date)->format('Y-m-d') : '')) }}"
+            max="255"
+        ></x-inputs.date>
+    </x-inputs.group>
+
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.number
+            name="total_balance"
+            label="Total Balance"
+            :value="old('total_balance', ($editing ? $employee->total_balance : ''))"
+            max="255"
+            placeholder="Total Balance"
+        ></x-inputs.number>
+    </x-inputs.group>
+
+    <x-inputs.group class="col-sm-12">
+        <x-inputs.date
+            name="archived_at"
+            label="Archived At"
+            value="{{ old('archived_at', ($editing ? optional($employee->archived_at)->format('Y-m-d') : '')) }}"
+            max="255"
+        ></x-inputs.date>
+    </x-inputs.group>
 </div>

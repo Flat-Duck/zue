@@ -24,25 +24,25 @@
                 <div class="col-3 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Administration :</label>
-                        <input value="{{ $employee->name }}" type="text" class="form-control" disabled >
+                        <input value="{{ $employee->administration_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Department :</label>
-                        <input value="{{ $employee->name }}" type="text" class="form-control" disabled >
+                        <input value="{{ $employee->department_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Cost Center :</label>
-                        <input value="{{ $employee->name }}" type="text" class="form-control" disabled >
+                        <input value="{{ $employee->center_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Location :</label>
-                        <input value="{{ $employee->name }}" type="text" class="form-control" disabled >
+                        <input value="{{ $employee->location_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
@@ -54,13 +54,13 @@
                 <div class="col-4 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Total Balance : </label>
-                        <input value="{{ $employee->balance }}" type="text" class="form-control bg-danger" disabled >
+                        <input value="{{ $employee->balance }}" type="text" class="form-control {{ ($employee->balance > 0)? 'bg-red-lt' : 'bg-green-lt' }} " disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
                         <label class="form-label">To Date :</label>
-                        <input value="{{ $employee->to_date }}" type="text" class="form-control" disabled >
+                        <input value="{{ $employee->last_date }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
             </div>

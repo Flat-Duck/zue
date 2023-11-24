@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('department_id');
             $table->unsignedBigInteger('center_id');
@@ -30,8 +30,16 @@ return new class extends Migration {
                 ->integer('transfered_balance')
                 ->default(0)
                 ->nullable();
+            $table->string('schedule')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('last_date')->nullable();
+            $table->integer('total_balance')->nullable();
+            $table->timestamp('archived_at')->nullable();
+
+            $table->index('number');
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

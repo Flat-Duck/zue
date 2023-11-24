@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('departments', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->unsignedBigInteger('administration_id');
+            $table->unsignedBigInteger('administration_id')->nullable();
 
             $table->timestamps();
         });
