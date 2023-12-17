@@ -47,7 +47,8 @@ class CenterController extends Controller
     public function update(
         CenterUpdateRequest $request,
         Center $center
-    ): CenterResource {
+    ): CenterResource
+    {
         $this->authorize('update', $center);
 
         $validated = $request->validated();

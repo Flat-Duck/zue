@@ -13,7 +13,8 @@ class DepartmentEmployeesController extends Controller
     public function index(
         Request $request,
         Department $department
-    ): EmployeeCollection {
+    ): EmployeeCollection
+    {
         $this->authorize('view', $department);
 
         $search = $request->get('search', '');
@@ -30,7 +31,8 @@ class DepartmentEmployeesController extends Controller
     public function store(
         Request $request,
         Department $department
-    ): EmployeeResource {
+    ): EmployeeResource
+    {
         $this->authorize('create', Employee::class);
 
         $validated = $request->validate([

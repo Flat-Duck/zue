@@ -40,7 +40,8 @@ class DepartmentController extends Controller
     public function show(
         Request $request,
         Department $department
-    ): DepartmentResource {
+    ): DepartmentResource
+    {
         $this->authorize('view', $department);
 
         return new DepartmentResource($department);
@@ -49,7 +50,8 @@ class DepartmentController extends Controller
     public function update(
         DepartmentUpdateRequest $request,
         Department $department
-    ): DepartmentResource {
+    ): DepartmentResource
+    {
         $this->authorize('update', $department);
 
         $validated = $request->validated();

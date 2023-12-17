@@ -19,11 +19,10 @@ class SearchEmployee extends Component
     public function searchEmployees()
     {
         $this->employee = Employee::where('number', $this->number)->first();
-        if($this->employee){
+        if ($this->employee) {
             $this->dispatch('employee-found', $this->employee);
-        }else{
-            $this->js("alert('Employee Not Found')"); 
+        } else {
+            $this->js("alert('Employee Not Found')");
         }
     }
-    
 }

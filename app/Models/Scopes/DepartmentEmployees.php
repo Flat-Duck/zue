@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Scope;
 
 class DepartmentEmployees implements Scope
 {
-    private  $center_id;
+    private $center_id;
 
     public function __construct(int $center)
     {
@@ -20,6 +20,6 @@ class DepartmentEmployees implements Scope
      */
     public function apply(Builder $builder, Model $model) : void
     {
-        $builder->where('center_id', $this-> center_id);
+        $builder->where('center_id', $this->center_id);
     }
 }

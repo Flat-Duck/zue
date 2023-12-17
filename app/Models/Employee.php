@@ -102,7 +102,7 @@ class Employee extends Model
     }
     
     public function getDepartmentNameAttribute()
-    { 
+    {
         return optional($this->department)->name ?? '-';
     }
 
@@ -131,20 +131,19 @@ class Employee extends Model
 
     public function getTotalWorkingDaysAttribute()
     {
-        return $this->timeSheets()->whereIn('value', ['A','B','Y','K'])->count();
+        return $this->timeSheets()->whereIn('value', ['A', 'B', 'Y', 'K'])->count();
     }
 
     public function getTotalOffDaysAttribute()
     {
-        return $this->timeSheets()->whereIn('value', ['F','X'])->count();
+        return $this->timeSheets()->whereIn('value', ['F', 'X'])->count();
     }
 
     protected static function boot()
     {
         parent::boot();
-        if(Auth::check()) {            
-            if(auth()->user()->hasRole('super_visor')) {
-
+        if (Auth::check()) {
+            if (auth()->user()->hasRole('super_visor')) {
                 static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
                 // dd(auth()->user());
             }

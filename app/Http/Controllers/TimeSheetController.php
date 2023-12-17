@@ -41,21 +41,21 @@ class TimeSheetController extends Controller
 
         //return view('app.employees.index', compact('employees', 'search'));
 
-        return view('app.time_sheets.index',compact('employees', 'search'));
+        return view('app.time_sheets.index', compact('employees', 'search'));
         //return view('app.time_sheets.index', compact('timeSheets', 'search'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request,Employee $employee): View
+    public function create(Request $request, Employee $employee): View
     {
         // $this->authorize('create', TimeSheet::class);
 
         //     # code...
             // $employees = Employee::pluck('job', 'id');
             //     $users = User::pluck('name', 'id');
-            // for ($i=2; $i < 10; $i++) { 
+            // for ($i=2; $i < 10; $i++) {
 
             
         //     foreach ($period as $dt) {
@@ -71,7 +71,7 @@ class TimeSheetController extends Controller
                 
         //     }
         // }
-        return view('app.time_sheets.create',compact('employee'));//, compact('employees', 'users'));
+        return view('app.time_sheets.create', compact('employee'));//, compact('employees', 'users'));
     }
 
     /**
@@ -127,7 +127,8 @@ class TimeSheetController extends Controller
     public function update(
         TimeSheetUpdateRequest $request,
         TimeSheet $timeSheet
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $timeSheet);
 
         $validated = $request->validated();
@@ -145,7 +146,8 @@ class TimeSheetController extends Controller
     public function destroy(
         Request $request,
         TimeSheet $timeSheet
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $timeSheet);
 
         $timeSheet->delete();

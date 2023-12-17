@@ -30,7 +30,7 @@ class ProfileController extends Controller
 
         $data = $this->validate($request, [
             'name' => 'required|max:40',
-            'roles' => 'array'
+            'roles' => 'array',
         ]);
 
       

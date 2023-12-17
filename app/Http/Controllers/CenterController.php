@@ -80,7 +80,8 @@ class CenterController extends Controller
     public function update(
         CenterUpdateRequest $request,
         Center $center
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $center);
 
         $validated = $request->validated();

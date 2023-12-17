@@ -13,7 +13,8 @@ class AdministrationDepartmentsController extends Controller
     public function index(
         Request $request,
         Administration $administration
-    ): DepartmentCollection {
+    ): DepartmentCollection
+    {
         $this->authorize('view', $administration);
 
         $search = $request->get('search', '');
@@ -30,7 +31,8 @@ class AdministrationDepartmentsController extends Controller
     public function store(
         Request $request,
         Administration $administration
-    ): DepartmentResource {
+    ): DepartmentResource
+    {
         $this->authorize('create', Department::class);
 
         $validated = $request->validate([

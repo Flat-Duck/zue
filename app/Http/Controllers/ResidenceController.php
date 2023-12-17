@@ -80,7 +80,8 @@ class ResidenceController extends Controller
     public function update(
         ResidenceUpdateRequest $request,
         Residence $residence
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $residence);
 
         $validated = $request->validated();
@@ -98,7 +99,8 @@ class ResidenceController extends Controller
     public function destroy(
         Request $request,
         Residence $residence
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $residence);
 
         $residence->delete();

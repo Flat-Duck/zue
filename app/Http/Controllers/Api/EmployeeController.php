@@ -47,7 +47,8 @@ class EmployeeController extends Controller
     public function update(
         EmployeeUpdateRequest $request,
         Employee $employee
-    ): EmployeeResource {
+    ): EmployeeResource
+    {
         $this->authorize('update', $employee);
 
         $validated = $request->validated();

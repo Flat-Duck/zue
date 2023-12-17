@@ -13,7 +13,8 @@ trait Searchable
         Builder $query,
         string $search,
         int $paginationQuantity = 10
-    ): Builder {
+    ): Builder
+    {
         return $query
             ->search($search)
             ->orderBy('updated_at', 'desc')

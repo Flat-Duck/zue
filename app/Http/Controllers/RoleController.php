@@ -8,7 +8,8 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Spatie\Permission\Models\Permission;
 
-class RoleController extends Controller {
+class RoleController extends Controller
+{
 
     /**
      * Display a listing of the resource.

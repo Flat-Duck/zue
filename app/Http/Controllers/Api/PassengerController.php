@@ -40,7 +40,8 @@ class PassengerController extends Controller
     public function show(
         Request $request,
         Passenger $passenger
-    ): PassengerResource {
+    ): PassengerResource
+    {
         $this->authorize('view', $passenger);
 
         return new PassengerResource($passenger);
@@ -49,7 +50,8 @@ class PassengerController extends Controller
     public function update(
         PassengerUpdateRequest $request,
         Passenger $passenger
-    ): PassengerResource {
+    ): PassengerResource
+    {
         $this->authorize('update', $passenger);
 
         $validated = $request->validated();

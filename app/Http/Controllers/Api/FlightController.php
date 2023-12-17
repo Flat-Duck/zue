@@ -47,7 +47,8 @@ class FlightController extends Controller
     public function update(
         FlightUpdateRequest $request,
         Flight $flight
-    ): FlightResource {
+    ): FlightResource
+    {
         $this->authorize('update', $flight);
 
         $validated = $request->validated();

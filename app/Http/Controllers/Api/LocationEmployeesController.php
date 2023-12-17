@@ -13,7 +13,8 @@ class LocationEmployeesController extends Controller
     public function index(
         Request $request,
         Location $location
-    ): EmployeeCollection {
+    ): EmployeeCollection
+    {
         $this->authorize('view', $location);
 
         $search = $request->get('search', '');
@@ -30,7 +31,8 @@ class LocationEmployeesController extends Controller
     public function store(
         Request $request,
         Location $location
-    ): EmployeeResource {
+    ): EmployeeResource
+    {
         $this->authorize('create', Employee::class);
 
         $validated = $request->validate([

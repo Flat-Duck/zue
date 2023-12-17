@@ -47,7 +47,8 @@ class StockController extends Controller
     public function update(
         StockUpdateRequest $request,
         Stock $stock
-    ): StockResource {
+    ): StockResource
+    {
         $this->authorize('update', $stock);
 
         $validated = $request->validated();

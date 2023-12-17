@@ -40,7 +40,8 @@ class ResidenceController extends Controller
     public function show(
         Request $request,
         Residence $residence
-    ): ResidenceResource {
+    ): ResidenceResource
+    {
         $this->authorize('view', $residence);
 
         return new ResidenceResource($residence);
@@ -49,7 +50,8 @@ class ResidenceController extends Controller
     public function update(
         ResidenceUpdateRequest $request,
         Residence $residence
-    ): ResidenceResource {
+    ): ResidenceResource
+    {
         $this->authorize('update', $residence);
 
         $validated = $request->validated();

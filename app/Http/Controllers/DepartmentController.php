@@ -88,7 +88,8 @@ class DepartmentController extends Controller
     public function update(
         DepartmentUpdateRequest $request,
         Department $department
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $department);
 
         $validated = $request->validated();
@@ -106,7 +107,8 @@ class DepartmentController extends Controller
     public function destroy(
         Request $request,
         Department $department
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $department);
 
         $department->delete();

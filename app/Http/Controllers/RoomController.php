@@ -85,7 +85,8 @@ class RoomController extends Controller
     public function update(
         RoomUpdateRequest $request,
         Room $room
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $room);
 
         $validated = $request->validated();

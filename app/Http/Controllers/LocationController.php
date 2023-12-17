@@ -80,7 +80,8 @@ class LocationController extends Controller
     public function update(
         LocationUpdateRequest $request,
         Location $location
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $location);
 
         $validated = $request->validated();
@@ -98,7 +99,8 @@ class LocationController extends Controller
     public function destroy(
         Request $request,
         Location $location
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $location);
 
         $location->delete();

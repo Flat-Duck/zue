@@ -29,7 +29,8 @@ class FlightPassengersController extends Controller
         Request $request,
         Flight $flight,
         Passenger $passenger
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $flight);
 
         $flight->passengers()->syncWithoutDetaching([$passenger->id]);
@@ -41,7 +42,8 @@ class FlightPassengersController extends Controller
         Request $request,
         Flight $flight,
         Passenger $passenger
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $flight);
 
         $flight->passengers()->detach($passenger);

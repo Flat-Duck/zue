@@ -80,7 +80,8 @@ class StockController extends Controller
     public function update(
         StockUpdateRequest $request,
         Stock $stock
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $stock);
 
         $validated = $request->validated();

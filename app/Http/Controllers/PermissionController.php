@@ -46,7 +46,7 @@ class PermissionController extends Controller
 
         $data = $this->validate($request, [
             'name' => 'required|max:64',
-            'roles' => 'array'
+            'roles' => 'array',
         ]);
 
         $permission = Permission::create($data);
@@ -92,7 +92,7 @@ class PermissionController extends Controller
 
         $data = $this->validate($request, [
             'name' => 'required|max:40',
-            'roles' => 'array'
+            'roles' => 'array',
         ]);
 
         $permission->update($data);

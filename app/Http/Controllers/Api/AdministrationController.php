@@ -28,7 +28,8 @@ class AdministrationController extends Controller
 
     public function store(
         AdministrationStoreRequest $request
-    ): AdministrationResource {
+    ): AdministrationResource
+    {
         $this->authorize('create', Administration::class);
 
         $validated = $request->validated();
@@ -41,7 +42,8 @@ class AdministrationController extends Controller
     public function show(
         Request $request,
         Administration $administration
-    ): AdministrationResource {
+    ): AdministrationResource
+    {
         $this->authorize('view', $administration);
 
         return new AdministrationResource($administration);
@@ -50,7 +52,8 @@ class AdministrationController extends Controller
     public function update(
         AdministrationUpdateRequest $request,
         Administration $administration
-    ): AdministrationResource {
+    ): AdministrationResource
+    {
         $this->authorize('update', $administration);
 
         $validated = $request->validated();
@@ -63,7 +66,8 @@ class AdministrationController extends Controller
     public function destroy(
         Request $request,
         Administration $administration
-    ): Response {
+    ): Response
+    {
         $this->authorize('delete', $administration);
 
         $administration->delete();

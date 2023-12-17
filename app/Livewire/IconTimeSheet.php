@@ -9,14 +9,14 @@ class IconTimeSheet extends Component
 {
     public Employee $employee;
 
-    function mount(){
+    function mount()
+    {
         //$this->employee = $employee;
-        
     }
-    public function selectEmployee( Employee $employee){
-        // $this->dispatch('employee-found', $employee);        
+    public function selectEmployee(Employee $employee)
+    {
+        // $this->dispatch('employee-found', $employee);
         $this->redirectRoute('time-sheets.create', ['employee' => $employee]);
-
     }
     public function render()
     {

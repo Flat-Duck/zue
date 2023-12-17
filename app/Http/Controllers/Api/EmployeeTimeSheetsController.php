@@ -13,7 +13,8 @@ class EmployeeTimeSheetsController extends Controller
     public function index(
         Request $request,
         Employee $employee
-    ): TimeSheetCollection {
+    ): TimeSheetCollection
+    {
         $this->authorize('view', $employee);
 
         $search = $request->get('search', '');
@@ -30,7 +31,8 @@ class EmployeeTimeSheetsController extends Controller
     public function store(
         Request $request,
         Employee $employee
-    ): TimeSheetResource {
+    ): TimeSheetResource
+    {
         $this->authorize('create', TimeSheet::class);
 
         $validated = $request->validate([

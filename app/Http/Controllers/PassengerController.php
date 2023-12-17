@@ -80,7 +80,8 @@ class PassengerController extends Controller
     public function update(
         PassengerUpdateRequest $request,
         Passenger $passenger
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $passenger);
 
         $validated = $request->validated();
@@ -98,7 +99,8 @@ class PassengerController extends Controller
     public function destroy(
         Request $request,
         Passenger $passenger
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $passenger);
 
         $passenger->delete();

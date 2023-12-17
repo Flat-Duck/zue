@@ -83,7 +83,8 @@ class AdministrationController extends Controller
     public function update(
         AdministrationUpdateRequest $request,
         Administration $administration
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $administration);
 
         $validated = $request->validated();
@@ -101,7 +102,8 @@ class AdministrationController extends Controller
     public function destroy(
         Request $request,
         Administration $administration
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('delete', $administration);
 
         $administration->delete();

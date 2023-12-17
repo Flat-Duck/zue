@@ -13,7 +13,8 @@ class ResidenceRoomsController extends Controller
     public function index(
         Request $request,
         Residence $residence
-    ): RoomCollection {
+    ): RoomCollection
+    {
         $this->authorize('view', $residence);
 
         $search = $request->get('search', '');

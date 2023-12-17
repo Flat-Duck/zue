@@ -29,7 +29,8 @@ class RoomEmployeesController extends Controller
         Request $request,
         Room $room,
         Employee $employee
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $room);
 
         $room->employees()->syncWithoutDetaching([$employee->id]);
@@ -41,7 +42,8 @@ class RoomEmployeesController extends Controller
         Request $request,
         Room $room,
         Employee $employee
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $room);
 
         $room->employees()->detach($employee);

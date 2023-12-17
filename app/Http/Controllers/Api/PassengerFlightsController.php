@@ -13,7 +13,8 @@ class PassengerFlightsController extends Controller
     public function index(
         Request $request,
         Passenger $passenger
-    ): FlightCollection {
+    ): FlightCollection
+    {
         $this->authorize('view', $passenger);
 
         $search = $request->get('search', '');
@@ -31,7 +32,8 @@ class PassengerFlightsController extends Controller
         Request $request,
         Passenger $passenger,
         Flight $flight
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $passenger);
 
         $passenger->flights()->syncWithoutDetaching([$flight->id]);
@@ -43,7 +45,8 @@ class PassengerFlightsController extends Controller
         Request $request,
         Passenger $passenger,
         Flight $flight
-    ): Response {
+    ): Response
+    {
         $this->authorize('update', $passenger);
 
         $passenger->flights()->detach($flight);

@@ -47,7 +47,8 @@ class LocationController extends Controller
     public function update(
         LocationUpdateRequest $request,
         Location $location
-    ): LocationResource {
+    ): LocationResource
+    {
         $this->authorize('update', $location);
 
         $validated = $request->validated();

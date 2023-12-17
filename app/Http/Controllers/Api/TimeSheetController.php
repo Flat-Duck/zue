@@ -40,7 +40,8 @@ class TimeSheetController extends Controller
     public function show(
         Request $request,
         TimeSheet $timeSheet
-    ): TimeSheetResource {
+    ): TimeSheetResource
+    {
         $this->authorize('view', $timeSheet);
 
         return new TimeSheetResource($timeSheet);
@@ -49,7 +50,8 @@ class TimeSheetController extends Controller
     public function update(
         TimeSheetUpdateRequest $request,
         TimeSheet $timeSheet
-    ): TimeSheetResource {
+    ): TimeSheetResource
+    {
         $this->authorize('update', $timeSheet);
 
         $validated = $request->validated();

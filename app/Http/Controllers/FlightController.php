@@ -80,7 +80,8 @@ class FlightController extends Controller
     public function update(
         FlightUpdateRequest $request,
         Flight $flight
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $this->authorize('update', $flight);
 
         $validated = $request->validated();

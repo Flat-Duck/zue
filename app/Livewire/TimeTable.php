@@ -13,7 +13,7 @@ class TimeTable extends Component
 {
     public $years = [];
     public $year = 2023;
-    public $times =[] ;
+    public $times = [];
     // public $number = 1 ;
     public $range;
     public $val;
@@ -22,34 +22,35 @@ class TimeTable extends Component
 
     function mount()
     {
-        if($this->employee->id > 0) {
+        if ($this->employee->id > 0) {
             $this->getOtherEmployees();
         }
         $this->updateUi();
     }
 
-    private function valid(){
+    private function valid()
+    {
         
-        if(is_null($this->range) || is_null($this->val)){
+        if (is_null($this->range) || is_null($this->val)) {
             return false;
         }
         return true;
     }
-    public function save(){
+    public function save()
+    {
         
-        if(!$this->valid()) dd("Not Valid");
+        if (!$this->valid()) {
+            dd("Not Valid");
+        }
         
-        if(str_contains($this->range,'to'))
-        {
+        if (str_contains($this->range, 'to')) {
             $period = MomentsJs::getRange($this->range);
             
-            foreach ($period as $dt) 
-            {
+            foreach ($period as $dt) {
                 TimeSheetBuilder::create($dt, $this->employee->id, $this->val);
             }
-        }else
-        {
-            TimeSheetBuilder::create($this->range, $this->employee->id, $this->val);            
+        } else {
+            TimeSheetBuilder::create($this->range, $this->employee->id, $this->val);
         }
         $this->loadByYear();
     }
@@ -62,32 +63,36 @@ class TimeTable extends Component
             'employee' => $this->employee,
             'times' => $this->times,
             'years' => $this->years
-            ]);
+            ]
+        );
     }
    
 
-    function loadByYear() 
+    function loadByYear()
     {
         $this->times = TimeSheetBuilder::build($this->year, $this->employee->id);
         $this->updateUi();
     }
 
-    function updateUi() {
-        $this->years[0] = $this->year-1;
+    function updateUi()
+    {
+        $this->years[0] = $this->year - 1;
         $this->years[1] = $this->year;
-        $this->years[2] = $this->year+1;       
+        $this->years[2] = $this->year + 1;
     }
 
     #[On('employee-found')]
-    function employee(Employee $employee) {
-        Debugbar::critical('called');        
+    function employee(Employee $employee)
+    {
+        Debugbar::critical('called');
         $this->employee = $employee;
         $this->loadByYear();
         $this->getOtherEmployees();
     }
-    function updateyear($val) {
+    function updateyear($val)
+    {
         $this->year += $val;
-        $this->loadByYear();        
+        $this->loadByYear();
         $this->updateUi();
     }
     function getOtherEmployees()
