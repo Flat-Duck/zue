@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Helpers\TimeSheetBuilder;
+use App\Models\Scopes\DepartmentEmployees;
 use App\Models\Scopes\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class Employee extends Model
 {
@@ -14,7 +16,6 @@ class Employee extends Model
     use Searchable;
     use SoftDeletes;
 
-    protected $with = ['center','department','location','department.administration'];
     protected $fillable = [
         'number',
         'job',
@@ -46,6 +47,8 @@ class Employee extends Model
         'start_date',
         'last_date',
         'balance',
+        'total_working_days',
+        'total_off_days',
     ];
     
     protected $searchableFields = ['*'];
@@ -105,24 +108,46 @@ class Employee extends Model
 
     public function getLocationNameAttribute()
     {
-        return is_null($this->location)? '' : $this->location->name;
+        return optional($this->location)->name ?? '-';
     }
     public function getCenterNameAttribute()
     {
-        return is_null($this->center)? '' :  $this->center->name;
+        return optional($this->center)->name ?? '-';
     }
 
     public function getStartDateAttribute($date)
     {
-         return date('Y/m/d',strtotime($date));
+         return date('Y/m/d', strtotime($date));
     }
     public function getLastDateAttribute($date)
     {
-        return date('Y/m/d',strtotime($date));
+        return date('Y/m/d', strtotime($date));
     }
 
     public function getBalanceAttribute()
     {
-        return isset($this)? 10 : '-';
+        return TimeSheetBuilder::calculateBalance($this->id, $this->schedule);
+    }
+
+    public function getTotalWorkingDaysAttribute()
+    {
+        return $this->timeSheets()->whereIn('value', ['A','B','Y','K'])->count();
+    }
+
+    public function getTotalOffDaysAttribute()
+    {
+        return $this->timeSheets()->whereIn('value', ['F','X'])->count();
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        if(Auth::check()) {            
+            if(auth()->user()->hasRole('super_visor')) {
+
+                static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
+                // dd(auth()->user());
+            }
+        }
     }
 }

@@ -2,20 +2,22 @@
 <div>
     <div class="row g-3">
         <div class="col-1 p-0 overflow-auto" style="max-height: 20rem">
-            @for ($i = 0; $i < 100; $i++)
-                {{-- <div class="list-group list-group-flush list-group-hoverable"> --}}
-                    {{-- <div class="list-group-item m-0 ps-1 p-0"> --}}
-                        <div class="row align-items-center m-1">                      
-                            <div class="col-auto m-0 p-0">
-                                <span class="avatar avatar-xs rounded me-2">JL</span>
-                            </div>
-                            <div class="col-auto text-truncate ps-0">
-                                <a href="{{ route('time-sheets.fill', $i) }}" class="text-reset d-block">9094</a>
-                            </div>
+            @foreach ( $dep_employees as $id => $number)
+            {{-- <div class="list-group list-group-flush list-group-hoverable"> --}}
+                {{-- <div class="list-group-item m-0 ps-1 p-0"> --}}
+                    <div class="row align-items-center m-1">                      
+                        <div class="col-auto m-0 p-0">
+                            <span class="avatar avatar-xs rounded me-2">JL</span>
                         </div>
+                        <div class="col-auto text-truncate ps-0">
+                            <a href="{{ route('time-sheets.fill', $id) }}" class="text-reset d-block">{{$number}}</a>
+                        </div>
+                    </div>
                     {{-- </div> --}}
-                {{-- </div> --}}
-            @endfor
+                    {{-- </div> --}}
+                    
+                    
+                @endforeach
             {{-- <div class=" list-group-header bg-dark sticky-bottom list-group-item m-0 ps-1 p-0">
                 <div class="btn-group w-100" role="group">
                     <label class="btn tag"> < </label>

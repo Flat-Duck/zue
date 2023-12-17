@@ -26,7 +26,7 @@ class EmployeeController extends Controller
 
         $employees = Employee::search($search)
             ->latest()
-            ->paginate(5)
+            ->paginate(30)
             ->withQueryString();
 
         return view('app.employees.index', compact('employees', 'search'));

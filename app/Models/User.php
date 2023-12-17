@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasRole('super-admin');
     }
+
+    public function center()
+    {
+        return $this->employee->center_id;
+    }
 }

@@ -49,5 +49,17 @@ class TimeSheetBuilder
         }
         
         return $times->sortKeys();
-   }
+        
+    public static function calculateBalance(int $employee_id,string $schedule)
+    {
+
+        $sch = explode('/', $schedule);
+
+        //$count = TimeSheet::where('employee_id', $employee_id)->count('valye')->groupBy('value');
+        $count = TimeSheet::where('employee_id', $employee_id)->select('value', DB::raw('COUNT(value) as count'))->groupBy('value')->get();
+        foreach ($count as $key => $val) {
+              // dd($val);
+        }
+    }
+
 }

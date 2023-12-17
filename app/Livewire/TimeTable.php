@@ -17,11 +17,14 @@ class TimeTable extends Component
     // public $number = 1 ;
     public $range;
     public $val;
+    public $dep_employees = [];
     public Employee $employee;
 
     function mount()
     {
-        
+        if($this->employee->id > 0) {
+            $this->getOtherEmployees();
+        }
         $this->updateUi();
     }
 
@@ -80,10 +83,16 @@ class TimeTable extends Component
         Debugbar::critical('called');        
         $this->employee = $employee;
         $this->loadByYear();
+        $this->getOtherEmployees();
     }
     function updateyear($val) {
         $this->year += $val;
         $this->loadByYear();        
         $this->updateUi();
+    }
+    function getOtherEmployees()
+    {
+        $this->dep_employees = $this->employee->center->employees()->pluck('id', 'number');
+        //dd($this->dep_employees);
     }
 }

@@ -16,6 +16,7 @@ class FlightEmployeesDetail extends Component
     public Employee $employee;
     public $employeesForSelect = [];
     public $employee_id = null;
+    public $id;
 
     public $showingModal = false;
     public $modalTitle = 'New Employee';
@@ -52,11 +53,13 @@ class FlightEmployeesDetail extends Component
     {
         $this->resetErrorBag();
         $this->showingModal = true;
+        $this->js("$('#$this->id').modal('show');");
     }
 
     public function hideModal(): void
     {
         $this->showingModal = false;
+        $this->js("$('#$this->id').modal('hide');");
     }
 
     public function save(): void
