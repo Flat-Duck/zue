@@ -115,6 +115,15 @@
                                 <span class="form-selectgroup-label">{{$V}}</span>
                             </label>
                         @endforeach
+                        
+
+                        <div class="col-6 col-sm-4 col-md-2 col-xl-auto">
+                            <a class="btn btn-pinterest w-100" wire:confirm="ok?" wire:click="destroy">
+                                Delete <i class="ti ti-trash-x"> </i>
+                            </a>
+                          </div>
+                            
+                        
                     </div>
                 </div>
             </div>

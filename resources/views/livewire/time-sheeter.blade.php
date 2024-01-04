@@ -81,6 +81,10 @@
                                 <span class="form-selectgroup-label">{{$V}}</span>
                             </label>
                         @endforeach
+                        <label class="form-selectgroup-item">
+                            <input type="radio" wire:confirm="ok?" wire:click="destroy" class="form-selectgroup-input">
+                            <span class="form-selectgroup-label">Delete</span>
+                        </label>
                     </div>
                 </div>
             </div>

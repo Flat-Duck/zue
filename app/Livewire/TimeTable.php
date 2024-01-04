@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Helpers\MomentsJs;
 use App\Helpers\TimeSheetBuilder;
+use App\Jobs\CalculateBalance;
 use App\Models\Employee;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Livewire\Attributes\On;
@@ -52,6 +53,22 @@ class TimeTable extends Component
         } else {
             TimeSheetBuilder::create($this->range, $this->employee->id, $this->val);
         }
+        CalculateBalance::dispatch($this->employee);
+        $this->loadByYear();
+    }
+    public function destroy()
+    {
+        
+        if (str_contains($this->range, 'to')) {
+            $period = MomentsJs::getRange($this->range);
+            
+            foreach ($period as $dt) {
+                TimeSheetBuilder::destroy($dt, $this->employee->id);
+            }
+        } else {
+            TimeSheetBuilder::destroy($this->range, $this->employee->id);
+        }
+        CalculateBalance::dispatch($this->employee);
         $this->loadByYear();
     }
 

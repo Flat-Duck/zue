@@ -16,6 +16,8 @@ use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdministrationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,12 +57,8 @@ Route::prefix('/')
         Route::resource('time-sheets', TimeSheetController::class);
         Route::resource('users', UserController::class);
         Route::resource('employees', EmployeeController::class);
-        Route::get('profile', [
-            \App\Http\Controllers\ProfileController::class,
-            'show',
-        ])->name('profile.show');
-        Route::put('profile', [
-            \App\Http\Controllers\ProfileController::class,
-            'update',
-        ])->name('profile.update');
+        Route::get('profile', [ProfileController::class, 'show' ])->name('profile.show');
+        Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('reports', [ReportController::class, 'index'])->name('admin.reports.index');
+        Route::post('reports/minus', [ReportController::class, 'minus'])->name('admin.reports.minus');
     });

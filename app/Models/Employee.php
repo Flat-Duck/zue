@@ -126,7 +126,13 @@ class Employee extends Model
 
     public function getBalanceAttribute()
     {
-        return TimeSheetBuilder::calculateBalance($this->id, $this->schedule);
+        return $this->total_balance;
+    }
+    public function calculateBalance()
+    {
+        $balance = TimeSheetBuilder::calculateBalance($this->id, $this->schedule, $this->transfered_balance);
+        $this->total_balance = $balance;
+        $this->save();
     }
 
     public function getTotalWorkingDaysAttribute()
