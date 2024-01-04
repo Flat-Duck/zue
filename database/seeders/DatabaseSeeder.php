@@ -88,19 +88,19 @@ class DatabaseSeeder extends Seeder
         //Eloquent::unguard();
 
         
-        $path = 'database\seeders\data\centers.sql';
+        $path = __DIR__ . '/data/centers.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('centers Data seeded!');
-        $path = 'database\seeders\data\departments.sql';
+        $path = __DIR__ . '/data/departments.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('departments Data seeded!');
-        $path = 'database\seeders\data\locations.sql';
+        $path = __DIR__ . '/data/locations.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('locations Data seeded!');
-        $path = 'database\seeders\data\employees.sql';
+        $path = __DIR__ . '/data/employees.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('employees Data seeded!');
-        $path = 'database\seeders\data\timesheets.sql';
+        $path = __DIR__ . '/data/timesheets.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('timesheets Data seeded!');
                      
