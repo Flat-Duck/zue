@@ -8,7 +8,7 @@
         @endcan
     </div>
 
-    <x-modal id="{{$id}}" wire:model="showingModal">
+    <x-modal id="{{$id}}" wire:model.live="showingModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ $modalTitle }}</h5>
@@ -29,7 +29,7 @@
                         <x-inputs.select
                             name="passenger_id"
                             label="Passenger"
-                            wire:model="passenger_id"
+                            wire:model.live="passenger_id"
                         >
                             <option value="null" disabled>Please select the Passenger</option>
                             @foreach($passengersForSelect as $value => $label)

@@ -104,14 +104,14 @@
             <div class="row g-5">
                 <div class="col-7">
                     <div class="flatpickr" wire:ignore>
-                        <input id="time" wire:model="range" x-data x-init="flatpickr($refs.input, {{ $options }} );" x-ref="input" type="hidden" data-input style="display: none;" />
+                        <input id="time" wire:model.live="range" x-data x-init="flatpickr($refs.input, {{ $options }} );" x-ref="input" type="hidden" data-input style="display: none;" />
                     </div>
                 </div>
                 <div class="col-5">
                     <div class="form-selectgroup">
                         @foreach(range('A','Z') as $V) 
                             <label class="form-selectgroup-item">
-                                <input type="radio" wire:confirm="ok?" wire:click="save" wire:model="val" value="{{$V}}" class="form-selectgroup-input">
+                                <input type="radio" wire:confirm="ok?" wire:click="save" wire:model.live="val" value="{{$V}}" class="form-selectgroup-input">
                                 <span class="form-selectgroup-label">{{$V}}</span>
                             </label>
                         @endforeach
