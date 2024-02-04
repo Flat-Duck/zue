@@ -1,4 +1,41 @@
-
+@extends('layouts.app', ['page' => 'employees'])
+@section('content')
+@section('styles')
+<style>
+    /* @page {size:landscape}  
+    @media print{
+        @page {size: A4 landscape;max-height:100%; max-width:100%}
+        use width if in portrait (use the smaller size to try 
+        and prevent image from overflowing page...
+        img { height: 90%; margin: 0; padding: 0; }
+        body{
+            width:100%;
+            height:100%;
+            visibility: hidden;
+            -webkit-transform: rotate(-90deg) scale(.68,.68); 
+            writing-mode: tb-rl;
+            @page { 
+                size: landscape;
+            }
+        #headTable {
+            width: 100%;
+            border: solid;
+            }
+        #section-to-print {
+            visibility: visible;
+            position: absolute;
+            left: 0; */
+            /* top: 0;
+            }
+        .row{
+            display: block;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+    }
+}
+*/
 
 @media print {
     .pagebreak { page-break-before: always; } page-break-after works, as well
@@ -30,7 +67,35 @@ table tr:last-child {
 @endsection
 <div class="card">
     <div class="card-body border-bottom" id="section-to-print">
-        <div  class="table-responsive p-0" >
+        <div id="pageHead"  style="position: fixed;">
+            <table border="1" class="table table-vcenter text-center" >
+                <tbody>
+                    <tr style="height: 55px;">
+                        <td style="width: 20%; height: 43px;"><img alt="" /></td>
+                        <td style="width: 20%; height: 43px;" colspan="3">
+                            <p style="text-align: center;">حقول الانتصار 103&nbsp;</p>
+                            <p style="text-align: center;">بطاقة ضبط اوقت</p>
+                        </td>
+                        <td style="width: 20%; height: 43px; text-align: center;"><img alt="" /></td>
+                    </tr>
+                    <tr style="height: 30px; text-align: center;">
+                        <td style="width: 20%; height: 30px;">السنة</td>
+                        <td style="width: 20%; height: 30px;">الشهر</td>
+                        <td style="width: 20%; height: 30px;">مركز التكلفة</td>
+                        <td style="width: 20%; height: 30px;">القسم</td>
+                        <td style="width: 20%; height: 30px;">الادارة&nbsp;</td>
+                    </tr>
+                    <tr style="height: 30px; text-align: center;">
+                        <td style="width: 20%; height: 30px;"></td>
+                        <td style="width: 20%; height: 30px;"></td>
+                        <td style="width: 20%; height: 30px;"></td>
+                        <td style="width: 20%; height: 30px;"></td>
+                        <td style="width: 20%; height: 30px;"></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            <div  class="table-responsive p-0" >
             <table  class="table table-vcenter text-center " border="1">
                 <thead>
                     <tr id="mainTable">
@@ -78,6 +143,14 @@ table tr:last-child {
                             <tr class="pagebreak"></tr>
                         @endif
                     @endforeach
+
+                    
+                    {{-- <tr class="bg-muted text-white">
+                        <td class="p-1" colspan="32"></td>
+                        <td class="p-1"> {{$tw}} </td>
+                        <td class="p-1"> {{$tf}} </td>
+                        <td class="p-1">-10</td>
+                    </tr> --}}
                 </tbody>
             </table>
         </div>

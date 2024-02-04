@@ -227,7 +227,7 @@ class DatabaseSeeder extends Seeder
         $user = \App\Models\User::factory()
         ->count(1)
         ->create([
-        'id' => 7275,
+        'id' => 9124,
         'name' =>'ارسينو بالو',
         'email' => 'balo91241970@gmail.com',
         'password' => Hash::make("913011447"),
