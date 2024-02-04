@@ -36,7 +36,7 @@
                   Dunn Slane</a>
                 <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2" style="background-image: url(./static/avatars/000f.jpg)"></span>
                     Emmy Levet</a> --}}
-        <div class="col-6 mb-3">
+        <div class="col-5 mb-3">
             <div class="row row-cards">
                 <div class="col-2 mt-3">
                     <div class="mb-3">
@@ -115,18 +115,20 @@
                                 <span class="form-selectgroup-label">{{$V}}</span>
                             </label>
                         @endforeach
-                        
-
+                        @if($revise)
                         <div class="col-6 col-sm-4 col-md-2 col-xl-auto">
                             <a class="btn btn-pinterest w-100" wire:confirm="ok?" wire:click="destroy">
                                 Delete <i class="ti ti-trash-x"> </i>
                             </a>
                           </div>
-                            
-                        
+                        @endif            
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="col-1 mb-3">
+            <label for="ov">Over time</label>
+                <input type="text" value="2" wire:model="ov" class="form-control" >
         </div>
     </div>
 
@@ -205,7 +207,13 @@
     window.onload = function () {
         flatpickr("#time", {
             inline: true,
-            mode: "range"
+            mode: "range",
+            enable: [
+                {
+                    from: "2024-04-01",
+                    to: "2024-05-01",
+                }
+            ]
         });
     
         console.log("DOM fully loaded and parsed last thing");

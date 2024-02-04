@@ -108,17 +108,14 @@ class TimeSheetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, TimeSheet $timeSheet): View
+    public function edit(Request $request, Employee $employee): View
     {
-        $this->authorize('update', $timeSheet);
+        //$this->authorize('update', $timeSheet);
 
-        $employees = Employee::pluck('job', 'id');
-        $users = User::pluck('name', 'id');
+        //$employees = Employee::pluck('job', 'id');
+        //$users = User::pluck('name', 'id');
 
-        return view(
-            'app.time_sheets.edit',
-            compact('timeSheet', 'employees', 'users')
-        );
+        return view('app.time_sheets.edit', compact('employee'));
     }
 
     /**

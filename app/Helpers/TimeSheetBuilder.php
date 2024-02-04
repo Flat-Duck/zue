@@ -2,16 +2,17 @@
 
 namespace App\Helpers;
 
+use App\Models\Center;
 use App\Models\TimeSheet;
 use Illuminate\Support\Facades\DB;
 
 class TimeSheetBuilder
 {
-    public static function create($day, int $employee_id, string $value)
+    public static function create($day, int $employee_id, string $value, int $over_time)
     {
         return TimeSheet::firstOrCreate(
             ['day' => $day, 'employee_id' => $employee_id ],
-            ['value' => $value, 'user_id' => auth()->id()]
+            ['value' => $value, 'user_id' => auth()->id(), 'over_time' => $over_time]
         );
     }
 
@@ -71,5 +72,15 @@ class TimeSheetBuilder
 
         $total = $w * $sch[0] / $sch[1] - $f;
         return $total + $transfered_balance;
+    }
+
+    public static function unApprovedTimeSheets(Center $center)
+    {
+        
+    }
+
+    public static function approvrTimeSheets($employee_id, $approved_by)
+    {
+        return TimeSheet::where('employee_id', $employee_id)->update([$approved_by => auth()->id()]);
     }
 }

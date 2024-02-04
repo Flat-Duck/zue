@@ -12,13 +12,17 @@
     <div class="card-body">
         <div class="col-12">
             {{-- @livewire('time-sheeter') --}}
-            @livewire('time-table',['employee' => $employee])
+            @livewire('time-table',['employee' => $employee, 'revise' => false])
             {{-- @livewire ('t-s-table') --}}
         </div>
     </div>
     <div class="card-footer text-end">
         <div class="d-flex">
-            <a href="{{ route('time-sheets.index') }}" class="btn btn-outline-secondary">@lang('crud.common.back')</a>
+            <a href="{{ route('time-sheets.index') }}" class="btn btn-outline-secondary">@lang('crud.common.back')</a>            
+         
+            <button type="submit" class="btn btn-primary">
+                <i class="ti ti-check"></i> @lang('crud.time_sheets.time_keeper_approve')
+            </button>
         </div>
     </div>
 </div>

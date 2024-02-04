@@ -145,6 +145,7 @@ return [
         'create_title' => 'Create TimeSheet',
         'edit_title' => 'Edit TimeSheet',
         'show_title' => 'Show TimeSheet',
+        'time_keeper_approve' => 'Timekeeper Approve',
         'inputs' => [
             'value' => 'Value',
             'day' => 'Day',

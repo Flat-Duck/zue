@@ -13,6 +13,7 @@ use Livewire\Component;
 class TimeTable extends Component
 {
     public $years = [];
+    public $ov = 2;
     public $year = 2023;
     public $times = [];
     // public $number = 1 ;
@@ -20,7 +21,13 @@ class TimeTable extends Component
     public $val;
     public $dep_employees = [];
     public Employee $employee;
+    public bool $revise = false;
 
+    function boot()
+    {
+        //  $this->year = now()->year;
+    }
+    
     function mount()
     {
         if ($this->employee->id > 0) {
@@ -39,6 +46,7 @@ class TimeTable extends Component
     }
     public function save()
     {
+       // dd($this->ov);
         
         if (!$this->valid()) {
             dd("Not Valid");
@@ -48,10 +56,10 @@ class TimeTable extends Component
             $period = MomentsJs::getRange($this->range);
             
             foreach ($period as $dt) {
-                TimeSheetBuilder::create($dt, $this->employee->id, $this->val);
+                TimeSheetBuilder::create($dt, $this->employee->id, $this->val, $this->ov);
             }
         } else {
-            TimeSheetBuilder::create($this->range, $this->employee->id, $this->val);
+            TimeSheetBuilder::create($this->range, $this->employee->id, $this->val, $this->ov);
         }
         CalculateBalance::dispatch($this->employee);
         $this->loadByYear();

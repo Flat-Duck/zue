@@ -18,6 +18,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Models\TimeSheet;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +31,14 @@ use App\Http\Controllers\ReportController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/ss', function () {
+     
+    $month_name = "April";
+    $chunk = TimeSheet::whereMonth('day', 10)->whereYear('day', '2023')->limit('3100')->get();
+    $chunks = $chunk->groupBy('employee_id')->chunk(10);
+    $month_days = Carbon\Carbon::now()->month($month_name)->daysInMonth + 1;
+
+    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days'));
 });
 
 Auth::routes();
@@ -54,6 +61,7 @@ Route::prefix('/')
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
         Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
+        Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
         Route::resource('time-sheets', TimeSheetController::class);
         Route::resource('users', UserController::class);
         Route::resource('employees', EmployeeController::class);
