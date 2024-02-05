@@ -36,7 +36,7 @@ class TimeSheetController extends Controller
 
         $employees = Employee::search($search)
             ->latest()
-            ->paginate(5)
+            ->paginate(20)
             ->withQueryString();
 
         //return view('app.employees.index', compact('employees', 'search'));
