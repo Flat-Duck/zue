@@ -149,9 +149,8 @@ class Employee extends Model
     {
         parent::boot();
         if (Auth::check()) {
-            if (auth()->user()->hasRole('super_visor')) {
+            if (auth()->user()->hasRole('super-visor')) {
                 static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
-                // dd(auth()->user());
             }
         }
     }
