@@ -210,14 +210,14 @@
             mode: "range",
             enable: [
                 {
-                    from: "2024-04-01",
-                    to: "2024-05-01",
+                    from: "2024-01-01",
+                    to: "2024-06-01",
                 }
             ]
         });
     
         console.log("DOM fully loaded and parsed last thing");
-    }; 
+    };
 
 </script>
 @endsection
