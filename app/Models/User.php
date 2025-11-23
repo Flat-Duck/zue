@@ -18,7 +18,7 @@ class User extends Authenticatable
     use Searchable;
     use HasApiTokens;
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['id','number','name', 'email', 'password'];
 
     protected $searchableFields = ['*'];
 
@@ -30,7 +30,7 @@ class User extends Authenticatable
 
     public function employee()
     {
-        return $this->hasOne(Employee::class);
+        return $this->hasOne(Employee::class,'id','id');
     }
 
     public function timeSheets()
@@ -46,5 +46,37 @@ class User extends Authenticatable
     public function center()
     {
         return $this->employee->center_id;
+    }
+
+    public function department()
+    {
+        return $this->employee->department_id;
+    }
+
+    public function location()
+    {
+        return $this->employee->location_id;
+    }
+
+    public function employee_level()
+    {
+        return $this->employee->employee_level;
+    }
+
+    public function management_level()
+    {
+        return $this->employee->management_level;
+    }
+
+    public function signature() {
+        return $this->hasOne(Signature::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->id = $user->number;
+            $user->save();
+        });
     }
 }
