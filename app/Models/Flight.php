@@ -11,12 +11,13 @@ class Flight extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['type', 'date', 'time'];
+    protected $fillable = ['type', 'date', 'time','plane_id'];
 
     protected $searchableFields = ['*'];
 
     protected $casts = [
         'date' => 'date',
+        'time' => 'datetime',
     ];
 
     public function passengers()
@@ -27,5 +28,9 @@ class Flight extends Model
     public function employees()
     {
         return $this->belongsToMany(Employee::class);
+    }
+    public function plane()
+    {
+        return $this->belongsTo(Plane::class);
     }
 }

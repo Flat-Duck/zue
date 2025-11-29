@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Room;
 use Illuminate\View\View;
 use App\Models\Residence;
@@ -22,9 +23,17 @@ class RoomController extends Controller
         $search = $request->get('search', '');
 
         $rooms = Room::search($search)
-            ->latest()
-            ->paginate(5)
+            ->paginate(50)
             ->withQueryString();
+
+            // foreach ($rooms as $k => $room)
+            // {
+            //     $room->update(['beds'=>1]);
+            //     if(in_array($room->residence->name,['40','41','42','43','44','45','46','48']) && $room->residence->type == "VILLA")
+            //     {
+            //         $room->update(['beds'=>2]);
+            //     }
+            // }
 
         return view('app.rooms.index', compact('rooms', 'search'));
     }
@@ -36,9 +45,11 @@ class RoomController extends Controller
     {
         $this->authorize('create', Room::class);
 
-        $residences = Residence::pluck('name', 'id');
+        //$residences = Residence::pluck('name', 'id');
+        $residences = Residence::all();
+        $employees = Employee::pluck('number', 'id');
 
-        return view('app.rooms.create', compact('residences'));
+        return view('app.rooms.create', compact('residences','employees'));
     }
 
     /**
@@ -51,7 +62,8 @@ class RoomController extends Controller
         $validated = $request->validated();
 
         $room = Room::create($validated);
-
+        $room->employees()->syncWithoutDetaching($request->employee_id);
+        
         return redirect()
             ->route('rooms.edit', $room)
             ->withSuccess(__('crud.common.created'));
@@ -74,9 +86,11 @@ class RoomController extends Controller
     {
         $this->authorize('update', $room);
 
-        $residences = Residence::pluck('name', 'id');
+        $residences = Residence::all();
+        $employees = Employee::pluck('number', 'id');
+        $residents = $room->employees()->pluck('number', 'id')->toArray();
 
-        return view('app.rooms.edit', compact('room', 'residences'));
+        return view('app.rooms.edit', compact('room', 'residences','employees','residents'));
     }
 
     /**
@@ -90,7 +104,7 @@ class RoomController extends Controller
         $this->authorize('update', $room);
 
         $validated = $request->validated();
-
+        $room->employees()->sync($request->employee_id);
         $room->update($validated);
 
         return redirect()

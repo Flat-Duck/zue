@@ -3,9 +3,16 @@
 namespace App\Models;
 
 use App\Helpers\TimeSheetBuilder;
+use App\Models\Scopes\ArchivedEmployees;
 use App\Models\Scopes\DepartmentEmployees;
 use App\Models\Scopes\Searchable;
+use App\Models\Scopes\SoftArchives;
+use App\Models\Scopes\SoftArchivingScope;
+use Carbon\Carbon;
+use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +22,7 @@ class Employee extends Model
     use HasFactory;
     use Searchable;
     use SoftDeletes;
+    use SoftArchives;
 
     protected $fillable = [
         'number',
@@ -37,6 +45,8 @@ class Employee extends Model
         'last_date',
         'total_balance',
         'archived_at',
+        'management_level',
+        'employee_level',
     ];
     
     protected $appends = [
@@ -49,6 +59,7 @@ class Employee extends Model
         'balance',
         'total_working_days',
         'total_off_days',
+        'default_over_time_value',
     ];
     
     protected $searchableFields = ['*'];
@@ -70,6 +81,31 @@ class Employee extends Model
     {
         return $this->hasMany(TimeSheet::class);
     }
+    public function clinicApointments ()
+    {
+        return $this->hasMany(ClinicApointment::class);
+    }
+    public function apointments ()
+    {
+        $appointments = $this->clinicApointments
+        // ->select(
+        //     DB::raw('YEAR(created_at) as year'),
+        //     DB::raw('MONTHNAME(created_at) as month'),
+        //     DB::raw('COUNT(*) as count'))
+        //     ->groupBy('year', 'month')
+        //     ->get();
+
+            ->map(function($appointment) {
+                $appointment->year = Carbon::parse($appointment->date)->format('Y');
+                $appointment->month = Carbon::parse($appointment->date)->format('F');
+                return $appointment;
+            });
+                // Group appointments by year and month 
+        return $appointments->groupBy(function($appointment)
+        {
+            return $appointment->year . '-' . $appointment->month;
+        });
+    }
 
     public function department()
     {
@@ -88,31 +124,35 @@ class Employee extends Model
 
     public function rooms()
     {
-        return $this->belongsToMany(Room::class);
+        return $this->belongsToMany(Room::class)->withPivot(['is_here', 'is_owner']);
     }
 
     public function flights()
     {
         return $this->belongsToMany(Flight::class);
     }
+    public function getOwnRoomAttribute()
+    {
+        return $this->rooms()->where('is_owner',true)->exists();
+    }
 
     public function getAdministrationNameAttribute()
     {
-        return optional($this->department->administration)->name ?? '-';
+        return Administration::first()->name;
     }
     
     public function getDepartmentNameAttribute()
     {
-        return optional($this->department)->name ?? '-';
+        return Department::first()->name;
     }
 
     public function getLocationNameAttribute()
     {
-        return optional($this->location)->name ?? '-';
+        return Location::first()->name;
     }
     public function getCenterNameAttribute()
     {
-        return optional($this->center)->name ?? '-';
+        return Center::first()->name;
     }
 
     public function getStartDateAttribute($date)
@@ -135,6 +175,7 @@ class Employee extends Model
         $this->save();
     }
 
+
     public function getTotalWorkingDaysAttribute()
     {
         return $this->timeSheets()->whereIn('value', ['A', 'B', 'Y', 'K'])->count();
@@ -144,14 +185,167 @@ class Employee extends Model
     {
         return $this->timeSheets()->whereIn('value', ['F', 'X'])->count();
     }
+    
+    public function getDefaultOverTimeValueAttribute()
+    {
+        return 2;
+    }
+
+
+    public function isSupervisor(): bool
+    {
+        return $this->hasRole('supervisor');
+    }
+
+    public function isCoordinator(): bool
+    {
+        return $this->hasRole('coordinator');
+    }
+
+    public function isSuperintendent(): bool
+    {
+        return $this->hasRole('superintendent');
+    }
+
+    public function isTimekeeper(): bool
+    {
+        return $this->hasRole('timekeeper');
+    }
+    
+    public function managementScopes(): HasMany
+    {
+        return $this->hasMany(ManagementScope::class, 'manager_id');
+    }
+
+    public function getFullNameAttribute(): string
+    {
+        return (string) $this->english_name;
+    }
+
+    public function isArchived(): bool
+    {
+        return !is_null($this->archived_at);
+    }
+
+    /**
+     * Query builder for all employees this employee can manage.
+     * Use this if you want to paginate, eager-load, etc.
+     */
+    public function managedEmployeesQuery(): Builder
+    {
+        $scopes = $this->managementScopes()->get();
+
+        // If no scope is defined, this manager manages nobody
+        if ($scopes->isEmpty()) {
+            return static::query()->whereRaw('0 = 1');
+        }
+
+        return static::query()
+            ->whereNull('archived_at')
+            ->where('id', '!=', $this->id)
+            ->where(function (Builder $q) use ($scopes) {
+                foreach ($scopes as $scope) {
+                    switch ($scope->scope_type) {
+                        case ManagementScope::TYPE_GLOBAL:
+                            $q->orWhereRaw('1 = 1');
+                            break;
+
+                        case ManagementScope::TYPE_LOCATION:
+                            if ($scope->location_id) {
+                                $q->orWhere('location_id', $scope->location_id);
+                            }
+                            break;
+
+                        case ManagementScope::TYPE_DEPARTMENT:
+                            if ($scope->location_id && $scope->department_id) {
+                                $q->orWhere(function (Builder $q2) use ($scope) {
+                                    $q2
+                                        ->where('location_id', $scope->location_id)
+                                        ->where('department_id', $scope->department_id);
+                                });
+                            }
+                            break;
+
+                        case ManagementScope::TYPE_CENTER:
+                            if ($scope->center_id) {
+                                $q->orWhere('center_id', $scope->center_id);
+                            }
+                            break;
+
+                        case ManagementScope::TYPE_EMPLOYEE:
+                            if ($scope->subordinate_employee_id) {
+                                $q->orWhere('id', $scope->subordinate_employee_id);
+                            }
+                            break;
+                    }
+                }
+            });
+    }
+
+    /**
+     * Get all managed employees as a collection.
+     */
+    public function managedEmployees()
+    {
+        return $this->managedEmployeesQuery()->get();
+    }
+
+    /**
+     * True/false check if this employee can manage the target.
+     */
+    public function canManage(Employee $target): bool
+    {
+        if ($this->id === $target->id) {
+            return false;
+        }
+
+        if ($this->trashed() || $target->trashed()) {
+            return false;
+        }
+
+        if ($this->isArchived() || $target->isArchived()) {
+            return false;
+        }
+
+        return $this
+            ->managedEmployeesQuery()
+            ->where('id', $target->id)
+            ->exists();
+    }
+
+    /**
+     * High-level check: can this employee manage the target employee?
+     */
+    // public function canManage(Employee $target): bool
+    // {
+    //     $scopes = $this->managementScopes()->get();
+
+    //     foreach ($scopes as $scope) {
+    //         if ($scope->matchesTargetEmployee($target)) {
+    //             return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
 
     protected static function boot()
     {
         parent::boot();
-        if (Auth::check()) {
-            if (auth()->user()->hasRole('super-visor')) {
-                static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
-            }
-        }
+        // if (Auth::check() && auth()->user()->hasRole('super-visor'))
+        // {
+        //     static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
+        // }
+        // if (Auth::check() && (auth()->user()->hasRole('super-visor')
+        //     ||auth()->user()->hasRole('super-visor') ||auth()->user()->hasRole('super-visor')))
+        // {
+        //     static::addGlobalScope(new UnderSupervisionEmployees(
+        //         auth()->user()->center(),
+        //         auth()->user()->department(),
+        //         auth()->user()->location()
+        //         )
+        //     );
+        // }
+        static::addGlobalScope(new SoftArchivingScope);
     }
 }

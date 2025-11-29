@@ -9,12 +9,20 @@ window._ = _;
 
 import popper from 'popper.js';
 import jquery from 'jquery';
+import SignaturePad from '@tabler/core/dist/libs/signature_pad';
 import bootstrap from 'bootstrap';
-
+//import TomSelect from 'tom-select';
+// import 'tom-select'
+import TomSelect from 'tom-select';
 try {
 
+    
     window.Popper = popper;
-    window.$ = window.jQuery = jquery;
+    window.$ = window.jQuery = jquery;    
+    window.TomSelect = TomSelect || {};
+    window.SignaturePad = SignaturePad;
+    // const selectElement = document.querySelector('#my-select');
+    // const tomSelect = new TomSelect(selectElement, { create: true });
     
 } catch (e) {}
 

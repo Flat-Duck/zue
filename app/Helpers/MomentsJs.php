@@ -5,7 +5,7 @@ namespace App\Helpers;
 use Carbon\CarbonPeriod;
 use stdClass;
 
-class MomentsJs 
+class MomentsJs
 {
    public $months;
 

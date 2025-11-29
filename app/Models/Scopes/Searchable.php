@@ -25,6 +25,23 @@ trait Searchable
      * Adds a scope to search the table based on the
      * $searchableFields array inside the model
      */
+    public function scopeWithArchived(Builder $query): Builder
+    {
+        return $query->orWhereNotNull('archived_at');
+    }
+    /**
+     * Adds a scope to search the table based on the
+     * $searchableFields array inside the model
+     */
+    public function scopeWithoutArchived(Builder $query): Builder
+    {
+        return $query->WhereNull('archived_at');
+    }
+
+    /**
+     * Adds a scope to search the table based on the
+     * $searchableFields array inside the model
+     */
     public function scopeSearch(Builder $query, string $search): Builder
     {
         $query->where(function ($query) use ($search) {
@@ -62,5 +79,30 @@ trait Searchable
         return $this->getConnection()
             ->getSchemaBuilder()
             ->getColumnListing($tableName);
+    }
+
+        /**
+     * Adds a scope to search the table based on the
+     * $searchableFields array inside the model
+     */
+    public function scopeByDepartment(Builder $query, $department_id): Builder
+    {
+        return $query->Where('department_id',$department_id);
+    }
+        /**
+     * Adds a scope to search the table based on the
+     * $searchableFields array inside the model
+     */
+    public function scopeByCenter(Builder $query, $center_id): Builder
+    {
+        return $query->Where('center_id',$center_id);
+    }
+        /**
+     * Adds a scope to search the table based on the
+     * $searchableFields array inside the model
+     */
+    public function scopeByLocation(Builder $query, $location_id): Builder
+    {
+        return $query->Where('location_id',$location_id);
     }
 }

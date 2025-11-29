@@ -28,7 +28,7 @@ class FlightEmployeesDetail extends Component
     public function mount(Flight $flight): void
     {
         $this->flight = $flight;
-        $this->employeesForSelect = Employee::pluck('job', 'id');
+        $this->employeesForSelect = Employee::pluck('number', 'id');
         $this->resetEmployeeData();
     }
 

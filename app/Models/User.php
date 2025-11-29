@@ -31,6 +31,8 @@ class User extends Authenticatable
     public function employee()
     {
         return $this->hasOne(Employee::class,'id','id');
+        // If you want to use employees.user_id instead, change to:
+        // return $this->hasOne(Employee::class, 'user_id', 'id');
     }
 
     public function timeSheets()
@@ -78,5 +80,59 @@ class User extends Authenticatable
             $user->id = $user->number;
             $user->save();
         });
+    }
+
+    /**
+     * Employees managed by this user (via linked employee).
+     */
+    public function managedEmployees()
+    {
+        if (!$this->employee) {
+            return collect();
+        }
+
+        return $this->employee->managedEmployees();
+    }
+
+    /**
+     * Query builder for employees managed by this user.
+     * Useful for pagination and eager loading.
+     */
+    public function managedEmployeesQuery()
+    {
+        if (!$this->employee) {
+            return Employee::query()->whereRaw('0 = 1');
+        }
+
+        return $this->employee->managedEmployeesQuery();
+    }
+
+    /**
+     * Users corresponding to the employees this user manages.
+     * This assumes user.id == employee.id (like in your booted override).
+     */
+    public function managedUsers()
+    {
+        $employeeIds = $this->managedEmployees()->pluck('id');
+
+        if ($employeeIds->isEmpty()) {
+            return collect();
+        }
+
+        return static::query()
+            ->whereIn('id', $employeeIds)
+            ->get();
+    }
+
+    /**
+     * Check if this user can manage another user.
+     */
+    public function canManageUser(User $target): bool
+    {
+        if (!$this->employee || !$target->employee) {
+            return false;
+        }
+
+        return $this->employee->canManage($target->employee);
     }
 }

@@ -1,80 +1,175 @@
 @extends('layouts.app', ['page' => 'employees'])
 @section('content')
 @section('styles')
- <style>
-    
-    .centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-/* Container holding the image and the text */
-.container {
-  position: relative;
-  text-align: center;
-  color: white;
-  min-height: 60px;
-}
-    @media print 
-    {
-        html, body{height:100%;width:100%;margin:0;padding:0;}
-        
-        img {
-            /* width:100%; */
-            height:100%;
-            display:block;
+    <style>
+        .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        
-        @page 
-        {
-            size: A4 landscape;
-            max-height:100%;
-            max-width:100%;
-            margin-bottom: 0px;
-            margin-top: 0px;
-            margin-left: 10px;
-            margin-right: 10px;
+        /* Container holding the image and the text */
+        .container {
+            position: relative;
+            text-align: center;
+            color: white;
+            min-height: 60px;
         }
-        .pagebreak { page-break-after: always; }
-    }
-    .header
-    {
-        max-height: 120px;
-        margin: 0px;
-        margin-top: 10px;
-    }
-    .box
-    {
-        border: 1px solid black;
-        margin: 0px;
-        margin-left: 2px;        
-    }
-    
-    .divider{margin: 0px;}
-    h6{margin: 0;}
-    table { page-break-inside:auto; }
-    thead { display:table-header-group; }
-    tfoot { display:table-footer-group; }
-    tr { page-break-inside:avoid; page-break-after:auto; }
-    table tr:last-child { border-bottom: 1px solid black; }
-    td, th { 
-        border: 1px solid black;
-        border-bottom: 0px;
-    }
-</style> 
+
+        @media print {
+
+            html,
+            body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            img {
+                /* width:100%; */
+                height: 100%;
+                display: block;
+            }
+
+
+            @page {
+                size: A4 landscape;
+                max-height: 100%;
+                max-width: 100%;
+                margin-bottom: 0px;
+                margin-top: 0px;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+
+            .pagebreak {
+                page-break-after: always;
+            }
+        }
+
+        .header {
+            max-height: 120px;
+            margin: 0px;
+            margin-top: 10px;
+        }
+
+        .box {
+            border: 1px solid black;
+            margin: 0px;
+            margin-left: 2px;
+        }
+
+        .divider {
+            margin: 0px;
+        }
+
+        h6 {
+            margin: 0;
+        }
+
+        table {
+            page-break-inside: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        table tr:last-child {
+            border-bottom: 1px solid black;
+        }
+
+        td,
+        th {
+            border: 1px solid black;
+            border-bottom: 0px;
+        }
+
+        .name {
+            font-size: small;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .skyblue {
+            background-color: #87ceeb !important;
+        }
+
+        .grassgreen {
+            background-color: #7cb378 !important;
+        }
+
+        .expnded {
+            /* font-size: x-large !important; */
+            font-size: larger !important;
+            color: black !important;
+
+
+        }
+
+        /* table {
+            border-collapse: collapse;
+            width: 100%;
+        } */
+
+        tbody tr:nth-child(even) {
+            border-bottom: 4px double #000 !important;
+            border-left: 4px double #000 !important;
+            border-right: 4px double #000 !important;
+
+        }
+
+        tbody tr:nth-child(odd) {
+            border-top: 4px double #000 !important;
+            border-left: 4px double #000 !important;
+            border-right: 4px double #000 !important;
+        }
+
+        tbody tr th:nth-child(1, 2, 3) {
+            border-top: 4px double #000 !important;
+            border-left: 4px double #000 !important;
+            border-right: 4px double #000 !important;
+        }
+
+        tbody th:nth-child(-n+3) {
+            border-top: 4px double #000 !important;
+            border-left: 4px double #000 !important;
+            border-right: 4px double #000 !important;
+        }
+
+        tbody td:last-child() {
+            border-top: 4px double #000 !important;
+            border-left: 4px double #000 !important;
+            border-right: 4px double #000 !important;
+        }
+
+        /* tbody th, tbody td {
+            border: 1px solid #ccc;
+            padding: 4px;
+        } */
+    </style>
 @endsection
 <div class="card">
     <div class="card-body">
         @php
-        $rt = 1;
+            $rt = 1;
         @endphp
-        @foreach ($chunks as  $k=> $days )
+        @foreach ($chunks as $k => $days)
             <div class="header">
                 <div class="row mt-2">
                     <div class="col-3">
-                        <img src="./img/zue-logo.png" style="height: 100px" class="mx-auto d-block">
+                        <img src="{{asset('/img/zue-logo.png')}}" style="height: 100px" class="mx-auto d-block">
                     </div>
                     <div class="col-6">
                         <h2 class="h2 text-center">
@@ -85,10 +180,10 @@
                         </h3>
                     </div>
                     <div class="col-3">
-                        <img src="./img/noc-logo.png" style="height: 100px" class="mx-auto d-block">
+                        <img src="{{asset('/img/noc-logo.png')}}" style="height: 100px" class="mx-auto d-block">
                     </div>
                 </div>
-                <div class="row mt-2" >
+                <div class="row mt-2">
                     <div class="col-1"></div>
                     <div class="col-2 box">
                         <h6 class="text-center">
@@ -134,84 +229,162 @@
                         <h6 class="text-center">
                             العمليات
                         </h6>
-                    </div>            
+                    </div>
                     <div class="col-1"></div>
                 </div>
             </div>
-        <div  class="table-responsive p-0 my-5" >
-            <table  class="table table-vcenter text-center">
-                <thead>
-                    <tr>
-                        <th class="p-1">#</th>
-                        <th class="p-0 m-0">ZOC Number</th>
-                        <th class="p-0" >Employee Name</th>
-                        @for ($i = 1; $i < $month_days; $i++)
-                            <th rowspan="2" class="p-1">
-                                <h5 class="p-0 m-0"> {{$x = $i >= 10? $i : '0'.$i  }}</h5>
-                            </th>
-                        @endfor
-                    </tr>
-                </thead>
-                <tbody>                    
-                    @foreach ($days as $e_id => $month )
-                    <tr>
-                        <th rowspan="2" class="p-0">{{$rt++}}</th>
-                        <th rowspan="2" class="p-0 m-0">{{$e_id}}</th>
-                        <th rowspan="2" class="p-0">abdulrahaman ali mahidwei</th>
-                        @foreach ($month as $day)
-                            @php $value = $day->value; @endphp
-                            @if ($value)
-                                @if ($value == 'F' || $value == 'X')
-                                    <td class="p-0">{{ $value }}</td>
-                                @elseif ($value == 'A' || $value == 'Y'|| $value == 'B')
-                                    <td class="p-0">{{ $value }}</td>
-                                @else
-                                    <td class="p-0" >{{ $value }}</td>
-                                @endif
-                            @else
-                                <td class="p-0 bg-muted" >?</td>
-                            @endif
-                        @endforeach                            
-                    </tr>
-                    <tr>
-                        @foreach ($month as $day)
-                            <td class="p-0 bg-muted" >{{$day->over_time}}</td>
-                        @endforeach
-                    </tr>
-                    @endforeach
-                    
-                </tbody>
-            </table>
-        </div>
-        <footer>
-          <div class="row">
+            <div class="table-responsive p-0 my-4">
+                <table class="table table-vcenter text-center">
+                    <thead>
+                        <tr>
+                            <th class="p-1">#</th>
+                            <th class="p-0 m-0">Z-N</th>
+                            <th class="p-0 ">Employee Name</th>
+                            @for ($i = 1; $i < $month_days; $i++)
+                                <th rowspan="2" class="p-1">
+                                    <h5 class="p-0 m-0"> {{ $x = $i >= 10 ? $i : '0' . $i }}</h5>
+                                </th>
+                            @endfor
+                            <th class="p-0">OT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($days as $e_id => $month)
+                            <div>
+                                <tr>
+                                    <th rowspan="2" class="p-0">{{ $rt++ }}</th>
+                                    <th rowspan="2" class="p-0 m-0">{{ $e_id }}</th>
+                                    <th rowspan="2" class="p-0 name m-0">{{ $employees[$e_id] }}</th>
+                                    @php
+                                        $TOT = 0;
+                                    @endphp
+                                    @foreach ($month as $day)
+                                        @php
+                                            $value = $day->value;
+                                            $OT = 0;
+                                        @endphp
+                                        @if ($value)
+                                            @if ($value == 'F' || $value == 'X')
+                                                <th class="p-0 grassgreen expnded">{{ $value }}</th>
+                                                @php
+                                                    $OT = 0;
+                                                @endphp
+                                            @elseif ($value == 'A' || $value == 'Y' || $value == 'B' || $value == 'K')
+                                                <th class="p-0 skyblue expnded">{{ $value }}</th>
+                                                @if ($value == 'Y' || $value == 'B' || $value == 'K')
+                                                    @php
+                                                        $OT = 4;
+                                                    @endphp
+                                                @elseif ($value == 'A')
+                                                    @php
+                                                        $OT = 2;
+                                                    @endphp
+                                                @endif
+                                            @else
+                                                <th class="p-0 expnded">{{ $value }}</th>
+                                            @endif
+                                        @else
+                                            <th class="p-0 bg-muted expnded">?</th>
+                                        @endif
+                                        @php
+                                            $TOT += $OT;
+                                        @endphp
+                                    @endforeach
 
-              <div class="col-1"></div>
-              <div class="col-3 box text-center "><h6>
-                  منسق الحقل
-                </h6><hr class="divider">
-                <h6 class="text-center">
-                    Salah Ahjel
-                </h6></div>
-                <div class="col-4 box text-center"><h6 >
-                    مشرف القسم	
-                </h6><hr class="divider">
-                <h6 class="container">
-                    <img src="./img/sig.png" style="height: 70px" class="mx-auto d-block centered">                    
-                </h6>
-                Omar Aggar
+
+                                    <th rowspan="2" class="p-1 expnded">{{ $TOT }}</th>
+                                </tr>
+
+                                <tr>
+                                    {{-- @php
+                                    $totalOverTime = 0;
+                                @endphp --}}
+                                    @php
+                                        $TOT = 0;
+                                    @endphp
+                                    @foreach ($month as $day)
+                                        @php
+                                            $OT = 0;
+                                            $bg = '';
+                                            $value = $day->value;
+                                            if ($value == 'Y' || $value == 'B' || $value == 'K') {
+                                                $OT = 4;
+                                                $bg = 'skyblue';
+                                            } elseif ($value == 'A') {
+                                                $OT = 2;
+                                                $bg = 'skyblue';
+                                            } elseif ($value == 'F' || $value == 'X') {
+                                                $OT = 0;
+                                                $bg = '';
+                                            } else {
+                                                $OT = 0;
+                                            }
+                                            $TOT += $OT;
+                                        @endphp
+
+                                        <td class="p-0 {{ $bg }} expnded ">{{ $OT == 0 ? '*' : $OT }}</td>
+                                        {{-- <td class="p-0 bg-muted">{{ $day->over_time <> 0? '*' }}</td> --}}
+                                        {{-- @php
+                                        $totalOverTime += $day->over_time;
+                                    @endphp --}}
+                                    @endforeach
+                                    {{-- <td class="p-0"> {{ $totalOverTime }}</td> --}}
+                                </tr>
+                            </div>
+                        @endforeach
+
+                    </tbody>
+                </table>
             </div>
-                <div class="col-3 box text-center"><h6 >
-                    حافظ الوقت	
-                </h6><hr class="divider">
-                <h6 >
-                    Omar Aggar
-                </h6></div>
-                <div class="col-1"></div>
-            </div>
-            
-        </footer> 
-        <div class="pagebreak"></div>
+            <footer>
+                <div class="row">
+
+                    <div class="col-1"></div>
+                    <div class="col-3 box text-center ">
+                        <h6>
+                            منسق الحقل
+                        </h6>
+                        <hr class="divider">
+
+                        <h6 class="container">
+                            @isset($signatures['super_intendent']['sign'])
+                            <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}" style="height: 70px; margin-top: 12px;"
+                                class="mx-auto d-block centered">
+                                @endisset
+                        </h6>
+                        {{ $signatures['super_intendent']['name'] }}
+                    </div>
+                    <div class="col-4 box text-center">
+                        <h6>
+                            مشرف القسم
+                        </h6>
+                        <hr class="divider">
+                        <h6 class="container">
+                            @isset($signatures['super_visor']['sign'])
+                            <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}" style="height: 70px; margin-top: 12px;"
+                                class="mx-auto d-block centered">
+                                @endisset
+                        </h6>
+                        {{ $signatures['super_visor']['name'] }}
+                    </div>
+                    <div class="col-3 box text-center">
+                        <h6>
+                            حافظ الوقت
+                        </h6>
+                         <hr class="divider">
+                        <h6 class="container">
+                            @isset($signatures['time_keeper']['sign'])
+                            <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}" style="height: 70px; margin-top: 12px;"
+                                class="mx-auto d-block centered">
+                            @endisset
+                        </h6>
+                        {{ $signatures['time_keeper']['name'] }}
+                    </div>
+                    <div class="col-1"></div>
+                </div>
+
+            </footer>
+            <div class="pagebreak"></div>
         @endforeach
     </div>
 </div>

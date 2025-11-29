@@ -24,5 +24,6 @@ class SearchEmployee extends Component
         } else {
             $this->js("alert('Employee Not Found')");
         }
+        $this->redirect( $this->employee->id,  true);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ClearRoomVacant;
+use App\Models\Employee;
 use App\Models\Flight;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -101,6 +103,30 @@ class FlightController extends Controller
         $this->authorize('delete', $flight);
 
         $flight->delete();
+
+        return redirect()
+            ->route('flights.index')
+            ->withSuccess(__('crud.common.removed'));
+    }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function approve(Request $request, Flight $flight): RedirectResponse
+    {
+        $employees  = $flight->employees;
+        foreach ($employees as $employee)
+        {
+            foreach($employee->rooms as $room)
+            {
+                if($room->pivot->is_owner)
+                {
+                    $room->pivot->is_here = false;
+                    $room->pivot->save();
+                }else{
+                    $room->pivot->delete();
+                }
+            }
+        }
 
         return redirect()
             ->route('flights.index')

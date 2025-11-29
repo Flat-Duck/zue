@@ -68,6 +68,7 @@
                 <tr>
                     <th>#</th>
                     <th>@lang('crud.flight_employees.inputs.employee_id')</th>
+                    <th>@lang('crud.flight_employees.inputs.name')</th>
                     <th></th>
                 </tr>
             </thead>
@@ -75,7 +76,8 @@
                 @foreach ($flightEmployees as $k=> $employee)
                 <tr>
                     <td>{{ $k+1 }}</td>
-                    <td>{{ $employee->name ?? '-' }}</td>
+                    <td>{{ $employee->number ?? '-' }}</td>
+                    <td>{{ $employee->english_name ?? '-' }}</td>
                     <td>
                         <div
                             role="group"

@@ -21,7 +21,7 @@ class ResidenceStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'max:255', 'string'],
-            'type' => ['required', 'in:villa,trailer'],
+            'type' => ['required', 'in:Villa,Trailer'],
         ];
     }
 }

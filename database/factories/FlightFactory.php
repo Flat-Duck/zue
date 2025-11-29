@@ -26,6 +26,7 @@ class FlightFactory extends Factory
             'type' => 'Air',
             'date' => $this->faker->date(),
             'time' => $this->faker->time(),
+            'plane_id' => \App\Models\Plane::factory(),
         ];
     }
 }

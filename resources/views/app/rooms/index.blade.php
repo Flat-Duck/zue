@@ -58,6 +58,8 @@
                     <th class="text-left">
                         @lang('crud.rooms.inputs.residence_id')
                     </th>
+                    <th class="text-right">@lang('crud.rooms.inputs.status')</th>
+                    <th class="text-right">@lang('crud.rooms.inputs.emplyees')</th>
                     <th class="text-center">@lang('crud.common.actions')</th>
                 </tr>
             </thead>
@@ -66,7 +68,22 @@
                 <tr>
                     <td>{{ $room->number ?? '-' }}</td>
                     <td>{{ $room->beds ?? '-' }}</td>
-                    <td>{{ optional($room->residence)->name ?? '-' }}</td>
+                    <td>{{ optional($room->residence)->type ?? '-' }} - {{ optional($room->residence)->name ?? '-' }}</td>
+                    <td>{!! $room->available? '<span class="badge bg-green text-green-fg">Avalible</span>' :'<span class="badge bg-red text-red-fg">Not Avalible</span>' !!}</td>
+                    <td>
+                        @foreach ($room->employees as $employee )
+                        <span class="tag  {{ $employee->pivot->is_owner? 'bg-lime-lt':'' }}">
+                            @if ($employee->pivot->is_here)
+                            <span class="badge bg-lime text-lime-fg tag-status badge-empty">
+                                @else
+                            <span class="badge bg-red text-red-fg tag-status badge-empty">
+                                
+                            @endif
+                            </span>
+                            {{$employee->number}}</span></br>
+                        @endforeach
+                    </td>
+                        
                     <td class="text-center" style="width: 134px;">
                         <div
                             role="group"

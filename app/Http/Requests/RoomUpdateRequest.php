@@ -23,6 +23,7 @@ class RoomUpdateRequest extends FormRequest
             'number' => ['required', 'max:255', 'string'],
             'beds' => ['required', 'numeric'],
             'residence_id' => ['required', 'exists:residences,id'],
+            'employee_id' => ['required', 'array'],
         ];
     }
 }

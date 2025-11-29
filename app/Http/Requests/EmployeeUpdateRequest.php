@@ -30,7 +30,7 @@ class EmployeeUpdateRequest extends FormRequest
             'address' => ['nullable', 'max:255', 'string'],
             'phone' => ['nullable', 'max:255', 'string'],
             'email' => ['nullable', 'email'],
-            'user_id' => ['required', 'exists:users,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
             'location_id' => ['required', 'exists:locations,id'],
             'department_id' => ['required', 'exists:departments,id'],
             'center_id' => ['required', 'exists:centers,id'],
@@ -40,6 +40,8 @@ class EmployeeUpdateRequest extends FormRequest
             'last_date' => ['nullable', 'date'],
             'total_balance' => ['nullable', 'numeric'],
             'archived_at' => ['nullable', 'date'],
+            'management_level' => ['nullable', 'numeric'],
+            'employee_level' => ['nullable', 'numeric'],
         ];
     }
 }

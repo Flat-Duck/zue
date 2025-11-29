@@ -10,12 +10,14 @@
         
         <title>zue</title>
         
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
         @vite('resources/js/app.js')
         
         
-        
+        <link rel="stylesheet" type="text/css" id="mce-u0" href="https://preview.tabler.io/dist/libs/hugerte/skins/ui/oxide/skin.min.css">
         {{-- @livewireStyles --}}
         @yield('styles')
+
     </head>
     
     <body>
@@ -48,10 +50,10 @@
         
         {{-- @livewireScripts --}}
         
-        @stack('scripts')
-        @yield('scripts')
         
+        <script src="{{asset('hugerte.js')}}"></script>
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+        <script src="https://preview.tabler.io/dist/libs/tom-select/dist/js/tom-select.base.min.js?1726507346"></script>
         
         @if (session()->has('success')) 
         <script>
@@ -88,6 +90,8 @@
                 })
             })
             </script>
+           @stack('scripts')
+           @yield('scripts') 
     @stack('modals')
     </body>
     </html>

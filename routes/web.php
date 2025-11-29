@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\ClinicApointmentController;
+use App\Http\Controllers\ManagementScopeController;
+use App\Http\Controllers\PlaneController;
+use App\Http\Controllers\RunController;
+use App\Imports\RoomsImport;
+use App\Models\Employee;
+use App\Models\Residence;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
@@ -19,6 +26,8 @@ use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Models\TimeSheet;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\OccupationalInjuryReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,14 +40,42 @@ use App\Models\TimeSheet;
 |
 */
 
+Route::post('/rr', function () {
+     
+    // $name = 1;
+    // $type = "VILLA";
+    // $re = Residence::where('name',$name)->where('type',$type)->first();
+    // if(is_null($re)){
+    //     $re = new Residence();
+    //     $re->name =  $name;
+    //     $re->type = $type;
+    //     $re->save();
+    // }
+    // dd($re);
+    Excel::import(new RoomsImport, request()->file('rooms'));
+
+    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees'));
+})->name('rr');
 Route::get('/ss', function () {
      
     $month_name = "April";
-    $chunk = TimeSheet::whereMonth('day', 10)->whereYear('day', '2023')->limit('3100')->get();
-    $chunks = $chunk->groupBy('employee_id')->chunk(10);
-    $month_days = Carbon\Carbon::now()->month($month_name)->daysInMonth + 1;
+    $chunk = Timesheet::whereHas('employee', function ($query) {
+    $query->whereNull('archived_at');
+})->whereMonth('day', 10)->whereYear('day', '2025')->limit('310')->get();
+    
+    $chunks = $chunk->groupBy('employee_id')->chunk(8);
+    $first_chunk = $chunks->first()->first()->first();
+    $signatures['time_keeper']['sign'] = $first_chunk->time_keeper->signature->image_path;
+    $signatures['time_keeper']['name'] = $first_chunk->time_keeper->name;
+    $signatures['super_visor']['sign'] = $first_chunk->super_visor?->signature->image_path;
+    $signatures['super_visor']['name'] = $first_chunk->super_visor?->name;
+    $signatures['super_intendent']['sign'] = $first_chunk->super_intendent?->signature->image_path;
+    $signatures['super_intendent']['name'] = $first_chunk->super_intendent?->name;
 
-    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days'));
+    $month_days = Carbon\Carbon::now()->month($month_name)->daysInMonth + 1;
+    $employees = Employee::pluck('english_name','number');
+    // return $chunks;
+    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees','signatures'));
 });
 
 Auth::routes();
@@ -50,23 +87,51 @@ Route::prefix('/')
     ->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
+        Route::resource('management-scopes', ManagementScopeController::class);
+
+        // Route::get('run', RunController::class)->name('run.index');
+        // Route::get('run', RunController::class)->name('run.index');
+        // Route::get('run', RunController::class)->name('run.index');
+        // Route::get('run', RunController::class)->name('run.index');
+        // Route::get('run', RunController::class)->name('run.index');
+
+Route::resource('injury-reports', OccupationalInjuryReportController::class);
 
         Route::resource('administrations', AdministrationController::class);
         Route::resource('centers', CenterController::class);
+
+        Route::post('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
+        Route::get('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
+        Route::get('clinic/history/{employee}', [ClinicApointmentController::class, 'history'])->name('clinic.history');
+        Route::get('clinic/diagnosis/{employee}', [ClinicApointmentController::class, 'diagnosis'])->name('clinic.diagnosis');
+        Route::resource('clinic', ClinicApointmentController::class);//->name('clinic');
+        
+        
         Route::resource('departments', DepartmentController::class);
+        Route::delete('flights/{flight}/approve', [FlightController::class,'approve'])->name('flights.approve');
         Route::resource('flights', FlightController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('passengers', PassengerController::class);
         Route::resource('residences', ResidenceController::class);
+        Route::resource('planes', PlaneController::class);
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
+        Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
+        Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
         Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
         Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
         Route::resource('time-sheets', TimeSheetController::class);
         Route::resource('users', UserController::class);
+        Route::get('dir', [EmployeeController::class,'dir']);
+        Route::get('employees/imports', [EmployeeController::class, 'imports']);
+        Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
         Route::resource('employees', EmployeeController::class);
+
+        Route::get('signature', [ProfileController::class, 'signature' ])->name('signature.show');
         Route::get('profile', [ProfileController::class, 'show' ])->name('profile.show');
         Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::get('reports', [ReportController::class, 'index'])->name('admin.reports.index');
         Route::post('reports/minus', [ReportController::class, 'minus'])->name('admin.reports.minus');
+        Route::post('reports/to_date', [ReportController::class, 'to_date'])->name('admin.reports.to_date');
+
     });

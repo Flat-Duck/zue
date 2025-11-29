@@ -12,6 +12,7 @@ class Room extends Model
     use Searchable;
 
     protected $fillable = ['number', 'beds', 'residence_id'];
+    protected $appends = ['available'];
 
     protected $searchableFields = ['*'];
 
@@ -22,6 +23,17 @@ class Room extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class);
+        return $this->belongsToMany(Employee::class)->withPivot(['is_here','is_owner']);
+    }
+
+    public function getAvailableAttribute()
+    {
+        $resdints = $this->employees()->where('is_here','=',true)->count();
+        
+        if($this->beds > $resdints)
+        {
+            return true;
+        }
+        return false;
     }
 }

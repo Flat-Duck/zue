@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\ClinicApointment;
+use Database\Factories\ClinicApointmentFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +13,10 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
+    // public function run(): void{
+        
+      
+    // }
     public function run(): void
     {
         // // Adding an admin user
@@ -85,9 +91,12 @@ class DatabaseSeeder extends Seeder
         // $this->call(StockSeeder::class);
         // $this->call(TimeSheetSeeder::class);
         // $this->call(UserSeeder::class);
-        //Eloquent::unguard();
+        // Eloquent::unguard();
 
         
+        $path = __DIR__ . '/data/administrations.sql';
+        DB::unprepared(file_get_contents($path));
+        $this->command->info('administrations Data seeded!');
         $path = __DIR__ . '/data/centers.sql';
         DB::unprepared(file_get_contents($path));
         $this->command->info('centers Data seeded!');
@@ -101,8 +110,8 @@ class DatabaseSeeder extends Seeder
         DB::unprepared(file_get_contents($path));
         $this->command->info('employees Data seeded!');
         $path = __DIR__ . '/data/timesheets.sql';
-        // DB::unprepared(file_get_contents($path));
-        // $this->command->info('timesheets Data seeded!');
+        DB::unprepared(file_get_contents($path));
+        $this->command->info('timesheets Data seeded!');
                  
         
 
@@ -286,6 +295,9 @@ class DatabaseSeeder extends Seeder
         'email' => 'ahmededeem81@gmail.com',
         'password' => Hash::make('914805876'),
         ]);
+          ClinicApointment::factory()
+        ->count(2)
+        ->create();
             
         }
 }

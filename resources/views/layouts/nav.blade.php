@@ -80,6 +80,14 @@
                                 {{ __('Profile') }}
                             </span>
                         </a>
+                        <a class="dropdown-item" href="{{ route('signature.show') }}" rel="noopener">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="ti ti-signature"></i>
+                            </span>
+                            <span class="nav-link-title">
+                                {{ __('My Signature') }}
+                            </span>
+                        </a>
                         <a class="dropdown-item" href="{{ route('logout') }}" rel="noopener" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <i class="ti ti-logout-2"></i>

@@ -63,8 +63,8 @@
                 @forelse($flights as $flight)
                 <tr>
                     <td>{{ $flight->type ?? '-' }}</td>
-                    <td>{{ $flight->date ?? '-' }}</td>
-                    <td>{{ $flight->time ?? '-' }}</td>
+                    <td>{{ $flight->date->format('d/m/Y') ?? '-' }}</td>
+                    <td>{{ $flight->time->format('H:i') ?? '-' }}</td>
                     <td class="text-center" style="width: 134px;">
                         <div
                             role="group"
@@ -78,14 +78,16 @@
                             >
                                 <i class="ti ti-edit"></i>
                             </a>
-                            @endcan @can('view', $flight)
+                            @endcan
+                             @can('view', $flight)
                             <a
                                 href="{{ route('flights.show', $flight) }}"
                                 class="btn btn-icon btn-outline-info ms-1"
                             >
                                 <i class="ti ti-eye"></i>
                             </a>
-                            @endcan @can('delete', $flight)
+                            @endcan 
+                            @can('delete', $flight)
                             <form
                                 action="{{ route('flights.destroy', $flight) }}"
                                 method="POST"
@@ -98,6 +100,22 @@
                                     class="btn btn-icon btn-outline-danger"
                                 >
                                     <i class="ti ti-trash-x"></i>
+                                </button>
+                            </form>
+                            @endcan
+                            @can('delete', $flight)
+                            <form
+                                action="{{ route('flights.approve', $flight) }}"
+                                method="POST"
+                                class="inline pointer ms-1"
+                                onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')"
+                            >
+                                @csrf @method('DELETE')
+                                <button
+                                    type="submit"
+                                    class="btn btn-icon btn-outline-green"
+                                >
+                                    <i class="ti ti-list-check"></i>
                                 </button>
                             </form>
                             @endcan

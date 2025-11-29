@@ -40,6 +40,8 @@ class EmployeeStoreRequest extends FormRequest
             'last_date' => ['nullable', 'date'],
             'total_balance' => ['nullable', 'numeric'],
             'archived_at' => ['nullable', 'date'],
+            'management_level' => ['nullable', 'numeric'],
+            'employee_level' => ['nullable', 'numeric'],
         ];
     }
 }

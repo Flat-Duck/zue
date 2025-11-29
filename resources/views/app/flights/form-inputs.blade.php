@@ -19,12 +19,12 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text
+        <x-inputs.time
             name="time"
             label="Time"
             :value="old('time', ($editing ? $flight->time : ''))"
             maxlength="255"
             placeholder="Time"
-        ></x-inputs.text>
+        ></x-inputs.time>
     </x-inputs.group>
 </div>

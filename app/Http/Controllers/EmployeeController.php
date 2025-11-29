@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ArchivedEmployeesImport;
 use App\Models\User;
 use App\Models\Center;
 use App\Models\Employee;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -30,6 +32,45 @@ class EmployeeController extends Controller
             ->withQueryString();
 
         return view('app.employees.index', compact('employees', 'search'));
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function dir(Request $request): View
+    {
+        $this->authorize('view-any', Employee::class);
+        
+        $employees = Employee::latest()
+            ->paginate(30)
+            ->withQueryString();
+
+        return view('app.employees.directory', compact('employees'));
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function imports(Request $request): View
+    {
+        $this->authorize('view-any', Employee::class);
+
+        return view('app.employees.imports');
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function importArchivedEmployees(Request $request)
+    {
+        $this->authorize('view-any', Employee::class);
+        
+        $request->validate([
+            'file' => 'required|mimes:xlsx'
+        ]);
+        
+        Excel::import(new ArchivedEmployeesImport, $request->file('file'));
+
+        return back()->with('success', 'Employees archived successfully.');
+
+        return back();
     }
 
     /**

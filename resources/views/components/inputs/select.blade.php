@@ -2,6 +2,7 @@
     'name',
     'label',
     'type' => 'text',
+    'class' => 'form-select',
 ])
 
 @if($label ?? null)
@@ -9,13 +10,13 @@
 @endif
 
 <select
-    id="{{ $name }}"
+    id="{{ str_replace('[]', '', $name) }}"
     name="{{ $name }}"
     {{ ($required ?? false) ? 'required' : '' }}
-    {{ $attributes->merge(['class' => 'form-control']) }}
+    {{ $attributes->merge(['class' => 'form-control '.$class.'']) }}
     autocomplete="off"
     @error($name)
-    {{ $attributes->merge(['classs' => 'is-invalid']) }}
+    {{ $attributes->merge(['class' => 'is-invalid']) }}
     {{-- {{dd($attributes->get('class'))}} --}}
     @enderror
 >

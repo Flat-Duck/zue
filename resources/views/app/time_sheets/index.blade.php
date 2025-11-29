@@ -44,6 +44,16 @@
                     <i class="ti ti-plus"></i>
                     @lang('crud.common.create')
                 </a>
+                     <a
+                    data-bs-original-title="طباعة"
+                    data-bs-placement="top"
+                    data-bs-toggle="tooltip"
+                    class="pull-right btn btn-green"
+                    href="{{ route('time-sheets.print_preview') }}"
+                >
+                    <i class="ti ti-printer"></i>
+                    @lang('crud.common.print_preview')
+                </a>
                 @endcan
             </div>
         </div>

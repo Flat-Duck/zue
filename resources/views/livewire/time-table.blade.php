@@ -5,7 +5,7 @@
             @foreach ( $dep_employees as $id => $number)
             {{-- <div class="list-group list-group-flush list-group-hoverable"> --}}
                 {{-- <div class="list-group-item m-0 ps-1 p-0"> --}}
-                    <div class="row align-items-center m-1">                      
+                    <div class="row align-items-center m-1">
                         <div class="col-auto m-0 p-0">
                             <span class="avatar avatar-xs rounded me-2">JL</span>
                         </div>
@@ -89,7 +89,7 @@
                 <div class="col-4 mt-3">
                     <div class="mb-3">
                         <label class="form-label">Total Balance : </label>
-                        <input value="{{ $employee->balance }}" type="text" class="form-control {{ ($employee->balance > 0)? 'bg-red-lt' : 'bg-green-lt' }} " disabled >
+                        <input value="{{ $employee->balance }}" type="text" class="form-control {{ ($employee->balance < 0)? 'bg-red-lt' : 'bg-green-lt' }} " disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
@@ -109,8 +109,8 @@
                 </div>
                 <div class="col-5">
                     <div class="form-selectgroup">
-                        @foreach(range('A','Z') as $V) 
-                            <label class="form-selectgroup-item">
+                        @foreach(App\Helpers\Rules::getLetters(auth()->user()) as $V)
+                            <label class="form-selectgroup-item" style="max-height: 40px; max-width: 40px;">
                                 <input type="radio" wire:confirm="ok?" wire:click="save" wire:model.live="val" value="{{$V}}" class="form-selectgroup-input">
                                 <span class="form-selectgroup-label">{{$V}}</span>
                             </label>
@@ -121,12 +121,12 @@
                                 Delete <i class="ti ti-trash-x"> </i>
                             </a>
                           </div>
-                        @endif            
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-1 mb-3">
+        <div class="col-1">
             <label for="ov">Over time</label>
                 <input type="text" value="2" wire:model="ov" class="form-control" >
         </div>
@@ -211,11 +211,11 @@
             enable: [
                 {
                     from: "2024-01-01",
-                    to: "2024-07-01",
+                    to: '2025-10-10',
                 }
             ]
         });
-    
+
         console.log("DOM fully loaded and parsed last thing");
     };
 

@@ -13,8 +13,8 @@ use Livewire\Component;
 class TimeTable extends Component
 {
     public $years = [];
-    public $ov = 2;
-    public $year = 2023;
+    public $ov = 0;
+    public $year = 2025;
     public $times = [];
     // public $number = 1 ;
     public $range;
@@ -27,18 +27,20 @@ class TimeTable extends Component
     {
         //  $this->year = now()->year;
     }
-    
+
     function mount()
     {
+        $this->year = now()->year;
         if ($this->employee->id > 0) {
             $this->getOtherEmployees();
+            $this->ov = $this->employee->default_over_time_value;
         }
         $this->updateUi();
     }
 
     private function valid()
     {
-        
+
         if (is_null($this->range) || is_null($this->val)) {
             return false;
         }
@@ -47,14 +49,14 @@ class TimeTable extends Component
     public function save()
     {
        // dd($this->ov);
-        
+
         if (!$this->valid()) {
             dd("Not Valid");
         }
-        
+
         if (str_contains($this->range, 'to')) {
             $period = MomentsJs::getRange($this->range);
-            
+
             foreach ($period as $dt) {
                 TimeSheetBuilder::create($dt, $this->employee->id, $this->val, $this->ov);
             }
@@ -66,10 +68,10 @@ class TimeTable extends Component
     }
     public function destroy()
     {
-        
+
         if (str_contains($this->range, 'to')) {
             $period = MomentsJs::getRange($this->range);
-            
+
             foreach ($period as $dt) {
                 TimeSheetBuilder::destroy($dt, $this->employee->id);
             }
@@ -91,7 +93,7 @@ class TimeTable extends Component
             ]
         );
     }
-   
+
 
     function loadByYear()
     {

@@ -19,6 +19,16 @@ class ProfileController extends Controller
 
         return view('auth.profile')->with('user', $user);
     }
+    /**
+    * Display the specified resource.
+    */
+    public function signature(): View
+    {
+        //$this->authorize('view', Permission::class);
+        $user = auth()->user();
+
+        return view('auth.signature')->with('user', $user);
+    }
 
  
     /**

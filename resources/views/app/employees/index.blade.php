@@ -44,6 +44,7 @@
                     <i class="ti ti-plus"></i>
                     @lang('crud.common.create')
                 </a>
+           
                 @endcan
             </div>
         </div>
@@ -62,7 +63,7 @@
                     <th class="text-left">
                         @lang('crud.employees.inputs.english_name')
                     </th>
-                    <th class="text-left">
+                    {{-- <th class="text-left">
                         @lang('crud.employees.inputs.id_card')
                     </th>
                     <th class="text-left">
@@ -82,7 +83,7 @@
                     </th>
                     <th class="text-left">
                         @lang('crud.employees.inputs.email')
-                    </th>
+                    </th> --}}
                     <th class="text-left">
                         @lang('crud.employees.inputs.user_id')
                     </th>
@@ -95,9 +96,9 @@
                     <th class="text-left">
                         @lang('crud.employees.inputs.center_id')
                     </th>
-                    <th class="text-right">
+                    {{-- <th class="text-right">
                         @lang('crud.employees.inputs.transfered_balance')
-                    </th>
+                    </th> --}}
                     <th class="text-left">
                         @lang('crud.employees.inputs.schedule')
                     </th>
@@ -110,9 +111,9 @@
                     <th class="text-right">
                         @lang('crud.employees.inputs.total_balance')
                     </th>
-                    <th class="text-left">
+                    {{-- <th class="text-left">
                         @lang('crud.employees.inputs.archived_at')
-                    </th>
+                    </th> --}}
                     <th class="text-center">@lang('crud.common.actions')</th>
                 </tr>
             </thead>
@@ -122,23 +123,23 @@
                     <td>{{ $employee->number ?? '-' }}</td>
                     <td>{{ $employee->job ?? '-' }}</td>
                     <td>{{ $employee->english_name ?? '-' }}</td>
-                    <td>{{ $employee->id_card ?? '-' }}</td>
+                    {{-- <td>{{ $employee->id_card ?? '-' }}</td>
                     <td>{{ $employee->id_card_issue_date ?? '-' }}</td>
                     <td>{{ $employee->passport ?? '-' }}</td>
                     <td>{{ $employee->passport_issue_date ?? '-' }}</td>
                     <td>{{ $employee->address ?? '-' }}</td>
                     <td>{{ $employee->phone ?? '-' }}</td>
-                    <td>{{ $employee->email ?? '-' }}</td>
+                    <td>{{ $employee->email ?? '-' }}</td> --}}
                     <td>{{ optional($employee->user)->name ?? '-' }}</td>
                     <td>{{ optional($employee->location)->name ?? '-' }}</td>
                     <td>{{ optional($employee->department)->name ?? '-' }}</td>
                     <td>{{ optional($employee->center)->name ?? '-' }}</td>
-                    <td>{{ $employee->transfered_balance ?? '-' }}</td>
+                    {{-- <td>{{ $employee->transfered_balance ?? '-' }}</td> --}}
                     <td>{{ $employee->schedule ?? '-' }}</td>
                     <td>{{ $employee->start_date ?? '-' }}</td>
                     <td>{{ $employee->last_date ?? '-' }}</td>
                     <td>{{ $employee->total_balance ?? '-' }}</td>
-                    <td>{{ $employee->archived_at ?? '-' }}</td>
+                    {{-- <td>{{ $employee->archived_at ?? '-' }}</td> --}}
                     <td class="text-center" style="width: 134px;">
                         <div
                             role="group"
