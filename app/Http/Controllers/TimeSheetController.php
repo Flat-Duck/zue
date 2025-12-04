@@ -6,6 +6,7 @@ use App\Helpers\MomentsJs;
 use App\Models\User;
 use App\Models\Employee;
 use App\Models\TimeSheet;
+use App\Services\TimeSheetService;
 use Carbon\Carbon;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -18,34 +19,33 @@ use DateTime;
 
 class TimeSheetController extends Controller
 {
+    protected $timeSheetService;
+
+    public function __construct(TimeSheetService $timeSheetService)
+    {
+        $this->timeSheetService = $timeSheetService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        
-        // $search = $request->get('search', '');
-        
-        // $timeSheets = TimeSheet::search($search)
-        //     ->latest()
-        //     ->paginate(5)
-        //     ->withQueryString();
-        
         $this->authorize('view-any', TimeSheet::class);
         $this->authorize('view-any', Employee::class);
 
         $search = $request->get('search', '');
 
         $employees = auth()->user()->managedEmployeesQuery()
-        // = Employee::search($search)
-        //     ->latest()
             ->paginate(20)
-            ->withQueryString();
-
-        //return view('app.employees.index', compact('employees', 'search'));
+            ->through(function ($employee) {
+                if (Carbon::parse($employee->last_date)->month + 2 != now()->month) {
+                    $employee->setAttribute('is_missing_last_time_sheet', true);
+                }
+                return $employee;
+            });
 
         return view('app.time_sheets.index', compact('employees', 'search'));
-        //return view('app.time_sheets.index', compact('timeSheets', 'search'));
     }
 
     /**
@@ -53,28 +53,7 @@ class TimeSheetController extends Controller
      */
     public function create(Request $request, Employee $employee): View
     {
-        // $this->authorize('create', TimeSheet::class);
-
-        //     # code...
-            // $employees = Employee::pluck('job', 'id');
-            //     $users = User::pluck('name', 'id');
-            // for ($i=2; $i < 10; $i++) {
-
-            
-        //     foreach ($period as $dt) {
-        //         $timeSheet = new TimeSheet();
-        //         $my_array = array('a','f');
-        //         $random_key = array_rand($my_array);
-        //         $val = $my_array[$random_key];
-                
-        //         $timeSheet->value = $val;
-        //         $timeSheet->day = $dt->format('Y-m-d');
-        //         $timeSheet->employee_id = $i;
-        //         $timeSheet->save();
-                
-        //     }
-        // }
-        return view('app.time_sheets.create', compact('employee'));//, compact('employees', 'users'));
+        return view('app.time_sheets.create', compact('employee'));
     }
 
     /**
@@ -87,12 +66,6 @@ class TimeSheetController extends Controller
         $validated = $request->validated();
 
         $timeSheet = TimeSheet::create($validated);
-
-
-
-
-
-
         return redirect()
             ->route('time-sheets.edit', $timeSheet)
             ->withSuccess(__('crud.common.created'));
@@ -108,51 +81,69 @@ class TimeSheetController extends Controller
         return view('app.time_sheets.show', compact('timeSheet'));
     }
 
-        /**
+    /**
      * Show the form for editing the specified resource.
      */
     public function print_preview(Request $request): View
     {
-        //$this->authorize('update', $timeSheet);
-
-        //$employees = Employee::pluck('job', 'id');
-        //$users = User::pluck('name', 'id');
-
         return view('app.time_sheets.print_preview');
     }
 
-        /**
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function approve_preview(Request $request): View
+    {
+        return view('app.time_sheets.approve_preview');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function approve(Request $request): View
+    {
+        $month = $request->selected_month;
+        $data = $this->timeSheetService->getApprovalData($month);
+
+        return view('app.time_sheets.approve', $data);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function print(Request $request): View
     {
-        $months = MomentsJs::getMonthsInYear();
-        $month_name = $months->get($request->selected_month);
-        
-        $chunk = Timesheet::
-        //whereHas('employee', function ($query) {
-        //$query->whereNull('archived_at');
-        //})//-
-        whereMonth('day', $request->selected_month)->whereYear('day', '2025')->
-        // limit(31)->
-        get();
-        // dd($chunk);
-        $chunks = $chunk->groupBy('employee_id')->chunk(8);
-        $first_chunk = $chunks->first()->first()->first();
-        $signatures['time_keeper']['sign'] = $first_chunk->time_keeper?->signature->image_path;
-        $signatures['time_keeper']['name'] = $first_chunk->time_keeper?->name;
-        $signatures['super_visor']['sign'] = $first_chunk->super_visor?->signature->image_path;
-        $signatures['super_visor']['name'] = $first_chunk->super_visor?->name;
-        $signatures['super_intendent']['sign'] = $first_chunk->super_intendent?->signature->image_path;
-        $signatures['super_intendent']['name'] = $first_chunk->super_intendent?->name;
+        $month = $request->selected_month;
+        $data = $this->timeSheetService->getApprovalData($month);
 
-        $month_days = Carbon::now()->month($month_name)->daysInMonth + 1;
-        $employees = Employee::pluck('english_name','number');
-        // return $chunks;
-        // 
-        return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees','signatures'));
+        return view('app.time_sheets.approve', $data);
+    }
 
-        // return view('app.time_sheets.print_preview');
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function approves(Request $request): RedirectResponse
+    {
+        $month = $request->get('month');
+        $level = $request->get('level'); // timekeeper / supervisor / superintendent
+
+        $query = Timesheet::whereMonth('day', $month)
+            ->whereYear('day', now()->year);
+
+        if ($level === 'timekeeper') {
+            $query->whereNull('timekeeper_id')
+                ->update(['timekeeper_id' => auth()->id()]);
+        } elseif ($level === 'supervisor') {
+            $query->whereNotNull('timekeeper_id')
+                ->whereNull('supervisor_id')
+                ->update(['supervisor_id' => auth()->id()]);
+        } elseif ($level === 'superintendent') {
+            $query->whereNotNull('supervisor_id')
+                ->whereNull('superintendent_id')
+                ->update(['superintendent_id' => auth()->id()]);
+        }
+
+        return back()->with('success', 'Time sheets approved.');
     }
 
     /**
@@ -160,11 +151,6 @@ class TimeSheetController extends Controller
      */
     public function edit(Request $request, Employee $employee): View
     {
-        //$this->authorize('update', $timeSheet);
-
-        //$employees = Employee::pluck('job', 'id');
-        //$users = User::pluck('name', 'id');
-
         return view('app.time_sheets.edit', compact('employee'));
     }
 
@@ -174,8 +160,7 @@ class TimeSheetController extends Controller
     public function update(
         TimeSheetUpdateRequest $request,
         TimeSheet $timeSheet
-    ): RedirectResponse
-    {
+    ): RedirectResponse {
         $this->authorize('update', $timeSheet);
 
         $validated = $request->validated();
@@ -193,8 +178,7 @@ class TimeSheetController extends Controller
     public function destroy(
         Request $request,
         TimeSheet $timeSheet
-    ): RedirectResponse
-    {
+    ): RedirectResponse {
         $this->authorize('delete', $timeSheet);
 
         $timeSheet->delete();

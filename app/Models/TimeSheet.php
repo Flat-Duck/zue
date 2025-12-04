@@ -39,12 +39,12 @@ class TimeSheet extends Model
     {
         return $this->belongsTo(User::class, 'timekeeper_id');
     }
-    
+
     public function super_intendent()
     {
         return $this->belongsTo(User::class, 'superintendent_id');
     }
-    
+
     public function super_visor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
@@ -53,5 +53,25 @@ class TimeSheet extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function getOtValueAttribute(): int
+    {
+        if (in_array($this->value, ['Y', 'B', 'K'])) {
+            return 4;
+        } elseif ($this->value === 'A') {
+            return 2;
+        }
+        return 0;
+    }
+
+    public function getCssClassAttribute(): string
+    {
+        if (in_array($this->value, ['Y', 'B', 'K', 'A'])) {
+            return 'skyblue';
+        } elseif (in_array($this->value, ['F', 'X'])) {
+            return 'grassgreen';
+        }
+        return '';
     }
 }

@@ -54,6 +54,15 @@
                     <i class="ti ti-printer"></i>
                     @lang('crud.common.print_preview')
                 </a>
+                <a data-bs-original-title="إعتماد"
+                    data-bs-placement="top"
+                    data-bs-toggle="tooltip"
+                    class="pull-right btn btn-yellow"
+                    href="{{ route('time-sheets.approve_preview') }}"
+                >
+                    <i class="ti ti-check"></i>
+                    @lang('crud.common.time_sheet_approve')
+                </a>
                 @endcan
             </div>
         </div>
@@ -66,18 +75,18 @@
                     <th class="text-right">
                         @lang('crud.employees.inputs.number')
                     </th>
-                    <th class="text-left">
+                    {{-- <th class="text-left">
                         @lang('crud.employees.inputs.job')
-                    </th>
+                    </th> --}}
                     <th class="text-left">
                         @lang('crud.employees.inputs.english_name')
                     </th>                    
                     <th class="text-left">
                         @lang('crud.employees.inputs.phone')
                     </th>
-                    <th class="text-left">
+                    {{-- <th class="text-left">
                         @lang('crud.employees.inputs.email')
-                    </th>
+                    </th> --}}
                     {{-- <th class="text-left">
                         @lang('crud.employees.inputs.user_id')
                     </th>
@@ -96,9 +105,9 @@
                     <th class="text-left">
                         @lang('crud.employees.inputs.schedule')
                     </th>
-                    <th class="text-left">
+                    {{-- <th class="text-left">
                         @lang('crud.employees.inputs.start_date')
-                    </th>
+                    </th> --}}
                     <th class="text-left">
                         @lang('crud.employees.inputs.last_date')
                     </th>
@@ -115,18 +124,31 @@
                 @forelse($employees as $employee)
                 <tr>
                     <td>{{ $employee->number ?? '-' }}</td>
-                    <td>{{ $employee->job ?? '-' }}</td>
+                    {{-- <td>{{ $employee->job ?? '-' }}</td> --}}
                     <td>{{ $employee->english_name ?? '-' }}</td>
                     <td>{{ $employee->phone ?? '-' }}</td>
-                    <td>{{ $employee->email ?? '-' }}</td>
+                    {{-- <td>{{ $employee->email ?? '-' }}</td> --}}
                     {{-- <td>{{ optional($employee->user)->name ?? '-' }}</td> --}}
                     {{-- <td>{{ optional($employee->location)->name ?? '-' }}</td> --}}
                     {{-- <td>{{ optional($employee->department)->name ?? '-' }}</td> --}}
                     {{-- <td>{{ optional($employee->center)->name ?? '-' }}</td> --}}
                     {{-- <td>{{ $employee->transfered_balance ?? '-' }}</td> --}}
                     <td>{{ $employee->schedule ?? '-' }}</td>
-                    <td>{{ $employee->start_date ?? '-' }}</td>
-                    <td>{{ $employee->last_date ?? '-' }}</td>
+                    {{-- <td>{{ $employee->start_date ?? '-' }}</td> --}}
+                    <td>
+                    <span class="badge 
+                    @if($employee->is_missing_last_time_sheet)
+                    bg-red text-red-fg
+                    @else
+                    bg-green text-green-fg
+                    @endif
+                    ">
+                        <i class="ti ti-calendar"></i>
+                        {{ $employee->last_date ?? '-' }}
+                    </span>
+         
+                    
+                    </td>
                     <td>{{ $employee->total_balance ?? '-' }}</td>
                     {{-- <td>{{ $employee->archived_at ?? '-' }}</td> --}}
                     <td class="text-center" style="width: 134px;">

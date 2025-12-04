@@ -25,7 +25,6 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
-use App\Models\TimeSheet;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\OccupationalInjuryReportController;
 
@@ -56,29 +55,49 @@ Route::post('/rr', function () {
 
     return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees'));
 })->name('rr');
-Route::get('/ss', function () {
+// Route::get('/ss', function () {
      
-    $month_name = "April";
-    $chunk = Timesheet::whereHas('employee', function ($query) {
-    $query->whereNull('archived_at');
-})->whereMonth('day', 10)->whereYear('day', '2025')->limit('310')->get();
+//     $month_name = "April";
+//     $chunk = Timesheet::whereHas('employee', function ($query) {
+//     $query->whereNull('archived_at');
+// })->whereMonth('day', 10)->whereYear('day', '2025')->limit('310')->get();
     
-    $chunks = $chunk->groupBy('employee_id')->chunk(8);
-    $first_chunk = $chunks->first()->first()->first();
-    $signatures['time_keeper']['sign'] = $first_chunk->time_keeper->signature->image_path;
-    $signatures['time_keeper']['name'] = $first_chunk->time_keeper->name;
-    $signatures['super_visor']['sign'] = $first_chunk->super_visor?->signature->image_path;
-    $signatures['super_visor']['name'] = $first_chunk->super_visor?->name;
-    $signatures['super_intendent']['sign'] = $first_chunk->super_intendent?->signature->image_path;
-    $signatures['super_intendent']['name'] = $first_chunk->super_intendent?->name;
+//     $chunks = $chunk->groupBy('employee_id')->chunk(8);
+//     $first_chunk = $chunks->first()->first()->first();
+//     $signatures['time_keeper']['sign'] = $first_chunk->time_keeper->signature->image_path;
+//     $signatures['time_keeper']['name'] = $first_chunk->time_keeper->name;
+//     $signatures['super_visor']['sign'] = $first_chunk->super_visor?->signature->image_path;
+//     $signatures['super_visor']['name'] = $first_chunk->super_visor?->name;
+//     $signatures['super_intendent']['sign'] = $first_chunk->super_intendent?->signature->image_path;
+//     $signatures['super_intendent']['name'] = $first_chunk->super_intendent?->name;
 
-    $month_days = Carbon\Carbon::now()->month($month_name)->daysInMonth + 1;
-    $employees = Employee::pluck('english_name','number');
-    // return $chunks;
-    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees','signatures'));
-});
+//     $month_days = Carbon\Carbon::now()->month($month_name)->daysInMonth + 1;
+//     $employees = Employee::pluck('english_name','number');
+//     // return $chunks;
+//     return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees','signatures'));
+// })->name('time-sheets.approve');
 
 Auth::routes();
+
+Route::get('time-sheets/approve_preview', [TimeSheetController::class, 'approve_preview'])->name('time-sheets.approve_preview');
+Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
+Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
+
+
+
+
+
+Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
+
+
+Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
+Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
+Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
+Route::resource('time-sheets', TimeSheetController::class);
+
+
+
+
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -95,7 +114,7 @@ Route::prefix('/')
         // Route::get('run', RunController::class)->name('run.index');
         // Route::get('run', RunController::class)->name('run.index');
 
-Route::resource('injury-reports', OccupationalInjuryReportController::class);
+        Route::resource('injury-reports', OccupationalInjuryReportController::class);
 
         Route::resource('administrations', AdministrationController::class);
         Route::resource('centers', CenterController::class);
@@ -116,11 +135,6 @@ Route::resource('injury-reports', OccupationalInjuryReportController::class);
         Route::resource('planes', PlaneController::class);
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
-        Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
-        Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
-        Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
-        Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
-        Route::resource('time-sheets', TimeSheetController::class);
         Route::resource('users', UserController::class);
         Route::get('dir', [EmployeeController::class,'dir']);
         Route::get('employees/imports', [EmployeeController::class, 'imports']);

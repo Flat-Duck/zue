@@ -142,7 +142,7 @@ protected function makeWhiteTransparent(string $binary): string
             $range  = \Imagick::getQuantumRange();
             $quant  = $range['quantumRangeLong'] ?? 65535;
             // للصور اللي فيها ظل/بيج خفيف، 20–30% ممتاز. إبدأ بـ 0.25
-            $fuzzRatio = 0.25;
+            $fuzzRatio = 0.25; 
             $fuzz      = (int)round($quant * $fuzzRatio);
 
             // امسح الخلفية (وكل ما يقرب منها) إلى شفاف

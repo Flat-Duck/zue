@@ -6,16 +6,18 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        @yield('meta_tags')
+        {{-- @yield('meta_tags') --}}
         
         <title>zue</title>
         
-        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-        @vite('resources/js/app.js')
-        
+        {{-- <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet"> --}}
+        {{-- @vite('resources/js/app.js') --}}
+        @vite('resources/sass/app.scss')
+
+        @vite('resources/js/app.css')
         
         <link rel="stylesheet" type="text/css" id="mce-u0" href="https://preview.tabler.io/dist/libs/hugerte/skins/ui/oxide/skin.min.css">
-        {{-- @livewireStyles --}}
+        @livewireStyles
         @yield('styles')
 
     </head>
@@ -50,10 +52,10 @@
         
         {{-- @livewireScripts --}}
         
-        
+                @vite('resources/js/app.js')
         <script src="{{asset('hugerte.js')}}"></script>
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-        <script src="https://preview.tabler.io/dist/libs/tom-select/dist/js/tom-select.base.min.js?1726507346"></script>
+        {{-- <script src="https://preview.tabler.io/dist/libs/tom-select/dist/js/tom-select.base.min.js?1726507346"></script> --}}
         
         @if (session()->has('success')) 
         <script>

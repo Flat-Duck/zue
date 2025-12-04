@@ -20,6 +20,7 @@ return [
         'saved' => ' Saved successfully',
         'removed' => ' Successfully removed',
         'print_preview' => ' Print',
+        'time_sheet_approve' => 'Approve Time Sheets',
         'none' => ' None',
         'please_select' => ' Please select',
     ],

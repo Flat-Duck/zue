@@ -1,392 +1,442 @@
 @extends('layouts.app', ['page' => 'employees'])
 @section('content')
-@section('styles')
-    <style>
-        .centered {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+    @section('styles')
+        <style>
+            .centered {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
 
-        /* Container holding the image and the text */
-        .container {
-            position: relative;
-            text-align: center;
-            color: white;
-            min-height: 60px;
-        }
+            /* Container holding the image and the text */
+            .container {
+                position: relative;
+                text-align: center;
+                color: white;
+                min-height: 60px;
+            }
 
-        @media print {
+            @media print {
 
-            html,
-            body {
-                height: 100%;
-                width: 100%;
+                html,
+                body {
+                    height: 100%;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                img {
+                    /* width:100%; */
+                    height: 100%;
+                    display: block;
+                }
+
+
+                @page {
+                    size: A4 landscape;
+                    max-height: 100%;
+                    max-width: 100%;
+                    margin-bottom: 0px;
+                    margin-top: 0px;
+                    margin-left: 10px;
+                    margin-right: 10px;
+                }
+
+                .pagebreak {
+                    page-break-after: always;
+                }
+            }
+
+            .header {
+                max-height: 120px;
+                margin: 0px;
+                margin-top: 10px;
+            }
+
+            .box {
+                border: 1px solid black;
+                margin: 0px;
+                margin-left: 2px;
+            }
+
+            .divider {
+                margin: 0px;
+            }
+
+            h6 {
                 margin: 0;
-                padding: 0;
             }
 
-            img {
-                /* width:100%; */
-                height: 100%;
-                display: block;
+            table {
+                page-break-inside: auto;
             }
 
-
-            @page {
-                size: A4 landscape;
-                max-height: 100%;
-                max-width: 100%;
-                margin-bottom: 0px;
-                margin-top: 0px;
-                margin-left: 10px;
-                margin-right: 10px;
+            thead {
+                display: table-header-group;
             }
 
-            .pagebreak {
-                page-break-after: always;
+            tfoot {
+                display: table-footer-group;
             }
-        }
 
-        .header {
-            max-height: 120px;
-            margin: 0px;
-            margin-top: 10px;
-        }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
 
-        .box {
-            border: 1px solid black;
-            margin: 0px;
-            margin-left: 2px;
-        }
+            table tr:last-child {
+                border-bottom: 1px solid black;
+            }
 
-        .divider {
-            margin: 0px;
-        }
+            td,
+            th {
+                border: 1px solid black;
+                border-bottom: 0px;
+            }
 
-        h6 {
-            margin: 0;
-        }
+            .name {
+                font-size: small;
+                padding: 0px;
+                margin: 0px;
+            }
 
-        table {
-            page-break-inside: auto;
-        }
+            .skyblue {
+                background-color: #87ceeb !important;
+            }
 
-        thead {
-            display: table-header-group;
-        }
+            .grassgreen {
+                background-color: #7cb378 !important;
+            }
 
-        tfoot {
-            display: table-footer-group;
-        }
-
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-        }
-
-        table tr:last-child {
-            border-bottom: 1px solid black;
-        }
-
-        td,
-        th {
-            border: 1px solid black;
-            border-bottom: 0px;
-        }
-
-        .name {
-            font-size: small;
-            padding: 0px;
-            margin: 0px;
-        }
-
-        .skyblue {
-            background-color: #87ceeb !important;
-        }
-
-        .grassgreen {
-            background-color: #7cb378 !important;
-        }
-
-        .expnded {
-            /* font-size: x-large !important; */
-            font-size: larger !important;
-            color: black !important;
+            .expnded {
+                /* font-size: x-large !important; */
+                font-size: larger !important;
+                color: black !important;
 
 
-        }
+            }
 
-        /* table {
-            border-collapse: collapse;
-            width: 100%;
-        } */
+            /* table {
+                        border-collapse: collapse;
+                        width: 100%;
+                    } */
 
-        tbody tr:nth-child(even) {
-            border-bottom: 4px double #000 !important;
-            border-left: 4px double #000 !important;
-            border-right: 4px double #000 !important;
+            tbody tr:nth-child(even) {
+                border-bottom: 4px double #000 !important;
+                border-left: 4px double #000 !important;
+                border-right: 4px double #000 !important;
 
-        }
+            }
 
-        tbody tr:nth-child(odd) {
-            border-top: 4px double #000 !important;
-            border-left: 4px double #000 !important;
-            border-right: 4px double #000 !important;
-        }
+            tbody tr:nth-child(odd) {
+                border-top: 4px double #000 !important;
+                border-left: 4px double #000 !important;
+                border-right: 4px double #000 !important;
+            }
 
-        tbody tr th:nth-child(1, 2, 3) {
-            border-top: 4px double #000 !important;
-            border-left: 4px double #000 !important;
-            border-right: 4px double #000 !important;
-        }
+            tbody tr th:nth-child(1, 2, 3) {
+                border-top: 4px double #000 !important;
+                border-left: 4px double #000 !important;
+                border-right: 4px double #000 !important;
+            }
 
-        tbody th:nth-child(-n+3) {
-            border-top: 4px double #000 !important;
-            border-left: 4px double #000 !important;
-            border-right: 4px double #000 !important;
-        }
+            tbody th:nth-child(-n+3) {
+                border-top: 4px double #000 !important;
+                border-left: 4px double #000 !important;
+                border-right: 4px double #000 !important;
+            }
 
-        tbody td:last-child() {
-            border-top: 4px double #000 !important;
-            border-left: 4px double #000 !important;
-            border-right: 4px double #000 !important;
-        }
+            tbody td:last-child() {
+                border-top: 4px double #000 !important;
+                border-left: 4px double #000 !important;
+                border-right: 4px double #000 !important;
+            }
 
-        /* tbody th, tbody td {
-            border: 1px solid #ccc;
-            padding: 4px;
-        } */
-    </style>
-@endsection
-<div class="card">
-    <div class="card-body">
-        @php
-            $rt = 1;
-        @endphp
-        @foreach ($chunks as $k => $days)
-            <div class="header">
-                <div class="row mt-2">
-                    <div class="col-3">
-                        <img src="{{asset('/img/zue-logo.png')}}" style="height: 100px" class="mx-auto d-block">
+            /* tbody th, tbody td {
+                        border: 1px solid #ccc;
+                        padding: 4px;
+                    } */
+        </style>
+    @endsection
+    <div class="card">
+        <div class="card-body">
+            @php
+                $rt = 1;
+            @endphp
+            @foreach ($chunks as $k => $days)
+                <div class="header">
+                    <div class="row mt-2">
+                        <div class="col-3">
+                            <img src="{{ asset('/img/zue-logo.png') }}" style="height: 100px" class="mx-auto d-block">
+                        </div>
+                        <div class="col-6">
+                            <h2 class="h2 text-center">
+                                حقول الانتصار 103
+                            </h2>
+                            <h3 class="h3 text-center">
+                                بطاقة ضبط الوقت
+                            </h3>
+                        </div>
+                        <div class="col-3">
+                            <img src="{{ asset('/img/noc-logo.png') }}" style="height: 100px" class="mx-auto d-block">
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <h2 class="h2 text-center">
-                            حقول الانتصار 103
-                        </h2>
-                        <h3 class="h3 text-center">
-                            بطاقة ضبط الوقت
-                        </h3>
-                    </div>
-                    <div class="col-3">
-                        <img src="{{asset('/img/noc-logo.png')}}" style="height: 100px" class="mx-auto d-block">
+                    <div class="row mt-2">
+                        <div class="col-1"></div>
+                        <div class="col-2 box">
+                            <h6 class="text-center">
+                                السنة
+                            </h6>
+                            <hr class="divider">
+                            <h6 class="text-center">
+                                2023
+                            </h6>
+                        </div>
+                        <div class="col-2 box">
+                            <h6 class="text-center">
+                                الشهر
+                            </h6>
+                            <hr class="divider">
+                            <h6 class="text-center">
+                                {{ $month_name }}
+                            </h6>
+                        </div>
+                        <div class="col-2 box">
+                            <h6 class="text-center">
+                                مركز التكلفة
+                            </h6>
+                            <hr class="divider">
+                            <h6 class="text-center">
+                                5M49
+                            </h6>
+                        </div>
+                        <div class="col-2 box">
+                            <h6 class="text-center">
+                                القسم
+                            </h6>
+                            <hr class="divider">
+                            <h6 class="text-center">
+                                معمل الغاز
+                            </h6>
+                        </div>
+                        <div class="col-2 box">
+                            <h6 class="text-center">
+                                الادارة
+                            </h6>
+                            <hr class="divider">
+                            <h6 class="text-center">
+                                العمليات
+                            </h6>
+                        </div>
+                        <div class="col-1"></div>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-1"></div>
-                    <div class="col-2 box">
-                        <h6 class="text-center">
-                            السنة
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="text-center">
-                            2023
-                        </h6>
-                    </div>
-                    <div class="col-2 box">
-                        <h6 class="text-center">
-                            الشهر
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="text-center">
-                            {{ $month_name }}
-                        </h6>
-                    </div>
-                    <div class="col-2 box">
-                        <h6 class="text-center">
-                            مركز التكلفة
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="text-center">
-                            5M49
-                        </h6>
-                    </div>
-                    <div class="col-2 box">
-                        <h6 class="text-center">
-                            القسم
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="text-center">
-                            معمل الغاز
-                        </h6>
-                    </div>
-                    <div class="col-2 box">
-                        <h6 class="text-center">
-                            الادارة
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="text-center">
-                            العمليات
-                        </h6>
-                    </div>
-                    <div class="col-1"></div>
-                </div>
-            </div>
-            <div class="table-responsive p-0 my-4">
-                <table class="table table-vcenter text-center">
-                    <thead>
-                        <tr>
-                            <th class="p-1">#</th>
-                            <th class="p-0 m-0">Z-N</th>
-                            <th class="p-0 ">Employee Name</th>
-                            @for ($i = 1; $i < $month_days; $i++)
-                                <th rowspan="2" class="p-1">
-                                    <h5 class="p-0 m-0"> {{ $x = $i >= 10 ? $i : '0' . $i }}</h5>
-                                </th>
-                            @endfor
-                            <th class="p-0">OT</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($days as $e_id => $month)
-                            <div>
-                                <tr>
-                                    <th rowspan="2" class="p-0">{{ $rt++ }}</th>
-                                    <th rowspan="2" class="p-0 m-0">{{ $e_id }}</th>
-                                    <th rowspan="2" class="p-0 name m-0">{{ $employees[$e_id] }}</th>
-                                    @php
-                                        $TOT = 0;
-                                    @endphp
-                                    @foreach ($month as $day)
+                <div class="table-responsive p-0 my-4" style="margin-top: 50px !important;">
+                    <table class="table table-vcenter text-center">
+                        <thead>
+                            <tr>
+                                <th class="p-1">#</th>
+                                <th class="p-0 m-0">Z-N</th>
+                                <th class="p-0 ">Employee Name</th>
+                                @for ($i = 1; $i < $month_days; $i++)
+                                    <th rowspan="2" class="p-1">
+                                        <h5 class="p-0 m-0"> {{ $x = $i >= 10 ? $i : '0' . $i }}</h5>
+                                    </th>
+                                @endfor
+                                <th class="p-0">OT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($days as $e_id => $month)
+                                <div>
+                                    <tr>
+                                        <th rowspan="2" class="p-0">{{ $rt++ }}</th>
+                                        <th rowspan="2" class="p-0 m-0">{{ $e_id }}</th>
+                                        <th rowspan="2" class="p-0 name m-0">{{ $employees[$e_id] }}</th>
                                         @php
-                                            $value = $day->value;
-                                            $OT = 0;
+                                            $totalOT = 0;
+                                            $daysCount = count($month);
+                                            $columnsCount = $month_days - 1;
                                         @endphp
-                                        @if ($value)
-                                            @if ($value == 'F' || $value == 'X')
-                                                <th class="p-0 grassgreen expnded">{{ $value }}</th>
-                                                @php
-                                                    $OT = 0;
-                                                @endphp
-                                            @elseif ($value == 'A' || $value == 'Y' || $value == 'B' || $value == 'K')
-                                                <th class="p-0 skyblue expnded">{{ $value }}</th>
-                                                @if ($value == 'Y' || $value == 'B' || $value == 'K')
-                                                    @php
-                                                        $OT = 4;
-                                                    @endphp
-                                                @elseif ($value == 'A')
-                                                    @php
-                                                        $OT = 2;
-                                                    @endphp
-                                                @endif
+                                        @foreach ($month as $day)
+                                            @php
+                                                $totalOT += $day->ot_value;
+                                            @endphp
+                                            @if ($day->value)
+                                                <th class="p-0 {{ $day->css_class }} expnded">{{ $day->value }}</th>
                                             @else
-                                                <th class="p-0 expnded">{{ $value }}</th>
+                                                <th class="p-0 bg-muted expnded">?</th>
                                             @endif
-                                        @else
+                                        @endforeach
+                                        @for ($i = $daysCount; $i < $columnsCount; $i++)
                                             <th class="p-0 bg-muted expnded">?</th>
-                                        @endif
-                                        @php
-                                            $TOT += $OT;
-                                        @endphp
-                                    @endforeach
-
-
-                                    <th rowspan="2" class="p-1 expnded">{{ $TOT }}</th>
-                                </tr>
-
-                                <tr>
-                                    {{-- @php
-                                    $totalOverTime = 0;
-                                @endphp --}}
-                                    @php
-                                        $TOT = 0;
-                                    @endphp
-                                    @foreach ($month as $day)
-                                        @php
-                                            $OT = 0;
-                                            $bg = '';
-                                            $value = $day->value;
-                                            if ($value == 'Y' || $value == 'B' || $value == 'K') {
-                                                $OT = 4;
-                                                $bg = 'skyblue';
-                                            } elseif ($value == 'A') {
-                                                $OT = 2;
-                                                $bg = 'skyblue';
-                                            } elseif ($value == 'F' || $value == 'X') {
-                                                $OT = 0;
+                                        @endfor
+                                        <th rowspan="2" class="p-1 expnded">{{ $totalOT }}</th>
+                                    </tr>
+                                    <tr>
+                                        @foreach ($month as $day)
+                                            @php
                                                 $bg = '';
-                                            } else {
-                                                $OT = 0;
-                                            }
-                                            $TOT += $OT;
-                                        @endphp
+                                                if ($day->ot_value > 0) {
+                                                    $bg = 'skyblue';
+                                                }
+                                            @endphp
+                                            <td class="p-0 {{ $bg }} expnded">{{ $day->ot_value == 0 ? '*' : $day->ot_value }}</td>
+                                        @endforeach
 
-                                        <td class="p-0 {{ $bg }} expnded ">{{ $OT == 0 ? '*' : $OT }}</td>
-                                        {{-- <td class="p-0 bg-muted">{{ $day->over_time <> 0? '*' }}</td> --}}
-                                        {{-- @php
-                                        $totalOverTime += $day->over_time;
-                                    @endphp --}}
-                                    @endforeach
-                                    {{-- <td class="p-0"> {{ $totalOverTime }}</td> --}}
-                                </tr>
-                            </div>
-                        @endforeach
+                                        {{-- Fill remaining columns --}}
+                                        @for ($i = $daysCount; $i < $columnsCount; $i++)
+                                            <td class="p-0 bg-muted expnded">*</td>
+                                        @endfor
+                                    </tr>
 
-                    </tbody>
-                </table>
-            </div>
-            <footer>
-                <div class="row">
+                                </div>
+                            @endforeach
 
-                    <div class="col-1"></div>
-                    <div class="col-3 box text-center ">
-                        <h6>
-                            منسق الحقل
-                        </h6>
-                        <hr class="divider">
-
-                        <h6 class="container">
-                            @isset($signatures['super_intendent']['sign'])
-                            <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}" style="height: 70px; margin-top: 12px;"
-                                class="mx-auto d-block centered">
-                                @endisset
-                        </h6>
-                        {{ $signatures['super_intendent']['name'] }}
-                    </div>
-                    <div class="col-4 box text-center">
-                        <h6>
-                            مشرف القسم
-                        </h6>
-                        <hr class="divider">
-                        <h6 class="container">
-                            @isset($signatures['super_visor']['sign'])
-                            <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}" style="height: 70px; margin-top: 12px;"
-                                class="mx-auto d-block centered">
-                                @endisset
-                        </h6>
-                        {{ $signatures['super_visor']['name'] }}
-                    </div>
-                    <div class="col-3 box text-center">
-                        <h6>
-                            حافظ الوقت
-                        </h6>
-                         <hr class="divider">
-                        <h6 class="container">
-                            @isset($signatures['time_keeper']['sign'])
-                            <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}" style="height: 70px; margin-top: 12px;"
-                                class="mx-auto d-block centered">
-                            @endisset
-                        </h6>
-                        {{ $signatures['time_keeper']['name'] }}
-                    </div>
-                    <div class="col-1"></div>
+                        </tbody>
+                    </table>
                 </div>
+                <footer>
+                    <div class="row">
+                        <div class="col-1"></div>
+                        <div class="col-3 box text-center ">
+                            <h6>منسق الحقل</h6>
+                            <hr class="divider">
 
-            </footer>
-            <div class="pagebreak"></div>
-        @endforeach
+                            @if(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
+                                {{-- زر الموافقة فقط لو المستخدم منسق الحقل وفيه تايم شيت يحتاج توقيع المنسق --}}
+                                <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                    class="pull-right btn btn-yellow"
+                                    href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month]) }}">
+                                    <i class="ti ti-check"></i>
+                                    @lang('crud.common.time_sheet_approve')
+                                </a>
+                            @else
+                                {{-- عرض التوقيع لو موجود --}}
+                                @isset($signatures['super_intendent']['sign'])
+                                    <div>
+                                        <h6 class="container">
+                                            <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
+                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                        </h6>
+                                        {{ $signatures['super_intendent']['name'] }}
+                                    </div>
+                                @endisset
+                            @endif
+                        </div>
+
+                        {{-- <div class="col-3 box text-center ">
+                            <h6>
+                                منسق الحقل
+                            </h6>
+                            <hr class="divider">
+                            <div>
+                                <h6 class="container">
+                                    @isset($signatures['super_intendent']['sign'])
+                                    <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
+                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                    @endisset
+                                </h6>
+                                {{ $signatures['super_intendent']['name'] }}
+                            </div>
+                            <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                class="pull-right btn btn-yellow" href="{{ route('time-sheets.approves') }}">
+                                <i class="ti ti-check"></i>
+                                @lang('crud.common.time_sheet_approve')
+                            </a>
+                        </div> --}}
+                        <div class="col-4 box text-center">
+                            <h6>مشرف القسم</h6>
+                            <hr class="divider">
+
+                            @if(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
+                                <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                    class="pull-right btn btn-yellow"
+                                    href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month]) }}">
+                                    <i class="ti ti-check"></i>
+                                    @lang('crud.common.time_sheet_approve')
+                                </a>
+                            @else
+                                @isset($signatures['super_visor']['sign'])
+                                    <div>
+                                        <h6 class="container">
+                                            <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
+                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                        </h6>
+                                        {{ $signatures['super_visor']['name'] }}
+                                    </div>
+                                @endisset
+                            @endif
+                        </div>
+
+                        {{-- <div class="col-4 box text-center">
+                            <h6>
+                                مشرف القسم
+                            </h6>
+                            <hr class="divider">
+                            <div>
+                                <h6 class="container">
+                                    @isset($signatures['super_visor']['sign'])
+                                    <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
+                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                    @endisset
+                                </h6>
+                                {{ $signatures['super_visor']['name'] }}
+                            </div>
+                        </div> --}}
+                        <div class="col-3 box text-center">
+                            <h6>حافظ الوقت</h6>
+                            <hr class="divider">
+
+                            @if(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
+                                <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                    class="pull-right btn btn-yellow"
+                                    href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month]) }}">
+                                    <i class="ti ti-check"></i>
+                                    @lang('crud.common.time_sheet_approve')
+                                </a>
+                            @else
+                                @isset($signatures['time_keeper']['sign'])
+                                    <div>
+                                        <h6 class="container">
+                                            <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
+                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                        </h6>
+                                        {{ $signatures['time_keeper']['name'] }}
+                                    </div>
+                                @endisset
+                            @endif
+                        </div>
+
+                        {{-- <div class="col-3 box text-center">
+                            <h6>
+                                حافظ الوقت
+                            </h6>
+                            <hr class="divider">
+                            <div>
+                                <h6 class="container">
+                                    @isset($signatures['time_keeper']['sign'])
+                                    <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
+                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                    @endisset
+                                </h6>
+                                {{ $signatures['time_keeper']['name'] }}
+                            </div>
+                            <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                class="pull-right btn btn-yellow" href="{{ route('time-sheets.approves') }}">
+                                <i class="ti ti-check"></i>
+                                @lang('crud.common.time_sheet_approve')
+                            </a>
+                        </div> --}}
+                        <div class="col-1"></div>
+                    </div>
+
+                </footer>
+                <div class="pagebreak"></div>
+            @endforeach
+        </div>
     </div>
-</div>
 
 @endsection

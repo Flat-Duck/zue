@@ -24,6 +24,8 @@ class Employee extends Model
     use SoftDeletes;
     use SoftArchives;
 
+    public const SPECIAL_WORK_DAYS_THRESHOLD = 19;
+
     protected $fillable = [
         'number',
         'job',
@@ -48,7 +50,7 @@ class Employee extends Model
         'management_level',
         'employee_level',
     ];
-    
+
     protected $appends = [
         'administration_name',
         'department_name',
@@ -61,7 +63,7 @@ class Employee extends Model
         'total_off_days',
         'default_over_time_value',
     ];
-    
+
     protected $searchableFields = ['*'];
 
     protected $casts = [
@@ -81,28 +83,27 @@ class Employee extends Model
     {
         return $this->hasMany(TimeSheet::class);
     }
-    public function clinicApointments ()
+    public function clinicApointments()
     {
         return $this->hasMany(ClinicApointment::class);
     }
-    public function apointments ()
+    public function apointments()
     {
         $appointments = $this->clinicApointments
-        // ->select(
-        //     DB::raw('YEAR(created_at) as year'),
-        //     DB::raw('MONTHNAME(created_at) as month'),
-        //     DB::raw('COUNT(*) as count'))
-        //     ->groupBy('year', 'month')
-        //     ->get();
+            // ->select(
+            //     DB::raw('YEAR(created_at) as year'),
+            //     DB::raw('MONTHNAME(created_at) as month'),
+            //     DB::raw('COUNT(*) as count'))
+            //     ->groupBy('year', 'month')
+            //     ->get();
 
-            ->map(function($appointment) {
+            ->map(function ($appointment) {
                 $appointment->year = Carbon::parse($appointment->date)->format('Y');
                 $appointment->month = Carbon::parse($appointment->date)->format('F');
                 return $appointment;
             });
-                // Group appointments by year and month 
-        return $appointments->groupBy(function($appointment)
-        {
+        // Group appointments by year and month 
+        return $appointments->groupBy(function ($appointment) {
             return $appointment->year . '-' . $appointment->month;
         });
     }
@@ -133,14 +134,14 @@ class Employee extends Model
     }
     public function getOwnRoomAttribute()
     {
-        return $this->rooms()->where('is_owner',true)->exists();
+        return $this->rooms()->where('is_owner', true)->exists();
     }
 
     public function getAdministrationNameAttribute()
     {
         return Administration::first()->name;
     }
-    
+
     public function getDepartmentNameAttribute()
     {
         return Department::first()->name;
@@ -157,7 +158,7 @@ class Employee extends Model
 
     public function getStartDateAttribute($date)
     {
-         return date('Y/m/d', strtotime($date));
+        return date('Y/m/d', strtotime($date));
     }
     public function getLastDateAttribute($date)
     {
@@ -185,7 +186,7 @@ class Employee extends Model
     {
         return $this->timeSheets()->whereIn('value', ['F', 'X'])->count();
     }
-    
+
     public function getDefaultOverTimeValueAttribute()
     {
         return 2;
@@ -211,7 +212,7 @@ class Employee extends Model
     {
         return $this->hasRole('timekeeper');
     }
-    
+
     public function managementScopes(): HasMany
     {
         return $this->hasMany(ManagementScope::class, 'manager_id');

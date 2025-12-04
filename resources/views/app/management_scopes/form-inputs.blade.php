@@ -143,31 +143,102 @@
     </x-inputs.group>
 
     {{-- Specific employees (multi-select) --}}
-    <x-inputs.group class="col-sm-12">
+    {{-- <x-inputs.group class="col-sm-12"> --}}
+    <div class="mb-3">
+        <div class="form-label">@lang('crud.management_scopes.inputs.subordinate_employee_id', [], 'en')
+</div>
+	{{-- <select class="form-select" {% if include.multiple %} multiple{% endif %}>
+		{% for option in options %}
+		<option value="{{ forloop.index }}">{{ option }}</option>
+		{% endfor %}
+	</select>
+</div>
         <label for="subordinate_employee_ids" class="form-label">
             @lang('crud.management_scopes.inputs.subordinate_employee_id', [], 'en')
-        </label>
+        </label> --}}
 
+            <select
+                name="subordinate_employee_ids[]"
+                id="subordinate_employee_ids"
+                class="form-select"
+                multiple
+                data-tomselect="tags"
+            >
+                @foreach($employees as $employee)
+                    <option value="{{ $employee->id }}" 
+                        @selected(in_array($employee->id, $selectedSubordinates)) >
+                        {{ $employee->english_name ?? ('#'.$employee->id) }}
+                    </option>
+                @endforeach
+            </select>
+            
+            <small class="form-hint">
+                Select one or more employees when scope type is <strong>employee</strong>.
+            </small>
+    {{-- </x-inputs.group> --}}
+        </div>
+         <x-inputs.group class="col-sm-12">
+        <label for="scope_type" class="form-label">
+            @lang('crud.management_scopes.inputs.scope_type', [], 'en')
+        </label>
         <select
-            name="subordinate_employee_ids[]"
-            id="subordinate_employee_ids"
-            {{-- class="form-control" --}}
-            multiple
-        class="form-select"
-        data-role="tagsinput"
+            name="scope_type"
+            id="scope_type"
+            class="form-control"
         >
-            @foreach($employees as $employee)
+            <option value="">
+                @lang('crud.common.none', [], 'en')
+            </option>
+                <option @selected(old('scope_type', $editing ? $managementScope->scope_type : '') == 'employees') value="employees">General Employees</option>
+                <option @selected(old('scope_type', $editing ? $managementScope->scope_type : '') == 'time_sheet')value="time_sheet">Time Sheet</option>
+           
+        </select>
+    </x-inputs.group>
+            <x-inputs.group class="col-sm-12">
+        <label for="department_id" class="form-label">
+            @lang('crud.management_scopes.inputs.department_id', [], 'en')
+        </label>
+        <select
+            name="department_id"
+            id="department_id"
+            class="form-control"
+        >
+            <option value="">
+                @lang('crud.common.none', [], 'en')
+            </option>
+            @foreach($departments as $department)
                 <option
-                    value="{{ $employee->id }}"
-                    @selected(in_array($employee->id, $selectedSubordinates))
+                    value="{{ $department->id }}"
+                    @selected(old('department_id', $editing ? $managementScope->department_id : '') == $department->id)
                 >
-                    {{ $employee->english_name ?? ('#'.$employee->id) }}
+                    {{ $department->name }}
                 </option>
             @endforeach
         </select>
-
-        <small class="form-hint">
-            Select one or more employees when scope type is <strong>employee</strong>.
-        </small>
     </x-inputs.group>
-</div>
+      {{-- Center --}}
+    <x-inputs.group class="col-sm-12">
+        <label for="center_id" class="form-label">
+            @lang('crud.management_scopes.inputs.center_id', [], 'en')
+        </label>
+        <select
+            name="center_id"
+            id="center_id"
+            class="form-control"
+        >
+            <option value="">
+                @lang('crud.common.none', [], 'en')
+            </option>
+            @foreach($centers as $center)
+                <option
+                    value="{{ $center->id }}"
+                    @selected(old('center_id', $editing ? $managementScope->center_id : '') == $center->id)
+                >
+                    {{ $center->name }}
+                </option>
+            @endforeach
+        </select>
+    </x-inputs.group>
+
+    </div>
+{{-- </div> --}}

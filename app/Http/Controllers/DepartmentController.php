@@ -23,7 +23,7 @@ class DepartmentController extends Controller
 
         $departments = Department::search($search)
             ->latest()
-            ->paginate(5)
+            ->paginate(50)
             ->withQueryString();
 
         return view('app.departments.index', compact('departments', 'search'));
