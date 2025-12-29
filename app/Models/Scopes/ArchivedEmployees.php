@@ -1,4 +1,4 @@
-<!-- <?php
+<?php
 
 namespace App\Models\Scopes;
 
@@ -17,15 +17,15 @@ class ArchivedEmployees implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      */
-    public function apply(Builder $builder, Model $model) : void
+    public function apply(Builder $builder, Model $model): void
     {
-        if($this->with) {
+        if ($this->with) {
             $this->scopeWithArchived($builder);
         } else {
             $this->scopeWithoutArchived($builder);
         }
     }
-    
+
     /**
      * Adds a scope to search the table based on the
      * $searchableFields array inside the model
@@ -58,10 +58,6 @@ class ArchivedEmployees implements Scope
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
-    public function apply(Builder $builder, Model $model)
-    {
-        $builder->whereNull($model->getQualifiedDeletedAtColumn());
-    }
 
     /**
      * Extend the query builder with the needed functions.
@@ -123,7 +119,7 @@ class ArchivedEmployees implements Scope
     protected function addWithArchived(Builder $builder)
     {
         $builder->macro('withArchived', function (Builder $builder, $withArchived = true) {
-            if (! $withArchived) {
+            if (!$withArchived) {
                 return $builder->withoutArchived();
             }
 

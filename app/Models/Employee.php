@@ -232,9 +232,18 @@ class Employee extends Model
      * Query builder for all employees this employee can manage.
      * Use this if you want to paginate, eager-load, etc.
      */
-    public function managedEmployeesQuery(): Builder
+    public function managedEmployeesQuery(?string $context = 'general'): Builder
     {
-        $scopes = $this->managementScopes()->get();
+        $scopes = $this->managementScopes()
+            ->where(function ($q) use ($context) {
+                // If context is provided, filter by it.
+                // If context is null, maybe return all? Or default to 'general'?
+                // Requirement implies specific context usage.
+                if ($context) {
+                    $q->where('context', $context);
+                }
+            })
+            ->get();
 
         // If no scope is defined, this manager manages nobody
         if ($scopes->isEmpty()) {
@@ -246,36 +255,60 @@ class Employee extends Model
             ->where('id', '!=', $this->id)
             ->where(function (Builder $q) use ($scopes) {
                 foreach ($scopes as $scope) {
+                    $settings = $scope->settings ?? [];
+                    $jobTitle = $settings['job_title'] ?? null;
+
+                    $applySettings = function (Builder $query) use ($jobTitle) {
+                        if ($jobTitle) {
+                            $query->where('job', $jobTitle);
+                        }
+                    };
+
                     switch ($scope->scope_type) {
                         case ManagementScope::TYPE_GLOBAL:
-                            $q->orWhereRaw('1 = 1');
+                            $q->orWhere(function (Builder $q2) use ($applySettings) {
+                                $q2->whereRaw('1 = 1');
+                                $applySettings($q2);
+                            });
                             break;
 
                         case ManagementScope::TYPE_LOCATION:
                             if ($scope->location_id) {
-                                $q->orWhere('location_id', $scope->location_id);
+                                $q->orWhere(function (Builder $q2) use ($scope, $applySettings) {
+                                    $q2->where('location_id', $scope->location_id);
+                                    $applySettings($q2);
+                                });
                             }
                             break;
 
                         case ManagementScope::TYPE_DEPARTMENT:
                             if ($scope->location_id && $scope->department_id) {
-                                $q->orWhere(function (Builder $q2) use ($scope) {
+                                $q->orWhere(function (Builder $q2) use ($scope, $applySettings) {
                                     $q2
                                         ->where('location_id', $scope->location_id)
                                         ->where('department_id', $scope->department_id);
+                                    $applySettings($q2);
                                 });
                             }
                             break;
 
                         case ManagementScope::TYPE_CENTER:
                             if ($scope->center_id) {
-                                $q->orWhere('center_id', $scope->center_id);
+                                $q->orWhere(function (Builder $q2) use ($scope, $applySettings) {
+                                    $q2->where('center_id', $scope->center_id);
+                                    $applySettings($q2);
+                                });
                             }
                             break;
 
                         case ManagementScope::TYPE_EMPLOYEE:
+                            // 1. Direct subordinate
                             if ($scope->subordinate_employee_id) {
                                 $q->orWhere('id', $scope->subordinate_employee_id);
+                            }
+                            // 2. Grouped subordinates
+                            if (!empty($settings['target_employee_ids'])) {
+                                $q->orWhereIn('id', $settings['target_employee_ids']);
                             }
                             break;
                     }
@@ -286,9 +319,9 @@ class Employee extends Model
     /**
      * Get all managed employees as a collection.
      */
-    public function managedEmployees()
+    public function managedEmployees(?string $context = 'general')
     {
-        return $this->managedEmployeesQuery()->get();
+        return $this->managedEmployeesQuery($context)->get();
     }
 
     /**
