@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('appraisal_form_version_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('appraisal_form_version_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('item_id')->constrained('appraisal_items')->cascadeOnDelete();
+
+            $table->string('section_override')->nullable();
+            $table->string('label_override')->nullable();
+            $table->unsignedInteger('max_score_override')->nullable();
+
+            $table->unsignedSmallInteger('sort_order')->default(1);
+            $table->boolean('is_required')->default(true);
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+
+            $table->unique(['appraisal_form_version_id', 'item_id'], 'apr_fvi_uq');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('appraisal_form_version_items');
+    }
+};

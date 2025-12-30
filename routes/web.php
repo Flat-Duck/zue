@@ -40,7 +40,7 @@ use App\Http\Controllers\OccupationalInjuryReportController;
 */
 
 Route::post('/rr', function () {
-     
+
     // $name = 1;
     // $type = "VILLA";
     // $re = Residence::where('name',$name)->where('type',$type)->first();
@@ -53,15 +53,15 @@ Route::post('/rr', function () {
     // dd($re);
     Excel::import(new RoomsImport, request()->file('rooms'));
 
-    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees'));
+    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days', 'employees'));
 })->name('rr');
 // Route::get('/ss', function () {
-     
+
 //     $month_name = "April";
 //     $chunk = Timesheet::whereHas('employee', function ($query) {
 //     $query->whereNull('archived_at');
 // })->whereMonth('day', 10)->whereYear('day', '2025')->limit('310')->get();
-    
+
 //     $chunks = $chunk->groupBy('employee_id')->chunk(8);
 //     $first_chunk = $chunks->first()->first()->first();
 //     $signatures['time_keeper']['sign'] = $first_chunk->time_keeper->signature->image_path;
@@ -113,21 +113,21 @@ Route::prefix('/')
         // Route::get('run', RunController::class)->name('run.index');
         // Route::get('run', RunController::class)->name('run.index');
         // Route::get('run', RunController::class)->name('run.index');
-
+    
         Route::resource('injury-reports', OccupationalInjuryReportController::class);
 
         Route::resource('administrations', AdministrationController::class);
         Route::resource('centers', CenterController::class);
 
-        Route::post('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
+        Route::post('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening.save');
         Route::get('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
         Route::get('clinic/history/{employee}', [ClinicApointmentController::class, 'history'])->name('clinic.history');
         Route::get('clinic/diagnosis/{employee}', [ClinicApointmentController::class, 'diagnosis'])->name('clinic.diagnosis');
         Route::resource('clinic', ClinicApointmentController::class);//->name('clinic');
-        
-        
+    
+
         Route::resource('departments', DepartmentController::class);
-        Route::delete('flights/{flight}/approve', [FlightController::class,'approve'])->name('flights.approve');
+        Route::delete('flights/{flight}/approve', [FlightController::class, 'approve'])->name('flights.approve');
         Route::resource('flights', FlightController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('passengers', PassengerController::class);
@@ -136,16 +136,18 @@ Route::prefix('/')
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
         Route::resource('users', UserController::class);
-        Route::get('dir', [EmployeeController::class,'dir']);
+        Route::get('dir', [EmployeeController::class, 'dir']);
         Route::get('employees/imports', [EmployeeController::class, 'imports']);
         Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
         Route::resource('employees', EmployeeController::class);
 
-        Route::get('signature', [ProfileController::class, 'signature' ])->name('signature.show');
-        Route::get('profile', [ProfileController::class, 'show' ])->name('profile.show');
+        Route::get('signature', [ProfileController::class, 'signature'])->name('signature.show');
+        Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::get('reports', [ReportController::class, 'index'])->name('admin.reports.index');
         Route::post('reports/minus', [ReportController::class, 'minus'])->name('admin.reports.minus');
         Route::post('reports/to_date', [ReportController::class, 'to_date'])->name('admin.reports.to_date');
 
     });
+
+include __DIR__ . '/appraisals.php';

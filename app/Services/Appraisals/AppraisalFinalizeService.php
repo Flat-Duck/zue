@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Services\Appraisals;
+
+use App\Models\Appraisals\AppraisalOfficial;
+use App\Models\Appraisals\AppraisalOfficialScore;
+use App\Models\Appraisals\AppraisalPeriod;
+use App\Models\Appraisals\AppraisalReview;
+use App\Models\Appraisals\AppraisalReviewScore;
+use App\Models\Appraisals\AppraisalFormVersionItem;
+use Illuminate\Support\Facades\DB;
+
+class AppraisalFinalizeService
+{
+    public function finalizeForEmployee(AppraisalPeriod $period, int $employeeId, int $finalizedByEmployeeId): AppraisalOfficial
+    {
+        return DB::transaction(function () use ($period, $employeeId, $finalizedByEmployeeId) {
+
+            $reviews = AppraisalReview::query()
+                ->where('appraisal_period_id', $period->id)
+                ->where('employee_id', $employeeId)
+                ->where('status', 'submitted')
+                ->get();
+
+            if ($reviews->count() === 0) {
+                // nothing to finalize
+                return AppraisalOfficial::firstOrCreate([
+                    'appraisal_period_id' => $period->id,
+                    'employee_id' => $employeeId,
+                    'appraisal_form_version_id' => $this->guessFormVersionId($employeeId),
+                ]);
+            }
+
+            // Use the review's form version (assume same across reviews for same employee+period)
+            $formVersionId = (int) $reviews->first()->appraisal_form_version_id;
+
+            $avgRows = AppraisalReviewScore::query()
+                ->whereIn('appraisal_review_id', $reviews->pluck('id'))
+                ->select('form_version_item_id')
+                ->selectRaw('AVG(score) as avg_score')
+                ->groupBy('form_version_item_id')
+                ->get();
+
+            $official = AppraisalOfficial::updateOrCreate(
+                ['appraisal_period_id' => $period->id, 'employee_id' => $employeeId],
+                [
+                    'appraisal_form_version_id' => $formVersionId,
+                    'reviews_count' => $reviews->count(),
+                    'finalized_at' => now(),
+                    'finalized_by' => $finalizedByEmployeeId,
+                ]
+            );
+
+            AppraisalOfficialScore::where('appraisals_official_id', $official->id)->delete();
+
+            $items = AppraisalFormVersionItem::with('item')
+                ->whereIn('id', $avgRows->pluck('form_version_item_id'))
+                ->get()
+                ->keyBy('id');
+
+            $total = 0.0;
+            $max = 0;
+
+            foreach ($avgRows as $row) {
+                $fvi = $items[$row->form_version_item_id] ?? null;
+                if (!$fvi)
+                    continue;
+
+                AppraisalOfficialScore::create([
+                    'appraisals_official_id' => $official->id,
+                    'form_version_item_id' => $row->form_version_item_id,
+                    'avg_score' => round((float) $row->avg_score, 2),
+                ]);
+
+                $total += (float) $row->avg_score;
+                $max += (int) $fvi->resolved_max_score;
+            }
+
+            $percentage = $max > 0 ? round(($total / $max) * 100, 2) : null;
+
+            $official->update([
+                'total_score' => (int) round($total),
+                'max_score' => $max,
+                'percentage' => $percentage,
+                'grade' => $this->gradeFromPercentage($percentage),
+            ]);
+
+            // Lock those submissions
+            AppraisalReview::whereIn('id', $reviews->pluck('id'))->update(['status' => 'locked']);
+
+            return $official;
+        });
+    }
+
+    private function gradeFromPercentage(?float $p): ?string
+    {
+        if ($p === null)
+            return null;
+        if ($p >= 90)
+            return 'ممتاز';
+        if ($p >= 80)
+            return 'جيد جداً';
+        if ($p >= 70)
+            return 'جيد';
+        if ($p >= 60)
+            return 'مقبول';
+        return 'ضعيف';
+    }
+
+    private function guessFormVersionId(int $employeeId): int
+    {
+        // fallback only; better to always create reviews with correct version
+        return (int) \App\Models\Appraisals\AppraisalFormVersion::query()
+            ->where('is_active', true)
+            ->orderByDesc('version')
+            ->value('id');
+    }
+}
