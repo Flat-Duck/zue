@@ -18,8 +18,7 @@
                             <li class="nav-item {{ $page == 'employees' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('employees.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Employees -->
-                                        <!-- Employees Icon -->
+                                        <i class="ti ti-users"></i>
                                     </span>
                                     <span class="nav-link-title">
                                         Employees
@@ -31,8 +30,7 @@
                             <li class="nav-item {{ $page == 'clinic' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('clinic.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Employees -->
-                                        <!-- Employees Icon -->
+                                        <i class="ti ti-building-hospital"></i>
                                     </span>
                                     <span class="nav-link-title">
                                         clinic
@@ -40,111 +38,168 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('view-any', App\Models\Flight::class)
-                            <li class="nav-item {{ $page == 'flights' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('flights.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Flights -->
-                                        <!-- Flights Icon -->
-                                    </span>
-                                    <span class="nav-link-title">
-                                        Flights
-                                    </span>
-                                </a>
-                            </li>
-                        @endcan
-                        {{-- @can('view-any', App\Models\Administration::class)
-                        <li class="nav-item {{ $page == 'administrations'? 'active':''  }}">
-                            <a class="nav-link" href="{{ route('administrations.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/Administrations -->
-                                    <!-- Administrations Icon -->
-                                </span>
-                                <span class="nav-link-title">
-                                    Administrations
-                                </span>
-                            </a>
-                        </li>
-                        @endcan
-                        @can('view-any', App\Models\Center::class)
-                        <li class="nav-item {{ $page == 'centers'? 'active':''  }}">
-                            <a class="nav-link" href="{{ route('centers.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/Centers -->
-                                    <!-- Centers Icon -->
-                                </span>
-                                <span class="nav-link-title">
-                                    Centers
-                                </span>
-                            </a>
-                        </li>
-                        @endcan
-                        @can('view-any', App\Models\Department::class)
-                        <li class="nav-item {{ $page == 'departments'? 'active':''  }}">
-                            <a class="nav-link" href="{{ route('departments.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/Departments -->
-                                    <!-- Departments Icon -->
-                                </span>
-                                <span class="nav-link-title">
-                                    Departments
-                                </span>
-                            </a>
-                        </li>
-                        @endcan
 
-                        @can('view-any', App\Models\Location::class)
-                        <li class="nav-item {{ $page == 'locations'? 'active':''  }}">
-                            <a class="nav-link" href="{{ route('locations.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/Locations -->
-                                    <!-- Locations Icon -->
-                                </span>
-                                <span class="nav-link-title">
-                                    Locations
-                                </span>
-                            </a>
-                        </li>
-                        @endcan --}}
-                        @can('view-any', App\Models\Passenger::class)
-                            <li class="nav-item {{ $page == 'passengers' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('passengers.index') }}">
+                        @if (
+                                Auth::user()->can('view-any', App\Models\Flight::class) ||
+                                Auth::user()->can('view-any', App\Models\Passenger::class)
+                            )
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Passengers -->
-                                        <!-- Passengers Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-building-airport">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M3.59 7h8.82a1 1 0 0 1 .902 1.433l-1.44 3a1 1 0 0 1 -.901 .567h-5.942a1 1 0 0 1 -.901 -.567l-1.44 -3a1 1 0 0 1 .901 -1.433" />
+                                            <path
+                                                d="M6 7l-.78 -2.342a.5 .5 0 0 1 .473 -.658h4.612a.5 .5 0 0 1 .475 .658l-.78 2.342" />
+                                            <path d="M8 2v2" />
+                                            <path d="M6 12v9h4v-9" />
+                                            <path d="M3 21h18" />
+                                            <path d="M22 5h-6l-1 -1" />
+                                            <path d="M18 3l2 2l-2 2" />
+                                            <path d="M10 17h7a2 2 0 0 1 2 2v2" />
+                                        </svg>
                                     </span>
                                     <span class="nav-link-title">
-                                        Passengers
+                                        Dispatcher Management
                                     </span>
                                 </a>
+                                <div class="dropdown-menu">
+                                    @can('view-any', App\Models\Flight::class)
+                                        <a class="dropdown-item" href="{{ route('flights.index') }}" rel="noopener">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-plane-departure"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Flights
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Passenger::class)
+                                        <a class="dropdown-item" href="{{ route('passengers.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-friends"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Passengers
+                                            </span>
+                                        </a>
+                                    @endcan
+                                </div>
                             </li>
-                        @endcan
-                        @can('view-any', App\Models\Residence::class)
-                            <li class="nav-item {{ $page == 'residences' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('residences.index') }}">
+                        @endif
+
+
+
+
+
+                        @if (
+                                Auth::user()->can('view-any', App\Models\Administration::class) ||
+                                Auth::user()->can('view-any', App\Models\Center::class) ||
+                                Auth::user()->can('view-any', App\Models\Department::class) ||
+                                Auth::user()->can('view-any', App\Models\Location::class) ||
+                                Auth::user()->can('view-any', App\Models\Passenger::class)
+                            )
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Residences -->
-                                        <!-- Residences Icon -->
+                                        <i class="ti ti-lock-access"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Residences
+                                        Management
                                     </span>
                                 </a>
+                                <div class="dropdown-menu">
+                                    @can('view-any', App\Models\Administration::class)
+                                        <a class="dropdown-item" href="{{ route('administrations.index') }}" rel="noopener">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-user-check"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Administrations
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Center::class)
+                                        <a class="dropdown-item" href="{{ route('centers.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-key"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Centers
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Department::class)
+                                        <a class="dropdown-item" href="{{ route('departments.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-key"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Departments
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Location::class)
+                                        <a class="dropdown-item" href="{{ route('locations.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-key"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Locations
+                                            </span>
+                                        </a>
+                                    @endcan
+
+                                </div>
                             </li>
-                        @endcan
-                        @can('view-any', App\Models\Room::class)
-                            <li class="nav-item {{ $page == 'rooms' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('rooms.index') }}">
+                        @endif
+
+
+                        @if (
+                                Auth::user()->can('view-any', App\Models\Residence::class) ||
+                                Auth::user()->can('view-any', App\Models\Room::class)
+                            )
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Rooms -->
-                                        <!-- Rooms Icon -->
+                                        <i class="ti ti-lock-access"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Rooms
+                                        Camp Boss
                                     </span>
                                 </a>
+                                <div class="dropdown-menu">
+                                    @can('view-any', App\Models\Residence::class)
+                                        <a class="dropdown-item" href="{{ route('residences.index') }}" rel="noopener">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-user-check"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Residences
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Room::class)
+                                        <a class="dropdown-item" href="{{ route('rooms.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-key"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Rooms
+                                            </span>
+                                        </a>
+                                    @endcan
+                                </div>
                             </li>
-                        @endcan
+                        @endif
+
                         @can('view-any', App\Models\Stock::class)
                             <li class="nav-item {{ $page == 'stocks' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('stocks.index') }}">
@@ -162,8 +217,7 @@
                             <li class="nav-item {{ $page == 'time-sheets' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('time-sheets.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Time Sheets -->
-                                        <!-- Time Sheets Icon -->
+                                        <i class="ti ti-calendar-time"></i>
                                     </span>
                                     <span class="nav-link-title">
                                         Time Sheets
@@ -171,8 +225,28 @@
                                 </a>
                             </li>
                         @endcan
+                        <li class="nav-item {{ $page == 'operations' ? 'active' : ''  }}">
+                            <a class="nav-link" href="{{ route('operations.index') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <i class="ti ti-settings-automation"></i>
+                                </span>
+                                <span class="nav-link-title">
+                                    Operations
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ $page == 'reports' ? 'active' : ''  }}">
+                            <a class="nav-link" href="{{ route('reports.index') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <i class="ti ti-report-analytics"></i>
+                                </span>
+                                <span class="nav-link-title">
+                                    Reports
+                                </span>
+                            </a>
+                        </li>
                         {{-- @can('view-any', App\Models\TimeSheet::class)
-                        <li class="nav-item {{ $page == 'run'? 'active':''  }}">
+                        <li class="nav-item {{ $page == 'run' ? 'active' : ''  }}">
                             <a class="nav-link" href="{{ route('run.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <!-- Download SVG icon from http://tabler-icons.io/i/Time Sheets -->
@@ -184,19 +258,7 @@
                             </a>
                         </li>
                         @endcan --}}
-                        @can('view-any', App\Models\User::class)
-                            <li class="nav-item {{ $page == 'users' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('users.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/Users -->
-                                        <!-- Users Icon -->
-                                    </span>
-                                    <span class="nav-link-title">
-                                        Users
-                                    </span>
-                                </a>
-                            </li>
-                        @endcan
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#navbar-appraisals" data-bs-toggle="dropdown"
                                 data-bs-auto-close="outside" role="button" aria-expanded="false">
@@ -294,46 +356,57 @@
                         </li>
 
                         @if (
-                                Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) ||
-                                Auth::user()->can('view-any', Spatie\Permission\Models\Permission::class)
-                            )
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
-                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <i class="ti ti-lock-access"></i>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        Access Management
-                                    </span>
-                                </a>
-                                <div class="dropdown-menu">
-                                    @can('view-any', Spatie\Permission\Models\Role::class)
-                                        <a class="dropdown-item" href="{{ route('roles.index') }}" rel="noopener">
+                                        Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) ||
+                                        Auth::user()->can('view-any', Spatie\Permission\Models\Permission::class)
+                                    )
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside" role="button" aria-expanded="false">
                                             <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="ti ti-user-check"></i>
+                                                <i class="ti ti-lock-access"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Roles
+                                                Access Management
                                             </span>
                                         </a>
-                                    @endcan
-                                    @can('view-any', Spatie\Permission\Models\Permission::class)
-                                        <a class="dropdown-item" href="{{ route('permissions.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="ti ti-key"></i>
-                                            </span>
-                                            <span class="nav-link-title">
-                                                Permissions
-                                            </span>
-                                        </a>
-                                    @endcan
-                                </div>
+
+
+                                        @can('view-any', App\Models\User::class)
+                                            <a class="dropdown-item" href="{{ route('users.index') }}" rel="noopener">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="ti ti-user-check"></i>
+                                                </span>
+                                                <span class="nav-link-title">
+                                                    Users
+                                                </span>
+                                            </a>
+                                        @endcan
+                                        @can('view-any', Spatie\Permission\Models\Role::class)
+                                            <a class="dropdown-item" href="{{ route('roles.index') }}" rel="noopener">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="ti ti-user-check"></i>
+                                                </span>
+                                                <span class="nav-link-title">
+                                                    Roles
+                                                </span>
+                                            </a>
+                                        @endcan
+                                        @can('view-any', Spatie\Permission\Models\Permission::class)
+                                            <a class="dropdown-item" href="{{ route('permissions.index') }}">
+                                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                    <i class="ti ti-key"></i>
+                                                </span>
+                                                <span class="nav-link-title">
+                                                    Permissions
+                                                </span>
+                                            </a>
+                                        @endcan
+                            </div>
                             </li>
                         @endif
                     @endauth
-                </ul>
-            </div>
+            </ul>
         </div>
+    </div>
     </div>
 </header>

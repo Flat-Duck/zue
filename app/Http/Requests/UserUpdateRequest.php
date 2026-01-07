@@ -29,6 +29,7 @@ class UserUpdateRequest extends FormRequest
             ],
             'password' => ['nullable'],
             'roles' => 'array',
+            'signature_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

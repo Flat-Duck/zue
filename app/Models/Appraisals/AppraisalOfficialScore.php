@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AppraisalOfficialScore extends Model
 {
-    protected $fillable = ['appraisals_official_id', 'form_version_item_id', 'avg_score'];
+    protected $fillable = ['appraisals_official_id', 'form_version_item_id', 'avg_score', 'score_override'];
 
     public function official(): BelongsTo
     {

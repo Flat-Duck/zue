@@ -128,6 +128,12 @@ class Employee extends Model
         return $this->belongsToMany(Room::class)->withPivot(['is_here', 'is_owner']);
     }
 
+    public function sick_leaves()
+    {
+        return 10;
+    }
+
+    
     public function flights()
     {
         return $this->belongsToMany(Flight::class);
@@ -198,9 +204,9 @@ class Employee extends Model
         return $this->hasRole('supervisor');
     }
 
-    public function isCoordinator(): bool
+    public function isFieldCoordinator(): bool
     {
-        return $this->hasRole('coordinator');
+        return $this->hasRole('fieldcoordinator');
     }
 
     public function isSuperintendent(): bool
@@ -366,12 +372,12 @@ class Employee extends Model
     protected static function boot()
     {
         parent::boot();
-        // if (Auth::check() && auth()->user()->hasRole('super-visor'))
+        // if (Auth::check() && auth()->user()->hasRole('supervisor'))
         // {
         //     static::addGlobalScope(new DepartmentEmployees(auth()->user()->center()));
         // }
-        // if (Auth::check() && (auth()->user()->hasRole('super-visor')
-        //     ||auth()->user()->hasRole('super-visor') ||auth()->user()->hasRole('super-visor')))
+        // if (Auth::check() && (auth()->user()->hasRole('supervisor')
+        //     ||auth()->user()->hasRole('supervisor') ||auth()->user()->hasRole('supervisor')))
         // {
         //     static::addGlobalScope(new UnderSupervisionEmployees(
         //         auth()->user()->center(),

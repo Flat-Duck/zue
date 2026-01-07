@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class AppraisalItem extends Model
 {
-    protected $fillable = ['key', 'default_section', 'default_label'];
+    protected $fillable = ['key', 'default_section', 'default_label', 'type'];
 }

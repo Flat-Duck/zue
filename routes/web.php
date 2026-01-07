@@ -21,6 +21,7 @@ use App\Http\Controllers\PassengerController;
 use App\Http\Controllers\ResidenceController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\OperationsController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\ProfileController;
@@ -108,12 +109,6 @@ Route::prefix('/')
         Route::resource('permissions', PermissionController::class);
         Route::resource('management-scopes', ManagementScopeController::class);
 
-        // Route::get('run', RunController::class)->name('run.index');
-        // Route::get('run', RunController::class)->name('run.index');
-        // Route::get('run', RunController::class)->name('run.index');
-        // Route::get('run', RunController::class)->name('run.index');
-        // Route::get('run', RunController::class)->name('run.index');
-    
         Route::resource('injury-reports', OccupationalInjuryReportController::class);
 
         Route::resource('administrations', AdministrationController::class);
@@ -135,7 +130,10 @@ Route::prefix('/')
         Route::resource('planes', PlaneController::class);
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
+        Route::get('users/template', [UserController::class, 'downloadTemplate'])->name('users.template');
+        Route::post('users/import', [UserController::class, 'import'])->name('users.import');
         Route::resource('users', UserController::class);
+        Route::post('users/{user}/upload-signature', [UserController::class, 'uploadSignature'])->name('users.upload-signature');
         Route::get('dir', [EmployeeController::class, 'dir']);
         Route::get('employees/imports', [EmployeeController::class, 'imports']);
         Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
@@ -144,10 +142,15 @@ Route::prefix('/')
         Route::get('signature', [ProfileController::class, 'signature'])->name('signature.show');
         Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::get('reports', [ReportController::class, 'index'])->name('admin.reports.index');
-        Route::post('reports/minus', [ReportController::class, 'minus'])->name('admin.reports.minus');
-        Route::post('reports/to_date', [ReportController::class, 'to_date'])->name('admin.reports.to_date');
-
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::post('reports/timesheets', [ReportController::class, 'timesheets'])->name('reports.timesheets');
+        Route::post('reports/balances', [ReportController::class, 'balances'])->name('reports.balances');
+        Route::post('reports/run', [ReportController::class, 'run'])->name('reports.run');
+        Route::post('reports/to_date', [ReportController::class, 'to_date'])->name('reports.to_date');
+        Route::post('reports/monthly-attendance', [ReportController::class, 'monthlyAttendance'])->name('reports.monthly-attendance');
+        Route::get('operations', [OperationsController::class, 'index'])->name('operations.index');
+        Route::post('operations/archive-by-timesheet', [OperationsController::class, 'archiveByTimesheet'])->name('operations.archive-by-timesheet');
+        Route::post('operations/unarchive-by-number', [OperationsController::class, 'unarchiveByNumber'])->name('operations.unarchive-by-number');
     });
 
 include __DIR__ . '/appraisals.php';

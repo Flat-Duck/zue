@@ -1,0 +1,11 @@
+﻿-- INSERT INTO `users` (`id`, `full_name`, `num`, `password`, `is_admin`, `is_users`, `is_revised`, `is_maint`, `is_employees`) VALUES
+--   (1, 'Abdulrahman Mahidwei', 9094, '95175300', 1, 1, 1, 1, 1),
+--   (2, 'Abdulhameed Ghnedi', 7080, '12051994', 0, NULL, NULL, NULL, NULL),
+--   (1002, 'Abdudayem Alawi', 6410, '01121988', 1, NULL, NULL, NULL, NULL),
+--   (2002, 'Khaled Scoot', 5527, 'aufhalkfhlyweufhlsjkdert', 0, NULL, NULL, NULL, NULL),
+--   (2003, 'Nabil Salem', 10588, 'N12345', 0, NULL, NULL, NULL, NULL),
+--   (2004, 'Essam Khaleel', 10601, 'E10601', 0, NULL, NULL, NULL, NULL),
+--   (2005, 'Omar Dahim', 8071, 'Domar8071', 0, NULL, NULL, NULL, NULL),
+--   (3004, 'wesam ali ', 10258, '1122334', 1, NULL, NULL, NULL, NULL),
+--   (3005, 'A.MAYOUF', 10729, 'A10729', 0, NULL, NULL, NULL, NULL)
+-- ;

@@ -19,6 +19,14 @@
                             <div class="form-hint">يفضل slug بالإنجليزي</div>
                         </div>
 
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" required>
+                                <option value="score" {{ old('type') === 'score' ? 'selected' : '' }}>Score (Numeric)</option>
+                                <option value="text" {{ old('type') === 'text' ? 'selected' : '' }}>Text (Comment)</option>
+                            </select>
+                        </div>
+
                         <div class="col-md-4">
                             <label class="form-label">Default Section</label>
                             <select name="default_section" class="form-select" required>

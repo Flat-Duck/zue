@@ -33,6 +33,7 @@ class AppraisalItemController extends Controller
         $data = $request->validate([
             'key' => 'required|string|max:255|unique:appraisal_items,key',
             'default_section' => 'required|in:job_performance,personal_traits,initiative',
+            'type' => 'required|in:score,text',
             'default_label' => 'required|string|max:255',
         ]);
 
@@ -51,6 +52,7 @@ class AppraisalItemController extends Controller
         $data = $request->validate([
             'key' => 'required|string|max:255|unique:appraisal_items,key,' . $item->id,
             'default_section' => 'required|in:job_performance,personal_traits,initiative',
+            'type' => 'required|in:score,text',
             'default_label' => 'required|string|max:255',
         ]);
 

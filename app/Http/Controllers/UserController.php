@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Models\Signature;
+use Illuminate\Support\Facades\Storage;
+use App\Services\SignatureService;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
 
 class UserController extends Controller
 {
@@ -54,6 +59,12 @@ class UserController extends Controller
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
+
+        $user = User::create($validated);
+
+        if ($request->hasFile('signature_file')) {
+            app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+        }
 
         $user->syncRoles($request->roles);
 
@@ -104,6 +115,12 @@ class UserController extends Controller
 
         $user->update($validated);
 
+        $user->update($validated);
+
+        if ($request->hasFile('signature_file')) {
+            app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+        }
+
         $user->syncRoles($request->roles);
 
         return redirect()
@@ -123,5 +140,61 @@ class UserController extends Controller
         return redirect()
             ->route('users.index')
             ->withSuccess(__('crud.common.removed'));
+    }
+
+    public function uploadSignature(Request $request, User $user): RedirectResponse
+    {
+        $this->authorize('update', $user);
+
+        $request->validate([
+            'signature_file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+
+        return redirect()
+            ->back()
+            ->withSuccess('Signature uploaded successfully');
+    }
+
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required',
+        ]);
+
+        try {
+            Excel::import(new UsersImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $message = 'Import failed. Row ' . $failures[0]->row() . ': ' . $failures[0]->errors()[0];
+             return redirect()->back()->withErrors(['file' => $message]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['file' => 'Error importing file: ' . $e->getMessage()]);
+        }
+
+        return redirect()
+            ->route('users.index')
+            ->withSuccess('Users imported successfully');
+    }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="users_import_template.csv"',
+        ];
+
+        $columns = ['name', 'email', 'number', 'phone'];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fputcsv($file, ['John Doe', 'john@example.com', 'ZOC123', '0912345678']); // Example row
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

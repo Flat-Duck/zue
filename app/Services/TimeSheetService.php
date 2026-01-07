@@ -14,7 +14,7 @@ class TimeSheetService
     {
         $months = MomentsJs::getMonthsInYear();
         $monthName = $months->get($month);
-        $year = now()->year;
+        $year = now()->year -1;
 
         $baseQuery = TimeSheet::whereHas('employee', function ($query) {
             $query->whereNull('archived_at');

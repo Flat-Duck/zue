@@ -1,47 +1,76 @@
 @extends('layouts.app', ['page' => 'appraisals'])
 
 @section('content')
-    <div class="container-xl">
-        <div class="page-header d-print-none">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h2 class="page-title">فترات التقييم</h2>
-                    <div class="text-muted">تفتح وتقفل تلقائياً حسب التواريخ</div>
-                </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Appraisal Periods</h3>
+            <div class="card-actions">
+                <a href="{{ route('appraisals.periods.create') }}" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    New Period
+                </a>
             </div>
         </div>
-
-        <div class="card">
-            <div class="table-responsive">
-                <table class="table table-vcenter card-table">
-                    <thead>
-                        <tr>
-                            <th>الفترة</th>
-                            <th>نافذة التقييم</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($periods as $p)
-                            <tr>
-                                <td class="fw-bold">{{ $p->label }}</td>
-                                <td>{{ $p->window_open_from->format('Y-m-d') }} → {{ $p->window_open_to->format('Y-m-d') }}</td>
-                                <td>
-                                    @php
-                                        $badge = match ($p->status) {
-                                            'open' => 'bg-green',
-                                            'closed' => 'bg-orange',
-                                            'locked' => 'bg-red',
-                                            default => 'bg-secondary',
-                                        };
-                                    @endphp
-                                    <span class="badge {{ $badge }}">{{ strtoupper($p->status) }}</span>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table class="table card-table table-vcenter text-nowrap datatable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Type</th>
+                        <th>Quarter</th>
+                        <th>Window</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($periods as $period)
+                                    <tr>
+                                        <td>{{ $period->year }}</td>
+                                        <td>
+                                            <span class="badge {{ $period->type === 'yearly' ? 'bg-purple-lt' : 'bg-blue-lt' }}">
+                                                {{ ucfirst($period->type) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $period->quarter ?? '-' }}</td>
+                                        <td>
+                                            {{ $period->window_open_from->format('M d, Y') }} -
+                                            {{ $period->window_open_to->format('M d, Y') }}
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ match ($period->status) {
+                            'open' => 'bg-success',
+                            'closed' => 'bg-secondary',
+                            'locked' => 'bg-danger',
+                            default => 'bg-warning'
+                        } }}">
+                                                {{ ucfirst($period->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('appraisals.periods.edit', $period) }}"
+                                                class="btn btn-sm btn-outline-primary">Edit</a>
+                                            @if($period->status !== 'open')
+                                                <form action="{{ route('appraisals.periods.destroy', $period) }}" method="POST" class="d-inline"
+                                                    onsubmit="return confirm('Are you sure?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </form>
+                                            @endif
+                                        </td>
+                                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex align-items-center">
+            {{ $periods->links() }}
         </div>
     </div>
 @endsection

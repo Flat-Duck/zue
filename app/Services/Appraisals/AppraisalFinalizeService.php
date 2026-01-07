@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\DB;
 
 class AppraisalFinalizeService
 {
-    public function finalizeForEmployee(AppraisalPeriod $period, int $employeeId, int $finalizedByEmployeeId): AppraisalOfficial
+    public function finalizeForEmployee(AppraisalPeriod $period, int $employeeId, ?int $finalizedByEmployeeId = null, bool $createIfEmpty = true): ?AppraisalOfficial
     {
-        return DB::transaction(function () use ($period, $employeeId, $finalizedByEmployeeId) {
+        return DB::transaction(function () use ($period, $employeeId, $finalizedByEmployeeId, $createIfEmpty) {
 
             $reviews = AppraisalReview::query()
                 ->where('appraisal_period_id', $period->id)
@@ -23,6 +23,9 @@ class AppraisalFinalizeService
                 ->get();
 
             if ($reviews->count() === 0) {
+                if (!$createIfEmpty) {
+                    return null;
+                }
                 // nothing to finalize
                 return AppraisalOfficial::firstOrCreate([
                     'appraisal_period_id' => $period->id,

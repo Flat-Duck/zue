@@ -20,17 +20,35 @@ class AppraisalOfficial extends Model
         'percentage',
         'grade',
         'finalized_at',
-        'finalized_by'
+        'finalized_by',
+        'employee_signed_at',
+        'manager_user_id',
+        'manager_signed_at',
+        'hr_user_id',
+        'hr_signed_at',
     ];
 
     protected $casts = [
         'percentage' => 'decimal:2',
         'finalized_at' => 'datetime',
+        'employee_signed_at' => 'datetime',
+        'manager_signed_at' => 'datetime',
+        'hr_signed_at' => 'datetime',
     ];
 
     public function scores(): HasMany
     {
         return $this->hasMany(AppraisalOfficialScore::class, 'appraisals_official_id');
+    }
+
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'manager_user_id');
+    }
+
+    public function hr(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'hr_user_id');
     }
 
     public function period(): BelongsTo

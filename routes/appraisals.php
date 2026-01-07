@@ -38,8 +38,10 @@ Route::middleware(['auth'])->prefix('/appraisals')->name('appraisals.')->group(f
 
     // Route::middleware(['auth'])->group(function () {
 
-    Route::get('/periods', [AppraisalPeriodController::class, 'index'])
-        ->name('periods.index');
+    Route::resource('periods', AppraisalPeriodController::class);
+
+    Route::post('/periods/generate-yearly', [AppraisalPeriodController::class, 'generateYearly'])
+        ->name('periods.generate-yearly');
 
     // Reviews (manager submissions)
     Route::get('/reviews', [AppraisalReviewController::class, 'index'])
@@ -61,11 +63,17 @@ Route::middleware(['auth'])->prefix('/appraisals')->name('appraisals.')->group(f
         ->name('reviews.submit');
 
     // Official (aggregated)
+    Route::get('/official', [AppraisalOfficialController::class, 'index'])
+        ->name('official.index');
+
     Route::get('/official/{period}/{employee}', [AppraisalOfficialController::class, 'show'])
         ->name('official.show');
 
     Route::post('/official/{period}/{employee}/finalize', [AppraisalOfficialController::class, 'finalize'])
         ->name('official.finalize');
+
+    Route::post('/official/{period}/{employee}/approve', [AppraisalOfficialController::class, 'approve'])
+        ->name('official.approve');
 
     Route::get('/employees/{employee}/appraisal-form', [EmployeeAppraisalFormController::class, 'edit'])
         ->name('employees.appraisal-form.edit');

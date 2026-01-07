@@ -6,7 +6,8 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Signature;
-use App\Services\ImageProcessingService;
+use App\Services\SignatureService;
+
 
 class UserSignature extends Component
 {
@@ -51,28 +52,17 @@ class UserSignature extends Component
      * Save signature from uploaded file
      * (remove white background → transparent PNG)
      */
-    public function saveUpload(ImageProcessingService $imageService): void
+    /**
+     * Save signature from uploaded file
+     * (remove white background → transparent PNG)
+     */
+    public function saveUpload(SignatureService $signatureService): void
     {
         $this->validate([
             'signatureFile' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048',
         ]);
 
-        // Read raw file
-        $binary = @file_get_contents($this->signatureFile->getRealPath());
-        if ($binary === false) {
-            session()->flash('error', 'Failed to read uploaded file.');
-            return;
-        }
-
-        // Make white transparent (PNG)
-        $processed = $imageService->makeWhiteTransparent($binary);
-
-        $fileName = 'signature_' . auth()->id() . '_' . time() . '.png';
-        $filePath = 'signatures/' . $fileName;
-
-        Storage::disk('public')->put($filePath, $processed);
-
-        $this->storeOrUpdateSignature($filePath);
+        $signatureService->saveSignature(auth()->user(), $this->signatureFile);
 
         // reset the temp upload
         $this->reset('signatureFile');

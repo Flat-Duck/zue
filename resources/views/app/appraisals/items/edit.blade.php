@@ -26,6 +26,16 @@
                             <input name="key" class="form-control" value="{{ old('key', $item->key) }}" required>
                         </div>
 
+                        <div class="col-md-2">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" required>
+                                <option value="score" {{ old('type', $item->type) === 'score' ? 'selected' : '' }}>Score
+                                    (Numeric)</option>
+                                <option value="text" {{ old('type', $item->type) === 'text' ? 'selected' : '' }}>Text
+                                    (Comment)</option>
+                            </select>
+                        </div>
+
                         <div class="col-md-4">
                             <label class="form-label">Default Section</label>
                             <select name="default_section" class="form-select" required>

@@ -1,6 +1,27 @@
 @extends('layouts.app', ['page' => 'appraisals'])
 
 @section('content')
+    <style>
+        .sticky-footer {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-container {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: #f8fafc;
+            padding-top: 1rem;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+
     <div class="container-xl">
         <div class="page-header d-print-none">
             <div class="row align-items-center">
@@ -23,6 +44,48 @@
         @if(session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
+
+        {{-- Progress Bar --}}
+        <div class="progress-container mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>نسبة الإكمال</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+        {{-- Attendance Stats (Read-Only from TimeSheets) --}}
+        <div class="card mb-3">
+            <div class="card-status-top bg-lime"></div>
+            <div class="card-header">
+                <h3 class="card-title">بيانات الحضور (محسوبة تلقائياً)</h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="h1 mb-0">{{ $attendanceStats['sick_leaves'] }}</div>
+                        <div class="text-muted">أجازات مرضية (S)</div>
+                    </div>
+                    <div class="col">
+                        <div class="h1 mb-0">{{ $attendanceStats['absence_days'] }}</div>
+                        <div class="text-muted">أيام الغياب (X)</div>
+                    </div>
+                    <div class="col">
+                        <div class="h1 mb-0">{{ $attendanceStats['unpaid_leaves'] }}</div>
+                        <div class="text-muted">بدون مرتب (Z)</div>
+                    </div>
+                    {{--
+                    <div class="col">
+                        <div class="h1 mb-0">{{ $attendanceStats['penalties'] }}</div>
+                        <div class="text-muted">الجزاءات</div>
+                    </div>
+                    --}}
+                </div>
+            </div>
+        </div>
 
         <div class="card mb-3">
             <div class="card-body">
@@ -60,7 +123,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('appraisals.reviews.update', $review->id) }}">
+        <form method="POST" action="{{ route('appraisals.reviews.update', $review->id) }}" id="review-form">
             @csrf
             @method('PUT')
 
@@ -78,27 +141,48 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-vcenter card-table">
+                            <table class="table table-vcenter card-table table-hover">
                                 <thead>
                                     <tr>
                                         <th>البند</th>
                                         <th class="text-center">الحد الأعلى</th>
-                                        <th class="text-center" style="width: 180px;">درجتك</th>
+                                        <th class="text-center" style="width: 250px;">التقييم</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($items as $vi)
                                         @php
                                             $scoreRow = $scoresMap[$vi->id] ?? null;
-                                            $value = $scoreRow?->score;
+                                            $isText = $vi->item && $vi->item->type === 'text';
+                                            $val = $isText ? ($scoreRow?->text_value ?? '') : ($scoreRow?->score ?? '');
                                         @endphp
                                         <tr>
                                             <td class="fw-bold">{{ $vi->resolved_label }}</td>
-                                            <td class="text-center">{{ $vi->resolved_max_score }}</td>
                                             <td class="text-center">
-                                                <input type="number" class="form-control text-center" name="scores[{{ $vi->id }}]"
-                                                    min="0" max="{{ $vi->resolved_max_score }}"
-                                                    value="{{ old('scores.' . $vi->id, $value) }}" {{ $review->status !== 'draft' ? 'disabled' : '' }} />
+                                                @if(!$isText)
+                                                    <span class="badge bg-azure-lt">{{ $vi->resolved_max_score }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary-lt">نصي</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @if($isText)
+                                                    <textarea class="form-control score-input"
+                                                              name="scores[{{ $vi->id }}]"
+                                                              rows="2"
+                                                              placeholder="أدخل النص هنا..."
+                                                              {{ $review->status !== 'draft' ? 'disabled' : '' }}>{{ old('scores.' . $vi->id, $val) }}</textarea>
+                                                @else
+                                                    <input type="number"
+                                                           class="form-control text-center score-input"
+                                                           name="scores[{{ $vi->id }}]"
+                                                           data-max="{{ $vi->resolved_max_score }}"
+                                                           min="0"
+                                                           max="{{ $vi->resolved_max_score }}"
+                                                           value="{{ old('scores.' . $vi->id, $val) }}"
+                                                           {{ $review->status !== 'draft' ? 'disabled' : '' }} />
+                                                    <div class="invalid-feedback" style="display:none;">تجاوز الحد</div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -108,18 +192,185 @@
                     </div>
             @endforeach
 
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary" {{ $review->status !== 'draft' ? 'disabled' : '' }}>حفظ</button>
+            <div class="sticky-footer d-flex gap-2 justify-content-end">
+                <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary me-auto">رجوع</a>
 
-                <form method="POST" action="{{ route('appraisals.reviews.submit', $review->id) }}">
-                    @csrf
-                    <button class="btn btn-success" {{ $review->status !== 'draft' ? 'disabled' : '' }}>
+                <button class="btn btn-primary" id="save-btn" {{ $review->status !== 'draft' ? 'disabled' : '' }}>حفظ
+                    التغييرات</button>
+
+                @if($review->status === 'draft')
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitModal">
                         إرسال (Submit)
                     </button>
-                </form>
-
-                <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary">رجوع</a>
+                @else
+                    <button class="btn btn-success" disabled>تم الإرسال</button>
+                @endif
             </div>
+
+            {{-- Submit Modal --}}
+            <div class="modal fade" id="submitModal" tabindex="-1">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="modal-title">هل أنت متأكد؟</div>
+                            <div>بعد الإرسال لن تتمكن من تعديل التقييم مرة أخرى.</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-link link-secondary me-auto"
+                                data-bs-dismiss="modal">إلغاء</button>
+                            <button type="button" class="btn btn-success"
+                                onclick="document.getElementById('submit-form').submit()">نعم، إرسال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
+
+        <form method="POST" action="{{ route('appraisals.reviews.submit', $review->id) }}" id="submit-form" class="d-none">
+            @csrf
+        </form>
+
     </div>
+
+    <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055">
+        <div id="autosave-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    تم الحفظ تلقائياً
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.score-input');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const saveBtn = document.getElementById('save-btn');
+            const reviewForm = document.getElementById('review-form');
+            const totalDisplay = document.querySelector('.h3:nth-of-type(1)'); // Selects the total score box roughly
+            const percentDisplay = document.querySelectorAll('.h3')[1]; // Selects percentage box
+            const autosaveToastEl = document.getElementById('autosave-toast');
+            let autosaveToast;
+            let autosaveTimer;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const autosaveToastEl = document.getElementById('autosave-toast');
+                if(autosaveToastEl) {
+                    autosaveToast = new bootstrap.Toast(autosaveToastEl, { delay: 2000 });
+                }
+            });
+
+            function updateProgress() {
+                let filled = 0;
+                let total = inputs.length;
+
+                inputs.forEach(input => {
+                    // For number inputs, check if value is not empty
+                    // For textareas, check if value is not empty after trimming
+                    if (input.tagName === 'INPUT' && input.type === 'number') {
+                        if (input.value !== '' && input.value !== null) {
+                            filled++;
+                        }
+                    } else if (input.tagName === 'TEXTAREA') {
+                        if (input.value.trim() !== '') {
+                            filled++;
+                        }
+                    }
+                });
+
+                const percent = total > 0 ? Math.round((filled / total) * 100) : 0;
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('aria-valuenow', percent);
+                progressText.innerText = getGrade(percent) + ' (' + percent + '%)';
+
+                if (percent === 100) {
+                    progressBar.classList.add('bg-success');
+                } else {
+                    progressBar.classList.remove('bg-success');
+                }
+            }
+
+            function getGrade(percent) {
+                // This is just a visual estimation, real grade comes from server after calc
+                // Matches the backend logic roughly for user feedback
+                if (percent < 10) return 'جاري التقييم...'; // Don't show grades too early
+                // We'll trust the server response for the actual grade,
+                // but we can update the label to show "Completeness" here.
+                return 'نسبة الإكمال';
+            }
+
+            function performAutosave() {
+               const formData = new FormData(reviewForm);
+
+               // We use fetch to send data
+               fetch(reviewForm.action, {
+                   method: 'POST',
+                   headers: {
+                       'X-Requested-With': 'XMLHttpRequest',
+                       'Accept': 'application/json'
+                   },
+                   body: formData
+               })
+               .then(response => response.json())
+               .then(data => {
+                   if(data.success) {
+                       // Update Totals from Server
+                       if (totalDisplay && percentDisplay) {
+                        // Assuming the structure didn't change, updates the text
+                        // We might need to target IDs more specifically in future refactor
+                        // For now we trust the H3 order: 1st is Total, 2nd is Percent
+                        const h3s = document.querySelectorAll('.card-body .h3');
+                        if(h3s.length >= 2) {
+                             h3s[0].innerText = data.total_score + ' / ' + data.max_score;
+                             h3s[1].innerText = data.percentage + '%';
+                        }
+                       }
+                       autosaveToast.show();
+                   }
+               })
+               .catch(error => console.error('Autosave failed:', error));
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Only check max score logic if it is a number input (has data-max)
+                    if (this.hasAttribute('data-max')) {
+                        const max = parseFloat(this.getAttribute('data-max'));
+                        const val = parseFloat(this.value);
+
+                        if (val > max) {
+                            this.classList.add('is-invalid');
+                            this.nextElementSibling.style.display = 'block';
+                            saveBtn.disabled = true;
+                        } else if (val < 0) {
+                            this.classList.add('is-invalid');
+                            this.nextElementSibling.style.display = 'block';
+                            saveBtn.disabled = true;
+                        } else {
+                            this.classList.remove('is-invalid');
+                            this.nextElementSibling.style.display = 'none';
+                            const anyInvalid = document.querySelectorAll('.is-invalid').length > 0;
+                            saveBtn.disabled = anyInvalid;
+
+                            // Trigger Autosave
+                            clearTimeout(autosaveTimer);
+                            autosaveTimer = setTimeout(performAutosave, 1000);
+                        }
+                    } else {
+                        // Text input - just trigger autosave
+                        clearTimeout(autosaveTimer);
+                        autosaveTimer = setTimeout(performAutosave, 1000);
+                    }
+
+                    updateProgress();
+                });
+            });
+
+            updateProgress();
+        });
+    </script>
 @endsection

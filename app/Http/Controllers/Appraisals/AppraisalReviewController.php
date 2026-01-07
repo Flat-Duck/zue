@@ -9,6 +9,9 @@ use App\Models\Appraisals\AppraisalReviewScore;
 use App\Models\Appraisals\AppraisalFormVersion;
 use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Employee;
+use App\Http\Requests\Appraisals\UpdateAppraisalReviewRequest;
+use App\Services\Appraisals\AppraisalScoreService;
+use App\Services\Appraisals\AppraisalAttendanceService;
 use Illuminate\Http\Request;
 
 class AppraisalReviewController extends Controller
@@ -36,7 +39,7 @@ class AppraisalReviewController extends Controller
         $periods = AppraisalPeriod::query()->where('status', 'open')->orderByDesc('year')->get();
 
         // الموظفين اللي تبي تقيمهم: هنا مثال بسيط (كلهم)
-        $employees = Employee::query()->orderBy('id')->limit(300)->get();
+        $employees = Employee::query()->orderBy('id')->limit(350)->get();
 
         return view('app.appraisals.reviews.create', compact('periods', 'employees'));
     }
@@ -100,7 +103,7 @@ class AppraisalReviewController extends Controller
         return redirect()->route('appraisals.reviews.edit', $review)->with('success', 'تم إنشاء التقييم.');
     }
 
-    public function edit(AppraisalReview $review)
+    public function edit(AppraisalReview $review, AppraisalAttendanceService $attendanceService)
     {
         $myEmployeeId = $this->currentEmployeeId();
 
@@ -118,6 +121,13 @@ class AppraisalReviewController extends Controller
             'scores.formVersionItem.item',
         ]);
 
+        // Calculate Attendance Stats
+        $attendanceStats = $attendanceService->getAttendanceStats(
+            $review->employee,
+            $review->period->window_open_from, // Or use specific period start/end if available in model
+            $review->period->window_open_to
+        );
+
         // Map scores by version_item_id
         $scoresMap = $review->scores->keyBy('form_version_item_id');
 
@@ -126,10 +136,10 @@ class AppraisalReviewController extends Controller
             ->where('is_active', true)
             ->groupBy(fn($vi) => $vi->resolved_section);
 
-        return view('app.appraisals.reviews.edit', compact('review', 'scoresMap', 'itemsBySection'));
+        return view('app.appraisals.reviews.edit', compact('review', 'scoresMap', 'itemsBySection', 'attendanceStats'));
     }
 
-    public function update(Request $request, AppraisalReview $review)
+    public function update(UpdateAppraisalReviewRequest $request, AppraisalReview $review, AppraisalScoreService $service)
     {
         $myEmployeeId = $this->currentEmployeeId();
         if ($review->appraiser_id !== $myEmployeeId)
@@ -137,41 +147,20 @@ class AppraisalReviewController extends Controller
         if ($review->status !== 'draft')
             return back()->with('error', 'التقييم مقفول.');
 
-        $data = $request->validate([
-            'scores' => 'required|array',
-            'scores.*' => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
-        // Update scores
-        $review->load(['scores.formVersionItem.item']);
+        // Use service to update scores
+        $service->updateScores($review, $data['scores'] ?? []);
 
-        $total = 0;
-        $max = 0;
-
-        foreach ($review->scores as $scoreRow) {
-            $fvi = $scoreRow->formVersionItem;
-            $maxScore = (int) $fvi->resolved_max_score;
-
-            $incoming = $data['scores'][$scoreRow->form_version_item_id] ?? null;
-            if ($incoming !== null) {
-                $incoming = (int) $incoming;
-                if ($incoming > $maxScore)
-                    $incoming = $maxScore;
-                $scoreRow->score = $incoming;
-                $scoreRow->save();
-            }
-
-            $total += (int) ($scoreRow->score ?? 0);
-            $max += $maxScore;
+        // JSON Response for Autosave
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'total_score' => $review->total_score,
+                'max_score' => $review->max_score,
+                'percentage' => $review->percentage,
+            ]);
         }
-
-        $percentage = $max > 0 ? round(($total / $max) * 100, 2) : null;
-
-        $review->update([
-            'total_score' => $total,
-            'max_score' => $max,
-            'percentage' => $percentage,
-        ]);
 
         return back()->with('success', 'تم حفظ الدرجات.');
     }
