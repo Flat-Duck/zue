@@ -235,6 +235,16 @@
                                 </span>
                             </a>
                         </li>
+                        <li class="nav-item {{ $page == 'maintenance' ? 'active' : ''  }}">
+                            <a class="nav-link" href="{{ route('maintenance.index') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <i class="ti ti-database"></i>
+                                </span>
+                                <span class="nav-link-title">
+                                    Maintenance
+                                </span>
+                            </a>
+                        </li>
                         <li class="nav-item {{ $page == 'reports' ? 'active' : ''  }}">
                             <a class="nav-link" href="{{ route('reports.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">

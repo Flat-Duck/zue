@@ -14,6 +14,27 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('appraisal:sync-period-status')->dailyAt('00:05');
 
+        if (\Schema::hasTable('maintenance_settings')) {
+            $autoEnabled = \App\Models\MaintenanceSetting::get('auto_backup_enabled');
+            if ($autoEnabled === '1') {
+                $interval = \App\Models\MaintenanceSetting::get('backup_interval', 'daily');
+                $time = \App\Models\MaintenanceSetting::get('backup_time', '00:00');
+                
+                $task = $schedule->command('backup:database');
+                
+                switch ($interval) {
+                    case 'daily':
+                        $task->dailyAt($time);
+                        break;
+                    case 'weekly':
+                        $task->weeklyOn(1, $time); // Mondays
+                        break;
+                    case 'monthly':
+                        $task->monthlyOn(1, $time); // 1st of month
+                        break;
+                }
+            }
+        }
     }
 
     /**

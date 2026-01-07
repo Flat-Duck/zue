@@ -22,6 +22,7 @@ use App\Http\Controllers\ResidenceController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\OperationsController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\ProfileController;
@@ -151,6 +152,15 @@ Route::prefix('/')
         Route::get('operations', [OperationsController::class, 'index'])->name('operations.index');
         Route::post('operations/archive-by-timesheet', [OperationsController::class, 'archiveByTimesheet'])->name('operations.archive-by-timesheet');
         Route::post('operations/unarchive-by-number', [OperationsController::class, 'unarchiveByNumber'])->name('operations.unarchive-by-number');
+
+        Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+        Route::post('maintenance/export', [MaintenanceController::class, 'export'])->name('maintenance.export');
+        Route::post('maintenance/import', [MaintenanceController::class, 'import'])->name('maintenance.import');
+        Route::post('maintenance/restore/{filename}', [MaintenanceController::class, 'restore'])->name('maintenance.restore');
+        Route::get('maintenance/download/{filename}', [MaintenanceController::class, 'download'])->name('maintenance.download');
+        Route::delete('maintenance/delete/{filename}', [MaintenanceController::class, 'delete'])->name('maintenance.delete');
+        Route::post('maintenance/settings', [MaintenanceController::class, 'updateSettings'])->name('maintenance.settings.update');
+        Route::post('maintenance/quick-backup', [MaintenanceController::class, 'runQuickBackup'])->name('maintenance.quick-backup');
     });
 
 include __DIR__ . '/appraisals.php';
