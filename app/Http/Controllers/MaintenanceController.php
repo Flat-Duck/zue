@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Services\BackupService;
 use App\Models\MaintenanceSetting;
 use App\Models\BackupLog;
+use App\Jobs\PerformBackupJob;
 
 class MaintenanceController extends Controller
 {
@@ -84,9 +85,9 @@ class MaintenanceController extends Controller
                 'started_at' => now(),
             ]);
 
-            $this->runInBackground($type, $log->id);
+            PerformBackupJob::dispatch($type, $selectedTables, $log->id);
 
-            return redirect()->back()->with('success', "Backup started in background (Task #{$log->id}). Check activity list for status.");
+            return redirect()->back()->with('success', "Backup job dispatched to queue (Task #{$log->id}).");
         }
 
         $sql = $this->backupService->performBackup($type, $selectedTables, false);
@@ -122,24 +123,12 @@ class MaintenanceController extends Controller
             'started_at' => now(),
         ]);
 
-        $this->runInBackground('both', $log->id);
+        PerformBackupJob::dispatch('both', [], $log->id);
 
-        return redirect()->back()->with('success', "Quick backup started in background (Task #{$log->id}).");
+        return redirect()->back()->with('success', "Quick backup job dispatched to queue (Task #{$log->id}).");
     }
 
-    protected function runInBackground($type, $logId)
-    {
-        $phpPath = PHP_BINARY;
-        $artisanPath = base_path('artisan');
-        
-        $command = "\"$phpPath\" \"$artisanPath\" backup:database --type=$type --log-id=$logId";
-
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            pclose(popen("start /B $command", "r"));
-        } else {
-            exec("$command > /dev/null 2>&1 &");
-        }
-    }
+    // runInBackground method removed in favor of Laravel Queues
 
     public function import(Request $request)
     {

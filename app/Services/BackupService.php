@@ -13,7 +13,7 @@ class BackupService
     public function performBackup($type = 'both', $selectedTables = [], $saveToBackups = true, $logId = null)
     {
         ini_set('memory_limit', '1024M');
-        set_time_limit(600); // 10 minutes
+        set_time_limit(1800); // 30 minutes
 
         $log = null;
         if ($logId) {
@@ -85,7 +85,14 @@ class BackupService
                 if (!Storage::disk('local')->exists('backups')) {
                     Storage::disk('local')->makeDirectory('backups');
                 }
-                Storage::disk('local')->putFileAs('backups', new \Illuminate\Http\File($tempPath), $filename);
+                
+                // Use stream for memory efficiency
+                $stream = fopen($tempPath, 'r');
+                Storage::disk('local')->put('backups/' . $filename, $stream);
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+                
                 unlink($tempPath);
                 $this->cleanupOldBackups();
 
