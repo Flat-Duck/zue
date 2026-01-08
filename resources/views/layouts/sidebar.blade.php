@@ -14,7 +14,7 @@
                                 </span>
                             </a>
                         </li>
-                        @can('view-any', App\Models\Employee::class)
+                        {{-- @can('view-any', App\Models\Employee::class)
                             <li class="nav-item {{ $page == 'employees' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('employees.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -25,8 +25,8 @@
                                     </span>
                                 </a>
                             </li>
-                        @endcan
-                        @can('view-any', App\Models\Employee::class)
+                        @endcan --}}
+                        {{-- @can('view-any', App\Models\Employee::class)
                             <li class="nav-item {{ $page == 'clinic' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('clinic.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -37,7 +37,7 @@
                                     </span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
 
                         @if (
                                 Auth::user()->can('view-any', App\Models\Flight::class) ||
@@ -417,6 +417,6 @@
                     @endauth
             </ul>
         </div>
-    </div>
-    </div>
+
+
 </header>

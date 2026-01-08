@@ -191,7 +191,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                2023
+                                {{ $selected_year }}
                             </h6>
                         </div>
                         <div class="col-2 box">
@@ -209,7 +209,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                5M49
+                                {{ $center?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
@@ -218,7 +218,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                معمل الغاز
+                                {{ $department?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
@@ -227,7 +227,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                العمليات
+                                {{ $administration?? '' }}
                             </h6>
                         </div>
                         <div class="col-1"></div>

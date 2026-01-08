@@ -59,6 +59,10 @@ class TimeSheetService
         $currentPage = collect();
         $maxPerPage = 8;
 
+        $department = $normalEmployees->first()->first()->employee->department->name;
+        $center = $normalEmployees->first()->first()->employee->center->name;
+        $administration = $normalEmployees->first()->first()->employee->department->administration->name;
+
         foreach ($normalEmployees as $employeeId => $days) {
             $currentPage->put($employeeId, $days);
 
@@ -116,6 +120,9 @@ class TimeSheetService
 
         return [
             'chunks' => $chunks,
+            'department' => $department,
+            'center' => $center,
+            'administration' => $administration,
             'month_name' => $monthName,
             'selected_month' => $month,
             'selected_year' => $year,

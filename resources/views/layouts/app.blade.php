@@ -30,7 +30,7 @@
         <div class="sticky-top">
             @include('layouts.nav')
             @include('layouts.sidebar')
-        </div>
+            </div>
         <div class="page-wrapper">
             {{-- <div class="page-header d-print-none">
                 <div class="container-xl">
