@@ -31,6 +31,8 @@ class ManagementScopeStoreRequest extends FormRequest
             'center_id' => ['nullable', 'exists:centers,id', 'required_if:scope_type,' . ManagementScope::TYPE_CENTER],
             'subordinate_employee_ids' => ['nullable', 'array', 'required_if:scope_type,' . ManagementScope::TYPE_EMPLOYEE],
             'subordinate_employee_ids.*' => ['exists:employees,id'],
+            'context' => ['nullable', 'string', 'max:255'],
+            'settings' => ['nullable', 'array'],
         ];
     }
 

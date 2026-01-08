@@ -86,9 +86,26 @@ class ManagementScopeService
 
     public function updateScope(ManagementScope $scope, array $data): void
     {
-        // For update, we usually handle single scope update. 
-        // The original controller logic for update was reusing 'validateScope' which returned normalized data.
-        // We will stick to simple update here.
+        $managerId = $data['manager_id'] ?? $scope->manager_id;
+        $scopeType = $data['scope_type'] ?? $scope->scope_type;
+        $subIds = $data['subordinate_employee_ids'] ?? [];
+        $settings = $data['settings'] ?? $scope->settings;
+
+        if ($scopeType === ManagementScope::TYPE_EMPLOYEE && !empty($subIds)) {
+            // Filter out self
+            $validSubIds = array_filter($subIds, fn($id) => $id !== $managerId);
+
+            $settings = (array)$settings;
+            $settings['target_employee_ids'] = array_values($validSubIds);
+
+            // Grouped scope has no single subordinate
+            $data['subordinate_employee_id'] = null;
+        }
+
+        $data['settings'] = $settings;
+
+        // subordinate_employee_ids is not a column, remove it before update
+        unset($data['subordinate_employee_ids']);
 
         $scope->update($data);
     }
