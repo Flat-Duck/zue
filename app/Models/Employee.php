@@ -24,7 +24,7 @@ class Employee extends Model
     use SoftDeletes;
     use SoftArchives;
 
-    public const SPECIAL_WORK_DAYS_THRESHOLD = 19;
+    public const SPECIAL_WORK_DAYS_THRESHOLD = 20;
 
     protected $fillable = [
         'number',

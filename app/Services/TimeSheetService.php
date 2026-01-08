@@ -44,7 +44,7 @@ class TimeSheetService
             // Use constant if available, otherwise fallback to 19
             $threshold = defined('App\Models\Employee::SPECIAL_WORK_DAYS_THRESHOLD')
                 ? Employee::SPECIAL_WORK_DAYS_THRESHOLD
-                : 19;
+                : 20;
 
             $isSpecial = $workDaysCount >= $threshold || $hasAWithFourOT;
 
