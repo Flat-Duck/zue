@@ -17,11 +17,11 @@ class Rules
         self::$availableLetters = static::$letters;
         if(!$user->isSuperAdmin())
         {
-            if(self::$aDparments->contains($user->employee->department->name)){
-                self::$availableLetters = self::$letters->diff(['K', 'B']);
-            }elseif(self::$kbDepartments->contains($user->employee->department->name)){
-                self::$availableLetters = static::$letters->diff(['A']);
-            }
+            // if(self::$aDparments->contains($user->employee->department->name)){
+            //     self::$availableLetters = self::$letters->diff(['K', 'B']);
+            // }elseif(self::$kbDepartments->contains($user->employee->department->name)){
+            //     self::$availableLetters = static::$letters->diff(['A']);
+            // }
         }
         return self::$availableLetters->all();
     }

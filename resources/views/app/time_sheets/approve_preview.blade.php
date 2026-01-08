@@ -30,21 +30,31 @@
                             <option value="12">Decembe</option>
                         </x-inputs.select>
                     </x-inputs.group>
+                    <x-inputs.group class="col-sm-4">
+                        <x-inputs.select name="selected_year" label="Select Year">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                        </x-inputs.select>
+                    </x-inputs.group>
                 </div>
             </div>
             <div class="card-footer">
                 <div class="row align-items-center">
                     <div class="col">
-                        <a href="{{ route('time-sheets.index') }}" class="btn btn-outline-secondary">@lang('crud.common.back')</a>
+                        <a href="{{ route('time-sheets.index') }}"
+                            class="btn btn-outline-secondary">@lang('crud.common.back')</a>
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-primary">
                             <i class="ti ti-printer"></i>
-                    @lang('crud.common.print_preview')
+                            @lang('crud.common.print_preview')
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    @endsection
+@endsection

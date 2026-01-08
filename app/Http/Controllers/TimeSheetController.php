@@ -36,7 +36,7 @@ class TimeSheetController extends Controller
 
         $search = $request->get('search', '');
 
-        $employees = auth()->user()->managedEmployeesQuery()
+        $employees = auth()->user()->managedEmployeesQuery('time_sheet')
             ->paginate(20)
             ->through(function ($employee) {
                 if (Carbon::parse($employee->last_date)->month + 2 != now()->month) {
@@ -103,7 +103,8 @@ class TimeSheetController extends Controller
     public function approve(Request $request): View
     {
         $month = $request->selected_month;
-        $data = $this->timeSheetService->getApprovalData($month);
+        $year = $request->selected_year;
+        $data = $this->timeSheetService->getApprovalData($month, $year);
 
         return view('app.time_sheets.approve', $data);
     }
@@ -124,11 +125,15 @@ class TimeSheetController extends Controller
      */
     public function approves(Request $request): RedirectResponse
     {
+        $year = $request->get('year');
         $month = $request->get('month');
         $level = $request->get('level'); // timekeeper / supervisor / superintendent
 
-        $query = Timesheet::whereMonth('day', $month)
-            ->whereYear('day', now()->year);
+        $query = TimeSheet::whereHas('employee', function ($query) {
+            $query->whereIn('id', auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id'));
+        })
+            ->whereMonth('day', $month)
+            ->whereYear('day', $year);
 
         if ($level === 'timekeeper') {
             $query->whereNull('timekeeper_id')

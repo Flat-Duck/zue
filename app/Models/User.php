@@ -70,6 +70,10 @@ class User extends Authenticatable
         return $this->employee->management_level;
     }
 
+    public function getSignaturePathAttribute() {
+        return $this->signature->image_path;
+    }
+
     public function signature() {
         return $this->hasOne(Signature::class);
     }
@@ -98,13 +102,13 @@ class User extends Authenticatable
      * Query builder for employees managed by this user.
      * Useful for pagination and eager loading.
      */
-    public function managedEmployeesQuery()
+    public function managedEmployeesQuery($context = 'general')
     {
         if (!$this->employee) {
             return Employee::query()->whereRaw('0 = 1');
         }
 
-        return $this->employee->managedEmployeesQuery();
+        return $this->employee->managedEmployeesQuery($context);
     }
 
     /**

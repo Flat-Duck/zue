@@ -309,7 +309,7 @@
                                 {{-- زر الموافقة فقط لو المستخدم منسق الحقل وفيه تايم شيت يحتاج توقيع المنسق --}}
                                 <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                     class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month]) }}">
+                                    href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year]) }}">
                                     <i class="ti ti-check"></i>
                                     @lang('crud.common.time_sheet_approve')
                                 </a>
@@ -354,7 +354,7 @@
                             @if(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
                                 <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                     class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month]) }}">
+                                    href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
                                     <i class="ti ti-check"></i>
                                     @lang('crud.common.time_sheet_approve')
                                 </a>
@@ -393,7 +393,7 @@
                             @if(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
                                 <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                     class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month]) }}">
+                                    href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
                                     <i class="ti ti-check"></i>
                                     @lang('crud.common.time_sheet_approve')
                                 </a>

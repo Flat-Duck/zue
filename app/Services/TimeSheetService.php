@@ -10,18 +10,24 @@ use Carbon\Carbon;
 
 class TimeSheetService
 {
-    public function getApprovalData(int $month): array
+    public function getApprovalData(int $month, int $year): array
     {
         $months = MomentsJs::getMonthsInYear();
         $monthName = $months->get($month);
-        $year = now()->year -1;
-
+        // $year = $year;
+            
+        // $baseQuery = auth()->user()->managedEmployeesQuery('time_sheet')
+        
+        // ->whereHas('timesheets', function ($query) use ($month, $year) {
+        //    $query->whereMonth('day', $month)
+        //    ->whereYear('day', $year);
+        // })->whereNull('archived_at');
         $baseQuery = TimeSheet::whereHas('employee', function ($query) {
-            $query->whereNull('archived_at');
+            $query->whereIn('id', auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id'));
         })
             ->whereMonth('day', $month)
             ->whereYear('day', $year);
-
+// dd($baseQuery->get());
         $chunk = $baseQuery->get();
         $groupedByEmployee = $chunk->groupBy('employee_id');
 
@@ -112,6 +118,7 @@ class TimeSheetService
             'chunks' => $chunks,
             'month_name' => $monthName,
             'selected_month' => $month,
+            'selected_year' => $year,
             'month_days' => $month_days,
             'employees' => $employees,
             'signatures' => $signatures,
