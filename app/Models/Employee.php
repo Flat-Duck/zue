@@ -261,7 +261,7 @@ class Employee extends Model
             ->where('id', '!=', $this->id)
             ->where(function (Builder $q) use ($scopes) {
                 foreach ($scopes as $scope) {
-                    $settings = $scope->settings ?? [];
+                    $settings = is_array($scope->settings) ? $scope->settings : [];
                     $jobTitle = $settings['job_title'] ?? null;
 
                     $applySettings = function (Builder $query) use ($jobTitle) {
@@ -273,7 +273,6 @@ class Employee extends Model
                     switch ($scope->scope_type) {
                         case ManagementScope::TYPE_GLOBAL:
                             $q->orWhere(function (Builder $q2) use ($applySettings) {
-                                $q2->whereRaw('1 = 1');
                                 $applySettings($q2);
                             });
                             break;
@@ -313,8 +312,9 @@ class Employee extends Model
                                 $q->orWhere('id', $scope->subordinate_employee_id);
                             }
                             // 2. Grouped subordinates
-                            if (!empty($settings['target_employee_ids'])) {
-                                $q->orWhereIn('id', $settings['target_employee_ids']);
+                            $targetIds = $settings['target_employee_ids'] ?? [];
+                            if (!empty($targetIds)) {
+                                $q->orWhereIn('id', $targetIds);
                             }
                             break;
                     }

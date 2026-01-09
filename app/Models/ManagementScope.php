@@ -7,7 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ManagementScope extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'manager_id',
+        'name',
+        'template',
+        'scope_type',
+        'context',
+        'location_id',
+        'department_id',
+        'center_id',
+        'subordinate_employee_id',
+        'settings',
+    ];
 
     protected $casts = [
         'settings' => 'array',

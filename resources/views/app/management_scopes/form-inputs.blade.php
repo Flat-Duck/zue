@@ -33,6 +33,7 @@
             id="manager_id"
             class="form-control"
             required
+            data-tomselect="select"
         >
             <option value="">
                 @lang('crud.common.please_select', [], 'en')
@@ -42,7 +43,46 @@
                     value="{{ $manager->id }}"
                     @selected(old('manager_id', $editing ? $managementScope->manager_id : ($managerId ?? '')) == $manager->id)
                 >
-                    {{ $manager->english_name ?? ('#'.$manager->id) }}
+                    {{ $manager->number }} - {{ $manager->english_name ?? ('#'.$manager->id) }}
+                </option>
+            @endforeach
+        </select>
+    </x-inputs.group>
+
+    {{-- Name --}}
+    <x-inputs.group class="col-sm-12">
+        <label for="name" class="form-label">
+            Scope Name (Optional)
+        </label>
+        <x-inputs.text
+            name="name"
+            id="name"
+            :value="old('name', ($editing ? $managementScope->name : ''))"
+            maxlength="255"
+            placeholder="e.g. My Custom Scope"
+        ></x-inputs.text>
+    </x-inputs.group>
+
+    {{-- Template --}}
+    <x-inputs.group class="col-sm-12">
+        <label for="template" class="form-label">
+            Template Identifier
+        </label>
+        <select
+            name="template"
+            id="template"
+            class="form-control"
+            required
+        >
+            @php
+                $templates = ['general', 'test1', 'test2', 'test3', 'test4'];
+            @endphp
+            @foreach($templates as $tpl)
+                <option
+                    value="{{ $tpl }}"
+                    @selected(old('template', $editing ? $managementScope->template : 'general') == $tpl)
+                >
+                    {{ ucfirst($tpl) }}
                 </option>
             @endforeach
         </select>
@@ -182,7 +222,7 @@
             @foreach($employees as $employee)
                 <option value="{{ $employee->id }}" 
                     @selected(in_array($employee->id, $selectedSubordinates)) >
-                    {{ $employee->english_name ?? ('#'.$employee->id) }}
+                    {{ $employee->number }} - {{ $employee->english_name ?? ('#'.$employee->id) }}
                 </option>
             @endforeach
         </select>

@@ -72,9 +72,10 @@
         <table class="table card-table table-vcenter text-nowrap datatable">
             <thead>
                 <tr>
-                    <th class="text-left">
-                        @lang('crud.management_scopes.columns.manager', [], 'en')
-                    </th>
+                    <th class="text-left">Scope Name</th>
+                    <th class="text-left">Template</th>
+                    <th class="text-left">Context</th>
+                    <th class="text-left">Manager</th>
                     <th class="text-left">
                         @lang('crud.management_scopes.columns.scope_type', [], 'en')
                     </th>
@@ -89,6 +90,9 @@
             <tbody>
                 @forelse($managementScopes as $scope)
                     <tr>
+                        <td>{{ $scope->name ?? '-' }}</td>
+                        <td><span class="badge badge-info">{{ ucfirst($scope->template) }}</span></td>
+                        <td><span class="badge badge-primary">{{ ucfirst(str_replace('_', ' ', $scope->context)) }}</span></td>
                         <td>
                             {{ $scope->manager->english_name ?? ('#'.$scope->manager_id) }}
                         </td>
@@ -116,6 +120,9 @@
 
                                 @case(\App\Models\ManagementScope::TYPE_EMPLOYEE)
                                     {{ $scope->subordinate?->english_name ?? ('#'.$scope->subordinate_employee_id) }}
+                                    @if(!empty($scope->settings['target_employee_ids']))
+                                        <br><small>+ {{ count($scope->settings['target_employee_ids']) }} grouped</small>
+                                    @endif
                                     @break
 
                                 @default
@@ -155,7 +162,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4">
+                        <td colspan="7">
                             @lang('crud.common.no_items_found')
                         </td>
                     </tr>

@@ -25,13 +25,15 @@ class ManagementScopeStoreRequest extends FormRequest
 
         return [
             'manager_id' => ['required', 'exists:employees,id'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'template' => ['required', 'string', Rule::in(['general', 'test1', 'test2', 'test3', 'test4'])],
             'scope_type' => ['required', Rule::in($types)],
             'location_id' => ['nullable', 'exists:locations,id', 'required_if:scope_type,' . ManagementScope::TYPE_LOCATION, 'required_if:scope_type,' . ManagementScope::TYPE_DEPARTMENT],
             'department_id' => ['nullable', 'exists:departments,id', 'required_if:scope_type,' . ManagementScope::TYPE_DEPARTMENT],
             'center_id' => ['nullable', 'exists:centers,id', 'required_if:scope_type,' . ManagementScope::TYPE_CENTER],
             'subordinate_employee_ids' => ['nullable', 'array', 'required_if:scope_type,' . ManagementScope::TYPE_EMPLOYEE],
             'subordinate_employee_ids.*' => ['exists:employees,id'],
-            'context' => ['nullable', 'string', 'max:255'],
+            'context' => ['required', 'string', 'max:255'],
             'settings' => ['nullable', 'array'],
         ];
     }
