@@ -265,7 +265,7 @@ class Employee extends Model
 
         return static::query()
             ->whereNull('archived_at')
-            ->where('id', '!=', $this->id)
+            // ->where('id', '!=', $this->id)
             ->where(function (Builder $q) use ($scopes) {
                 foreach ($scopes as $scope) {
                     $settings = is_array($scope->settings) ? $scope->settings : [];
