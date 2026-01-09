@@ -233,7 +233,7 @@
                         <div class="col-1"></div>
                     </div>
                 </div>
-                <div class="table-responsive p-0 my-4" style="margin-top: 50px !important;">
+                <div class="table-responsive p-0 mt-4 mb-1" style="margin-top: 50px !important;">
                     <table class="table table-vcenter text-center">
                         <thead>
                             <tr>

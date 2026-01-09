@@ -27,7 +27,7 @@
 
 <body>
     <div id="app" class="page">
-        <div class="sticky-top">
+        <div class="sticky-top d-print-none">
             @include('layouts.nav')
             @include('layouts.sidebar')
             </div>
