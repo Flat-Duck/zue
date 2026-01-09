@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ManagementScope extends Model
 {
@@ -30,8 +31,14 @@ class ManagementScope extends Model
     public const TYPE_CENTER = 'center';     // specific center
     public const TYPE_EMPLOYEE = 'employee';   // specific employee
 
+    public function managers(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class, 'management_scope_manager', 'management_scope_id', 'manager_id');
+    }
+
     public function manager(): BelongsTo
     {
+        // Legacy owner
         return $this->belongsTo(Employee::class, 'manager_id');
     }
 
@@ -60,6 +67,18 @@ class ManagementScope extends Model
      */
     public function matchesTargetEmployee(Employee $target): bool
     {
+        $settings = $this->settings ?? [];
+        $jobTitle = $settings['job_title'] ?? null;
+
+        $matchesJob = true;
+        if (!empty($jobTitle)) {
+            $matchesJob = !empty($target->job) && (trim(strtolower($target->job)) === trim(strtolower($jobTitle)));
+        }
+
+        if (!$matchesJob) {
+            return false;
+        }
+
         switch ($this->scope_type) {
             case self::TYPE_GLOBAL:
                 return true;
@@ -84,7 +103,7 @@ class ManagementScope extends Model
                     return true;
                 }
                 // Check grouped employees via settings
-                $targetIds = $this->settings['target_employee_ids'] ?? [];
+                $targetIds = $settings['target_employee_ids'] ?? [];
                 if (in_array($target->id, $targetIds)) {
                     return true;
                 }

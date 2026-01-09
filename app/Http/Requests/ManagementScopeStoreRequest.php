@@ -24,7 +24,8 @@ class ManagementScopeStoreRequest extends FormRequest
         ];
 
         return [
-            'manager_id' => ['required', 'exists:employees,id'],
+            'manager_ids' => ['required', 'array', 'min:1'],
+            'manager_ids.*' => ['exists:employees,id'],
             'name' => ['nullable', 'string', 'max:255'],
             'template' => ['required', 'string', Rule::in(['general', 'test1', 'test2', 'test3', 'test4'])],
             'scope_type' => ['required', Rule::in($types)],
@@ -42,9 +43,12 @@ class ManagementScopeStoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             if ($this->scope_type === ManagementScope::TYPE_EMPLOYEE) {
-                $subIds = $this->subordinate_employee_ids ?? [];
-                if (in_array($this->manager_id, $subIds)) {
-                    $validator->errors()->add('subordinate_employee_ids', 'Manager and subordinate cannot be the same employee.');
+                $subIds = (array) ($this->subordinate_employee_ids ?? []);
+                $managerIds = (array) ($this->manager_ids ?? []);
+                
+                $intersection = array_intersect($managerIds, $subIds);
+                if (!empty($intersection)) {
+                    $validator->errors()->add('subordinate_employee_ids', 'A manager cannot also be a subordinate in the same scope.');
                 }
             }
         });

@@ -24,9 +24,11 @@ class ManagementScopeController extends Controller
             ->orderBy('manager_id')
             ->orderBy('scope_type');
 
-        // Filter by manager
+        // Filter by manager (check if manager is in the shared list)
         if (!empty($managerId)) {
-            $query->where('manager_id', $managerId);
+            $query->whereHas('managers', function ($q) use ($managerId) {
+                $q->where('employees.id', $managerId);
+            });
         }
 
         // Text search (manager name, subordinate name, scope_type)
@@ -90,7 +92,7 @@ class ManagementScopeController extends Controller
         $service->createScopes($request->validated());
 
         return redirect()
-            ->route('management-scopes.index', ['manager_id' => $request->manager_id])
+            ->route('management-scopes.index')
             ->with('success', 'Management scope(s) created successfully.');
     }
 
@@ -129,18 +131,16 @@ class ManagementScopeController extends Controller
         $service->updateScope($managementScope, $request->validated());
 
         return redirect()
-            ->route('management-scopes.index', ['manager_id' => $request->manager_id])
+            ->route('management-scopes.index')
             ->with('success', 'Management scope updated successfully.');
     }
 
     public function destroy(ManagementScope $managementScope)
     {
-        $managerId = $managementScope->manager_id;
-
         $managementScope->delete();
 
         return redirect()
-            ->route('management-scopes.index', ['manager_id' => $managerId])
+            ->route('management-scopes.index')
             ->with('success', 'Management scope deleted successfully.');
     }
 }

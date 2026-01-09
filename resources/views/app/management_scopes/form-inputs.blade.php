@@ -4,11 +4,22 @@
     /** @var \App\Models\ManagementScope|null $managementScope */
     $editing = isset($managementScope);
 
-    // For multi-select:
-    // - prefer old('subordinate_employee_ids') if validation failed
-    // - otherwise, when editing an employee scope:
-    //   1. Check direct subordinate (legacy)
-    //   2. Check grouped subordinates (settings)
+    // 1. Managers Selection
+    $selectedManagers = old('manager_ids');
+    if ($editing && empty($selectedManagers)) {
+        $selectedManagers = $managementScope->managers->pluck('id')->toArray();
+        // Fallback to legacy owner if pivot is empty but owner exists
+        if (empty($selectedManagers) && $managementScope->manager_id) {
+            $selectedManagers = [$managementScope->manager_id];
+        }
+    }
+    // If we're creating and a managerId was passed in query string
+    if (!$editing && empty($selectedManagers) && !empty($managerId)) {
+        $selectedManagers = [$managerId];
+    }
+    $selectedManagers = (array) $selectedManagers;
+
+    // 2. Subordinates Selection (multi-select)
     $selectedSubordinates = old('subordinate_employee_ids');
 
     if ($editing && empty($selectedSubordinates)) {
@@ -23,30 +34,31 @@
 @endphp
 
 <div class="row">
-    {{-- Manager --}}
+    {{-- Managers --}}
     <x-inputs.group class="col-sm-12">
-        <label for="manager_id" class="form-label">
-            @lang('crud.management_scopes.inputs.manager_id', [], 'en')
+        <label for="manager_ids" class="form-label">
+            Managers (One or More)
         </label>
         <select
-            name="manager_id"
-            id="manager_id"
+            name="manager_ids[]"
+            id="manager_ids"
             class="form-control"
             required
-            data-tomselect="select"
+            multiple
+            data-tomselect="tags"
         >
-            <option value="">
-                @lang('crud.common.please_select', [], 'en')
-            </option>
             @foreach($managers as $manager)
                 <option
                     value="{{ $manager->id }}"
-                    @selected(old('manager_id', $editing ? $managementScope->manager_id : ($managerId ?? '')) == $manager->id)
+                    @selected(in_array($manager->id, $selectedManagers))
                 >
                     {{ $manager->number }} - {{ $manager->english_name ?? ('#'.$manager->id) }}
                 </option>
             @endforeach
         </select>
+        <small class="form-hint">
+            You can assign multiple managers to the same scope.
+        </small>
     </x-inputs.group>
 
     {{-- Name --}}

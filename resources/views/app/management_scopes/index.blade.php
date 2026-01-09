@@ -22,11 +22,12 @@
                         />
                     </div>
 
-                    <div class="col-auto">
+                    <div class="col-auto" style="min-width: 250px;">
                         <select
                             name="manager_id"
                             class="form-control"
                             onchange="this.form.submit()"
+                            data-tomselect="select"
                         >
                             <option value="">
                                 @lang('crud.management_scopes.filters.all_managers', [], 'en')
@@ -36,7 +37,7 @@
                                     value="{{ $manager->id }}"
                                     @selected(request('manager_id') == $manager->id)
                                 >
-                                    {{ $manager->english_name ?? ('#'.$manager->id) }}
+                                    {{ $manager->number }} - {{ $manager->english_name ?? ('#'.$manager->id) }}
                                 </option>
                             @endforeach
                         </select>
@@ -75,7 +76,7 @@
                     <th class="text-left">Scope Name</th>
                     <th class="text-left">Template</th>
                     <th class="text-left">Context</th>
-                    <th class="text-left">Manager</th>
+                    <th class="text-left">Managers</th>
                     <th class="text-left">
                         @lang('crud.management_scopes.columns.scope_type', [], 'en')
                     </th>
@@ -94,7 +95,17 @@
                         <td><span class="badge badge-info">{{ ucfirst($scope->template) }}</span></td>
                         <td><span class="badge badge-primary">{{ ucfirst(str_replace('_', ' ', $scope->context)) }}</span></td>
                         <td>
-                            {{ $scope->manager->english_name ?? ('#'.$scope->manager_id) }}
+                            @foreach($scope->managers as $m)
+                                <span class="badge badge-outline-secondary mb-1">
+                                    {{ $m->english_name }}
+                                </span>
+                                @if(!$loop->last) <br> @endif
+                            @endforeach
+                            @if($scope->managers->isEmpty() && $scope->manager_id)
+                                <span class="badge badge-outline-secondary">
+                                    {{ $scope->manager->english_name ?? ('#'.$scope->manager_id) }} (Legacy)
+                                </span>
+                            @endif
                         </td>
                         <td>
                             {{ ucfirst($scope->scope_type) }}

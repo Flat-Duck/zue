@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ManagementScope;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -219,7 +221,15 @@ class Employee extends Model
         return $this->hasRole('timekeeper');
     }
 
-    public function managementScopes(): HasMany
+    public function managementScopes(): BelongsToMany
+    {
+        return $this->belongsToMany(ManagementScope::class, 'management_scope_manager', 'manager_id', 'management_scope_id');
+    }
+
+    /**
+     * Legacy owned scopes.
+     */
+    public function ownedManagementScopes(): HasMany
     {
         return $this->hasMany(ManagementScope::class, 'manager_id');
     }
@@ -242,9 +252,6 @@ class Employee extends Model
     {
         $scopes = $this->managementScopes()
             ->where(function ($q) use ($context) {
-                // If context is provided, filter by it.
-                // If context is null, maybe return all? Or default to 'general'?
-                // Requirement implies specific context usage.
                 if ($context) {
                     $q->where('context', $context);
                 }
@@ -266,7 +273,7 @@ class Employee extends Model
 
                     $applySettings = function (Builder $query) use ($jobTitle) {
                         if ($jobTitle) {
-                            $query->where('job', $jobTitle);
+                            $query->where('job', 'like', trim($jobTitle));
                         }
                     };
 

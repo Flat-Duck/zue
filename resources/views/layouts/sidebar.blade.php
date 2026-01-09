@@ -151,16 +151,6 @@
                                             </span>
                                         </a>
                                     @endcan
-                                    @can('view-any', App\Models\ManagementScope::class)
-                                        <a class="dropdown-item" href="{{ route('management-scopes.index') }}">
-                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="ti ti-adjustments-horizontal"></i>
-                                            </span>
-                                            <span class="nav-link-title">
-                                                Management Scopes
-                                            </span>
-                                        </a>
-                                    @endcan
                                 </div>
                             </li>
                         @endif
@@ -229,6 +219,18 @@
                                 </a>
                             </li>
                         @endcan
+                        {{-- @can('view-any', App\Models\ManagementScope::class) --}}
+                            <li class="nav-item {{ $page == 'management_scopes' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('management-scopes.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-adjustments-horizontal"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Management Scopes
+                                    </span>
+                                </a>
+                            </li>
+                        {{-- @endcan --}}
                         <li class="nav-item {{ $page == 'operations' ? 'active' : ''  }}">
                             <a class="nav-link" href="{{ route('operations.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
