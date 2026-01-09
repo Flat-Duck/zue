@@ -302,7 +302,7 @@
                     <div class="row">
                         <div class="col-1"></div>
                         <div class="col-3 box text-center ">
-                            <h6>منسق الحقل</h6>
+                            <h6>مراقب الحقول</h6>
                             <hr class="divider">
 
                             @if(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
