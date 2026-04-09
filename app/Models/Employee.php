@@ -331,9 +331,9 @@ class Employee extends Model
             return $query;
         }
 
-        // Strict ownership for time-sheet context (explicit subordinate ownership only):
-        // - hide any employee who is listed as subordinate in another manager's scope
-        // - includes both subordinate_employee_id and settings.target_employee_ids
+        // Strict ownership for time-sheet context:
+        // - hide employees assigned as subordinate/target in another manager's scope
+        // - hide employees that are managers in any time_sheet scope
         $candidateIds = (clone $query)->pluck('id')->map(fn($id) => (int) $id)->values();
 
         if ($candidateIds->isEmpty()) {
@@ -351,12 +351,16 @@ class Employee extends Model
             ]);
 
         $disallowedIds = [];
+        $managerPoolIds = [];
         $candidateLookup = $candidateIds->flip();
 
         foreach ($timeSheetScopes as $scope) {
             $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
             if (empty($managerIds) && !is_null($scope->manager_id)) {
                 $managerIds = [(int) $scope->manager_id];
+            }
+            foreach ($managerIds as $managerId) {
+                $managerPoolIds[] = (int) $managerId;
             }
 
             if (in_array((int) $this->id, $managerIds, true)) {
@@ -376,6 +380,12 @@ class Employee extends Model
                 if ($candidateLookup->has($targetId)) {
                     $disallowedIds[] = $targetId;
                 }
+            }
+        }
+
+        foreach (array_unique($managerPoolIds) as $managerId) {
+            if ($candidateLookup->has($managerId)) {
+                $disallowedIds[] = $managerId;
             }
         }
 
