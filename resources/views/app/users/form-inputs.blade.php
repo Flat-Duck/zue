@@ -2,21 +2,21 @@
 
 <div class="row">
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="number" label="ZOC No" :value="old('number', ($editing ? $user->number : ''))" maxlength="255"
-            placeholder="ZOC No" required :readonly="$editing"></x-inputs.text>
+        <x-inputs.text name="number" label="ZOC No" :value="old('number', ($editing ? $user->number : ''))"
+            placeholder="ZOC No" required></x-inputs.text>
     </x-inputs.group>
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $user->name : ''))" maxlength="255"
-            placeholder="Name" required></x-inputs.text>
+        <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $user->name : ''))" placeholder="Name"
+            required></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.email name="email" label="Email" :value="old('email', ($editing ? $user->email : ''))" maxlength="255"
+        <x-inputs.email name="email" label="Email" :value="old('email', ($editing ? $user->email : ''))"
             placeholder="Email" required></x-inputs.email>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.password name="password" label="Password" maxlength="255" placeholder="Password"
+        <x-inputs.password name="password" label="Password" placeholder="Password"
             :required="!$editing"></x-inputs.password>
     </x-inputs.group>
 

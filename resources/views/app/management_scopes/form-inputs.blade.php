@@ -70,7 +70,7 @@
             name="name"
             id="name"
             :value="old('name', ($editing ? $managementScope->name : ''))"
-            maxlength="255"
+            
             placeholder="e.g. My Custom Scope"
         ></x-inputs.text>
     </x-inputs.group>

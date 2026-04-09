@@ -55,7 +55,7 @@
             name="old_value"
             label="Old Value"
             :value="old('old_value', ($editing ? $timeSheet->old_value : ''))"
-            maxlength="255"
+            
             placeholder="Old Value"
         ></x-inputs.text>
     </x-inputs.group>

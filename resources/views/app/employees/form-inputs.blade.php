@@ -7,7 +7,7 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="job" label="Job" :value="old('job', ($editing ? $employee->job : ''))" maxlength="255"
+        <x-inputs.text name="job" label="Job" :value="old('job', ($editing ? $employee->job : ''))"
             placeholder="Job"></x-inputs.text>
     </x-inputs.group>
     @role('super-admin')
@@ -34,12 +34,12 @@
     </x-inputs.group>
     @endrole
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="english_name" label="English Name" :value="old('english_name', ($editing ? $employee->english_name : ''))" maxlength="255" placeholder="English Name"></x-inputs.text>
+        <x-inputs.text name="english_name" label="English Name" :value="old('english_name', ($editing ? $employee->english_name : ''))" placeholder="English Name"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="id_card" label="Id Card" :value="old('id_card', ($editing ? $employee->id_card : ''))"
-            maxlength="255" placeholder="Id Card"></x-inputs.text>
+            placeholder="Id Card"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
@@ -49,7 +49,7 @@
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="passport" label="Passport" :value="old('passport', ($editing ? $employee->passport : ''))"
-            maxlength="255" placeholder="Passport"></x-inputs.text>
+            placeholder="Passport"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
@@ -59,17 +59,17 @@
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="address" label="Address" :value="old('address', ($editing ? $employee->address : ''))"
-            maxlength="255" placeholder="Address"></x-inputs.text>
+            placeholder="Address"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="phone" label="Phone" :value="old('phone', ($editing ? $employee->phone : ''))"
-            maxlength="255" placeholder="Phone"></x-inputs.text>
+            placeholder="Phone"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.email name="email" label="Email" :value="old('email', ($editing ? $employee->email : ''))"
-            maxlength="255" placeholder="Email"></x-inputs.email>
+            placeholder="Email"></x-inputs.email>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
@@ -118,7 +118,7 @@
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="schedule" label="Schedule" :value="old('schedule', ($editing ? $employee->schedule : ''))"
-            maxlength="255" placeholder="Schedule"></x-inputs.text>
+            placeholder="Schedule"></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
