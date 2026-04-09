@@ -65,4 +65,13 @@ class OperationsController extends Controller
 
         return redirect()->back()->with('success', "Successfully un-archived $count employees.");
     }
+
+    public function unarchiveAll()
+    {
+        $count = Employee::withArchived()
+            ->whereNotNull('archived_at')
+            ->update(['archived_at' => null]);
+
+        return redirect()->back()->with('success', "Successfully un-archived all archived employees ({$count}).");
+    }
 }

@@ -60,7 +60,8 @@
                             <p class="text-muted">
                                 Enter one or more employee numbers to restore them from the archive.
                             </p>
-                            <form action="{{ route('operations.unarchive-by-number') }}" method="POST">
+                            <form id="unarchiveByNumberForm" action="{{ route('operations.unarchive-by-number') }}"
+                                method="POST">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">Employee Numbers</label>
@@ -68,12 +69,19 @@
                                         placeholder="Enter numbers separated by space, comma or newline..."
                                         required></textarea>
                                 </div>
-                                <div class="form-footer">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="ti ti-rotate-2 me-2"></i> Un-archive Employees
-                                    </button>
-                                </div>
                             </form>
+                            <div class="form-footer d-flex gap-2">
+                                <button type="submit" form="unarchiveByNumberForm" class="btn btn-primary w-100">
+                                    <i class="ti ti-rotate-2 me-2"></i> Un-archive Employees
+                                </button>
+                                <form action="{{ route('operations.unarchive-all') }}" method="POST" class="w-100"
+                                    onsubmit="return confirm('Are you sure you want to un-archive all employees?');">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="ti ti-rotate-clockwise-2 me-2"></i> Un-archive All
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

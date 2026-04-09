@@ -154,6 +154,7 @@ Route::prefix('/')
         Route::get('operations', [OperationsController::class, 'index'])->name('operations.index');
         Route::post('operations/archive-by-timesheet', [OperationsController::class, 'archiveByTimesheet'])->name('operations.archive-by-timesheet');
         Route::post('operations/unarchive-by-number', [OperationsController::class, 'unarchiveByNumber'])->name('operations.unarchive-by-number');
+        Route::post('operations/unarchive-all', [OperationsController::class, 'unarchiveAll'])->name('operations.unarchive-all');
 
         Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
         Route::post('maintenance/export', [MaintenanceController::class, 'export'])->name('maintenance.export');
