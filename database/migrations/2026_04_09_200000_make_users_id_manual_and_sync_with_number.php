@@ -48,6 +48,7 @@ return new class extends Migration
                 ->foreign('user_id')
                 ->references('id')
                 ->on('users')
+                ->onUpdate('CASCADE')
                 ->onDelete('cascade');
         });
     }
@@ -93,6 +94,7 @@ return new class extends Migration
                 ->foreign('user_id')
                 ->references('id')
                 ->on('users')
+                ->onUpdate('CASCADE')
                 ->onDelete('cascade');
         });
     }

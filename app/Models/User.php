@@ -87,6 +87,12 @@ class User extends Authenticatable
         static::creating(function ($user) {
             $user->id = (int) $user->number;
         });
+
+        static::updating(function ($user) {
+            if ($user->isDirty('number')) {
+                $user->id = (int) $user->number;
+            }
+        });
     }
 
     /**

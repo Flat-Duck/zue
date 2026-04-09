@@ -108,7 +108,12 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
+        $oldUserId = (int) $user->id;
         $validated = $request->validated();
+
+        if (array_key_exists('number', $validated)) {
+            $validated['number'] = (int) $validated['number'];
+        }
 
         if (empty($validated['password'])) {
             unset($validated['password']);
@@ -117,6 +122,11 @@ class UserController extends Controller
         }
 
         $user->update($validated);
+
+        if (auth()->check() && (int) auth()->id() === $oldUserId && (int) $user->id !== $oldUserId) {
+            Auth::login($user);
+            $request->session()->migrate(true);
+        }
 
         if ($request->hasFile('signature_file')) {
             app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
