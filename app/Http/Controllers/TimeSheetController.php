@@ -127,28 +127,96 @@ class TimeSheetController extends Controller
     {
         $year = $request->get('year');
         $month = $request->get('month');
-        $level = $request->get('level'); // timekeeper / supervisor / superintendent
+        $level = strtolower((string) $request->get('level')); // timekeeper / supervisor / superintendent / fieldcoordinator
+        if ($level === 'coordinator') {
+            $level = 'fieldcoordinator';
+        }
 
-        $query = TimeSheet::whereHas('employee', function ($query) {
-            $query->whereIn('id', auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id'));
-        })
+        $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
+        $workflow = $this->timeSheetService->getManagedApprovalBuckets($managedEmployeeIds);
+
+        $query = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
             ->whereMonth('day', $month)
             ->whereYear('day', $year);
 
-        if ($level === 'timekeeper') {
-            $query->whereNull('timekeeper_id')
-                ->update(['timekeeper_id' => auth()->id()]);
-        } elseif ($level === 'supervisor') {
-            $query->whereNotNull('timekeeper_id')
-                ->whereNull('supervisor_id')
-                ->update(['supervisor_id' => auth()->id()]);
-        } elseif ($level === 'superintendent') {
-            $query->whereNotNull('supervisor_id')
-                ->whereNull('superintendent_id')
-                ->update(['superintendent_id' => auth()->id()]);
+        if (
+            ($level === 'timekeeper' && !auth()->user()->hasRole('timekeeper')) ||
+            ($level === 'supervisor' && !auth()->user()->hasRole('supervisor')) ||
+            ($level === 'fieldcoordinator' && !auth()->user()->hasRole('fieldcoordinator')) ||
+            ($level === 'superintendent' && !auth()->user()->hasRole('superintendent'))
+        ) {
+            abort(403);
         }
 
-        return back()->with('success', 'Time sheets approved.');
+        if (!in_array($level, ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'], true)) {
+            return back()->with('error', 'Invalid approval level.');
+        }
+
+        $updated = 0;
+
+        if ($level === 'timekeeper') {
+            $updated = (clone $query)
+                ->whereNull('timekeeper_id')
+                ->update(['timekeeper_id' => auth()->id()]);
+        } elseif ($level === 'supervisor') {
+            if (!empty($workflow['needs_supervisor_ids'])) {
+                $updated = (clone $query)
+                    ->whereIn('employee_id', $workflow['needs_supervisor_ids'])
+                    ->whereNotNull('timekeeper_id')
+                    ->whereNull('supervisor_id')
+                    ->update(['supervisor_id' => auth()->id()]);
+            }
+        } elseif ($level === 'fieldcoordinator') {
+            $idsA2 = $workflow['A2'];
+            $idsA3 = $workflow['A3'];
+            if (!empty($workflow['needs_fieldcoordinator_ids'])) {
+                $updated = (clone $query)
+                    ->whereIn('employee_id', $workflow['needs_fieldcoordinator_ids'])
+                    ->whereNull('superintendent_id')
+                    ->where(function ($builder) use ($idsA2, $idsA3) {
+                        if (!empty($idsA2)) {
+                            $builder->orWhere(function ($q) use ($idsA2) {
+                                $q->whereIn('employee_id', $idsA2)
+                                    ->whereNotNull('timekeeper_id');
+                            });
+                        }
+
+                        if (!empty($idsA3)) {
+                            $builder->orWhere(function ($q) use ($idsA3) {
+                                $q->whereIn('employee_id', $idsA3)
+                                    ->whereNotNull('supervisor_id');
+                            });
+                        }
+                    })
+                    ->update(['superintendent_id' => auth()->id()]);
+            }
+        } elseif ($level === 'superintendent') {
+            $idsA1 = $workflow['A1'];
+            $idsLegacy = $workflow['LEGACY'];
+            if (!empty($workflow['needs_superintendent_ids'])) {
+                $updated = (clone $query)
+                    ->whereIn('employee_id', $workflow['needs_superintendent_ids'])
+                    ->whereNull('superintendent_id')
+                    ->where(function ($builder) use ($idsA1, $idsLegacy) {
+                        if (!empty($idsA1)) {
+                            $builder->orWhere(function ($q) use ($idsA1) {
+                                $q->whereIn('employee_id', $idsA1)
+                                    ->whereNotNull('timekeeper_id');
+                            });
+                        }
+
+                        if (!empty($idsLegacy)) {
+                            $builder->orWhere(function ($q) use ($idsLegacy) {
+                                $q->whereIn('employee_id', $idsLegacy)
+                                    ->whereNotNull('supervisor_id');
+                            });
+                        }
+                    })
+                    ->update(['superintendent_id' => auth()->id()]);
+            }
+        }
+
+        return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
     }
 
     /**

@@ -4,39 +4,41 @@
             <div class="container-xl">
                 <ul class="navbar-nav">
                     @auth
-                        <li class="nav-item {{ $page == 'dashboard' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('home') }}">
+                        @can('view-any', App\Models\Employee::class)
+                            <li class="nav-item {{ $page == 'dashboard' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('home') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-home"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Dashboard
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+                        {{-- @can('view-any', App\Models\Employee::class)
+                        <li class="nav-item {{ $page == 'employees' ? 'active' : ''  }}">
+                            <a class="nav-link" href="{{ route('employees.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-home"></i>
+                                    <i class="ti ti-users"></i>
                                 </span>
                                 <span class="nav-link-title">
-                                    Dashboard
+                                    Employees
                                 </span>
                             </a>
                         </li>
-                        {{-- @can('view-any', App\Models\Employee::class)
-                            <li class="nav-item {{ $page == 'employees' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('employees.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <i class="ti ti-users"></i>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        Employees
-                                    </span>
-                                </a>
-                            </li>
                         @endcan --}}
                         {{-- @can('view-any', App\Models\Employee::class)
-                            <li class="nav-item {{ $page == 'clinic' ? 'active' : ''  }}">
-                                <a class="nav-link" href="{{ route('clinic.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <i class="ti ti-building-hospital"></i>
-                                    </span>
-                                    <span class="nav-link-title">
-                                        clinic
-                                    </span>
-                                </a>
-                            </li>
+                        <li class="nav-item {{ $page == 'clinic' ? 'active' : ''  }}">
+                            <a class="nav-link" href="{{ route('clinic.index') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <i class="ti ti-building-hospital"></i>
+                                </span>
+                                <span class="nav-link-title">
+                                    clinic
+                                </span>
+                            </a>
+                        </li>
                         @endcan --}}
 
                         @if (
@@ -219,7 +221,7 @@
                                 </a>
                             </li>
                         @endcan
-                        {{-- @can('view-any', App\Models\ManagementScope::class) --}}
+                        @can('view-any', App\Models\ManagementScope::class)
                             <li class="nav-item {{ $page == 'management_scopes' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('management-scopes.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -230,37 +232,43 @@
                                     </span>
                                 </a>
                             </li>
-                        {{-- @endcan --}}
-                        <li class="nav-item {{ $page == 'operations' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('operations.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-settings-automation"></i>
-                                </span>
-                                <span class="nav-link-title">
-                                    Operations
-                                </span>
-                            </a>
-                        </li>
-                        <li class="nav-item {{ $page == 'maintenance' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('maintenance.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-database"></i>
-                                </span>
-                                <span class="nav-link-title">
-                                    Maintenance
-                                </span>
-                            </a>
-                        </li>
-                        <li class="nav-item {{ $page == 'reports' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('reports.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-report-analytics"></i>
-                                </span>
-                                <span class="nav-link-title">
-                                    Reports
-                                </span>
-                            </a>
-                        </li>
+                        @endcan
+                        @can('view-any', App\Models\Employee::class)
+                            <li class="nav-item {{ $page == 'operations' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('operations.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-settings-automation"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Operations
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('view-any', App\Models\User::class)
+                            <li class="nav-item {{ $page == 'maintenance' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('maintenance.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-database"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Maintenance
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('view-any', App\Models\TimeSheet::class)
+                            <li class="nav-item {{ $page == 'reports' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('reports.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-report-analytics"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Reports
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
                         {{-- @can('view-any', App\Models\TimeSheet::class)
                         <li class="nav-item {{ $page == 'run' ? 'active' : ''  }}">
                             <a class="nav-link" href="{{ route('run.index') }}">
@@ -372,53 +380,53 @@
                         </li>
 
                         @if (
-                                        Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) ||
-                                        Auth::user()->can('view-any', Spatie\Permission\Models\Permission::class)
-                                    )
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
-                                            data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                Auth::user()->can('view-any', Spatie\Permission\Models\Role::class) ||
+                                Auth::user()->can('view-any', Spatie\Permission\Models\Permission::class)
+                            )
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
+                                    data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-lock-access"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Access Management
+                                    </span>
+                                </a>
+
+                                <div class="dropdown-menu">
+                                    @can('view-any', App\Models\User::class)
+                                        <a class="dropdown-item" href="{{ route('users.index') }}" rel="noopener">
                                             <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                <i class="ti ti-lock-access"></i>
+                                                <i class="ti ti-user-check"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Access Management
+                                                Users
                                             </span>
                                         </a>
-
-                                        <div class="dropdown-menu">
-                                            @can('view-any', App\Models\User::class)
-                                                <a class="dropdown-item" href="{{ route('users.index') }}" rel="noopener">
-                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                        <i class="ti ti-user-check"></i>
-                                                    </span>
-                                                    <span class="nav-link-title">
-                                                        Users
-                                                    </span>
-                                                </a>
-                                            @endcan
-                                            @can('view-any', Spatie\Permission\Models\Role::class)
-                                                <a class="dropdown-item" href="{{ route('roles.index') }}" rel="noopener">
-                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                        <i class="ti ti-user-check"></i>
-                                                    </span>
-                                                    <span class="nav-link-title">
-                                                        Roles
-                                                    </span>
-                                                </a>
-                                            @endcan
-                                            @can('view-any', Spatie\Permission\Models\Permission::class)
-                                                <a class="dropdown-item" href="{{ route('permissions.index') }}">
-                                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                        <i class="ti ti-key"></i>
-                                                    </span>
-                                                    <span class="nav-link-title">
-                                                        Permissions
-                                                    </span>
-                                                </a>
-                                            @endcan
-                                        </div>
-                                    </li>
+                                    @endcan
+                                    @can('view-any', Spatie\Permission\Models\Role::class)
+                                        <a class="dropdown-item" href="{{ route('roles.index') }}" rel="noopener">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-user-check"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Roles
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', Spatie\Permission\Models\Permission::class)
+                                        <a class="dropdown-item" href="{{ route('permissions.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-key"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Permissions
+                                            </span>
+                                        </a>
+                                    @endcan
+                                </div>
+                            </li>
                         @endif
                     @endauth
                 </ul>

@@ -5,29 +5,45 @@ namespace App\Services;
 use App\Helpers\MomentsJs;
 use App\Models\TimeSheet;
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
 
 class TimeSheetService
 {
+    private const A3_DEPARTMENT_KEYS = [
+        'gaspant',
+        'gp',
+        'production',
+        'prod',
+        'prodnc163',
+        'lab',
+        'generalmaintenance',
+        'genmaint',
+        'esp',
+        'campboss',
+        'camboss',
+    ];
+
+    private const A4_DEPARTMENT_KEYS = [
+        'admin',
+        'accounting',
+        'transportation',
+        'transport',
+        'transp',
+    ];
+
     public function getApprovalData(int $month, int $year): array
     {
         $months = MomentsJs::getMonthsInYear();
         $monthName = $months->get($month);
-        // $year = $year;
-            
-        // $baseQuery = auth()->user()->managedEmployeesQuery('time_sheet')
-        
-        // ->whereHas('timesheets', function ($query) use ($month, $year) {
-        //    $query->whereMonth('day', $month)
-        //    ->whereYear('day', $year);
-        // })->whereNull('archived_at');
-        $baseQuery = TimeSheet::whereHas('employee', function ($query) {
-            $query->whereIn('id', auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id'));
-        })
+        $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
+        $workflow = $this->getManagedApprovalBuckets($managedEmployeeIds);
+
+        $baseQuery = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
             ->whereMonth('day', $month)
             ->whereYear('day', $year);
-// dd($baseQuery->get());
+
         $chunk = $baseQuery->get();
         $groupedByEmployee = $chunk->groupBy('employee_id');
 
@@ -59,10 +75,6 @@ class TimeSheetService
         $currentPage = collect();
         $maxPerPage = 8;
 
-        $department = $normalEmployees->first()->first()->employee->department->name;
-        $center = $normalEmployees->first()->first()->employee->center->name;
-        $administration = $normalEmployees->first()->first()->employee->department->administration->name;
-
         foreach ($normalEmployees as $employeeId => $days) {
             $currentPage->put($employeeId, $days);
 
@@ -83,39 +95,140 @@ class TimeSheetService
         }
 
         $chunks = $pages;
-        $signatures = [];
-        $canTimekeeperApprove = false;
-        $canSupervisorApprove = false;
-        $canSuperintendentApprove = false;
+        $firstRow = $chunk->first();
+        $department = $firstRow?->employee?->department?->name ?? '';
+        $center = $firstRow?->employee?->center?->name ?? '';
+        $administration = $firstRow?->employee?->department?->administration?->name ?? '';
 
-        if ($chunks->isNotEmpty() && $chunks->first()->isNotEmpty()) {
-            $first_chunk = $chunks->first()->first()->first();
+        $idsA1 = $workflow['A1'];
+        $idsA2 = $workflow['A2'];
+        $idsA3 = $workflow['A3'];
+        $idsA4 = $workflow['A4'];
+        $idsLegacy = $workflow['LEGACY'];
 
-            if ($first_chunk) {
-                $signatures['time_keeper']['sign'] = $first_chunk->time_keeper?->signature->image_path;
-                $signatures['time_keeper']['name'] = $first_chunk->time_keeper?->name;
-                $signatures['super_visor']['sign'] = $first_chunk->super_visor?->signature->image_path;
-                $signatures['super_visor']['name'] = $first_chunk->super_visor?->name;
-                $signatures['super_intendent']['sign'] = $first_chunk->super_intendent?->signature->image_path;
-                $signatures['super_intendent']['name'] = $first_chunk->super_intendent?->name;
-            }
+        $idsNeedSupervisor = $workflow['needs_supervisor_ids'];
+        $idsNeedFieldCoordinator = $workflow['needs_fieldcoordinator_ids'];
+        $idsNeedSuperintendent = $workflow['needs_superintendent_ids'];
 
-            $canTimekeeperApprove = (clone $baseQuery)
-                ->whereNull('timekeeper_id')
-                ->exists();
+        $signatures = [
+            'time_keeper' => ['sign' => null, 'name' => null],
+            'super_visor' => ['sign' => null, 'name' => null],
+            'field_coordinator' => ['sign' => null, 'name' => null],
+            'coordinator' => ['sign' => null, 'name' => null],
+            'super_intendent' => ['sign' => null, 'name' => null],
+        ];
 
-            $canSupervisorApprove = (clone $baseQuery)
-                ->whereNull('supervisor_id')
-                ->whereNotNull('timekeeper_id')
-                ->exists();
+        $timekeeperSignedSheet = (clone $baseQuery)
+            ->whereNotNull('timekeeper_id')
+            ->with('time_keeper.signature')
+            ->first();
+        if ($timekeeperSignedSheet?->time_keeper) {
+            $signatures['time_keeper'] = [
+                'sign' => $timekeeperSignedSheet->time_keeper?->signature?->image_path,
+                'name' => $timekeeperSignedSheet->time_keeper?->name,
+            ];
+        }
 
-            $canSuperintendentApprove = (clone $baseQuery)
-                ->whereNull('superintendent_id')
+        if (!empty($idsNeedSupervisor)) {
+            $supervisorSignedSheet = (clone $baseQuery)
+                ->whereIn('employee_id', $idsNeedSupervisor)
                 ->whereNotNull('supervisor_id')
+                ->with('super_visor.signature')
+                ->first();
+            if ($supervisorSignedSheet?->super_visor) {
+                $signatures['super_visor'] = [
+                    'sign' => $supervisorSignedSheet->super_visor?->signature?->image_path,
+                    'name' => $supervisorSignedSheet->super_visor?->name,
+                ];
+            }
+        }
+
+        if (!empty($idsNeedFieldCoordinator)) {
+            $fieldCoordinatorSignedSheet = (clone $baseQuery)
+                ->whereIn('employee_id', $idsNeedFieldCoordinator)
+                ->whereNotNull('superintendent_id')
+                ->with('super_intendent.signature')
+                ->first();
+            if ($fieldCoordinatorSignedSheet?->super_intendent) {
+                $signatures['field_coordinator'] = [
+                    'sign' => $fieldCoordinatorSignedSheet->super_intendent?->signature?->image_path,
+                    'name' => $fieldCoordinatorSignedSheet->super_intendent?->name,
+                ];
+                $signatures['coordinator'] = $signatures['field_coordinator'];
+            }
+        }
+
+        if (!empty($idsNeedSuperintendent)) {
+            $superintendentSignedSheet = (clone $baseQuery)
+                ->whereIn('employee_id', $idsNeedSuperintendent)
+                ->whereNotNull('superintendent_id')
+                ->with('super_intendent.signature')
+                ->first();
+            if ($superintendentSignedSheet?->super_intendent) {
+                $signatures['super_intendent'] = [
+                    'sign' => $superintendentSignedSheet->super_intendent?->signature?->image_path,
+                    'name' => $superintendentSignedSheet->super_intendent?->name,
+                ];
+            }
+        }
+
+        $canTimekeeperApprove = (clone $baseQuery)
+            ->whereNull('timekeeper_id')
+            ->exists();
+
+        $canSupervisorApprove = !empty($idsNeedSupervisor) && (clone $baseQuery)
+            ->whereIn('employee_id', $idsNeedSupervisor)
+            ->whereNotNull('timekeeper_id')
+            ->whereNull('supervisor_id')
+            ->exists();
+
+        $canFieldCoordinatorApprove = false;
+        if (!empty($idsNeedFieldCoordinator)) {
+            $canFieldCoordinatorApprove = (clone $baseQuery)
+                ->whereIn('employee_id', $idsNeedFieldCoordinator)
+                ->whereNull('superintendent_id')
+                ->where(function ($query) use ($idsA2, $idsA3) {
+                    if (!empty($idsA2)) {
+                        $query->orWhere(function ($q) use ($idsA2) {
+                            $q->whereIn('employee_id', $idsA2)
+                                ->whereNotNull('timekeeper_id');
+                        });
+                    }
+
+                    if (!empty($idsA3)) {
+                        $query->orWhere(function ($q) use ($idsA3) {
+                            $q->whereIn('employee_id', $idsA3)
+                                ->whereNotNull('supervisor_id');
+                        });
+                    }
+                })
                 ->exists();
         }
 
-        $month_days = Carbon::now()->month($monthName)->daysInMonth;
+        $canSuperintendentApprove = false;
+        if (!empty($idsNeedSuperintendent)) {
+            $canSuperintendentApprove = (clone $baseQuery)
+                ->whereIn('employee_id', $idsNeedSuperintendent)
+                ->whereNull('superintendent_id')
+                ->where(function ($query) use ($idsA1, $idsLegacy) {
+                    if (!empty($idsA1)) {
+                        $query->orWhere(function ($q) use ($idsA1) {
+                            $q->whereIn('employee_id', $idsA1)
+                                ->whereNotNull('timekeeper_id');
+                        });
+                    }
+
+                    if (!empty($idsLegacy)) {
+                        $query->orWhere(function ($q) use ($idsLegacy) {
+                            $q->whereIn('employee_id', $idsLegacy)
+                                ->whereNotNull('supervisor_id');
+                        });
+                    }
+                })
+                ->exists();
+        }
+
+        $month_days = Carbon::create($year, $month, 1)->daysInMonth;
         $employees = Employee::pluck('english_name', 'number');
 
         return [
@@ -131,7 +244,93 @@ class TimeSheetService
             'signatures' => $signatures,
             'canTimekeeperApprove' => $canTimekeeperApprove,
             'canSupervisorApprove' => $canSupervisorApprove,
-            'canSuperintendentApprove' => $canSuperintendentApprove
+            'canFieldCoordinatorApprove' => $canFieldCoordinatorApprove,
+            'canCoordinatorApprove' => $canFieldCoordinatorApprove,
+            'canSuperintendentApprove' => $canSuperintendentApprove,
+            'requiresSupervisorStage' => !empty($idsNeedSupervisor),
+            'requiresFieldCoordinatorStage' => !empty($idsNeedFieldCoordinator),
+            'requiresSuperintendentStage' => !empty($idsNeedSuperintendent),
         ];
+    }
+
+    public function getManagedApprovalBuckets(?Collection $managedEmployeeIds = null): array
+    {
+        $managedEmployeeIds ??= auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
+
+        $employees = Employee::query()
+            ->with('department:id,name')
+            ->whereIn('id', $managedEmployeeIds)
+            ->get(['id', 'department_id']);
+
+        $supervisorLookup = User::query()
+            ->whereIn('id', $employees->pluck('id'))
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'supervisor');
+            })
+            ->pluck('id')
+            ->flip();
+
+        $buckets = [
+            'A1' => [],
+            'A2' => [],
+            'A3' => [],
+            'A4' => [],
+            'LEGACY' => [],
+        ];
+
+        foreach ($employees as $employee) {
+            $departmentKey = $this->normalizeDepartmentName($employee->department?->name);
+            $isSupervisorEmployee = $supervisorLookup->has($employee->id);
+
+            if ($this->isA3Department($departmentKey)) {
+                $buckets[$isSupervisorEmployee ? 'A2' : 'A3'][] = $employee->id;
+                continue;
+            }
+
+            if ($this->isA4Department($departmentKey)) {
+                $buckets[$isSupervisorEmployee ? 'A1' : 'A4'][] = $employee->id;
+                continue;
+            }
+
+            // Fallback to old 3-step chain for unknown departments.
+            $buckets['LEGACY'][] = $employee->id;
+        }
+
+        foreach ($buckets as $key => $ids) {
+            $buckets[$key] = array_values(array_unique($ids));
+        }
+
+        $buckets['needs_supervisor_ids'] = array_values(array_unique(array_merge(
+            $buckets['A3'],
+            $buckets['A4'],
+            $buckets['LEGACY']
+        )));
+
+        $buckets['needs_fieldcoordinator_ids'] = array_values(array_unique(array_merge(
+            $buckets['A2'],
+            $buckets['A3']
+        )));
+
+        $buckets['needs_superintendent_ids'] = array_values(array_unique(array_merge(
+            $buckets['A1'],
+            $buckets['LEGACY']
+        )));
+
+        return $buckets;
+    }
+
+    private function normalizeDepartmentName(?string $name): string
+    {
+        return preg_replace('/[^a-z0-9]/', '', strtolower((string) $name));
+    }
+
+    private function isA3Department(string $normalizedDepartment): bool
+    {
+        return in_array($normalizedDepartment, self::A3_DEPARTMENT_KEYS, true);
+    }
+
+    private function isA4Department(string $normalizedDepartment): bool
+    {
+        return in_array($normalizedDepartment, self::A4_DEPARTMENT_KEYS, true);
     }
 }
