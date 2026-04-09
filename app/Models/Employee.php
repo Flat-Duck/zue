@@ -353,6 +353,24 @@ class Employee extends Model
         $disallowedIds = [];
         $managerPoolIds = [];
         $candidateLookup = $candidateIds->flip();
+        $myEmployeeScopeAllowedIds = [];
+
+        foreach ($scopes as $myScope) {
+            if ($myScope->scope_type !== ManagementScope::TYPE_EMPLOYEE) {
+                continue;
+            }
+
+            if (!is_null($myScope->subordinate_employee_id)) {
+                $myEmployeeScopeAllowedIds[] = (int) $myScope->subordinate_employee_id;
+            }
+
+            $myTargetIds = (array) ($myScope->settings['target_employee_ids'] ?? []);
+            foreach ($myTargetIds as $myTargetId) {
+                $myEmployeeScopeAllowedIds[] = (int) $myTargetId;
+            }
+        }
+
+        $myEmployeeScopeAllowedLookup = collect(array_unique($myEmployeeScopeAllowedIds))->flip();
 
         foreach ($timeSheetScopes as $scope) {
             $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
@@ -385,6 +403,11 @@ class Employee extends Model
 
         foreach (array_unique($managerPoolIds) as $managerId) {
             if ($candidateLookup->has($managerId)) {
+                // Manager-employees are only visible when explicitly assigned in
+                // one of my own employee-type scopes.
+                if ($myEmployeeScopeAllowedLookup->has((int) $managerId)) {
+                    continue;
+                }
                 $disallowedIds[] = $managerId;
             }
         }
