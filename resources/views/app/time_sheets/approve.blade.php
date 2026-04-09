@@ -119,9 +119,9 @@
             }
 
             /* table {
-                        border-collapse: collapse;
-                        width: 100%;
-                    } */
+                                                                                border-collapse: collapse;
+                                                                                width: 100%;
+                                                                            } */
 
             tbody tr:nth-child(even) {
                 border-bottom: 4px double #000 !important;
@@ -155,9 +155,9 @@
             }
 
             /* tbody th, tbody td {
-                        border: 1px solid #ccc;
-                        padding: 4px;
-                    } */
+                                                                                border: 1px solid #ccc;
+                                                                                padding: 4px;
+                                                                            } */
         </style>
     @endsection
     <div class="card">
@@ -209,7 +209,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                {{ $center?? '' }}
+                                {{ $center ?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
@@ -218,7 +218,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                {{ $department?? '' }}
+                                {{ $department ?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
@@ -227,7 +227,7 @@
                             </h6>
                             <hr class="divider">
                             <h6 class="text-center">
-                                {{ $administration?? '' }}
+                                {{ $administration ?? '' }}
                             </h6>
                         </div>
                         <div class="col-1"></div>
@@ -300,12 +300,11 @@
                 </div>
                 <footer>
                     <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-3 box text-center ">
-                            <h6>مراقب الحقول</h6>
-                            <hr class="divider">
-
-                            @if(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
+                        @if(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
+                            <div class="col-1"></div>
+                            <div class="col-3 box text-center ">
+                                <h6>مراقب الحقول</h6>
+                                <hr class="divider">
                                 {{-- زر الموافقة فقط لو المستخدم منسق الحقل وفيه تايم شيت يحتاج توقيع المنسق --}}
                                 <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                     class="pull-right btn btn-yellow"
@@ -313,7 +312,6 @@
                                     <i class="ti ti-check"></i>
                                     @lang('crud.common.time_sheet_approve')
                                 </a>
-                            @else
                                 {{-- عرض التوقيع لو موجود --}}
                                 @isset($signatures['super_intendent']['sign'])
                                     <div>
@@ -324,42 +322,47 @@
                                         {{ $signatures['super_intendent']['name'] }}
                                     </div>
                                 @endisset
-                            @endif
-                        </div>
 
-                        {{-- <div class="col-3 box text-center ">
-                            <h6>
-                                منسق الحقل
-                            </h6>
-                            <hr class="divider">
-                            <div>
-                                <h6 class="container">
-                                    @isset($signatures['super_intendent']['sign'])
-                                    <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
-                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                    @endisset
-                                </h6>
-                                {{ $signatures['super_intendent']['name'] }}
                             </div>
-                            <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                class="pull-right btn btn-yellow" href="{{ route('time-sheets.approves') }}">
-                                <i class="ti ti-check"></i>
-                                @lang('crud.common.time_sheet_approve')
-                            </a>
-                        </div> --}}
-                        <div class="col-4 box text-center">
-                            <h6>مشرف القسم</h6>
-                            <hr class="divider">
-
-                            @if(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
+                        @endif
+                        @if(auth()->user()->hasRole('coordinator') && $canCoordinatorApprove)
+                            <div class="col-1"></div>
+                            <div class="col-3 box text-center ">
+                                <h6>منسق الحقول</h6>
+                                <hr class="divider">
+                                {{-- زر الموافقة فقط لو المستخدم منسق الحقل وفيه تايم شيت يحتاج توقيع المنسق --}}
                                 <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                     class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                    href="{{ route('time-sheets.approves', ['level' => 'coordinator', 'month' => $selected_month, 'year' => $selected_year]) }}">
                                     <i class="ti ti-check"></i>
                                     @lang('crud.common.time_sheet_approve')
                                 </a>
-                            @else
-                                @isset($signatures['super_visor']['sign'])
+                                {{-- عرض التوقيع لو موجود --}}
+                                @isset($signatures['super_intendent']['sign'])
+                                    <div>
+                                        <h6 class="container">
+                                            <img src="{{ asset('storage/' . $signatures['coordinator']['sign']) }}"
+                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                        </h6>
+                                        {{ $signatures['coordinator']['name'] }}
+                                    </div>
+                                @endisset
+
+                            </div>
+                        @endif
+                        @if(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
+                            <div class="col-4 box text-center">
+                                <h6>مشرف القسم</h6>
+                                <hr class="divider">
+                                @if(!isset($signatures['super_visor']['sign']))
+                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                        class="pull-right btn btn-yellow"
+                                        href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                        <i class="ti ti-check"></i>
+                                        @lang('crud.common.time_sheet_approve')
+                                    </a>
+                                @else
+
                                     <div>
                                         <h6 class="container">
                                             <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
@@ -367,69 +370,35 @@
                                         </h6>
                                         {{ $signatures['super_visor']['name'] }}
                                     </div>
-                                @endisset
-                            @endif
-                        </div>
-
-                        {{-- <div class="col-4 box text-center">
-                            <h6>
-                                مشرف القسم
-                            </h6>
-                            <hr class="divider">
-                            <div>
-                                <h6 class="container">
-                                    @isset($signatures['super_visor']['sign'])
-                                    <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
-                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                    @endisset
-                                </h6>
-                                {{ $signatures['super_visor']['name'] }}
+                                @endif
                             </div>
-                        </div> --}}
+                        @endif
+
                         <div class="col-3 box text-center">
-                            <h6>حافظ الوقت</h6>
-                            <hr class="divider">
-
                             @if(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
-                                <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                    class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
-                                    <i class="ti ti-check"></i>
-                                    @lang('crud.common.time_sheet_approve')
-                                </a>
-                            @else
-                                @isset($signatures['time_keeper']['sign'])
-                                    <div>
-                                        <h6 class="container">
-                                            <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
-                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                        </h6>
-                                        {{ $signatures['time_keeper']['name'] }}
-                                    </div>
-                                @endisset
-                            @endif
-                        </div>
+                                    <h6>حافظ الوقت</h6>
+                                    <hr class="divider">
 
-                        {{-- <div class="col-3 box text-center">
-                            <h6>
-                                حافظ الوقت
-                            </h6>
-                            <hr class="divider">
-                            <div>
-                                <h6 class="container">
-                                    @isset($signatures['time_keeper']['sign'])
-                                    <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
-                                        style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                    @endisset
-                                </h6>
-                                {{ $signatures['time_keeper']['name'] }}
-                            </div>
-                            <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                class="pull-right btn btn-yellow" href="{{ route('time-sheets.approves') }}">
-                                <i class="ti ti-check"></i>
-                                @lang('crud.common.time_sheet_approve')
-                            </a>
-                        </div> --}}
+                                    @if(!isset($signatures['time_keeper']['sign']))
+                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow"
+                                            href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </a>
+                                    @else
+
+                                        <div>
+                                            <h6 class="container">
+                                                <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
+                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                            </h6>
+                                            {{ $signatures['time_keeper']['name'] }}
+                                        </div>
+                                    @endif
+
+                                </div>
+                            @endif
                         <div class="col-1"></div>
                     </div>
 
