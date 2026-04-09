@@ -331,18 +331,12 @@ class Employee extends Model
             return $query;
         }
 
-        // Strict ownership for time-sheet context:
-        // - hide any employee covered by another manager's scope
-        // - self is visible only when no other manager can cover self
-        $candidateEmployees = (clone $query)->get([
-            'id',
-            'location_id',
-            'department_id',
-            'center_id',
-            'job',
-        ]);
+        // Strict ownership for time-sheet context (explicit subordinate ownership only):
+        // - hide any employee who is listed as subordinate in another manager's scope
+        // - includes both subordinate_employee_id and settings.target_employee_ids
+        $candidateIds = (clone $query)->pluck('id')->map(fn($id) => (int) $id)->values();
 
-        if ($candidateEmployees->isEmpty()) {
+        if ($candidateIds->isEmpty()) {
             return static::query()->whereRaw('0 = 1');
         }
 
@@ -352,42 +346,43 @@ class Employee extends Model
             ->get([
                 'id',
                 'manager_id',
-                'scope_type',
-                'context',
-                'location_id',
-                'department_id',
-                'center_id',
                 'subordinate_employee_id',
                 'settings',
             ]);
 
-        $allowedIds = [];
+        $disallowedIds = [];
+        $candidateLookup = $candidateIds->flip();
 
-        foreach ($candidateEmployees as $candidate) {
-            $hasOtherManager = false;
+        foreach ($timeSheetScopes as $scope) {
+            $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
+            if (empty($managerIds) && !is_null($scope->manager_id)) {
+                $managerIds = [(int) $scope->manager_id];
+            }
 
-            foreach ($timeSheetScopes as $scope) {
-                if (!$scope->matchesTargetEmployee($candidate)) {
-                    continue;
-                }
+            if (in_array((int) $this->id, $managerIds, true)) {
+                continue;
+            }
 
-                $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
-                if (empty($managerIds) && !is_null($scope->manager_id)) {
-                    $managerIds = [(int) $scope->manager_id];
-                }
-
-                foreach ($managerIds as $managerId) {
-                    if ($managerId !== (int) $this->id) {
-                        $hasOtherManager = true;
-                        break 2;
-                    }
+            if (!is_null($scope->subordinate_employee_id)) {
+                $subordinateId = (int) $scope->subordinate_employee_id;
+                if ($candidateLookup->has($subordinateId)) {
+                    $disallowedIds[] = $subordinateId;
                 }
             }
 
-            if (!$hasOtherManager) {
-                $allowedIds[] = (int) $candidate->id;
+            $targetIds = (array) ($scope->settings['target_employee_ids'] ?? []);
+            foreach ($targetIds as $targetId) {
+                $targetId = (int) $targetId;
+                if ($candidateLookup->has($targetId)) {
+                    $disallowedIds[] = $targetId;
+                }
             }
         }
+
+        $allowedIds = $candidateIds
+            ->diff(array_unique($disallowedIds))
+            ->values()
+            ->all();
 
         if (empty($allowedIds)) {
             return static::query()->whereRaw('0 = 1');
