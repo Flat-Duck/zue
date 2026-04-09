@@ -14,6 +14,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @enderror
+            @error('impersonation')
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Impersonation Failed:</strong> {{ $message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @enderror
             <div class="d-flex">
                 <form>
                     <div class="row g-2">
@@ -78,7 +84,7 @@
                                     </button>
                                 @endif
                             </td>
-                            <td class="text-center" style="width: 134px;">
+                            <td class="text-center">
                                 <div role="group" aria-label="Row Actions" class="btn-group">
                                     @can('update', $user)
                                         <a href="{{ route('users.edit', $user) }}" class="btn btn-icon btn-outline-warinig ms-1">
@@ -97,6 +103,15 @@
                                             </button>
                                         </form>
                                     @endcan
+                                    @if(auth()->user()->hasRole('super-admin') && !session()->has('impersonator_id') && auth()->id() !== $user->id)
+                                        <form action="{{ route('users.impersonate', $user) }}" method="POST" class="inline pointer ms-1"
+                                            onsubmit="return confirm('Sign in as {{ addslashes($user->name) }}?')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-icon btn-outline-primary" title="Sign in as user">
+                                                <i class="ti ti-user-share"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

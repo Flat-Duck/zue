@@ -9,6 +9,20 @@
             </a>
         </h1>
         <div class="navbar-nav flex-row order-md-last">
+            @if(auth()->check() && session()->has('impersonator_id'))
+                <div class="nav-item d-none d-md-flex me-3 align-items-center">
+                    <span class="badge bg-orange-lt text-orange me-2">
+                        Signed in as {{ auth()->user()->name }}
+                    </span>
+                    <form action="{{ route('users.impersonate.stop') }}" method="POST" class="m-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            Return to {{ session('impersonator_name', 'Super Admin') }}
+                        </button>
+                    </form>
+                </div>
+            @endif
             <div class="nav-item d-none d-md-flex me-3">
                 <div class="btn-list">
                 <a href="https://github.com/sponsors/codecalm" class="btn" target="_blank" rel="noreferrer">
@@ -72,6 +86,20 @@
                         @endif
                     @endguest
                     @auth
+                        @if(session()->has('impersonator_id'))
+                            <form action="{{ route('users.impersonate.stop') }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="dropdown-item">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-user-undo"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Return to {{ session('impersonator_name', 'Super Admin') }}
+                                    </span>
+                                </button>
+                            </form>
+                        @endif
                         <a class="dropdown-item" href="{{ route('profile.show') }}" rel="noopener">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <i class="ti ti-user-circle"></i>
