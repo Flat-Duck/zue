@@ -53,6 +53,8 @@ class TimeSheetController extends Controller
      */
     public function create(Request $request, Employee $employee): View
     {
+        $this->ensureManageableForTimeSheet($employee->id);
+
         return view('app.time_sheets.create', compact('employee'));
     }
 
@@ -64,6 +66,7 @@ class TimeSheetController extends Controller
         $this->authorize('create', TimeSheet::class);
 
         $validated = $request->validated();
+        $this->ensureManageableForTimeSheet((int) $validated['employee_id']);
 
         $timeSheet = TimeSheet::create($validated);
         return redirect()
@@ -224,6 +227,8 @@ class TimeSheetController extends Controller
      */
     public function edit(Request $request, Employee $employee): View
     {
+        $this->ensureManageableForTimeSheet($employee->id);
+
         return view('app.time_sheets.edit', compact('employee'));
     }
 
@@ -235,6 +240,7 @@ class TimeSheetController extends Controller
         TimeSheet $timeSheet
     ): RedirectResponse {
         $this->authorize('update', $timeSheet);
+        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id);
 
         $validated = $request->validated();
 
@@ -253,11 +259,22 @@ class TimeSheetController extends Controller
         TimeSheet $timeSheet
     ): RedirectResponse {
         $this->authorize('delete', $timeSheet);
+        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id);
 
         $timeSheet->delete();
 
         return redirect()
             ->route('time-sheets.index')
             ->withSuccess(__('crud.common.removed'));
+    }
+
+    private function ensureManageableForTimeSheet(int $employeeId): void
+    {
+        $isManageable = auth()->user()
+            ->managedEmployeesQuery('time_sheet')
+            ->where('id', $employeeId)
+            ->exists();
+
+        abort_unless($isManageable, 403);
     }
 }
