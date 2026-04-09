@@ -101,7 +101,8 @@
                                 <h2 class="mb-0">حقول الانتصار 103</h2>
                                 <h3 class="mb-0">بطاقة ضبط الوقت</h3>
                                 <div class="mt-2">
-                                    <strong>Month:</strong> {{ $month_name }} | <strong>Year:</strong> {{ now()->year }}
+                                    <strong>Month:</strong> {{ $month_name }} | <strong>Year:</strong>
+                                    {{ $selected_year ?? now()->year }}
                                     @if(isset($center_name)) | <strong>Center:</strong> {{ $center_name }} @endif
                                 </div>
                             </div>

@@ -117,9 +117,10 @@ class ReportController extends Controller
     {
         $request->validate([
             'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
         ]);
 
-        $data = $service->getApprovalData($request->month);
+        $data = $service->getApprovalData((int) $request->month, (int) $request->year);
         $data['page'] = 'reports';
 
         return view('app.reports.monthly_attendance', $data);

@@ -173,19 +173,38 @@
                         <div class="card-body">
                             <form action="{{ route('reports.monthly-attendance') }}" method="POST">
                                 @csrf
-                                <div class="mb-3">
-                                    <label class="form-label">Select Month</label>
-                                    <select name="month" class="form-select" required>
-                                        @foreach(range(1, 12) as $m)
-                                            <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
-                                                {{ date('F', mktime(0, 0, 0, $m, 1)) }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Month</label>
+                                            <select name="month" class="form-select" required>
+                                                @foreach(range(1, 12) as $m)
+                                                    <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
+                                                        {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Year</label>
+                                            <select name="year" class="form-select" required>
+                                                @php
+                                                    $currentYear = now()->year;
+                                                @endphp
+                                                @for($y = $currentYear + 1; $y >= $currentYear - 5; $y--)
+                                                    <option value="{{ $y }}" {{ $y === $currentYear ? 'selected' : '' }}>
+                                                        {{ $y }}
+                                                    </option>
+                                                @endfor
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="text-muted mb-3">
                                     <small>This generates the official monthly attendance grid with approval signatures for
-                                        the current year ({{ now()->year }}).</small>
+                                        the selected month and year.</small>
                                 </div>
                                 <div class="form-footer">
                                     <button type="submit" class="btn btn-yellow w-100">
