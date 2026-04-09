@@ -18,7 +18,11 @@ class User extends Authenticatable
     use Searchable;
     use HasApiTokens;
 
-    protected $fillable = ['id','number','name', 'email', 'password'];
+    protected $fillable = ['number', 'name', 'email', 'password'];
+
+    public $incrementing = false;
+
+    protected $keyType = 'int';
 
     protected $searchableFields = ['*'];
 
@@ -80,9 +84,8 @@ class User extends Authenticatable
 
     protected static function booted()
     {
-        static::created(function ($user) {
-            $user->id = $user->number;
-            $user->save();
+        static::creating(function ($user) {
+            $user->id = (int) $user->number;
         });
     }
 

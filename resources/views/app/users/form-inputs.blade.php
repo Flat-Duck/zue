@@ -2,8 +2,8 @@
 
 <div class="row">
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="number" label="ZOC No" :value="old('number', ($editing ? $user->id : ''))" maxlength="255"
-            placeholder="ZOC No" required></x-inputs.text>
+        <x-inputs.text name="number" label="ZOC No" :value="old('number', ($editing ? $user->number : ''))" maxlength="255"
+            placeholder="ZOC No" required :readonly="$editing"></x-inputs.text>
     </x-inputs.group>
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $user->name : ''))" maxlength="255"

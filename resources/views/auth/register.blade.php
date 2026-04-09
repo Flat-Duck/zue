@@ -11,6 +11,15 @@
                     </div>
                 @endif
                 <div class="mb-3">
+                    <label class="form-label required">{{ __('ZOC No') }}</label>
+                    <input type="number" min="1" placeholder="Enter ZOC No" id="number" class="form-control @error('number') is-invalid @enderror" name="number" value="{{ old('number') }}" required autocomplete="off">
+                    @error('number')
+                        <span class="invalid-feedback">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+                <div class="mb-3">
                     <label class="form-label required">{{ __('Name') }}</label>
                     <input type="text" placeholder="Enter Name" id="name" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
                     @error('name')

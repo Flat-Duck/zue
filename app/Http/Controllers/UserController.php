@@ -59,10 +59,9 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $validated = $request->validated();
+        $validated['number'] = (int) $validated['number'];
 
         $validated['password'] = Hash::make($validated['password']);
-
-        $user = User::create($validated);
 
         $user = User::create($validated);
 
@@ -116,8 +115,6 @@ class UserController extends Controller
         } else {
             $validated['password'] = Hash::make($validated['password']);
         }
-
-        $user->update($validated);
 
         $user->update($validated);
 
@@ -195,7 +192,7 @@ class UserController extends Controller
         $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
-            fputcsv($file, ['John Doe', 'john@example.com', 'ZOC123', '0912345678']); // Example row
+            fputcsv($file, ['John Doe', 'john@example.com', '10001', '0912345678']); // Example row
             fclose($file);
         };
 
