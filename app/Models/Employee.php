@@ -147,21 +147,21 @@ class Employee extends Model
 
     public function getAdministrationNameAttribute()
     {
-        return Administration::first()->name;
+        return $this->department->administration->name;
     }
 
     public function getDepartmentNameAttribute()
     {
-        return Department::first()->name;
+        return $this->department->name;
     }
 
     public function getLocationNameAttribute()
     {
-        return Location::first()->name;
+        return $this->location->name;
     }
     public function getCenterNameAttribute()
     {
-        return Center::first()->name;
+        return $this->center->name;
     }
 
     public function getStartDateAttribute($date)
