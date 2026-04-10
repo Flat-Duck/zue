@@ -35,6 +35,16 @@
             <div class="col-auto ms-auto d-print-none">
                 @can('create', App\Models\Employee::class)
                 <a
+                    data-bs-original-title="Quick Create"
+                    data-bs-placement="top"
+                    data-bs-toggle="tooltip"
+                    class="pull-right btn btn-outline-primary me-2"
+                    href="{{ route('employees.quick-create') }}"
+                >
+                    <i class="ti ti-bolt"></i>
+                    Quick Create
+                </a>
+                <a
                     data-bs-original-title="إنشاء"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"

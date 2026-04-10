@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\EmployeeQuickStoreRequest;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use Maatwebsite\Excel\Facades\Excel;
@@ -89,6 +90,56 @@ class EmployeeController extends Controller
             'app.employees.create',
             compact('users', 'locations', 'departments', 'centers')
         );
+    }
+
+    /**
+     * Show the quick create form for employees.
+     */
+    public function quickCreate(Request $request): View
+    {
+        $this->authorize('create', Employee::class);
+
+        $locations = Location::pluck('name', 'id');
+        $centers = Center::pluck('name', 'id');
+
+        return view('app.employees.quick-create', compact('locations', 'centers'));
+    }
+
+    /**
+     * Store a newly created employee from the quick create form.
+     */
+    public function quickStore(EmployeeQuickStoreRequest $request): RedirectResponse
+    {
+        $this->authorize('create', Employee::class);
+
+        $validated = $request->validated();
+
+        $departmentId =
+            optional(auth()->user()?->employee)->department_id
+            ?? Department::query()->value('id');
+
+        if (!$departmentId) {
+            return back()
+                ->withErrors([
+                    'department' => 'No department found. Please create a department first.',
+                ])
+                ->withInput();
+        }
+
+        $employee = Employee::create([
+            'english_name' => $validated['english_name'],
+            'number' => (int) $validated['number'],
+            'start_date' => $validated['employment_date'],
+            'location_id' => $validated['location_id'],
+            'center_id' => $validated['center_id'],
+            'department_id' => $departmentId,
+            'user_id' => null,
+            'transfered_balance' => 0,
+        ]);
+
+        return redirect()
+            ->route('employees.edit', $employee)
+            ->withSuccess(__('crud.common.created'));
     }
 
     /**

@@ -139,6 +139,8 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
         Route::post('users/{user}/upload-signature', [UserController::class, 'uploadSignature'])->name('users.upload-signature');
         Route::get('dir', [EmployeeController::class, 'dir']);
         Route::get('employees/imports', [EmployeeController::class, 'imports']);
+        Route::get('employees/quick-create', [EmployeeController::class, 'quickCreate'])->name('employees.quick-create');
+        Route::post('employees/quick-create', [EmployeeController::class, 'quickStore'])->name('employees.quick-store');
         Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
         Route::resource('employees', EmployeeController::class);
 
