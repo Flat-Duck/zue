@@ -153,6 +153,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
         Route::post('reports/monthly-attendance', [ReportController::class, 'monthlyAttendance'])->name('reports.monthly-attendance');
         Route::get('operations', [OperationsController::class, 'index'])->name('operations.index');
         Route::post('operations/archive-by-timesheet', [OperationsController::class, 'archiveByTimesheet'])->name('operations.archive-by-timesheet');
+        Route::post('operations/archive-by-number', [OperationsController::class, 'archiveByNumber'])->name('operations.archive-by-number');
         Route::post('operations/unarchive-by-number', [OperationsController::class, 'unarchiveByNumber'])->name('operations.unarchive-by-number');
         Route::post('operations/unarchive-all', [OperationsController::class, 'unarchiveAll'])->name('operations.unarchive-all');
 

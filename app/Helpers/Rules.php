@@ -33,7 +33,7 @@ class Rules
         self::$letters = self::$letters->diff($excludeLetters);
         self::$aDparments = collect(['MAINT', 'F. CO-R', 'TRANSP', 'ADMIN', 'F.COORD.', 'GEN MAINT', 'CAMP BOSS',
                             'ACCOUNTING', 'REDA PUMP', '', 'WAREHOUSE', 'CLINIC', 'LAB', 'TRAINING', 'H,S&E', 'F. ENG']);
-        self::$kbDepartments = collect(['PROD' , 'G/P' , 'DRILLING', 'SECURITY', 'PROD .NC163', 'F/S']);
+        self::$kbDepartments = collect(['PROD' , 'Gas Plant' , 'DRILLING', 'SECURITY', 'PROD .NC163', 'F/S']);
     }
 
 }

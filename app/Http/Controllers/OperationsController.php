@@ -49,6 +49,23 @@ class OperationsController extends Controller
         return redirect()->back()->with('success', "Archived $count employees whose last timesheet was on or before " . $date->format('Y-m-d'));
     }
 
+    public function archiveByNumber(Request $request)
+    {
+        $request->validate([
+            'employee_numbers' => 'required|string',
+        ]);
+
+        // Split by comma, space or newline
+        $numbers = preg_split('/[\s,]+/', $request->employee_numbers, -1, PREG_SPLIT_NO_EMPTY);
+
+        $count = Employee::withArchived()
+            ->whereIn('number', $numbers)
+            ->whereNull('archived_at')
+            ->update(['archived_at' => now()]);
+
+        return redirect()->back()->with('success', "Successfully archived $count employees.");
+    }
+
     public function unarchiveByNumber(Request $request)
     {
         $request->validate([

@@ -46,6 +46,27 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <hr class="my-4">
+
+                            <p class="text-muted mb-2">
+                                Or archive by entering one or more employee numbers.
+                            </p>
+                            <form id="archiveByNumberForm" action="{{ route('operations.archive-by-number') }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to archive these employees by number?');">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label">Employee Numbers</label>
+                                    <textarea name="employee_numbers" class="form-control" rows="3"
+                                        placeholder="Enter numbers separated by space, comma or newline..."
+                                        required></textarea>
+                                </div>
+                                <div class="form-footer">
+                                    <button type="submit" class="btn btn-outline-warning w-100">
+                                        <i class="ti ti-archive me-2"></i> Archive By Numbers
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
