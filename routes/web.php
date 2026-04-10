@@ -81,6 +81,10 @@ Route::post('/rr', function () {
 
 Auth::routes();
 
+Route::prefix('/')
+    ->middleware('auth')
+
+    ->group(function () {
 Route::get('time-sheets/approve_preview', [TimeSheetController::class, 'approve_preview'])->name('time-sheets.approve_preview');
 Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
 Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
@@ -103,9 +107,6 @@ Route::resource('time-sheets', TimeSheetController::class);
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::prefix('/')
-    ->middleware('auth')
-    ->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
         Route::resource('management-scopes', ManagementScopeController::class);
