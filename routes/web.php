@@ -90,8 +90,7 @@ Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->na
 Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
 
 
-
-
+Route::get('/', [HomeController::class, 'index'])->name('home1');
 
 Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
 
