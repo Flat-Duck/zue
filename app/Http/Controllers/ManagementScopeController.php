@@ -16,6 +16,8 @@ class ManagementScopeController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', ManagementScope::class);
+
         $managerId = $request->get('manager_id');
         $search = $request->get('search');
 
@@ -57,6 +59,8 @@ class ManagementScopeController extends Controller
 
     public function create(Request $request)
     {
+        $this->authorize('create', ManagementScope::class);
+
         $managerId = $request->get('manager_id');
 
         $managers = Employee::orderBy('english_name')->get();
@@ -89,6 +93,8 @@ class ManagementScopeController extends Controller
 
     public function store(ManagementScopeStoreRequest $request, ManagementScopeService $service)
     {
+        $this->authorize('create', ManagementScope::class);
+
         $service->createScopes($request->validated());
 
         return redirect()
@@ -98,6 +104,8 @@ class ManagementScopeController extends Controller
 
     public function edit(ManagementScope $managementScope)
     {
+        $this->authorize('update', $managementScope);
+
         $managers = Employee::orderBy('english_name')->get();
         $employees = Employee::orderBy('english_name')->get();
         $locations = Location::orderBy('name')->get();
@@ -128,6 +136,8 @@ class ManagementScopeController extends Controller
 
     public function update(ManagementScopeStoreRequest $request, ManagementScope $managementScope, ManagementScopeService $service)
     {
+        $this->authorize('update', $managementScope);
+
         $service->updateScope($managementScope, $request->validated());
 
         return redirect()
@@ -137,6 +147,8 @@ class ManagementScopeController extends Controller
 
     public function destroy(ManagementScope $managementScope)
     {
+        $this->authorize('delete', $managementScope);
+
         $managementScope->delete();
 
         return redirect()

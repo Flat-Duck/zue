@@ -68,6 +68,38 @@
         </div>
     </div>
 
+    @if(!empty($groupedEmployees ?? null))
+    <div class="card-body border-bottom">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <h4 class="mb-2">Supervisors</h4>
+                @if(($groupedEmployees['supervisors'] ?? collect())->isEmpty())
+                    <p class="text-muted mb-0">No supervisors in current scope.</p>
+                @else
+                    <ul class="mb-0 ps-3">
+                        @foreach($groupedEmployees['supervisors'] as $supervisor)
+                            <li>{{ $supervisor->english_name }} ({{ $supervisor->number }})</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+            <div class="col-md-8">
+                <h4 class="mb-2">Normal Employees By Department</h4>
+                @if(($groupedEmployees['normal_employees_by_department'] ?? collect())->isEmpty())
+                    <p class="text-muted mb-0">No normal employees in current scope.</p>
+                @else
+                    @foreach($groupedEmployees['normal_employees_by_department'] as $departmentName => $departmentEmployees)
+                        <div class="mb-1">
+                            <strong>{{ $departmentName }}</strong>:
+                            {{ $departmentEmployees->count() }} employee(s)
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="table-responsive">
         <table class="table card-table table-vcenter text-nowrap datatable">
             <thead>

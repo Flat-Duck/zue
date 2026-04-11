@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Employee;
 use App\Models\TimeSheet;
 use App\Services\TimeSheetService;
+use App\Services\TimeSheetAuthorizationService;
 use Carbon\Carbon;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -20,10 +21,15 @@ use DateTime;
 class TimeSheetController extends Controller
 {
     protected $timeSheetService;
+    protected $timeSheetAuthorizationService;
 
-    public function __construct(TimeSheetService $timeSheetService)
+    public function __construct(
+        TimeSheetService $timeSheetService,
+        TimeSheetAuthorizationService $timeSheetAuthorizationService
+    )
     {
         $this->timeSheetService = $timeSheetService;
+        $this->timeSheetAuthorizationService = $timeSheetAuthorizationService;
     }
 
     /**
@@ -45,7 +51,13 @@ class TimeSheetController extends Controller
                 return $employee;
             });
 
-        return view('app.time_sheets.index', compact('employees', 'search'));
+        $groupedEmployees = null;
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            $groupedEmployees = $this->timeSheetAuthorizationService
+                ->groupedManagedEmployees(auth()->user(), 'time_sheet');
+        }
+
+        return view('app.time_sheets.index', compact('employees', 'search', 'groupedEmployees'));
     }
 
     /**
@@ -117,8 +129,9 @@ class TimeSheetController extends Controller
      */
     public function print(Request $request): View
     {
-        $month = $request->selected_month;
-        $data = $this->timeSheetService->getApprovalData($month);
+        $month = (int) $request->selected_month;
+        $year = (int) ($request->selected_year ?: now()->year);
+        $data = $this->timeSheetService->getApprovalData($month, $year);
 
         return view('app.time_sheets.approve', $data);
     }
@@ -128,11 +141,16 @@ class TimeSheetController extends Controller
      */
     public function approves(Request $request): RedirectResponse
     {
-        $year = $request->get('year');
-        $month = $request->get('month');
+        $year = (int) $request->get('year');
+        $month = (int) $request->get('month');
         $level = strtolower((string) $request->get('level')); // timekeeper / supervisor / superintendent / fieldcoordinator
         if ($level === 'coordinator') {
             $level = 'fieldcoordinator';
+        }
+
+        if (config('timesheet_auth.v2_write_enabled', false)) {
+            $updated = $this->timeSheetAuthorizationService->approve(auth()->user(), $month, $year, $level);
+            return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
         }
 
         $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');

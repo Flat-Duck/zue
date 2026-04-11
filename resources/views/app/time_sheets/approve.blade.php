@@ -299,108 +299,136 @@
                     </table>
                 </div>
                 <footer>
-                    @php
-                        $timekeeperSigned = !empty($signatures['time_keeper']['sign'] ?? null);
-                        $supervisorSigned = !empty($signatures['super_visor']['sign'] ?? null);
-                        $fieldCoordinatorSigned = !empty($signatures['field_coordinator']['sign'] ?? null);
-                        $superintendentSigned = !empty($signatures['super_intendent']['sign'] ?? null);
-
-                        $showSupervisorStage = $requiresSupervisorStage && ($timekeeperSigned || $supervisorSigned || $canSupervisorApprove);
-                        $showFieldCoordinatorStage = $requiresFieldCoordinatorStage && ($timekeeperSigned || $supervisorSigned || $fieldCoordinatorSigned || $canFieldCoordinatorApprove);
-                        $showSuperintendentStage = $requiresSuperintendentStage && ($timekeeperSigned || $superintendentSigned || $canSuperintendentApprove);
-                    @endphp
-
-                    <div class="row gx-2">
-                        <div class="col box text-center">
-                            <h6>حافظ الوقت</h6>
-                            <hr class="divider">
-                            @if($timekeeperSigned)
-                                <div>
-                                    <h6 class="container">
-                                        <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
-                                            style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                    </h6>
-                                    {{ $signatures['time_keeper']['name'] }}
+                    @if(!empty($approvalStages ?? []))
+                        <div class="row gx-2">
+                            @foreach($approvalStages as $stage)
+                                @continue(empty($stage['visible']))
+                                <div class="col box text-center">
+                                    <h6>{{ $stage['label'] }}</h6>
+                                    <hr class="divider">
+                                    @if(!empty($stage['signature']['path'] ?? null))
+                                        <div>
+                                            <h6 class="container">
+                                                <img src="{{ asset('storage/' . $stage['signature']['path']) }}"
+                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                            </h6>
+                                            {{ $stage['signature']['name'] ?? '' }}
+                                        </div>
+                                    @elseif(!empty($stage['can_approve']))
+                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow"
+                                            href="{{ route('time-sheets.approves', ['level' => $stage['key'], 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </a>
+                                    @endif
                                 </div>
-                            @elseif(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
-                                <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                    class="pull-right btn btn-yellow"
-                                    href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
-                                    <i class="ti ti-check"></i>
-                                    @lang('crud.common.time_sheet_approve')
-                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        @php
+                            $timekeeperSigned = !empty($signatures['time_keeper']['sign'] ?? null);
+                            $supervisorSigned = !empty($signatures['super_visor']['sign'] ?? null);
+                            $fieldCoordinatorSigned = !empty($signatures['field_coordinator']['sign'] ?? null);
+                            $superintendentSigned = !empty($signatures['super_intendent']['sign'] ?? null);
+
+                            $showSupervisorStage = $requiresSupervisorStage && ($timekeeperSigned || $supervisorSigned || $canSupervisorApprove);
+                            $showFieldCoordinatorStage = $requiresFieldCoordinatorStage && ($timekeeperSigned || $supervisorSigned || $fieldCoordinatorSigned || $canFieldCoordinatorApprove);
+                            $showSuperintendentStage = $requiresSuperintendentStage && ($timekeeperSigned || $superintendentSigned || $canSuperintendentApprove);
+                        @endphp
+
+                        <div class="row gx-2">
+                            <div class="col box text-center">
+                                <h6>حافظ الوقت</h6>
+                                <hr class="divider">
+                                @if($timekeeperSigned)
+                                    <div>
+                                        <h6 class="container">
+                                            <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
+                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                        </h6>
+                                        {{ $signatures['time_keeper']['name'] }}
+                                    </div>
+                                @elseif(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
+                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                        class="pull-right btn btn-yellow"
+                                        href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                        <i class="ti ti-check"></i>
+                                        @lang('crud.common.time_sheet_approve')
+                                    </a>
+                                @endif
+                            </div>
+
+                            @if($showSupervisorStage)
+                                <div class="col box text-center">
+                                    <h6>مشرف القسم</h6>
+                                    <hr class="divider">
+                                    @if($supervisorSigned)
+                                        <div>
+                                            <h6 class="container">
+                                                <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
+                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                            </h6>
+                                            {{ $signatures['super_visor']['name'] }}
+                                        </div>
+                                    @elseif(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
+                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow"
+                                            href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if($showFieldCoordinatorStage)
+                                <div class="col box text-center">
+                                    <h6>منسق الحقول</h6>
+                                    <hr class="divider">
+                                    @if($fieldCoordinatorSigned)
+                                        <div>
+                                            <h6 class="container">
+                                                <img src="{{ asset('storage/' . $signatures['field_coordinator']['sign']) }}"
+                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                            </h6>
+                                            {{ $signatures['field_coordinator']['name'] }}
+                                        </div>
+                                    @elseif(auth()->user()->hasRole('fieldcoordinator') && $canFieldCoordinatorApprove)
+                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow"
+                                            href="{{ route('time-sheets.approves', ['level' => 'fieldcoordinator', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if($showSuperintendentStage)
+                                <div class="col box text-center">
+                                    <h6>مراقب الحقول</h6>
+                                    <hr class="divider">
+                                    @if($superintendentSigned)
+                                        <div>
+                                            <h6 class="container">
+                                                <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
+                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                            </h6>
+                                            {{ $signatures['super_intendent']['name'] }}
+                                        </div>
+                                    @elseif(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
+                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow"
+                                            href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </a>
+                                    @endif
+                                </div>
                             @endif
                         </div>
-
-                        @if($showSupervisorStage)
-                            <div class="col box text-center">
-                                <h6>مشرف القسم</h6>
-                                <hr class="divider">
-                                @if($supervisorSigned)
-                                    <div>
-                                        <h6 class="container">
-                                            <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
-                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                        </h6>
-                                        {{ $signatures['super_visor']['name'] }}
-                                    </div>
-                                @elseif(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
-                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                        class="pull-right btn btn-yellow"
-                                        href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
-                                        <i class="ti ti-check"></i>
-                                        @lang('crud.common.time_sheet_approve')
-                                    </a>
-                                @endif
-                            </div>
-                        @endif
-
-                        @if($showFieldCoordinatorStage)
-                            <div class="col box text-center">
-                                <h6>منسق الحقول</h6>
-                                <hr class="divider">
-                                @if($fieldCoordinatorSigned)
-                                    <div>
-                                        <h6 class="container">
-                                            <img src="{{ asset('storage/' . $signatures['field_coordinator']['sign']) }}"
-                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                        </h6>
-                                        {{ $signatures['field_coordinator']['name'] }}
-                                    </div>
-                                @elseif(auth()->user()->hasRole('fieldcoordinator') && $canFieldCoordinatorApprove)
-                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                        class="pull-right btn btn-yellow"
-                                        href="{{ route('time-sheets.approves', ['level' => 'fieldcoordinator', 'month' => $selected_month, 'year' => $selected_year]) }}">
-                                        <i class="ti ti-check"></i>
-                                        @lang('crud.common.time_sheet_approve')
-                                    </a>
-                                @endif
-                            </div>
-                        @endif
-
-                        @if($showSuperintendentStage)
-                            <div class="col box text-center">
-                                <h6>مراقب الحقول</h6>
-                                <hr class="divider">
-                                @if($superintendentSigned)
-                                    <div>
-                                        <h6 class="container">
-                                            <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
-                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
-                                        </h6>
-                                        {{ $signatures['super_intendent']['name'] }}
-                                    </div>
-                                @elseif(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
-                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                        class="pull-right btn btn-yellow"
-                                        href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year]) }}">
-                                        <i class="ti ti-check"></i>
-                                        @lang('crud.common.time_sheet_approve')
-                                    </a>
-                                @endif
-                            </div>
-                        @endif
-                    </div>
+                    @endif
                 </footer>
                 <div class="pagebreak"></div>
             @endforeach

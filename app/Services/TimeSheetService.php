@@ -11,6 +11,10 @@ use Carbon\Carbon;
 
 class TimeSheetService
 {
+    public function __construct(private readonly TimeSheetAuthorizationService $authorizationService)
+    {
+    }
+
     private const A3_DEPARTMENT_KEYS = [
         'gaspant',
         'gp',
@@ -35,6 +39,10 @@ class TimeSheetService
 
     public function getApprovalData(int $month, int $year): array
     {
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            return $this->authorizationService->buildApprovalData($month, $year);
+        }
+
         $months = MomentsJs::getMonthsInYear();
         $monthName = $months->get($month);
         $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');

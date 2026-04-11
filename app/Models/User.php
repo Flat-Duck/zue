@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\TimeSheetAuth\ActorResolver;
+use App\Services\TimeSheetAuthorizationService;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Scopes\Searchable;
 use Spatie\Permission\Traits\HasRoles;
@@ -100,11 +102,18 @@ class User extends Authenticatable
      */
     public function managedEmployees()
     {
-        if (!$this->employee) {
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            return app(TimeSheetAuthorizationService::class)
+                ->managedEmployeesQuery($this, 'time_sheet')
+                ->get();
+        }
+
+        $employee = app(ActorResolver::class)->resolveEmployee($this);
+        if (!$employee) {
             return collect();
         }
 
-        return $this->employee->managedEmployees();
+        return $employee->managedEmployees();
     }
 
     /**
@@ -113,11 +122,16 @@ class User extends Authenticatable
      */
     public function managedEmployeesQuery($context = 'general')
     {
-        if (!$this->employee) {
+        if (config('timesheet_auth.v2_read_enabled', false) && $context === 'time_sheet') {
+            return app(TimeSheetAuthorizationService::class)->managedEmployeesQuery($this, $context);
+        }
+
+        $employee = app(ActorResolver::class)->resolveEmployee($this);
+        if (!$employee) {
             return Employee::query()->whereRaw('0 = 1');
         }
 
-        return $this->employee->managedEmployeesQuery($context);
+        return $employee->managedEmployeesQuery($context);
     }
 
     /**
@@ -142,10 +156,13 @@ class User extends Authenticatable
      */
     public function canManageUser(User $target): bool
     {
-        if (!$this->employee || !$target->employee) {
+        $selfEmployee = app(ActorResolver::class)->resolveEmployee($this);
+        $targetEmployee = app(ActorResolver::class)->resolveEmployee($target);
+
+        if (!$selfEmployee || !$targetEmployee) {
             return false;
         }
 
-        return $this->employee->canManage($target->employee);
+        return $selfEmployee->canManage($targetEmployee);
     }
 }
