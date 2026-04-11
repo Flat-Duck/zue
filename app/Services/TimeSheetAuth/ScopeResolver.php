@@ -20,7 +20,11 @@ class ScopeResolver
      *
      * @return array<int, array{policy_id:int,can_fill:bool,can_approve:bool,can_revise:bool}>
      */
-    public function resolveEmployeeAccessMap(User $user, string $context = 'time_sheet'): array
+    public function resolveEmployeeAccessMap(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedPolicyId = null
+    ): array
     {
         $actorEmployee = $this->actorResolver->resolveEmployee($user);
         if (!$actorEmployee) {
@@ -45,6 +49,12 @@ class ScopeResolver
 
             return $actor->can_fill || $actor->can_approve || $actor->can_revise;
         })->values();
+
+        if (!is_null($selectedPolicyId)) {
+            $actorPolicies = $actorPolicies
+                ->where('id', (int) $selectedPolicyId)
+                ->values();
+        }
 
         if ($actorPolicies->isEmpty()) {
             return [];
@@ -125,21 +135,73 @@ class ScopeResolver
         return $result;
     }
 
-    public function resolveVisibleEmployeeIds(User $user, string $context = 'time_sheet'): Collection
+    public function resolveVisibleEmployeeIds(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedPolicyId = null
+    ): Collection
     {
-        return collect(array_keys($this->resolveEmployeeAccessMap($user, $context)))
+        return collect(array_keys($this->resolveEmployeeAccessMap($user, $context, $selectedPolicyId)))
             ->map(fn($id) => (int) $id)
             ->values();
     }
 
-    public function managedEmployeesQuery(User $user, string $context = 'time_sheet'): Builder
+    public function managedEmployeesQuery(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedPolicyId = null
+    ): Builder
     {
-        $ids = $this->resolveVisibleEmployeeIds($user, $context);
+        $ids = $this->resolveVisibleEmployeeIds($user, $context, $selectedPolicyId);
         if ($ids->isEmpty()) {
             return Employee::query()->whereRaw('0 = 1');
         }
 
         return Employee::query()->whereIn('id', $ids->all());
+    }
+
+    public function selectablePolicies(User $user, string $context = 'time_sheet'): Collection
+    {
+        $actorEmployee = $this->actorResolver->resolveEmployee($user);
+        if (!$actorEmployee) {
+            return collect();
+        }
+
+        return ScopePolicy::query()
+            ->select('scope_policies.*')
+            ->join('scope_policy_actors as spa', 'spa.policy_id', '=', 'scope_policies.id')
+            ->where('spa.actor_employee_id', $actorEmployee->id)
+            ->where(function ($query) {
+                $query->where('spa.can_fill', true)
+                    ->orWhere('spa.can_approve', true)
+                    ->orWhere('spa.can_revise', true);
+            })
+            ->where('scope_policies.context', $context)
+            ->where('scope_policies.is_active', true)
+            ->orderBy('spa.id')
+            ->distinct()
+            ->with('actors')
+            ->get();
+    }
+
+    public function resolveSelectedPolicyId(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $requestedPolicyId = null
+    ): ?int {
+        $selectablePolicies = $this->selectablePolicies($user, $context)->values();
+        if ($selectablePolicies->isEmpty()) {
+            return null;
+        }
+
+        if (!is_null($requestedPolicyId) && $requestedPolicyId > 0) {
+            $requested = $selectablePolicies->firstWhere('id', (int) $requestedPolicyId);
+            if ($requested) {
+                return (int) $requested->id;
+            }
+        }
+
+        return (int) $selectablePolicies->first()->id;
     }
 
     private function matchedEmployeeIdsForPolicy(ScopePolicy $policy): array

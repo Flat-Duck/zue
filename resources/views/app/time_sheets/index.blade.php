@@ -13,7 +13,7 @@
                             id="indexSearch"
                             name="search"
                             type="text"
-                            value=""
+                            value="{{ $search }}"
                             class="form-control"
                             placeholder="Search…"
                             aria-label="Search..."
@@ -22,6 +22,17 @@
                             autocomplete="off"
                         />
                     </div>
+                    @if(!empty($scopeOptions ?? null) && $scopeOptions->isNotEmpty())
+                    <div class="col-md-4">
+                        <select name="scope_policy_id" class="form-select">
+                            @foreach($scopeOptions as $scopeOption)
+                                <option value="{{ $scopeOption['id'] }}" @selected((int) $selectedScopePolicyId === (int) $scopeOption['id'])>
+                                    {{ $scopeOption['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
@@ -39,17 +50,17 @@
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-primary"
-                    href="{{ route('employees.create') }}"
+                    href="{{ route('employees.create', ['scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                 >
                     <i class="ti ti-plus"></i>
                     @lang('crud.common.create')
                 </a>
-                     <a
+                 <a
                     data-bs-original-title="طباعة"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-green"
-                    href="{{ route('time-sheets.print_preview') }}"
+                    href="{{ route('time-sheets.print_preview', ['scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                 >
                     <i class="ti ti-printer"></i>
                     @lang('crud.common.print_preview')
@@ -58,7 +69,7 @@
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-yellow"
-                    href="{{ route('time-sheets.approve_preview') }}"
+                    href="{{ route('time-sheets.approve_preview', ['scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                 >
                     <i class="ti ti-check"></i>
                     @lang('crud.common.time_sheet_approve')
@@ -191,7 +202,7 @@
                         >
                             @can('update', $employee)
                             <a
-                                href="{{ route('time-sheets.revise', $employee) }}"
+                                href="{{ route('time-sheets.revise', ['employee' => $employee, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                                 class="btn btn-icon btn-outline-warinig ms-1"
                             >
                                 <i class="ti ti-edit"></i>
@@ -204,7 +215,7 @@
                                 <i class="ti ti-eye"></i>
                             </a>
                             @endcan
-                            <a href="{{ route('time-sheets.fill', $employee) }}"
+                            <a href="{{ route('time-sheets.fill', ['employee' => $employee, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                                     data-bs-original-title="Fill Time Sheet"
                                     data-bs-placement="top"
                                     data-bs-toggle="tooltip"

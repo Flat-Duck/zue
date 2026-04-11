@@ -162,6 +162,33 @@
     @endsection
     <div class="card">
         <div class="card-body">
+            @if(!empty($scopeOptions ?? null) && $scopeOptions->isNotEmpty())
+                <form action="{{ route('time-sheets.approve') }}" method="get" class="d-print-none mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Management Scope</label>
+                            <select name="scope_policy_id" class="form-select">
+                                @foreach($scopeOptions as $scopeOption)
+                                    <option value="{{ $scopeOption['id'] }}" @selected((int) ($selectedScopePolicyId ?? 0) === (int) $scopeOption['id'])>
+                                        {{ $scopeOption['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Month</label>
+                            <input type="number" min="1" max="12" name="selected_month" class="form-control" value="{{ $selected_month }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Year</label>
+                            <input type="number" min="2000" max="2100" name="selected_year" class="form-control" value="{{ $selected_year }}">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">Apply</button>
+                        </div>
+                    </div>
+                </form>
+            @endif
             @php
                 $rt = 1;
             @endphp
@@ -317,7 +344,7 @@
                                     @elseif(!empty($stage['can_approve']))
                                         <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                             class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => $stage['key'], 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            href="{{ route('time-sheets.approves', ['level' => $stage['key'], 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
                                             <i class="ti ti-check"></i>
                                             @lang('crud.common.time_sheet_approve')
                                         </a>
@@ -352,7 +379,7 @@
                                 @elseif(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
                                     <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                         class="pull-right btn btn-yellow"
-                                        href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                        href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
                                         <i class="ti ti-check"></i>
                                         @lang('crud.common.time_sheet_approve')
                                     </a>
@@ -374,7 +401,7 @@
                                     @elseif(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
                                         <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                             class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
                                             <i class="ti ti-check"></i>
                                             @lang('crud.common.time_sheet_approve')
                                         </a>
@@ -397,7 +424,7 @@
                                     @elseif(auth()->user()->hasRole('fieldcoordinator') && $canFieldCoordinatorApprove)
                                         <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                             class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'fieldcoordinator', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            href="{{ route('time-sheets.approves', ['level' => 'fieldcoordinator', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
                                             <i class="ti ti-check"></i>
                                             @lang('crud.common.time_sheet_approve')
                                         </a>
@@ -420,7 +447,7 @@
                                     @elseif(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
                                         <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
                                             class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year]) }}">
+                                            href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
                                             <i class="ti ti-check"></i>
                                             @lang('crud.common.time_sheet_approve')
                                         </a>

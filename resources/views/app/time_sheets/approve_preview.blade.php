@@ -14,6 +14,17 @@
             <div class="col-12">
 
                 <div class="row">
+                    @if(!empty($scopeOptions ?? null) && $scopeOptions->isNotEmpty())
+                    <x-inputs.group class="col-sm-4">
+                        <x-inputs.select name="scope_policy_id" label="Management Scope">
+                            @foreach($scopeOptions as $scopeOption)
+                                <option value="{{ $scopeOption['id'] }}" @selected((int) ($selectedScopePolicyId ?? 0) === (int) $scopeOption['id'])>
+                                    {{ $scopeOption['name'] }}
+                                </option>
+                            @endforeach
+                        </x-inputs.select>
+                    </x-inputs.group>
+                    @endif
                     <x-inputs.group class="col-sm-4">
                         <x-inputs.select name="selected_month" label="Select Month">
                             <option value="1 ">January</option>
@@ -44,7 +55,7 @@
             <div class="card-footer">
                 <div class="row align-items-center">
                     <div class="col">
-                        <a href="{{ route('time-sheets.index') }}"
+                        <a href="{{ route('time-sheets.index', ['scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
                             class="btn btn-outline-secondary">@lang('crud.common.back')</a>
                     </div>
                     <div class="col-auto">

@@ -41,23 +41,43 @@ class TimeSheetController extends Controller
         $this->authorize('view-any', Employee::class);
 
         $search = $request->get('search', '');
+        $scopeOptions = collect();
+        $selectedScopePolicyId = null;
+        $groupedEmployees = null;
 
-        $employees = auth()->user()->managedEmployeesQuery('time_sheet')
-            ->paginate(20)
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+            $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user(), 'time_sheet');
+            $groupedEmployees = $this->timeSheetAuthorizationService
+                ->groupedManagedEmployees(auth()->user(), 'time_sheet', $selectedScopePolicyId);
+
+            $employees = $this->timeSheetAuthorizationService
+                ->managedEmployeesQueryForScope(auth()->user(), 'time_sheet', $selectedScopePolicyId)
+                ->paginate(20);
+        } else {
+            $employees = auth()->user()->managedEmployeesQuery('time_sheet')
+                ->paginate(20);
+        }
+
+        $employees = $employees
             ->through(function ($employee) {
                 if (Carbon::parse($employee->last_date)->month + 2 != now()->month) {
                     $employee->setAttribute('is_missing_last_time_sheet', true);
                 }
                 return $employee;
-            });
+            })
+            ->appends(array_filter([
+                'search' => $search,
+                'scope_policy_id' => $selectedScopePolicyId,
+            ]));
 
-        $groupedEmployees = null;
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            $groupedEmployees = $this->timeSheetAuthorizationService
-                ->groupedManagedEmployees(auth()->user(), 'time_sheet');
-        }
-
-        return view('app.time_sheets.index', compact('employees', 'search', 'groupedEmployees'));
+        return view('app.time_sheets.index', compact(
+            'employees',
+            'search',
+            'groupedEmployees',
+            'scopeOptions',
+            'selectedScopePolicyId'
+        ));
     }
 
     /**
@@ -65,7 +85,7 @@ class TimeSheetController extends Controller
      */
     public function create(Request $request, Employee $employee): View
     {
-        $this->ensureManageableForTimeSheet($employee->id);
+        $this->ensureManageableForTimeSheet($employee->id, $this->selectedScopePolicyIdFromRequest($request));
 
         return view('app.time_sheets.create', compact('employee'));
     }
@@ -78,7 +98,7 @@ class TimeSheetController extends Controller
         $this->authorize('create', TimeSheet::class);
 
         $validated = $request->validated();
-        $this->ensureManageableForTimeSheet((int) $validated['employee_id']);
+        $this->ensureManageableForTimeSheet((int) $validated['employee_id'], $this->selectedScopePolicyIdFromRequest($request));
 
         $timeSheet = TimeSheet::create($validated);
         return redirect()
@@ -109,7 +129,15 @@ class TimeSheetController extends Controller
      */
     public function approve_preview(Request $request): View
     {
-        return view('app.time_sheets.approve_preview');
+        $scopeOptions = collect();
+        $selectedScopePolicyId = null;
+
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user(), 'time_sheet');
+            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+        }
+
+        return view('app.time_sheets.approve_preview', compact('scopeOptions', 'selectedScopePolicyId'));
     }
 
     /**
@@ -117,9 +145,10 @@ class TimeSheetController extends Controller
      */
     public function approve(Request $request): View
     {
-        $month = $request->selected_month;
-        $year = $request->selected_year;
-        $data = $this->timeSheetService->getApprovalData($month, $year);
+        $month = (int) $request->selected_month;
+        $year = (int) $request->selected_year;
+        $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+        $data = $this->timeSheetService->getApprovalData($month, $year, $selectedScopePolicyId);
 
         return view('app.time_sheets.approve', $data);
     }
@@ -131,7 +160,8 @@ class TimeSheetController extends Controller
     {
         $month = (int) $request->selected_month;
         $year = (int) ($request->selected_year ?: now()->year);
-        $data = $this->timeSheetService->getApprovalData($month, $year);
+        $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+        $data = $this->timeSheetService->getApprovalData($month, $year, $selectedScopePolicyId);
 
         return view('app.time_sheets.approve', $data);
     }
@@ -149,7 +179,14 @@ class TimeSheetController extends Controller
         }
 
         if (config('timesheet_auth.v2_write_enabled', false)) {
-            $updated = $this->timeSheetAuthorizationService->approve(auth()->user(), $month, $year, $level);
+            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+            $updated = $this->timeSheetAuthorizationService->approve(
+                auth()->user(),
+                $month,
+                $year,
+                $level,
+                $selectedScopePolicyId
+            );
             return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
         }
 
@@ -245,7 +282,7 @@ class TimeSheetController extends Controller
      */
     public function edit(Request $request, Employee $employee): View
     {
-        $this->ensureManageableForTimeSheet($employee->id);
+        $this->ensureManageableForTimeSheet($employee->id, $this->selectedScopePolicyIdFromRequest($request));
 
         return view('app.time_sheets.edit', compact('employee'));
     }
@@ -258,7 +295,7 @@ class TimeSheetController extends Controller
         TimeSheet $timeSheet
     ): RedirectResponse {
         $this->authorize('update', $timeSheet);
-        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id);
+        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id, $this->selectedScopePolicyIdFromRequest($request));
 
         $validated = $request->validated();
 
@@ -277,7 +314,7 @@ class TimeSheetController extends Controller
         TimeSheet $timeSheet
     ): RedirectResponse {
         $this->authorize('delete', $timeSheet);
-        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id);
+        $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id, $this->selectedScopePolicyIdFromRequest($request));
 
         $timeSheet->delete();
 
@@ -286,13 +323,39 @@ class TimeSheetController extends Controller
             ->withSuccess(__('crud.common.removed'));
     }
 
-    private function ensureManageableForTimeSheet(int $employeeId): void
+    private function ensureManageableForTimeSheet(int $employeeId, ?int $selectedScopePolicyId = null): void
     {
-        $isManageable = auth()->user()
-            ->managedEmployeesQuery('time_sheet')
-            ->where('id', $employeeId)
-            ->exists();
+        if (config('timesheet_auth.v2_read_enabled', false)) {
+            $isManageable = $this->timeSheetAuthorizationService
+                ->managedEmployeesQueryForScope(auth()->user(), 'time_sheet', $selectedScopePolicyId)
+                ->where('id', $employeeId)
+                ->exists();
+        } else {
+            $isManageable = auth()->user()
+                ->managedEmployeesQuery('time_sheet')
+                ->where('id', $employeeId)
+                ->exists();
+        }
 
         abort_unless($isManageable, 403);
+    }
+
+    private function selectedScopePolicyIdFromRequest(Request $request): ?int
+    {
+        if (
+            !config('timesheet_auth.v2_read_enabled', false)
+            && !config('timesheet_auth.v2_write_enabled', false)
+        ) {
+            return null;
+        }
+
+        $requested = $request->query('scope_policy_id', $request->input('scope_policy_id'));
+        $requested = is_null($requested) || $requested === '' ? null : (int) $requested;
+
+        return $this->timeSheetAuthorizationService->resolveSelectedScopePolicyId(
+            auth()->user(),
+            'time_sheet',
+            $requested
+        );
     }
 }

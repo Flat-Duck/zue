@@ -37,10 +37,10 @@ class TimeSheetService
         'transp',
     ];
 
-    public function getApprovalData(int $month, int $year): array
+    public function getApprovalData(int $month, int $year, ?int $scopePolicyId = null): array
     {
         if (config('timesheet_auth.v2_read_enabled', false)) {
-            return $this->authorizationService->buildApprovalData($month, $year);
+            return $this->authorizationService->buildApprovalData($month, $year, $scopePolicyId);
         }
 
         $months = MomentsJs::getMonthsInYear();

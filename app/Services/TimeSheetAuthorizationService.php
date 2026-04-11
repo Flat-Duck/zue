@@ -35,15 +35,63 @@ class TimeSheetAuthorizationService
         return $this->scopeResolver->resolveVisibleEmployeeIds($user, $context);
     }
 
+    public function managedEmployeesQueryForScope(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedScopePolicyId = null
+    ): Builder {
+        return $this->scopeResolver
+            ->managedEmployeesQuery($user, $context, $selectedScopePolicyId)
+            ->whereNull('archived_at');
+    }
+
+    public function managedEmployeeIdsForScope(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedScopePolicyId = null
+    ): Collection {
+        return $this->scopeResolver->resolveVisibleEmployeeIds($user, $context, $selectedScopePolicyId);
+    }
+
+    public function resolveSelectedScopePolicyId(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $requestedScopePolicyId = null
+    ): ?int {
+        return $this->scopeResolver->resolveSelectedPolicyId($user, $context, $requestedScopePolicyId);
+    }
+
+    public function selectableScopes(User $user, string $context = 'time_sheet'): Collection
+    {
+        return $this->scopeResolver
+            ->selectablePolicies($user, $context)
+            ->map(function ($policy) {
+                $name = trim((string) ($policy->name ?? ''));
+                if ($name === '') {
+                    $name = 'Scope #' . $policy->id;
+                }
+
+                return [
+                    'id' => (int) $policy->id,
+                    'name' => $name,
+                ];
+            })
+            ->values();
+    }
+
     /**
      * @return array{
      *   supervisors:\Illuminate\Support\Collection<int,\App\Models\Employee>,
      *   normal_employees_by_department:\Illuminate\Support\Collection<string,\Illuminate\Support\Collection<int,\App\Models\Employee>>
      * }
      */
-    public function groupedManagedEmployees(User $user, string $context = 'time_sheet'): array
+    public function groupedManagedEmployees(
+        User $user,
+        string $context = 'time_sheet',
+        ?int $selectedScopePolicyId = null
+    ): array
     {
-        $employees = $this->managedEmployeesQuery($user, $context)
+        $employees = $this->managedEmployeesQueryForScope($user, $context, $selectedScopePolicyId)
             ->with('department:id,name')
             ->orderBy('department_id')
             ->orderBy('english_name')
@@ -63,7 +111,7 @@ class TimeSheetAuthorizationService
         ];
     }
 
-    public function buildApprovalData(int $month, int $year): array
+    public function buildApprovalData(int $month, int $year, ?int $requestedScopePolicyId = null): array
     {
         /** @var User|null $user */
         $user = auth()->user();
@@ -71,10 +119,13 @@ class TimeSheetAuthorizationService
             return [];
         }
 
+        $selectedScopePolicyId = $this->resolveSelectedScopePolicyId($user, 'time_sheet', $requestedScopePolicyId);
+        $scopeOptions = $this->selectableScopes($user, 'time_sheet');
+
         $months = MomentsJs::getMonthsInYear();
         $monthName = $months->get($month);
 
-        $managedEmployeeIds = $this->managedEmployeeIds($user, 'time_sheet');
+        $managedEmployeeIds = $this->managedEmployeeIdsForScope($user, 'time_sheet', $selectedScopePolicyId);
         $this->workflowResolver->ensureMonthlyStepsForEmployees($managedEmployeeIds, $month, $year, 'time_sheet');
 
         $baseQuery = TimeSheet::query()
@@ -133,7 +184,7 @@ class TimeSheetAuthorizationService
         $center = $firstRow?->employee?->center?->name ?? '';
         $administration = $firstRow?->employee?->department?->administration?->name ?? '';
 
-        $stages = $this->approvalStages($user, $month, $year, $managedEmployeeIds);
+        $stages = $this->approvalStages($user, $month, $year, $managedEmployeeIds, $selectedScopePolicyId);
         $stagesByKey = collect($stages)->keyBy('key');
 
         $signatures = [
@@ -201,6 +252,8 @@ class TimeSheetAuthorizationService
             'requiresFieldCoordinatorStage' => !is_null($fieldCoordinatorStage),
             'requiresSuperintendentStage' => !is_null($superintendentStage),
             'approvalStages' => $stages,
+            'scopeOptions' => $scopeOptions,
+            'selectedScopePolicyId' => $selectedScopePolicyId,
         ];
     }
 
@@ -219,9 +272,10 @@ class TimeSheetAuthorizationService
         User $user,
         int $month,
         int $year,
-        ?Collection $managedEmployeeIds = null
+        ?Collection $managedEmployeeIds = null,
+        ?int $selectedScopePolicyId = null
     ): array {
-        $managedEmployeeIds ??= $this->managedEmployeeIds($user, 'time_sheet');
+        $managedEmployeeIds ??= $this->managedEmployeeIdsForScope($user, 'time_sheet', $selectedScopePolicyId);
         if ($managedEmployeeIds->isEmpty()) {
             return [];
         }
@@ -243,7 +297,7 @@ class TimeSheetAuthorizationService
             ->get()
             ->keyBy(fn(ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
 
-        $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet');
+        $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet', $selectedScopePolicyId);
         $grouped = $steps->groupBy('step_key');
 
         $stageRows = [];
@@ -318,7 +372,13 @@ class TimeSheetAuthorizationService
         return $stageRows;
     }
 
-    public function approve(User $user, int $month, int $year, string $stepKey): int
+    public function approve(
+        User $user,
+        int $month,
+        int $year,
+        string $stepKey,
+        ?int $selectedScopePolicyId = null
+    ): int
     {
         $stepKey = $this->normalizeStepKey($stepKey);
         $allowed = ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'];
@@ -331,14 +391,14 @@ class TimeSheetAuthorizationService
             abort(403);
         }
 
-        $managedEmployeeIds = $this->managedEmployeeIds($user, 'time_sheet');
+        $managedEmployeeIds = $this->managedEmployeeIdsForScope($user, 'time_sheet', $selectedScopePolicyId);
         if ($managedEmployeeIds->isEmpty()) {
             return 0;
         }
 
         $this->workflowResolver->ensureMonthlyStepsForEmployees($managedEmployeeIds, $month, $year, 'time_sheet');
 
-        $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet');
+        $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet', $selectedScopePolicyId);
 
         $steps = TimeSheetApprovalStep::query()
             ->whereIn('employee_id', $managedEmployeeIds)
