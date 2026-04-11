@@ -4,6 +4,7 @@ namespace App\Services\TimeSheetAuth;
 
 use App\Models\Employee;
 use App\Models\ScopePolicy;
+use App\Models\ScopePolicyActor;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -167,21 +168,37 @@ class ScopeResolver
             return collect();
         }
 
-        return ScopePolicy::query()
-            ->select('scope_policies.*')
-            ->join('scope_policy_actors as spa', 'spa.policy_id', '=', 'scope_policies.id')
-            ->where('spa.actor_employee_id', $actorEmployee->id)
+        $policyIds = ScopePolicyActor::query()
+            ->where('actor_employee_id', $actorEmployee->id)
             ->where(function ($query) {
-                $query->where('spa.can_fill', true)
-                    ->orWhere('spa.can_approve', true)
-                    ->orWhere('spa.can_revise', true);
+                $query->where('can_fill', true)
+                    ->orWhere('can_approve', true)
+                    ->orWhere('can_revise', true);
             })
-            ->where('scope_policies.context', $context)
-            ->where('scope_policies.is_active', true)
-            ->orderBy('spa.id')
-            ->distinct()
+            ->whereHas('policy', function ($query) use ($context) {
+                $query->where('context', $context)
+                    ->where('is_active', true);
+            })
+            ->orderBy('id')
+            ->pluck('policy_id')
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($policyIds->isEmpty()) {
+            return collect();
+        }
+
+        $policiesById = ScopePolicy::query()
+            ->whereIn('id', $policyIds->all())
             ->with('actors')
-            ->get();
+            ->get()
+            ->keyBy('id');
+
+        return $policyIds
+            ->map(fn(int $policyId) => $policiesById->get($policyId))
+            ->filter()
+            ->values();
     }
 
     public function resolveSelectedPolicyId(
