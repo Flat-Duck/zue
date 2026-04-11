@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\Helpers\MomentsJs;
 use App\Models\ApprovalFlowStep;
+use App\Models\Center;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\ScopePolicy;
 use App\Models\TimeSheet;
 use App\Models\TimeSheetApprovalStep;
 use App\Models\User;
@@ -179,10 +182,10 @@ class TimeSheetAuthorizationService
             ]));
         }
 
-        $firstRow = $chunk->first();
-        $department = $firstRow?->employee?->department?->name ?? '';
-        $center = $firstRow?->employee?->center?->name ?? '';
-        $administration = $firstRow?->employee?->department?->administration?->name ?? '';
+        [$department, $center, $administration] = $this->resolveApproveHeaderContext(
+            $selectedScopePolicyId,
+            $chunk->first()
+        );
 
         $stages = $this->approvalStages($user, $month, $year, $managedEmployeeIds, $selectedScopePolicyId);
         $stagesByKey = collect($stages)->keyBy('key');
@@ -527,5 +530,54 @@ class TimeSheetAuthorizationService
     private function flowStepKey(int $flowId, int $order): string
     {
         return $flowId . ':' . $order;
+    }
+
+    /**
+     * Resolve print/header context from selected scope first.
+     * Falls back to first timesheet row when scope has no explicit print context.
+     */
+    private function resolveApproveHeaderContext(?int $selectedScopePolicyId, ?TimeSheet $firstRow): array
+    {
+        $department = '';
+        $center = '';
+        $administration = '';
+
+        if (!is_null($selectedScopePolicyId)) {
+            $policy = ScopePolicy::query()->find($selectedScopePolicyId, ['id', 'department_id', 'center_id', 'settings']);
+            if ($policy) {
+                $settings = is_array($policy->settings) ? $policy->settings : [];
+
+                $printDepartmentId = (int) ($settings['print_department_id'] ?? ($policy->department_id ?? 0));
+                $printCenterId = (int) ($settings['print_center_id'] ?? ($policy->center_id ?? 0));
+
+                if ($printDepartmentId > 0) {
+                    $departmentModel = Department::query()
+                        ->with('administration:id,name')
+                        ->find($printDepartmentId, ['id', 'name', 'administration_id']);
+
+                    if ($departmentModel) {
+                        $department = (string) ($departmentModel->name ?? '');
+                        $administration = (string) ($departmentModel->administration?->name ?? '');
+                    }
+                }
+
+                if ($printCenterId > 0) {
+                    $centerModel = Center::query()->find($printCenterId, ['id', 'name']);
+                    if ($centerModel) {
+                        $center = (string) ($centerModel->name ?? '');
+                    }
+                }
+            }
+        }
+
+        if ($department !== '' || $center !== '' || $administration !== '') {
+            return [$department, $center, $administration];
+        }
+
+        return [
+            (string) ($firstRow?->employee?->department?->name ?? ''),
+            (string) ($firstRow?->employee?->center?->name ?? ''),
+            (string) ($firstRow?->employee?->department?->administration?->name ?? ''),
+        ];
     }
 }

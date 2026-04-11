@@ -65,6 +65,9 @@ class ManagementScopeService
                             $newSettings['target_employee_ids'] = array_values($validSubIds);
 
                             $scope = $this->createScope($managerIds, $scopeType, array_merge($baseAttributes, [
+                                'location_id' => $data['location_id'] ?? null,
+                                'department_id' => $data['department_id'] ?? null,
+                                'center_id' => $data['center_id'] ?? null,
                                 'subordinate_employee_id' => null,
                                 'settings' => $newSettings,
                             ]));

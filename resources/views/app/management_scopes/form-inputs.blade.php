@@ -193,6 +193,9 @@
                 </option>
             @endforeach
         </select>
+        <small class="form-hint">
+            For <strong>employee</strong> scope type, this is used as print header context only.
+        </small>
     </x-inputs.group>
 
     {{-- Center --}}
@@ -217,6 +220,9 @@
                 </option>
             @endforeach
         </select>
+        <small class="form-hint">
+            For <strong>employee</strong> scope type, this is used as print header context only.
+        </small>
     </x-inputs.group>
 
     {{-- Specific employees (multi-select) --}}
