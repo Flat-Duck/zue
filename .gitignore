@@ -17,3 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/database/seeders/sql_dump/new.sql
+/database/seeders/sql_dump/mysql.sql
