@@ -62,6 +62,7 @@ class TimeTable extends Component
 
     public function save(): void
     {
+        $this->authorizeEmployeeMutation();
         Gate::authorize('create', TimeSheet::class);
 
         if (! $this->valid()) {
@@ -86,6 +87,7 @@ class TimeTable extends Component
 
     public function destroy(): void
     {
+        $this->authorizeEmployeeMutation();
         Gate::authorize('delete', new TimeSheet(['employee_id' => $this->employee->id]));
 
         if (str_contains($this->range, 'to')) {
@@ -148,5 +150,21 @@ class TimeTable extends Component
     {
         $this->dep_employees = $this->employee->center->employees()->pluck('id', 'number');
         // dd($this->dep_employees);
+    }
+
+    private function authorizeEmployeeMutation(): void
+    {
+        abort_unless(auth()->check(), 403);
+
+        if (auth()->user()->isSuperAdmin()) {
+            return;
+        }
+
+        abort_unless(
+            auth()->user()->managedEmployeesQuery('time_sheet')
+                ->whereKey($this->employee->getKey())
+                ->exists(),
+            403
+        );
     }
 }
