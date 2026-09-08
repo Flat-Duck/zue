@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
-use App\Models\TimeSheet;
-
 use App\Models\Employee;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\TimeSheet;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class TimeSheetControllerTest extends TestCase
 {
@@ -18,6 +16,11 @@ class TimeSheetControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        config([
+            'timesheet_auth.v2_read_enabled' => false,
+            'timesheet_auth.v2_write_enabled' => false,
+        ]);
 
         $this->actingAs(
             User::factory()->create(['email' => 'admin@admin.com'])
@@ -116,7 +119,7 @@ class TimeSheetControllerTest extends TestCase
         $data = [
             'value' => 'F',
             'day' => $this->faker->date(),
-            'revised_at' => $this->faker->dateTime(),
+            'revised_at' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
             'old_value' => $this->faker->text(255),
             'user_id' => $user->id,
             'employee_id' => $employee->id,

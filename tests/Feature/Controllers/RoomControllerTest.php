@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
-use App\Models\Room;
-
 use App\Models\Residence;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Room;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class RoomControllerTest extends TestCase
 {
@@ -62,7 +60,7 @@ class RoomControllerTest extends TestCase
     {
         $data = Room::factory()
             ->make()
-            ->toArray();
+            ->getAttributes();
 
         $response = $this->post(route('rooms.store'), $data);
 
