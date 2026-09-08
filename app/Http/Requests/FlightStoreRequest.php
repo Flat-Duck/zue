@@ -23,6 +23,7 @@ class FlightStoreRequest extends FormRequest
             'type' => ['nullable', 'in:Air,Ground'],
             'date' => ['nullable', 'date'],
             'time' => ['nullable', 'date_format:H:i'],
+            'plane_id' => ['required', 'exists:planes,id'],
         ];
     }
 }

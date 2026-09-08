@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Flight;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class FlightFactory extends Factory
@@ -25,7 +24,7 @@ class FlightFactory extends Factory
         return [
             'type' => 'Air',
             'date' => $this->faker->date(),
-            'time' => $this->faker->time(),
+            'time' => $this->faker->time('H:i'),
             'plane_id' => \App\Models\Plane::factory(),
         ];
     }

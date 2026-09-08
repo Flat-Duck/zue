@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
 use App\Models\Flight;
-
-use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class FlightTest extends TestCase
 {
@@ -38,7 +38,7 @@ class FlightTest extends TestCase
 
         $response = $this->getJson(route('api.flights.index'));
 
-        $response->assertOk()->assertSee($flights[0]->date);
+        $response->assertOk()->assertSee($flights[0]->date->toISOString());
     }
 
     /**
@@ -46,15 +46,18 @@ class FlightTest extends TestCase
      */
     public function it_stores_the_flight(): void
     {
-        $data = Flight::factory()
-            ->make()
-            ->toArray();
+        $data = Flight::factory()->make()->getAttributes();
+        $data['time'] = $this->faker->time('H:i');
 
         $response = $this->postJson(route('api.flights.store'), $data);
 
         $this->assertDatabaseHas('flights', $data);
 
-        $response->assertStatus(201)->assertJsonFragment($data);
+        $response->assertStatus(201)->assertJsonFragment([
+            'date' => Carbon::parse($data['date'])->toISOString(),
+            'type' => $data['type'],
+            'plane_id' => $data['plane_id'],
+        ]);
     }
 
     /**
@@ -67,7 +70,7 @@ class FlightTest extends TestCase
         $data = [
             'type' => 'Air',
             'date' => $this->faker->date(),
-            'time' => $this->faker->time(),
+            'time' => $this->faker->time('H:i'),
         ];
 
         $response = $this->putJson(route('api.flights.update', $flight), $data);
@@ -76,7 +79,11 @@ class FlightTest extends TestCase
 
         $this->assertDatabaseHas('flights', $data);
 
-        $response->assertOk()->assertJsonFragment($data);
+        $response->assertOk()->assertJsonFragment([
+            'id' => $flight->id,
+            'date' => Carbon::parse($data['date'])->toISOString(),
+            'type' => $data['type'],
+        ]);
     }
 
     /**
