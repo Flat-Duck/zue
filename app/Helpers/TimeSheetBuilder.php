@@ -4,8 +4,8 @@ namespace App\Helpers;
 
 use App\Models\Center;
 use App\Models\TimeSheet;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TimeSheetBuilder
 {
@@ -24,7 +24,12 @@ class TimeSheetBuilder
 
     public static function build(int $year, int $employee_id)
     {
-        $dde = TimeSheet::whereYear('day', $year)->where('employee_id', $employee_id)
+        $from = Carbon::create($year, 1, 1)->startOfYear();
+        $until = $from->copy()->addYear();
+
+        $dde = TimeSheet::where('day', '>=', $from)
+            ->where('day', '<', $until)
+            ->where('employee_id', $employee_id)
             ->select(DB::raw('DATE_FORMAT(day, "%Y-%m-%d") as fday, value, DATE_FORMAT(day, "%d") as idk'))->get();
         $times = collect($dde->toArray())
             ->groupBy(function ($item) {
@@ -40,6 +45,7 @@ class TimeSheetBuilder
         $times->transform(function ($item, $key) use ($year) {
             $days_in_months = MomentsJs::getDaysInMonth($key, $year);
             $missingItems = $days_in_months->diffKeys($item);
+
             return $item->mergeRecursive($missingItems)->sortKeys();
         });
 
@@ -63,15 +69,16 @@ class TimeSheetBuilder
         $total = 0;
         $count = TimeSheet::where('employee_id', $employee_id)->select('value', DB::raw('COUNT(value) as count'))->groupBy('value')->get();
         foreach ($count as $key => $val) {
-            $f = $val->value == "F" ? $f + $val->count : $f;
-            $f = $val->value == "X" ? $f + $val->count : $f;
-            $w = $val->value == "B" ? $w + $val->count : $w;
-            $w = $val->value == "A" ? $w + $val->count : $w;
-            $w = $val->value == "K" ? $w + $val->count : $w;
-            $w = $val->value == "Y" ? $w + $val->count : $w;
+            $f = $val->value == 'F' ? $f + $val->count : $f;
+            $f = $val->value == 'X' ? $f + $val->count : $f;
+            $w = $val->value == 'B' ? $w + $val->count : $w;
+            $w = $val->value == 'A' ? $w + $val->count : $w;
+            $w = $val->value == 'K' ? $w + $val->count : $w;
+            $w = $val->value == 'Y' ? $w + $val->count : $w;
         }
 
         $total = $w * $sch[0] / $sch[1] - $f;
+
         return $total + $transfered_balance;
     }
 
@@ -87,16 +94,18 @@ class TimeSheetBuilder
             ->groupBy('value')
             ->get();
         foreach ($count as $val) {
-            if (in_array($val->value, ["F", "X"])) {
+            if (in_array($val->value, ['F', 'X'])) {
                 $f += $val->count;
-            } elseif (in_array($val->value, ["B", "A", "K", "Y"])) {
+            } elseif (in_array($val->value, ['B', 'A', 'K', 'Y'])) {
                 $w += $val->count;
             }
         }
 
         $total = $w * $sch[0] / $sch[1] - $f;
+
         return $total + $transfered_balance;
     }
+
     public static function calculateBulckBalanceToDate($empls, $employeeIds, string $date)
     {
         // Fetch and organize the time sheet counts in a hash map
@@ -106,7 +115,8 @@ class TimeSheetBuilder
             ->groupBy('employee_id', 'value')
             ->get()
             ->groupBy('employee_id');
-        //return dd($timeSheetValues);
+
+        // return dd($timeSheetValues);
         return $empls->map(function ($employee) use ($timeSheetValues) {
             $schedule = explode('/', $employee->schedule);
             $w = 0;
@@ -123,14 +133,13 @@ class TimeSheetBuilder
 
             $total = (($w * (int) $schedule[0]) / (int) $schedule[1]) - $f;
             $employee['total_balance'] = $total + $employee->transfered_balance;
+
             return $employee;
         });
     }
 
-    public static function unApprovedTimeSheets(Center $center)
-    {
+    public static function unApprovedTimeSheets(Center $center) {}
 
-    }
     public static function unApprovedTimeSheetLevel($employee_id)
     {
         $TimeSheet = TimeSheet::where('employee_id', $employee_id)->orderByDesc('id')
@@ -144,9 +153,9 @@ class TimeSheetBuilder
                 return 3;
             }
         }
+
         return 0;
     }
-
 
     public static function approvrTimeSheets($employee_id, $approved_by)
     {

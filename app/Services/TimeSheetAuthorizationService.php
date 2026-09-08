@@ -24,8 +24,7 @@ class TimeSheetAuthorizationService
         private readonly ActorResolver $actorResolver,
         private readonly ScopeResolver $scopeResolver,
         private readonly WorkflowResolver $workflowResolver
-    ) {
-    }
+    ) {}
 
     public function managedEmployeesQuery(User $user, string $context = 'time_sheet'): Builder
     {
@@ -71,7 +70,7 @@ class TimeSheetAuthorizationService
             ->map(function ($policy) {
                 $name = trim((string) ($policy->name ?? ''));
                 if ($name === '') {
-                    $name = 'Scope #' . $policy->id;
+                    $name = 'Scope #'.$policy->id;
                 }
 
                 return [
@@ -92,21 +91,20 @@ class TimeSheetAuthorizationService
         User $user,
         string $context = 'time_sheet',
         ?int $selectedScopePolicyId = null
-    ): array
-    {
+    ): array {
         $employees = $this->managedEmployeesQueryForScope($user, $context, $selectedScopePolicyId)
             ->with('department:id,name')
             ->orderBy('department_id')
             ->orderBy('english_name')
             ->get();
 
-        $supervisors = $employees->filter(fn(Employee $employee) => $this->workflowResolver->hasRole($employee, 'supervisor'))
+        $supervisors = $employees->filter(fn (Employee $employee) => $this->workflowResolver->hasRole($employee, 'supervisor'))
             ->values();
 
-        $normal = $employees->reject(fn(Employee $employee) => $this->workflowResolver->hasRole($employee, 'supervisor'))
+        $normal = $employees->reject(fn (Employee $employee) => $this->workflowResolver->hasRole($employee, 'supervisor'))
             ->values();
 
-        $normalByDepartment = $normal->groupBy(fn(Employee $employee) => (string) ($employee->department?->name ?? 'Unknown'));
+        $normalByDepartment = $normal->groupBy(fn (Employee $employee) => (string) ($employee->department?->name ?? 'Unknown'));
 
         return [
             'supervisors' => $supervisors,
@@ -118,7 +116,7 @@ class TimeSheetAuthorizationService
     {
         /** @var User|null $user */
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -130,11 +128,13 @@ class TimeSheetAuthorizationService
 
         $managedEmployeeIds = $this->managedEmployeeIdsForScope($user, 'time_sheet', $selectedScopePolicyId);
         $this->workflowResolver->ensureMonthlyStepsForEmployees($managedEmployeeIds, $month, $year, 'time_sheet');
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $until = $from->copy()->addMonth();
 
         $baseQuery = TimeSheet::query()
             ->whereIn('employee_id', $managedEmployeeIds)
-            ->whereMonth('day', $month)
-            ->whereYear('day', $year);
+            ->where('day', '>=', $from)
+            ->where('day', '<', $until);
 
         $chunk = $baseQuery->get();
         $groupedByEmployee = $chunk->groupBy('employee_id');
@@ -144,7 +144,7 @@ class TimeSheetAuthorizationService
 
         foreach ($groupedByEmployee as $employeeId => $days) {
             $workDaysCount = $days->whereIn('value', ['A', 'B', 'K', 'Y'])->count();
-            $hasAWithFourOT = $days->contains(fn($day) => $day->value === 'A' && (int) $day->over_time === 4);
+            $hasAWithFourOT = $days->contains(fn ($day) => $day->value === 'A' && (int) $day->over_time === 4);
 
             $threshold = defined('App\Models\Employee::SPECIAL_WORK_DAYS_THRESHOLD')
                 ? Employee::SPECIAL_WORK_DAYS_THRESHOLD
@@ -203,21 +203,21 @@ class TimeSheetAuthorizationService
         $fieldCoordinatorStage = $stagesByKey->get('fieldcoordinator');
         $superintendentStage = $stagesByKey->get('superintendent');
 
-        if ($timekeeperStage && !empty($timekeeperStage['signature']['path'])) {
+        if ($timekeeperStage && ! empty($timekeeperStage['signature']['path'])) {
             $signatures['time_keeper'] = [
                 'sign' => $timekeeperStage['signature']['path'],
                 'name' => $timekeeperStage['signature']['name'],
             ];
         }
 
-        if ($supervisorStage && !empty($supervisorStage['signature']['path'])) {
+        if ($supervisorStage && ! empty($supervisorStage['signature']['path'])) {
             $signatures['super_visor'] = [
                 'sign' => $supervisorStage['signature']['path'],
                 'name' => $supervisorStage['signature']['name'],
             ];
         }
 
-        if ($fieldCoordinatorStage && !empty($fieldCoordinatorStage['signature']['path'])) {
+        if ($fieldCoordinatorStage && ! empty($fieldCoordinatorStage['signature']['path'])) {
             $signatures['field_coordinator'] = [
                 'sign' => $fieldCoordinatorStage['signature']['path'],
                 'name' => $fieldCoordinatorStage['signature']['name'],
@@ -225,7 +225,7 @@ class TimeSheetAuthorizationService
             $signatures['coordinator'] = $signatures['field_coordinator'];
         }
 
-        if ($superintendentStage && !empty($superintendentStage['signature']['path'])) {
+        if ($superintendentStage && ! empty($superintendentStage['signature']['path'])) {
             $signatures['super_intendent'] = [
                 'sign' => $superintendentStage['signature']['path'],
                 'name' => $superintendentStage['signature']['name'],
@@ -251,9 +251,9 @@ class TimeSheetAuthorizationService
             'canFieldCoordinatorApprove' => (bool) ($fieldCoordinatorStage['can_approve'] ?? false),
             'canCoordinatorApprove' => (bool) ($fieldCoordinatorStage['can_approve'] ?? false),
             'canSuperintendentApprove' => (bool) ($superintendentStage['can_approve'] ?? false),
-            'requiresSupervisorStage' => !is_null($supervisorStage),
-            'requiresFieldCoordinatorStage' => !is_null($fieldCoordinatorStage),
-            'requiresSuperintendentStage' => !is_null($superintendentStage),
+            'requiresSupervisorStage' => ! is_null($supervisorStage),
+            'requiresFieldCoordinatorStage' => ! is_null($fieldCoordinatorStage),
+            'requiresSuperintendentStage' => ! is_null($superintendentStage),
             'approvalStages' => $stages,
             'scopeOptions' => $scopeOptions,
             'selectedScopePolicyId' => $selectedScopePolicyId,
@@ -298,7 +298,7 @@ class TimeSheetAuthorizationService
         $flowStepMap = ApprovalFlowStep::query()
             ->whereIn('flow_id', $steps->pluck('flow_id')->unique())
             ->get()
-            ->keyBy(fn(ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
+            ->keyBy(fn (ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
 
         $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet', $selectedScopePolicyId);
         $grouped = $steps->groupBy('step_key');
@@ -307,7 +307,7 @@ class TimeSheetAuthorizationService
         foreach ($grouped as $stepKey => $rows) {
             $rows = $rows->values();
             $order = (int) $rows->min('step_order');
-            $approvedRows = $rows->filter(fn(TimeSheetApprovalStep $row) => !is_null($row->approved_at))->values();
+            $approvedRows = $rows->filter(fn (TimeSheetApprovalStep $row) => ! is_null($row->approved_at))->values();
 
             $signature = ['name' => null, 'path' => null];
             if ($approvedRows->isNotEmpty()) {
@@ -317,25 +317,25 @@ class TimeSheetAuthorizationService
 
             $canApprove = false;
             foreach ($rows as $row) {
-                if (!is_null($row->approved_at)) {
+                if (! is_null($row->approved_at)) {
                     continue;
                 }
 
                 $capabilities = $accessMap[(int) $row->employee_id] ?? null;
-                if (!$capabilities || !$capabilities['can_approve']) {
+                if (! $capabilities || ! $capabilities['can_approve']) {
                     continue;
                 }
 
                 $flowStep = $flowStepMap->get($this->flowStepKey((int) $row->flow_id, (int) $row->step_order));
-                if (!$flowStep || !$flowStep->can_approve) {
+                if (! $flowStep || ! $flowStep->can_approve) {
                     continue;
                 }
 
-                if (!$this->userHasRoleForStep($user, $flowStep->required_role)) {
+                if (! $this->userHasRoleForStep($user, $flowStep->required_role)) {
                     continue;
                 }
 
-                if (!$this->workflowResolver->dependencyIsSatisfied($row)) {
+                if (! $this->workflowResolver->dependencyIsSatisfied($row)) {
                     continue;
                 }
 
@@ -343,7 +343,7 @@ class TimeSheetAuthorizationService
                 break;
             }
 
-            $completed = $rows->isNotEmpty() && $rows->every(fn(TimeSheetApprovalStep $row) => !is_null($row->approved_at));
+            $completed = $rows->isNotEmpty() && $rows->every(fn (TimeSheetApprovalStep $row) => ! is_null($row->approved_at));
 
             $stageRows[] = [
                 'key' => (string) $stepKey,
@@ -360,6 +360,7 @@ class TimeSheetAuthorizationService
             if ((int) $a['order'] !== (int) $b['order']) {
                 return ((int) $a['order']) <=> ((int) $b['order']);
             }
+
             return strcmp((string) $a['key'], (string) $b['key']);
         });
 
@@ -367,7 +368,7 @@ class TimeSheetAuthorizationService
         $allowNext = true;
         foreach ($stageRows as $index => $stageRow) {
             $stageRows[$index]['visible'] = $allowNext;
-            if ($allowNext && !$stageRow['completed']) {
+            if ($allowNext && ! $stageRow['completed']) {
                 $allowNext = false;
             }
         }
@@ -381,16 +382,15 @@ class TimeSheetAuthorizationService
         int $year,
         string $stepKey,
         ?int $selectedScopePolicyId = null
-    ): int
-    {
+    ): int {
         $stepKey = $this->normalizeStepKey($stepKey);
         $allowed = ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'];
-        if (!in_array($stepKey, $allowed, true)) {
+        if (! in_array($stepKey, $allowed, true)) {
             return 0;
         }
 
         $actor = $this->actorResolver->resolveEmployee($user);
-        if (!$actor) {
+        if (! $actor) {
             abort(403);
         }
 
@@ -418,25 +418,25 @@ class TimeSheetAuthorizationService
         $flowStepMap = ApprovalFlowStep::query()
             ->whereIn('flow_id', $steps->pluck('flow_id')->unique())
             ->get()
-            ->keyBy(fn(ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
+            ->keyBy(fn (ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
 
         $approvedEmployeeIds = [];
         foreach ($steps as $step) {
             $capabilities = $accessMap[(int) $step->employee_id] ?? null;
-            if (!$capabilities || !$capabilities['can_approve']) {
+            if (! $capabilities || ! $capabilities['can_approve']) {
                 continue;
             }
 
             $flowStep = $flowStepMap->get($this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
-            if (!$flowStep || !$flowStep->can_approve) {
+            if (! $flowStep || ! $flowStep->can_approve) {
                 continue;
             }
 
-            if (!$this->userHasRoleForStep($user, $flowStep->required_role)) {
+            if (! $this->userHasRoleForStep($user, $flowStep->required_role)) {
                 continue;
             }
 
-            if (!$this->workflowResolver->dependencyIsSatisfied($step)) {
+            if (! $this->workflowResolver->dependencyIsSatisfied($step)) {
                 continue;
             }
 
@@ -456,10 +456,13 @@ class TimeSheetAuthorizationService
             return count($approvedEmployeeIds);
         }
 
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $until = $from->copy()->addMonth();
+
         return (int) TimeSheet::query()
             ->whereIn('employee_id', array_keys($approvedEmployeeIds))
-            ->whereMonth('day', $month)
-            ->whereYear('day', $year)
+            ->where('day', '>=', $from)
+            ->where('day', '<', $until)
             ->whereNull($legacyColumn)
             ->update([$legacyColumn => (int) $actor->id]);
     }
@@ -467,12 +470,12 @@ class TimeSheetAuthorizationService
     private function resolveSignatureForApprover(int $employeeId): array
     {
         $employee = Employee::query()->find($employeeId);
-        if (!$employee) {
+        if (! $employee) {
             return ['name' => null, 'path' => null];
         }
 
         $user = $this->actorResolver->resolveUserForEmployee($employee);
-        if (!$user) {
+        if (! $user) {
             return ['name' => null, 'path' => null];
         }
 
@@ -529,7 +532,7 @@ class TimeSheetAuthorizationService
 
     private function flowStepKey(int $flowId, int $order): string
     {
-        return $flowId . ':' . $order;
+        return $flowId.':'.$order;
     }
 
     /**
@@ -542,7 +545,7 @@ class TimeSheetAuthorizationService
         $center = '';
         $administration = '';
 
-        if (!is_null($selectedScopePolicyId)) {
+        if (! is_null($selectedScopePolicyId)) {
             $policy = ScopePolicy::query()->find($selectedScopePolicyId, ['id', 'department_id', 'center_id', 'settings']);
             if ($policy) {
                 $settings = is_array($policy->settings) ? $policy->settings : [];

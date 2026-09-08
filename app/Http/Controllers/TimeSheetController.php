@@ -2,32 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\MomentsJs;
-use App\Models\User;
-use App\Models\Employee;
-use App\Models\TimeSheet;
-use App\Services\TimeSheetService;
-use App\Services\TimeSheetAuthorizationService;
-use Carbon\Carbon;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
-use DateInterval;
-use DatePeriod;
-use DateTime;
+use App\Models\Employee;
+use App\Models\TimeSheet;
+use App\Services\TimeSheetAuthorizationService;
+use App\Services\TimeSheetService;
+use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TimeSheetController extends Controller
 {
     protected $timeSheetService;
+
     protected $timeSheetAuthorizationService;
 
     public function __construct(
         TimeSheetService $timeSheetService,
         TimeSheetAuthorizationService $timeSheetAuthorizationService
-    )
-    {
+    ) {
         $this->timeSheetService = $timeSheetService;
         $this->timeSheetAuthorizationService = $timeSheetAuthorizationService;
     }
@@ -64,6 +59,7 @@ class TimeSheetController extends Controller
                 if (Carbon::parse($employee->last_date)->month + 2 != now()->month) {
                     $employee->setAttribute('is_missing_last_time_sheet', true);
                 }
+
                 return $employee;
             })
             ->appends(array_filter([
@@ -101,6 +97,7 @@ class TimeSheetController extends Controller
         $this->ensureManageableForTimeSheet((int) $validated['employee_id'], $this->selectedScopePolicyIdFromRequest($request));
 
         $timeSheet = TimeSheet::create($validated);
+
         return redirect()
             ->route('time-sheets.edit', $timeSheet)
             ->withSuccess(__('crud.common.created'));
@@ -187,26 +184,29 @@ class TimeSheetController extends Controller
                 $level,
                 $selectedScopePolicyId
             );
+
             return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
         }
 
         $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
         $workflow = $this->timeSheetService->getManagedApprovalBuckets($managedEmployeeIds);
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $until = $from->copy()->addMonth();
 
         $query = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
-            ->whereMonth('day', $month)
-            ->whereYear('day', $year);
+            ->where('day', '>=', $from)
+            ->where('day', '<', $until);
 
         if (
-            ($level === 'timekeeper' && !auth()->user()->hasRole('timekeeper')) ||
-            ($level === 'supervisor' && !auth()->user()->hasRole('supervisor')) ||
-            ($level === 'fieldcoordinator' && !auth()->user()->hasRole('fieldcoordinator')) ||
-            ($level === 'superintendent' && !auth()->user()->hasRole('superintendent'))
+            ($level === 'timekeeper' && ! auth()->user()->hasRole('timekeeper')) ||
+            ($level === 'supervisor' && ! auth()->user()->hasRole('supervisor')) ||
+            ($level === 'fieldcoordinator' && ! auth()->user()->hasRole('fieldcoordinator')) ||
+            ($level === 'superintendent' && ! auth()->user()->hasRole('superintendent'))
         ) {
             abort(403);
         }
 
-        if (!in_array($level, ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'], true)) {
+        if (! in_array($level, ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'], true)) {
             return back()->with('error', 'Invalid approval level.');
         }
 
@@ -217,7 +217,7 @@ class TimeSheetController extends Controller
                 ->whereNull('timekeeper_id')
                 ->update(['timekeeper_id' => auth()->id()]);
         } elseif ($level === 'supervisor') {
-            if (!empty($workflow['needs_supervisor_ids'])) {
+            if (! empty($workflow['needs_supervisor_ids'])) {
                 $updated = (clone $query)
                     ->whereIn('employee_id', $workflow['needs_supervisor_ids'])
                     ->whereNotNull('timekeeper_id')
@@ -227,19 +227,19 @@ class TimeSheetController extends Controller
         } elseif ($level === 'fieldcoordinator') {
             $idsA2 = $workflow['A2'];
             $idsA3 = $workflow['A3'];
-            if (!empty($workflow['needs_fieldcoordinator_ids'])) {
+            if (! empty($workflow['needs_fieldcoordinator_ids'])) {
                 $updated = (clone $query)
                     ->whereIn('employee_id', $workflow['needs_fieldcoordinator_ids'])
                     ->whereNull('superintendent_id')
                     ->where(function ($builder) use ($idsA2, $idsA3) {
-                        if (!empty($idsA2)) {
+                        if (! empty($idsA2)) {
                             $builder->orWhere(function ($q) use ($idsA2) {
                                 $q->whereIn('employee_id', $idsA2)
                                     ->whereNotNull('timekeeper_id');
                             });
                         }
 
-                        if (!empty($idsA3)) {
+                        if (! empty($idsA3)) {
                             $builder->orWhere(function ($q) use ($idsA3) {
                                 $q->whereIn('employee_id', $idsA3)
                                     ->whereNotNull('supervisor_id');
@@ -251,19 +251,19 @@ class TimeSheetController extends Controller
         } elseif ($level === 'superintendent') {
             $idsA1 = $workflow['A1'];
             $idsLegacy = $workflow['LEGACY'];
-            if (!empty($workflow['needs_superintendent_ids'])) {
+            if (! empty($workflow['needs_superintendent_ids'])) {
                 $updated = (clone $query)
                     ->whereIn('employee_id', $workflow['needs_superintendent_ids'])
                     ->whereNull('superintendent_id')
                     ->where(function ($builder) use ($idsA1, $idsLegacy) {
-                        if (!empty($idsA1)) {
+                        if (! empty($idsA1)) {
                             $builder->orWhere(function ($q) use ($idsA1) {
                                 $q->whereIn('employee_id', $idsA1)
                                     ->whereNotNull('timekeeper_id');
                             });
                         }
 
-                        if (!empty($idsLegacy)) {
+                        if (! empty($idsLegacy)) {
                             $builder->orWhere(function ($q) use ($idsLegacy) {
                                 $q->whereIn('employee_id', $idsLegacy)
                                     ->whereNotNull('supervisor_id');
@@ -343,8 +343,8 @@ class TimeSheetController extends Controller
     private function selectedScopePolicyIdFromRequest(Request $request): ?int
     {
         if (
-            !config('timesheet_auth.v2_read_enabled', false)
-            && !config('timesheet_auth.v2_write_enabled', false)
+            ! config('timesheet_auth.v2_read_enabled', false)
+            && ! config('timesheet_auth.v2_write_enabled', false)
         ) {
             return null;
         }

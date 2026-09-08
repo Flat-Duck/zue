@@ -3,17 +3,15 @@
 namespace App\Services;
 
 use App\Helpers\MomentsJs;
-use App\Models\TimeSheet;
 use App\Models\Employee;
+use App\Models\TimeSheet;
 use App\Models\User;
-use Illuminate\Support\Collection;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class TimeSheetService
 {
-    public function __construct(private readonly TimeSheetAuthorizationService $authorizationService)
-    {
-    }
+    public function __construct(private readonly TimeSheetAuthorizationService $authorizationService) {}
 
     private const A3_DEPARTMENT_KEYS = [
         'gaspant',
@@ -47,10 +45,12 @@ class TimeSheetService
         $monthName = $months->get($month);
         $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
         $workflow = $this->getManagedApprovalBuckets($managedEmployeeIds);
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $until = $from->copy()->addMonth();
 
         $baseQuery = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
-            ->whereMonth('day', $month)
-            ->whereYear('day', $year);
+            ->where('day', '>=', $from)
+            ->where('day', '<', $until);
 
         $chunk = $baseQuery->get();
         $groupedByEmployee = $chunk->groupBy('employee_id');
@@ -137,7 +137,7 @@ class TimeSheetService
             ];
         }
 
-        if (!empty($idsNeedSupervisor)) {
+        if (! empty($idsNeedSupervisor)) {
             $supervisorSignedSheet = (clone $baseQuery)
                 ->whereIn('employee_id', $idsNeedSupervisor)
                 ->whereNotNull('supervisor_id')
@@ -151,7 +151,7 @@ class TimeSheetService
             }
         }
 
-        if (!empty($idsNeedFieldCoordinator)) {
+        if (! empty($idsNeedFieldCoordinator)) {
             $fieldCoordinatorSignedSheet = (clone $baseQuery)
                 ->whereIn('employee_id', $idsNeedFieldCoordinator)
                 ->whereNotNull('superintendent_id')
@@ -166,7 +166,7 @@ class TimeSheetService
             }
         }
 
-        if (!empty($idsNeedSuperintendent)) {
+        if (! empty($idsNeedSuperintendent)) {
             $superintendentSignedSheet = (clone $baseQuery)
                 ->whereIn('employee_id', $idsNeedSuperintendent)
                 ->whereNotNull('superintendent_id')
@@ -184,26 +184,26 @@ class TimeSheetService
             ->whereNull('timekeeper_id')
             ->exists();
 
-        $canSupervisorApprove = !empty($idsNeedSupervisor) && (clone $baseQuery)
+        $canSupervisorApprove = ! empty($idsNeedSupervisor) && (clone $baseQuery)
             ->whereIn('employee_id', $idsNeedSupervisor)
             ->whereNotNull('timekeeper_id')
             ->whereNull('supervisor_id')
             ->exists();
 
         $canFieldCoordinatorApprove = false;
-        if (!empty($idsNeedFieldCoordinator)) {
+        if (! empty($idsNeedFieldCoordinator)) {
             $canFieldCoordinatorApprove = (clone $baseQuery)
                 ->whereIn('employee_id', $idsNeedFieldCoordinator)
                 ->whereNull('superintendent_id')
                 ->where(function ($query) use ($idsA2, $idsA3) {
-                    if (!empty($idsA2)) {
+                    if (! empty($idsA2)) {
                         $query->orWhere(function ($q) use ($idsA2) {
                             $q->whereIn('employee_id', $idsA2)
                                 ->whereNotNull('timekeeper_id');
                         });
                     }
 
-                    if (!empty($idsA3)) {
+                    if (! empty($idsA3)) {
                         $query->orWhere(function ($q) use ($idsA3) {
                             $q->whereIn('employee_id', $idsA3)
                                 ->whereNotNull('supervisor_id');
@@ -214,19 +214,19 @@ class TimeSheetService
         }
 
         $canSuperintendentApprove = false;
-        if (!empty($idsNeedSuperintendent)) {
+        if (! empty($idsNeedSuperintendent)) {
             $canSuperintendentApprove = (clone $baseQuery)
                 ->whereIn('employee_id', $idsNeedSuperintendent)
                 ->whereNull('superintendent_id')
                 ->where(function ($query) use ($idsA1, $idsLegacy) {
-                    if (!empty($idsA1)) {
+                    if (! empty($idsA1)) {
                         $query->orWhere(function ($q) use ($idsA1) {
                             $q->whereIn('employee_id', $idsA1)
                                 ->whereNotNull('timekeeper_id');
                         });
                     }
 
-                    if (!empty($idsLegacy)) {
+                    if (! empty($idsLegacy)) {
                         $query->orWhere(function ($q) use ($idsLegacy) {
                             $q->whereIn('employee_id', $idsLegacy)
                                 ->whereNotNull('supervisor_id');
@@ -255,9 +255,9 @@ class TimeSheetService
             'canFieldCoordinatorApprove' => $canFieldCoordinatorApprove,
             'canCoordinatorApprove' => $canFieldCoordinatorApprove,
             'canSuperintendentApprove' => $canSuperintendentApprove,
-            'requiresSupervisorStage' => !empty($idsNeedSupervisor),
-            'requiresFieldCoordinatorStage' => !empty($idsNeedFieldCoordinator),
-            'requiresSuperintendentStage' => !empty($idsNeedSuperintendent),
+            'requiresSupervisorStage' => ! empty($idsNeedSupervisor),
+            'requiresFieldCoordinatorStage' => ! empty($idsNeedFieldCoordinator),
+            'requiresSuperintendentStage' => ! empty($idsNeedSuperintendent),
         ];
     }
 
@@ -292,11 +292,13 @@ class TimeSheetService
 
             if ($this->isA3Department($departmentKey)) {
                 $buckets[$isSupervisorEmployee ? 'A2' : 'A3'][] = $employee->id;
+
                 continue;
             }
 
             if ($this->isA4Department($departmentKey)) {
                 $buckets[$isSupervisorEmployee ? 'A1' : 'A4'][] = $employee->id;
+
                 continue;
             }
 
