@@ -1,5 +1,17 @@
 # Laravel Application — Unified Fix Implementation Plan
 
+## Scope adjustment
+
+The generated legacy API surface is out of scope for this remediation program. The
+legacy API routes, controllers, and API feature tests are archived under
+`legacy-api/` and are not loaded by the application. Shared MVC models, factories,
+requests, and services remain in place when they are used by the web application.
+
+Future implementation work focuses on the MVC application, services, Livewire
+components, Blade views, Eloquent behavior, authorization, reports, queues, and
+production operations. New tests will be written for those workflows after the
+application fixes are complete.
+
 ## Purpose
 
 This plan converts the application audit into a controlled remediation program.
