@@ -8,6 +8,7 @@ use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AppraisalFormVersionItemsController extends Controller
 {
@@ -27,6 +28,8 @@ class AppraisalFormVersionItemsController extends Controller
 
     public function addItem(Request $request, AppraisalFormVersion $version)
     {
+        $this->ensureVersionIsMutable($version);
+
         $data = $request->validate([
             'item_id' => 'required|exists:appraisal_items,id',
             'max_score_override' => 'required|integer|min:0',
@@ -57,6 +60,8 @@ class AppraisalFormVersionItemsController extends Controller
 
     public function bulkUpdate(Request $request, AppraisalFormVersion $version)
     {
+        $this->ensureVersionIsMutable($version);
+
         $data = $request->validate([
             'rows' => 'required|array',
             'rows.*.id' => 'required|exists:appraisal_form_version_items,id',
@@ -98,6 +103,8 @@ class AppraisalFormVersionItemsController extends Controller
 
     public function destroy(AppraisalFormVersion $version, AppraisalFormVersionItem $versionItem)
     {
+        $this->ensureVersionIsMutable($version);
+
         if ($versionItem->appraisal_form_version_id !== $version->id) {
             abort(404);
         }
@@ -105,5 +112,14 @@ class AppraisalFormVersionItemsController extends Controller
         $versionItem->delete();
 
         return back()->with('success', 'تم حذف البند من الـ Version.');
+    }
+
+    private function ensureVersionIsMutable(AppraisalFormVersion $version): void
+    {
+        if ($version->isLocked()) {
+            throw ValidationException::withMessages([
+                'version' => 'This appraisal version is locked because it is already in use.',
+            ]);
+        }
     }
 }

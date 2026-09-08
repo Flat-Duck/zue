@@ -48,7 +48,7 @@ class RoomController extends Controller
         $this->authorize('create', Room::class);
 
         // $residences = Residence::pluck('name', 'id');
-        $residences = Residence::all();
+        $residences = Residence::query()->select(['id', 'type', 'name'])->orderBy('name')->get();
         $employees = Employee::pluck('number', 'id');
 
         return view('app.rooms.create', compact('residences', 'employees'));
@@ -88,7 +88,7 @@ class RoomController extends Controller
     {
         $this->authorize('update', $room);
 
-        $residences = Residence::all();
+        $residences = Residence::query()->select(['id', 'type', 'name'])->orderBy('name')->get();
         $employees = Employee::pluck('number', 'id');
         $residents = $room->employees()->pluck('number', 'id')->toArray();
 

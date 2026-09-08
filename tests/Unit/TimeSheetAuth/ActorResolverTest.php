@@ -15,7 +15,7 @@ class ActorResolverTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_resolves_employee_by_user_id_before_legacy_fallback(): void
+    public function test_it_resolves_employee_only_through_the_canonical_user_link(): void
     {
         $resolver = app(ActorResolver::class);
 
@@ -47,7 +47,6 @@ class ActorResolverTest extends TestCase
         $this->assertNotNull($resolvedCanonical);
         $this->assertSame($canonicalEmployee->id, $resolvedCanonical->id);
 
-        $this->assertNotNull($resolvedLegacy);
-        $this->assertSame($legacyEmployee->id, $resolvedLegacy->id);
+        $this->assertNull($resolvedLegacy);
     }
 }

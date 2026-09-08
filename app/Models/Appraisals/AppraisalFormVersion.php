@@ -13,7 +13,7 @@ class AppraisalFormVersion extends Model
         'version',
         'effective_from',
         'effective_to',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -30,5 +30,15 @@ class AppraisalFormVersion extends Model
     public function versionItems(): HasMany
     {
         return $this->hasMany(AppraisalFormVersionItem::class)->orderBy('sort_order');
+    }
+
+    public function isLocked(): bool
+    {
+        return AppraisalReview::query()
+            ->where('appraisal_form_version_id', $this->id)
+            ->exists()
+            || AppraisalOfficial::query()
+                ->where('appraisal_form_version_id', $this->id)
+                ->exists();
     }
 }

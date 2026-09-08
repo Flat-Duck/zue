@@ -47,7 +47,10 @@ class ManagementScopeController extends Controller
 
         $managementScopes = $query->paginate(20)->appends($request->query());
 
-        $managers = Employee::orderBy('english_name')->get();
+        $managers = Employee::query()
+            ->select(['id', 'number', 'english_name'])
+            ->orderBy('english_name')
+            ->get();
 
         return view('app.management_scopes.index', [
             'managementScopes' => $managementScopes,
@@ -62,11 +65,11 @@ class ManagementScopeController extends Controller
 
         $managerId = $request->get('manager_id');
 
-        $managers = Employee::orderBy('english_name')->get();
-        $employees = Employee::orderBy('english_name')->get();
-        $locations = Location::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        $centers = Center::orderBy('name')->get();
+        $managers = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
+        $employees = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
+        $locations = Location::query()->select(['id', 'name'])->orderBy('name')->get();
+        $departments = Department::query()->select(['id', 'name'])->orderBy('name')->get();
+        $centers = Center::query()->select(['id', 'name'])->orderBy('name')->get();
 
         $scopeTypes = [
             ManagementScope::TYPE_GLOBAL,
@@ -105,11 +108,11 @@ class ManagementScopeController extends Controller
     {
         $this->authorize('update', $managementScope);
 
-        $managers = Employee::orderBy('english_name')->get();
-        $employees = Employee::orderBy('english_name')->get();
-        $locations = Location::orderBy('name')->get();
-        $departments = Department::orderBy('name')->get();
-        $centers = Center::orderBy('name')->get();
+        $managers = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
+        $employees = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
+        $locations = Location::query()->select(['id', 'name'])->orderBy('name')->get();
+        $departments = Department::query()->select(['id', 'name'])->orderBy('name')->get();
+        $centers = Center::query()->select(['id', 'name'])->orderBy('name')->get();
 
         $scopeTypes = [
             ManagementScope::TYPE_GLOBAL,

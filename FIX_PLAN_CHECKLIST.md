@@ -100,10 +100,10 @@ Legend:
 - [x] Document the V2 `scope_policies` / `scope_policy_actors` tables as the authoritative management-scope store; legacy rows remain a migration bridge.
 - [x] Compare old and V2 management-scope results for a representative manager with a regression test.
 - [x] Management-scope UI writes are synchronized into the authoritative V2 store.
-- [~] Remove compatibility paths after parity is demonstrated; the resolver fallback and legacy rows remain temporarily so existing production records can be migrated with `timesheet-auth-v2:import --seed-flows` before removal.
+- [x] Remove the legacy actor-resolution fallback after parity validation; canonical `employees.user_id` links are now required.
 - [x] Establish canonical identity rules: `users.id` identifies login accounts, `employees.id` identifies HR records, `employees.user_id` links them, and employee numbers are business identifiers.
 - [x] Stop rewriting user primary keys when employee numbers change.
-- [~] Reconcile users, employees, signatures, approvers, roles, Sanctum tokens, and management scopes; canonical employee links and employee-based approval/scope actors are enforced, while logged legacy actor fallbacks remain for existing records.
+- [x] Reconcile users, employees, signatures, approvers, roles, Sanctum tokens, and management scopes around canonical user and employee IDs; signatures, roles, and tokens remain user-owned while approvals and scopes remain employee-owned.
 - [x] Review destructive cascades: deleted management scopes deactivate their V2 policy and retain actor history; existing HR record cascades were not broadened.
 
 ## Phase 4 — Timesheet Integrity and Safe Writes
@@ -122,9 +122,9 @@ Legend:
 - [x] Make approval operations transactional with conditional updates/locks where justified.
 - [x] Make monthly approval-step creation idempotent under concurrent requests by locking employee rows.
 - [x] Convert remaining state-changing approval GET operations to POST with CSRF where applicable.
-- [ ] Reconcile duplicate `employee_id + day` rows before adding a uniqueness constraint.
-- [~] Add concurrency/double-approval/reassignment tests.
-  - Reassignment, idempotent writes, and conditional approval behavior are covered; a database-level concurrent worker test remains pending.
+- [x] Reconcile duplicate `employee_id + day` rows before adding a uniqueness constraint with `timesheets:reconcile-duplicates`.
+- [x] Add concurrency/double-approval/reassignment protection and tests.
+  - Mutation transactions lock rows, writes are idempotent, approvals are conditional, and the database now enforces unique employee/day rows.
 
 ## Phase 5 — Remove Measured Query Inefficiencies
 
@@ -187,7 +187,7 @@ Legend:
 - [x] Avoid one query per row in version-item bulk update.
 - [x] Fix official appraisal search to use real employee columns.
 - [~] Scoring behavior still needs explicit business-rule confirmation for required/text/partial items.
-- [~] Version freezing after use is not fully enforced yet.
+- [x] Freeze appraisal version items after the version is referenced by a review or official appraisal.
 - [~] Re-finalization business behavior is still not formally decided.
 - [ ] Add tests for required items, text items, percentages, closed periods, mixed versions, concurrent activation, and yearly aggregation idempotency.
 
@@ -221,7 +221,7 @@ Legend:
 - [x] Confirm route cache works after the current changes.
 - [~] Queue retry/timeout settings improved for backups.
 - [ ] Verify production `.env` values outside this code review: `APP_ENV=production`, `APP_DEBUG=false`.
-- [ ] Verify config cache and view cache in the deployment environment.
+- [x] Verify config cache and view cache locally; deployment-environment verification remains operational.
 - [ ] Verify durable shared storage/object storage needs before horizontal scaling.
 - [ ] Configure production log level, rotation, and centralized collection.
 - [ ] Add sensitive-data redaction where required.
@@ -281,12 +281,10 @@ Legend:
 
 ## Highest-Value Remaining Implementation Order
 
-1. Reconcile duplicate timesheet rows and add the `employee_id + day` uniqueness constraint if business rules confirm it.
-2. Finish management-scope/identity reconciliation before changing identity constraints.
-3. Add query-budget/performance measurements for employee, timesheet, report, dashboard, and clinic pages.
-4. Finish backup restore verification using a disposable database.
-5. Finish appraisal version freezing and scoring business-rule tests.
-6. Queue large exports/yearly appraisal aggregation only where production size justifies it.
-7. Run dependency audits and patch approved compatible security updates.
-8. Add PHPStan/Larastan baseline after dependency approval.
-9. Reassess Octane only after the PHP-FPM app is secure, stable, and measured.
+1. Add query-budget/performance measurements for employee, timesheet, report, dashboard, and clinic pages.
+2. Finish backup restore verification using a disposable database.
+3. Finish appraisal scoring business-rule tests and concurrent activation tests.
+4. Queue large exports/yearly appraisal aggregation only where production size justifies it.
+5. Verify production environment, storage, logging, monitoring, and audit-event requirements.
+6. Add PHPStan/Larastan baseline after dependency approval.
+7. Reassess Octane only after the PHP-FPM app is secure, stable, and measured.

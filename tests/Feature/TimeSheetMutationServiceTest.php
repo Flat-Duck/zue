@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\TimeSheet;
 use App\Models\User;
 use App\Services\TimeSheetMutationService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
@@ -45,6 +46,22 @@ class TimeSheetMutationServiceTest extends TestCase
         $this->expectException(ValidationException::class);
 
         $service->createForEmployee($employee, '2026-01-10', 'A', 2, User::factory()->create());
+    }
+
+    public function test_database_constraint_rejects_duplicate_employee_day_rows(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '5/5']);
+        TimeSheet::factory()->create([
+            'employee_id' => $employee->id,
+            'day' => '2026-01-10',
+        ]);
+
+        $this->expectException(QueryException::class);
+
+        TimeSheet::factory()->create([
+            'employee_id' => $employee->id,
+            'day' => '2026-01-10',
+        ]);
     }
 
     public function test_revise_preserves_employee_id_and_records_audit_fields(): void
