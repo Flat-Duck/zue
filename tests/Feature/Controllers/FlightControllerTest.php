@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Flight;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class FlightControllerTest extends TestCase
 {
@@ -58,9 +57,8 @@ class FlightControllerTest extends TestCase
      */
     public function it_stores_the_flight(): void
     {
-        $data = Flight::factory()
-            ->make()
-            ->toArray();
+        $data = Flight::factory()->make()->getAttributes();
+        $data['time'] = $this->faker->time('H:i');
 
         $response = $this->post(route('flights.store'), $data);
 
@@ -111,7 +109,7 @@ class FlightControllerTest extends TestCase
         $data = [
             'type' => 'Air',
             'date' => $this->faker->date(),
-            'time' => $this->faker->time(),
+            'time' => $this->faker->time('H:i'),
         ];
 
         $response = $this->put(route('flights.update', $flight), $data);

@@ -106,21 +106,26 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'delete users']);
         Permission::create(['name' => 'manage maintenance']);
 
-        // Create admin role and assign all permissions
+        // Create roles and grant the complete permission set to super-admin.
         $allPermissions = Permission::all();
-        $adminRole = Role::create(['name' => 'super-admin']);
-        $adminRole = Role::create(['name' => 'timekeeper']);
-        $adminRole = Role::create(['name' => 'supervisor']);
-        $adminRole = Role::create(['name' => 'fieldcoordinator']);
-        $adminRole = Role::create(['name' => 'superintendent']);
-        $adminRole = Role::create(['name' => 'campboss']);
-        $adminRole = Role::create(['name' => 'flightdispatcher']);
-        $adminRole->givePermissionTo($allPermissions);
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+        $superAdminRole->givePermissionTo($allPermissions);
+
+        foreach ([
+            'timekeeper',
+            'supervisor',
+            'fieldcoordinator',
+            'superintendent',
+            'campboss',
+            'flightdispatcher',
+        ] as $roleName) {
+            Role::create(['name' => $roleName]);
+        }
 
         $user = \App\Models\User::whereEmail('admin@admin.com')->first();
 
         if ($user) {
-            $user->assignRole($adminRole);
+            $user->assignRole($superAdminRole);
         }
     }
 }
