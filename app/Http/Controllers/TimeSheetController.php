@@ -96,6 +96,8 @@ class TimeSheetController extends Controller
         $validated = $request->validated();
         $this->ensureManageableForTimeSheet((int) $validated['employee_id'], $this->selectedScopePolicyIdFromRequest($request));
 
+        $validated['user_id'] = auth()->id();
+
         $timeSheet = TimeSheet::create($validated);
 
         return redirect()
@@ -298,6 +300,10 @@ class TimeSheetController extends Controller
         $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id, $this->selectedScopePolicyIdFromRequest($request));
 
         $validated = $request->validated();
+        $validated['employee_id'] = $timeSheet->employee_id;
+        $validated['user_id'] = auth()->id();
+        $validated['revised_at'] = now();
+        $validated['old_value'] = $timeSheet->value;
 
         $timeSheet->update($validated);
 
