@@ -56,9 +56,10 @@ class TimeSheetController extends Controller
 
         $employees = $employees
             ->through(function ($employee) {
-                if (Carbon::parse($employee->last_date)->month + 2 != now()->month) {
-                    $employee->setAttribute('is_missing_last_time_sheet', true);
-                }
+                $isMissingLastTimeSheet = is_null($employee->last_date)
+                    || Carbon::parse($employee->last_date)->addMonthsNoOverflow(2)->month !== now()->month;
+
+                $employee->setAttribute('is_missing_last_time_sheet', $isMissingLastTimeSheet);
 
                 return $employee;
             })
@@ -101,7 +102,7 @@ class TimeSheetController extends Controller
         $timeSheet = TimeSheet::create($validated);
 
         return redirect()
-            ->route('time-sheets.edit', $timeSheet)
+            ->route('time-sheets.revise', ['employee' => $timeSheet->employee_id])
             ->withSuccess(__('crud.common.created'));
     }
 
@@ -144,8 +145,16 @@ class TimeSheetController extends Controller
      */
     public function approve(Request $request): View
     {
-        $month = (int) $request->selected_month;
-        $year = (int) $request->selected_year;
+        $this->authorize('view-any', TimeSheet::class);
+
+        $validated = $request->validate([
+            'selected_month' => ['required', 'integer', 'min:1', 'max:12'],
+            'selected_year' => ['required', 'integer', 'min:2000', 'max:2100'],
+            'scope_policy_id' => ['nullable', 'integer', 'exists:scope_policies,id'],
+        ]);
+
+        $month = (int) $validated['selected_month'];
+        $year = (int) $validated['selected_year'];
         $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
         $data = $this->timeSheetService->getApprovalData($month, $year, $selectedScopePolicyId);
 
@@ -157,8 +166,16 @@ class TimeSheetController extends Controller
      */
     public function print(Request $request): View
     {
-        $month = (int) $request->selected_month;
-        $year = (int) ($request->selected_year ?: now()->year);
+        $this->authorize('view-any', TimeSheet::class);
+
+        $validated = $request->validate([
+            'selected_month' => ['required', 'integer', 'min:1', 'max:12'],
+            'selected_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            'scope_policy_id' => ['nullable', 'integer', 'exists:scope_policies,id'],
+        ]);
+
+        $month = (int) $validated['selected_month'];
+        $year = (int) ($validated['selected_year'] ?? now()->year);
         $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
         $data = $this->timeSheetService->getApprovalData($month, $year, $selectedScopePolicyId);
 
@@ -308,7 +325,7 @@ class TimeSheetController extends Controller
         $timeSheet->update($validated);
 
         return redirect()
-            ->route('time-sheets.edit', $timeSheet)
+            ->route('time-sheets.revise', ['employee' => $timeSheet->employee_id])
             ->withSuccess(__('crud.common.saved'));
     }
 

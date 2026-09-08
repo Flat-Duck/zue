@@ -59,8 +59,6 @@ class Employee extends Model
         'start_date',
         'last_date',
         'balance',
-        'total_working_days',
-        'total_off_days',
         'default_over_time_value',
     ];
 
@@ -129,7 +127,7 @@ class Employee extends Model
 
     public function rooms()
     {
-        return $this->belongsToMany(Room::class);
+        return $this->belongsToMany(Room::class)->withPivot(['is_owner', 'is_here']);
     }
 
     public function sick_leaves()
@@ -149,31 +147,39 @@ class Employee extends Model
 
     public function getAdministrationNameAttribute()
     {
-        return $this->department->administration->name;
+        return $this->department?->administration?->name;
     }
 
     public function getDepartmentNameAttribute()
     {
-        return $this->department->name;
+        return $this->department?->name;
     }
 
     public function getLocationNameAttribute()
     {
-        return $this->location->name;
+        return $this->location?->name;
     }
 
     public function getCenterNameAttribute()
     {
-        return $this->center->name;
+        return $this->center?->name;
     }
 
     public function getStartDateAttribute($date)
     {
+        if (is_null($date)) {
+            return null;
+        }
+
         return date('Y/m/d', strtotime($date));
     }
 
     public function getLastDateAttribute($date)
     {
+        if (is_null($date)) {
+            return null;
+        }
+
         return date('Y/m/d', strtotime($date));
     }
 

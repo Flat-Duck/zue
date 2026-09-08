@@ -21,6 +21,6 @@
         </div>
     </div>
     <div class="text-center text-secondary mt-3">
-        Forget it, send me back to the sign in screen. <a href="{{ route('register') }}">Login</a>
+        Forget it, send me back to the sign in screen. <a href="{{ route('login') }}">Login</a>
     </div>
 @endsection         

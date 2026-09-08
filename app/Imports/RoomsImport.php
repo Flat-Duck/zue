@@ -6,46 +6,72 @@ use App\Models\Employee;
 use App\Models\Residence;
 use App\Models\Room;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use Str;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class RoomsImport implements ToCollection
+class RoomsImport implements ToCollection, WithChunkReading
 {
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
-        foreach ($rows as $row)
-        {
-            if (isset($row[0]) && isset($row[1]) && isset($row[2]) && isset($row[3]))
-            {
-                $room =   Room::firstOrCreate([
-                    'number'    => $row[3],
-                    'residence_id' => $this->getResident($row[2],$row[1])],
-                    [
-                    'number'    => $row[3],
-                    'residence_id' => $this->getResident($row[2],$row[1]),
-                    'beds'    => 1
-                ]);
+        $employeeIds = $rows
+            ->pluck(0)
+            ->filter(fn ($employeeId): bool => filled($employeeId) && ! Str::contains((string) $employeeId, '+'))
+            ->map(fn ($employeeId): int => (int) $employeeId)
+            ->unique()
+            ->values();
+
+        $existingEmployeeIds = Employee::query()
+            ->whereIn('id', $employeeIds)
+            ->pluck('id')
+            ->map(fn ($employeeId): int => (int) $employeeId)
+            ->flip();
+
+        foreach ($rows as $row) {
+            if (! isset($row[0], $row[1], $row[2], $row[3])) {
+                continue;
             }
-            
-            if(Employee::find($row[0]) && !Str::contains($row[0],'+'))
-            {
-                $room->employees()->attach($row[0],['is_owner' => true, 'is_here' => true]);
+
+            $employeeId = (int) $row[0];
+            if (! $existingEmployeeIds->has($employeeId)) {
+                continue;
             }
+
+            $residenceId = $this->getResident((string) $row[2], (string) $row[1]);
+            $room = Room::firstOrCreate(
+                [
+                    'number' => (string) $row[3],
+                    'residence_id' => $residenceId,
+                ],
+                [
+                    'beds' => 1,
+                ]
+            );
+
+            $room->employees()->syncWithoutDetaching([
+                $employeeId => ['is_owner' => true, 'is_here' => true],
+            ]);
         }
     }
-    
-    private function getResident($name, $type)
+
+    public function chunkSize(): int
     {
-        $re =  Residence::firstOrCreate(
+        return 500;
+    }
+
+    private function getResident(string $name, string $type): int
+    {
+        $residence = Residence::firstOrCreate(
             [
-                'name'    => $name,
-                'type'    => $type
-            ],[
-                'name'    => $name,
-                'type'    => $type
+                'name' => $name,
+                'type' => $type,
+            ],
+            [
+                'name' => $name,
+                'type' => $type,
             ]
         );
-        
-        return $re->id;
+
+        return (int) $residence->id;
     }
 }

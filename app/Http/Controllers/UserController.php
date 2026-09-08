@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Models\Signature;
-use Illuminate\Support\Facades\Storage;
-use App\Services\SignatureService;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
+use App\Models\User;
+use App\Services\SignatureService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     private const IMPERSONATOR_ID_SESSION_KEY = 'impersonator_id';
+
     private const IMPERSONATOR_NAME_SESSION_KEY = 'impersonator_name';
 
     /**
@@ -104,8 +104,7 @@ class UserController extends Controller
     public function update(
         UserUpdateRequest $request,
         User $user
-    ): RedirectResponse
-    {
+    ): RedirectResponse {
         $this->authorize('update', $user);
 
         $oldUserId = (int) $user->id;
@@ -168,21 +167,25 @@ class UserController extends Controller
             ->withSuccess('Signature uploaded successfully');
     }
 
-
     public function import(Request $request): RedirectResponse
     {
+        $this->authorize('create', User::class);
+
         $request->validate([
-            'file' => 'required',
+            'file' => ['required', 'file', 'mimes:xlsx,csv,txt', 'max:51200'],
         ]);
 
         try {
             Excel::import(new UsersImport, $request->file('file'));
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-             $failures = $e->failures();
-             $message = 'Import failed. Row ' . $failures[0]->row() . ': ' . $failures[0]->errors()[0];
-             return redirect()->back()->withErrors(['file' => $message]);
+            $failures = $e->failures();
+            $message = 'Import failed. Row '.$failures[0]->row().': '.$failures[0]->errors()[0];
+
+            return redirect()->back()->withErrors(['file' => $message]);
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['file' => 'Error importing file: ' . $e->getMessage()]);
+            report($e);
+
+            return redirect()->back()->withErrors(['file' => 'Error importing file. Check the application logs for details.']);
         }
 
         return redirect()
@@ -192,6 +195,8 @@ class UserController extends Controller
 
     public function downloadTemplate()
     {
+        $this->authorize('create', User::class);
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="users_import_template.csv"',
@@ -213,7 +218,7 @@ class UserController extends Controller
     {
         $actor = auth()->user();
 
-        if (!$actor || !$actor->hasRole('super-admin')) {
+        if (! $actor || ! $actor->hasRole('super-admin')) {
             abort(403);
         }
 
@@ -237,13 +242,13 @@ class UserController extends Controller
         $impersonatorId = $request->session()->pull(self::IMPERSONATOR_ID_SESSION_KEY);
         $request->session()->forget(self::IMPERSONATOR_NAME_SESSION_KEY);
 
-        if (!$impersonatorId) {
+        if (! $impersonatorId) {
             return back()->withErrors(['impersonation' => 'No active impersonation session found.']);
         }
 
         $impersonator = User::find($impersonatorId);
 
-        if (!$impersonator || !$impersonator->hasRole('super-admin')) {
+        if (! $impersonator || ! $impersonator->hasRole('super-admin')) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

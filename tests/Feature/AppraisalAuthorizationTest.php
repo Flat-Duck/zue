@@ -17,5 +17,6 @@ class AppraisalAuthorizationTest extends TestCase
         $this->get(route('appraisals.items.index'))->assertForbidden();
         $this->get(route('appraisals.forms.index'))->assertForbidden();
         $this->get(route('appraisals.periods.index'))->assertForbidden();
+        $this->get(route('appraisals.official.index'))->assertForbidden();
     }
 }

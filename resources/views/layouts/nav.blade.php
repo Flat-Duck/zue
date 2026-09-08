@@ -81,9 +81,6 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     @guest
                         <a href="{{ route('login') }}" class="dropdown-item">Login</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="dropdown-item">Register</a>
-                        @endif
                     @endguest
                     @auth
                         @if(session()->has('impersonator_id'))

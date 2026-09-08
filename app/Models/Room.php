@@ -24,17 +24,13 @@ class Room extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class);
+        return $this->belongsToMany(Employee::class)->withPivot(['is_owner', 'is_here']);
     }
 
     public function getAvailableAttribute()
     {
-        $resdints = $this->employees()->count();
+        $residents = $this->employees_count ?? $this->employees()->count();
 
-        if ($this->beds > $resdints) {
-            return true;
-        }
-
-        return false;
+        return $this->beds > $residents;
     }
 }

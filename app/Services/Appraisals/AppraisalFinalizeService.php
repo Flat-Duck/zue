@@ -2,12 +2,13 @@
 
 namespace App\Services\Appraisals;
 
+use App\Models\Appraisals\AppraisalFormVersion;
+use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalOfficial;
 use App\Models\Appraisals\AppraisalOfficialScore;
 use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Appraisals\AppraisalReview;
 use App\Models\Appraisals\AppraisalReviewScore;
-use App\Models\Appraisals\AppraisalFormVersionItem;
 use Illuminate\Support\Facades\DB;
 
 class AppraisalFinalizeService
@@ -20,17 +21,24 @@ class AppraisalFinalizeService
                 ->where('appraisal_period_id', $period->id)
                 ->where('employee_id', $employeeId)
                 ->where('status', 'submitted')
+                ->lockForUpdate()
                 ->get();
 
             if ($reviews->count() === 0) {
-                if (!$createIfEmpty) {
+                if (! $createIfEmpty) {
                     return null;
                 }
+
+                $formVersionId = $this->guessFormVersionId();
+                if ($formVersionId === null) {
+                    return null;
+                }
+
                 // nothing to finalize
                 return AppraisalOfficial::firstOrCreate([
                     'appraisal_period_id' => $period->id,
                     'employee_id' => $employeeId,
-                    'appraisal_form_version_id' => $this->guessFormVersionId($employeeId),
+                    'appraisal_form_version_id' => $formVersionId,
                 ]);
             }
 
@@ -54,6 +62,8 @@ class AppraisalFinalizeService
                 ]
             );
 
+            $official->refresh();
+
             AppraisalOfficialScore::where('appraisals_official_id', $official->id)->delete();
 
             $items = AppraisalFormVersionItem::with('item')
@@ -66,8 +76,9 @@ class AppraisalFinalizeService
 
             foreach ($avgRows as $row) {
                 $fvi = $items[$row->form_version_item_id] ?? null;
-                if (!$fvi)
+                if (! $fvi) {
                     continue;
+                }
 
                 AppraisalOfficialScore::create([
                     'appraisals_official_id' => $official->id,
@@ -97,25 +108,32 @@ class AppraisalFinalizeService
 
     private function gradeFromPercentage(?float $p): ?string
     {
-        if ($p === null)
+        if ($p === null) {
             return null;
-        if ($p >= 90)
+        }
+        if ($p >= 90) {
             return 'ممتاز';
-        if ($p >= 80)
+        }
+        if ($p >= 80) {
             return 'جيد جداً';
-        if ($p >= 70)
+        }
+        if ($p >= 70) {
             return 'جيد';
-        if ($p >= 60)
+        }
+        if ($p >= 60) {
             return 'مقبول';
+        }
+
         return 'ضعيف';
     }
 
-    private function guessFormVersionId(int $employeeId): int
+    private function guessFormVersionId(): ?int
     {
-        // fallback only; better to always create reviews with correct version
-        return (int) \App\Models\Appraisals\AppraisalFormVersion::query()
+        $formVersionId = AppraisalFormVersion::query()
             ->where('is_active', true)
             ->orderByDesc('version')
             ->value('id');
+
+        return $formVersionId === null ? null : (int) $formVersionId;
     }
 }

@@ -50,7 +50,8 @@ class TimeSheetService
 
         $baseQuery = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
             ->where('day', '>=', $from)
-            ->where('day', '<', $until);
+            ->where('day', '<', $until)
+            ->with(['employee.department.administration', 'employee.center']);
 
         $chunk = $baseQuery->get();
         $groupedByEmployee = $chunk->groupBy('employee_id');

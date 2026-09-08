@@ -2,21 +2,28 @@
 
 namespace App\Jobs;
 
+use App\Models\BackupLog;
+use App\Services\BackupService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Services\BackupService;
-use App\Models\BackupLog;
 
 class PerformBackupJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 1800; // 30 minutes
+    public int $timeout = 1800;
+
+    public int $tries = 2;
+
+    public int $backoff = 300;
+
     protected $type;
+
     protected $logId;
+
     protected $selectedTables;
 
     /**
@@ -47,7 +54,7 @@ class PerformBackupJob implements ShouldQueue
             if ($log) {
                 $log->update([
                     'status' => 'failed',
-                    'error' => "Queued job failed: " . $exception->getMessage(),
+                    'error' => 'Queued job failed: '.$exception->getMessage(),
                     'completed_at' => now(),
                 ]);
             }

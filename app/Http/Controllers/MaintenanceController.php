@@ -40,12 +40,7 @@ class MaintenanceController extends Controller
             return strcmp($b['created_at'], $a['created_at']);
         });
 
-        $tables = DB::select('SHOW TABLES');
-        $dbName = config('database.connections.mysql.database');
-        $tableKey = 'Tables_in_'.$dbName;
-        $tables = array_map(function ($table) use ($tableKey) {
-            return $table->$tableKey;
-        }, $tables);
+        $tables = $this->backupService->baseTableNames();
 
         $settings = [
             'auto_backup_enabled' => MaintenanceSetting::get('auto_backup_enabled', '0'),
@@ -160,7 +155,9 @@ class MaintenanceController extends Controller
 
             return redirect()->back()->with('success', 'Import completed successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Import failed: '.$e->getMessage());
+            report($e);
+
+            return redirect()->back()->with('error', 'Import failed. Check the application logs for details.');
         }
     }
 
@@ -181,7 +178,9 @@ class MaintenanceController extends Controller
 
             return redirect()->back()->with('success', 'Database restored successfully from '.$filename);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Restore failed: '.$e->getMessage());
+            report($e);
+
+            return redirect()->back()->with('error', 'Restore failed. Check the application logs for details.');
         }
     }
 

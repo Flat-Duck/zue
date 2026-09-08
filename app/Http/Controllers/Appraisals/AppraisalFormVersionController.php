@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Appraisals\AppraisalFormVersion;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppraisalFormVersionController extends Controller
 {
@@ -48,8 +49,15 @@ class AppraisalFormVersionController extends Controller
 
     public function activate(AppraisalFormVersion $version)
     {
-        AppraisalFormVersion::where('appraisal_form_id', $version->appraisal_form_id)->update(['is_active' => false]);
-        $version->update(['is_active' => true]);
+        DB::transaction(function () use ($version): void {
+            AppraisalFormVersion::query()
+                ->where('appraisal_form_id', $version->appraisal_form_id)
+                ->lockForUpdate()
+                ->get();
+
+            AppraisalFormVersion::where('appraisal_form_id', $version->appraisal_form_id)->update(['is_active' => false]);
+            $version->update(['is_active' => true]);
+        });
 
         return back()->with('success', 'تم تفعيل الـ Version.');
     }

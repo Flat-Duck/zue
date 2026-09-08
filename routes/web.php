@@ -78,7 +78,7 @@ Route::post('/rr', function () {
 //     return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days','employees','signatures'));
 // })->name('time-sheets.approve');
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::prefix('/')
     ->middleware('auth')
@@ -95,7 +95,7 @@ Route::prefix('/')
         Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
         Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
         Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
-        Route::resource('time-sheets', TimeSheetController::class);
+        Route::resource('time-sheets', TimeSheetController::class)->except(['create', 'edit']);
 
         Route::get('/home', [HomeController::class, 'index'])->name('home');
 

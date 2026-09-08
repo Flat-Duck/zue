@@ -2,97 +2,143 @@
 
 namespace App\Services;
 
+use App\Models\BackupLog;
+use App\Models\MaintenanceSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
-use App\Models\MaintenanceSetting;
-use App\Models\BackupLog;
+use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 class BackupService
 {
-    public function performBackup($type = 'both', $selectedTables = [], $saveToBackups = true, $logId = null)
+    public function performBackup(string $type = 'both', array $selectedTables = [], bool $saveToBackups = true, ?int $logId = null): string
+    {
+        $lock = Cache::lock('database-backup', 1800);
+
+        if (! $lock->get()) {
+            throw new RuntimeException('Another database backup is already running.');
+        }
+
+        try {
+            return $this->performBackupWithLock($type, $selectedTables, $saveToBackups, $logId);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function baseTableNames(): array
+    {
+        $tables = DB::select('SHOW FULL TABLES');
+        $tableNames = [];
+
+        foreach ($tables as $table) {
+            $tableArray = array_values((array) $table);
+
+            if (($tableArray[1] ?? null) === 'BASE TABLE') {
+                $tableNames[] = (string) $tableArray[0];
+            }
+        }
+
+        return $tableNames;
+    }
+
+    protected function performBackupWithLock(string $type, array $selectedTables, bool $saveToBackups, ?int $logId): string
     {
         ini_set('memory_limit', '1024M');
-        set_time_limit(1800); // 30 minutes
+        set_time_limit(1800);
+
+        if (! in_array($type, ['structure', 'data', 'both'], true)) {
+            throw new RuntimeException('Invalid backup type.');
+        }
 
         $log = null;
         if ($logId) {
-            $log = BackupLog::find($logId);
+            $log = BackupLog::query()->find($logId);
             if ($log) {
                 $log->update(['status' => 'running', 'started_at' => now()]);
             }
         }
 
         try {
-            if (empty($selectedTables)) {
-                $tables = DB::select('SHOW FULL TABLES');
-                $selectedTables = [];
-                foreach ($tables as $table) {
-                    $tableArray = (array) $table;
-                    $tableName = reset($tableArray);
-                    $tableType = end($tableArray);
-                    
-                    if ($tableType === 'BASE TABLE') {
-                        $selectedTables[] = $tableName;
-                    }
-                }
-            }
+            $selectedTables = $this->validatedTableNames($selectedTables);
 
-            $filename = "backup_" . now()->format('Ymd_His') . ".sql";
-            $tempPath = storage_path('app/temp_' . $filename);
+            $filename = 'backup_'.now()->format('Ymd_His').'_'.Str::uuid().'.sql';
+            $tempPath = storage_path('app/temp_'.$filename);
             $handle = fopen($tempPath, 'w');
 
+            if ($handle === false) {
+                throw new RuntimeException('Unable to create backup temp file.');
+            }
+
             fwrite($handle, "-- Database Export\n");
-            fwrite($handle, "-- Date: " . now()->toDateTimeString() . "\n\n");
+            fwrite($handle, '-- Date: '.now()->toDateTimeString()."\n\n");
 
             foreach ($selectedTables as $table) {
                 try {
                     if ($type === 'structure' || $type === 'both') {
-                        $createTableResult = DB::select("SHOW CREATE TABLE `$table`");
-                        if (!empty($createTableResult)) {
+                        $createTableResult = DB::select('SHOW CREATE TABLE '.$this->quoteIdentifier($table));
+                        if (! empty($createTableResult)) {
                             $createTable = $createTableResult[0];
-                            fwrite($handle, "DROP TABLE IF EXISTS `$table`;\n");
-                            fwrite($handle, $createTable->{'Create Table'} . ";\n\n");
+                            fwrite($handle, 'DROP TABLE IF EXISTS '.$this->quoteIdentifier($table).";\n");
+                            fwrite($handle, $createTable->{'Create Table'}.";\n\n");
                         }
                     }
 
                     if ($type === 'data' || $type === 'both') {
-                        DB::table($table)->orderBy(DB::raw('1'))->chunk(500, function ($rows) use ($handle, $table) {
+                        DB::table($table)->orderByRaw('1')->chunk(500, function ($rows) use ($handle, $table) {
                             foreach ($rows as $row) {
                                 $rowArray = (array) $row;
                                 $keys = array_keys($rowArray);
                                 $values = array_values($rowArray);
-                                
-                                $escapedValues = array_map(function ($value) {
-                                    if ($value === null) return 'NULL';
-                                    if (is_numeric($value) && !is_string($value)) return $value;
-                                    return "'" . addslashes($value) . "'";
+
+                                $escapedValues = array_map(function ($value): string {
+                                    if ($value === null) {
+                                        return 'NULL';
+                                    }
+
+                                    if (is_numeric($value) && ! is_string($value)) {
+                                        return (string) $value;
+                                    }
+
+                                    return DB::getPdo()->quote((string) $value);
                                 }, $values);
 
-                                fwrite($handle, "INSERT INTO `$table` (`" . implode("`, `", $keys) . "`) VALUES (" . implode(", ", $escapedValues) . ");\n");
+                                $columns = implode(', ', array_map(fn (string $key): string => $this->quoteIdentifier($key), $keys));
+                                fwrite($handle, 'INSERT INTO '.$this->quoteIdentifier($table).' ('.$columns.') VALUES ('.implode(', ', $escapedValues).");\n");
                             }
                         });
                         fwrite($handle, "\n");
                     }
-                } catch (\Exception $e) {
-                    fwrite($handle, "-- Error exporting table $table: " . $e->getMessage() . "\n\n");
+                } catch (Throwable $exception) {
+                    fclose($handle);
+                    @unlink($tempPath);
+
+                    throw new RuntimeException("Failed exporting table [{$table}].", 0, $exception);
                 }
             }
 
             fclose($handle);
 
             if ($saveToBackups) {
-                if (!Storage::disk('local')->exists('backups')) {
+                if (! Storage::disk('local')->exists('backups')) {
                     Storage::disk('local')->makeDirectory('backups');
                 }
-                
-                // Use stream for memory efficiency
+
                 $stream = fopen($tempPath, 'r');
-                Storage::disk('local')->put('backups/' . $filename, $stream);
+                $stored = Storage::disk('local')->put('backups/'.$filename, $stream);
                 if (is_resource($stream)) {
                     fclose($stream);
                 }
-                
+
+                if (! $stored) {
+                    throw new RuntimeException('Unable to write backup file to storage.');
+                }
+
                 unlink($tempPath);
                 $this->cleanupOldBackups();
 
@@ -100,9 +146,10 @@ class BackupService
                     $log->update([
                         'status' => 'completed',
                         'filename' => $filename,
-                        'completed_at' => now()
+                        'completed_at' => now(),
                     ]);
                 }
+
                 return $filename;
             }
 
@@ -112,31 +159,34 @@ class BackupService
             if ($log) {
                 $log->update([
                     'status' => 'completed',
-                    'completed_at' => now()
+                    'completed_at' => now(),
                 ]);
             }
+
             return $content;
 
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             if ($log) {
                 $log->update([
                     'status' => 'failed',
                     'error' => $e->getMessage(),
-                    'completed_at' => now()
+                    'completed_at' => now(),
                 ]);
             }
             throw $e;
         }
     }
 
-    protected function cleanupOldBackups()
+    protected function cleanupOldBackups(): void
     {
         $keepCount = (int) MaintenanceSetting::get('keep_backups_count', 10);
-        $backups = Storage::disk('local')->files('backups');
-        
+        $backups = collect(Storage::disk('local')->files('backups'))
+            ->filter(fn (string $backup): bool => Str::is('backups/backup_*.sql', $backup))
+            ->values()
+            ->all();
+
         if (count($backups) > $keepCount) {
-            // Sort by last modified
-            usort($backups, function ($a, $b) {
+            usort($backups, function (string $a, string $b): int {
                 return Storage::disk('local')->lastModified($a) <=> Storage::disk('local')->lastModified($b);
             });
 
@@ -145,5 +195,35 @@ class BackupService
                 Storage::disk('local')->delete($backups[$i]);
             }
         }
+    }
+
+    /**
+     * @param  list<string>  $selectedTables
+     * @return list<string>
+     */
+    protected function validatedTableNames(array $selectedTables): array
+    {
+        $availableTables = $this->baseTableNames();
+
+        if ($selectedTables === []) {
+            return $availableTables;
+        }
+
+        $invalidTables = array_diff($selectedTables, $availableTables);
+
+        if ($invalidTables !== []) {
+            throw new RuntimeException('Invalid backup table selection.');
+        }
+
+        return array_values($selectedTables);
+    }
+
+    protected function quoteIdentifier(string $identifier): string
+    {
+        if (! preg_match('/^[A-Za-z0-9_]+$/', $identifier)) {
+            throw new RuntimeException('Invalid database identifier.');
+        }
+
+        return '`'.$identifier.'`';
     }
 }

@@ -3,23 +3,27 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\UpdateAppraisalReviewRequest;
+use App\Models\Appraisals\AppraisalFormVersion;
+use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Appraisals\AppraisalReview;
 use App\Models\Appraisals\AppraisalReviewScore;
-use App\Models\Appraisals\AppraisalFormVersion;
-use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Employee;
-use App\Http\Requests\Appraisals\UpdateAppraisalReviewRequest;
-use App\Services\Appraisals\AppraisalScoreService;
 use App\Services\Appraisals\AppraisalAttendanceService;
+use App\Services\Appraisals\AppraisalScoreService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AppraisalReviewController extends Controller
 {
     private function currentEmployeeId(): int
     {
-        // عدّلها حسب مشروعك
-        return (int) auth()->user()->employee->id;
+        $employeeId = auth()->user()?->employee?->id;
+
+        abort_if(is_null($employeeId), 403);
+
+        return (int) $employeeId;
     }
 
     public function index()
@@ -38,8 +42,10 @@ class AppraisalReviewController extends Controller
     {
         $periods = AppraisalPeriod::query()->where('status', 'open')->orderByDesc('year')->get();
 
-        // الموظفين اللي تبي تقيمهم: هنا مثال بسيط (كلهم)
-        $employees = Employee::query()->orderBy('id')->limit(350)->get();
+        $employees = $this->reviewableEmployeesQuery()
+            ->orderBy('english_name')
+            ->limit(350)
+            ->get();
 
         return view('app.appraisals.reviews.create', compact('periods', 'employees'));
     }
@@ -52,15 +58,19 @@ class AppraisalReviewController extends Controller
         ]);
 
         $period = AppraisalPeriod::findOrFail($data['appraisal_period_id']);
-        if (!$period->isOpen()) {
+        if (! $period->isOpen()) {
             return back()->with('error', 'الفترة مقفولة.');
         }
 
         $employee = Employee::findOrFail($data['employee_id']);
+        abort_unless(
+            $this->reviewableEmployeesQuery()->whereKey($employee->id)->exists(),
+            403
+        );
 
         // Determine employee form + active latest version
         $formId = $employee->appraisal_form_id;
-        if (!$formId) {
+        if (! $formId) {
             return back()->with('error', 'الموظف ما عنده نموذج تقييم محدد.');
         }
 
@@ -70,7 +80,7 @@ class AppraisalReviewController extends Controller
             ->orderByDesc('version')
             ->first();
 
-        if (!$formVersion) {
+        if (! $formVersion) {
             return back()->with('error', 'ما فيش version فعّالة للنموذج.');
         }
 
@@ -107,8 +117,9 @@ class AppraisalReviewController extends Controller
     {
         $myEmployeeId = $this->currentEmployeeId();
 
-        if ($review->appraiser_id !== $myEmployeeId)
+        if ($review->appraiser_id !== $myEmployeeId) {
             abort(403);
+        }
 
         $review->load([
             'period',
@@ -134,7 +145,7 @@ class AppraisalReviewController extends Controller
         // Group version items by resolved section
         $itemsBySection = $review->formVersion->versionItems
             ->where('is_active', true)
-            ->groupBy(fn($vi) => $vi->resolved_section);
+            ->groupBy(fn ($vi) => $vi->resolved_section);
 
         return view('app.appraisals.reviews.edit', compact('review', 'scoresMap', 'itemsBySection', 'attendanceStats'));
     }
@@ -142,10 +153,12 @@ class AppraisalReviewController extends Controller
     public function update(UpdateAppraisalReviewRequest $request, AppraisalReview $review, AppraisalScoreService $service)
     {
         $myEmployeeId = $this->currentEmployeeId();
-        if ($review->appraiser_id !== $myEmployeeId)
+        if ($review->appraiser_id !== $myEmployeeId) {
             abort(403);
-        if ($review->status !== 'draft')
+        }
+        if ($review->status !== 'draft') {
             return back()->with('error', 'التقييم مقفول.');
+        }
 
         $data = $request->validated();
 
@@ -168,14 +181,16 @@ class AppraisalReviewController extends Controller
     public function submit(AppraisalReview $review)
     {
         $myEmployeeId = $this->currentEmployeeId();
-        if ($review->appraiser_id !== $myEmployeeId)
+        if ($review->appraiser_id !== $myEmployeeId) {
             abort(403);
-        if ($review->status !== 'draft')
+        }
+        if ($review->status !== 'draft') {
             return back();
+        }
 
         // Require the period open
         $review->load('period');
-        if (!$review->period->isOpen()) {
+        if (! $review->period->isOpen()) {
             return back()->with('error', 'الفترة مقفولة.');
         }
 
@@ -183,5 +198,16 @@ class AppraisalReviewController extends Controller
         $review->save();
 
         return redirect()->route('appraisals.reviews.index')->with('success', 'تم إرسال التقييم.');
+    }
+
+    private function reviewableEmployeesQuery(): Builder
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole(['hr', 'admin', 'super-admin'])) {
+            return Employee::query()->whereNull('archived_at');
+        }
+
+        return $user->managedEmployeesQuery('general');
     }
 }

@@ -6,7 +6,6 @@ use App\Models\Employee;
 use App\Models\TimeSheet;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -30,11 +29,12 @@ class HomeController extends Controller
         $usersCount = User::count();
         $employeesCount = Employee::count();
 
-        // Timesheet stats for current month
-        $startOfMonth = Carbon::now()->subMonths(6)->startOfMonth();
-        $endOfMonth = Carbon::now()->subMonths(6)->endOfMonth();
-// dd($usersCount, $startOfMonth, $endOfMonth);
-        $employeesWithTimesheets = TimeSheet::whereBetween('day', [$startOfMonth, $endOfMonth])
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $startOfNextMonth = $startOfMonth->copy()->addMonth();
+
+        $employeesWithTimesheets = TimeSheet::query()
+            ->where('day', '>=', $startOfMonth)
+            ->where('day', '<', $startOfNextMonth)
             ->distinct('employee_id')
             ->count('employee_id');
 

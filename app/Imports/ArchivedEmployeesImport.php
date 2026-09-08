@@ -3,24 +3,28 @@
 namespace App\Imports;
 
 use App\Models\Employee;
-use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class ArchivedEmployeesImport implements ToCollection
+class ArchivedEmployeesImport implements ToCollection, WithChunkReading
 {
-    /**
-     * @param Collection $rows
-     */
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
-        foreach ($rows as $row)
-        {
-            $employee = Employee::find( $row[0]);
+        $employeeIds = $rows
+            ->pluck(0)
+            ->filter()
+            ->map(fn ($employeeId): int => (int) $employeeId)
+            ->unique()
+            ->values();
 
-            if ($employee) {
-                $employee->archived_at = now();
-                $employee->save();
-            }
-        }
+        Employee::query()
+            ->whereIn('id', $employeeIds)
+            ->update(['archived_at' => now()]);
+    }
+
+    public function chunkSize(): int
+    {
+        return 500;
     }
 }

@@ -95,11 +95,11 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $employee->number }}</td>
                                     <td class="text-start"><strong>{{ $employee->english_name }}</strong></td>
-                                    <td>{{ optional($employee->start_date)->format('Y-m-d') ?? '-' }}</td>
+                                <td>{{ $employee->start_date ?? '-' }}</td>
                                     <td>{{ $employee->department->name ?? '-' }}</td>
                                     <td>{{ $employee->location->name ?? '-' }}</td>
                                     <td>{{ $employee->schedule }}</td>
-                                    <td>{{ optional($employee->last_date)->format('Y-m-d') ?? '-' }}</td>
+                                <td>{{ $employee->last_date ?? '-' }}</td>
                                     <td class="{{ $employee->total_balance < 0 ? 'text-danger' : '' }}">
                                         <strong>{{ round($employee->total_balance, 2) }}</strong>
                                     </td>

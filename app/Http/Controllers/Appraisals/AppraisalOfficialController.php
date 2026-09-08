@@ -8,12 +8,15 @@ use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Employee;
 use App\Services\Appraisals\AppraisalFinalizeService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AppraisalOfficialController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeOfficialManagement();
+
         $q = trim((string) $request->get('q'));
         $year = $request->get('year', now()->year);
 
@@ -21,8 +24,8 @@ class AppraisalOfficialController extends Controller
             ->whereHas('period', fn ($query) => $query->where('year', $year)->where('type', 'yearly'))
             ->when($q, function ($query) use ($q) {
                 $query->whereHas('employee', function ($sub) use ($q) {
-                    $sub->where('first_name', 'like', "%{$q}%")
-                        ->orWhere('last_name', 'like', "%{$q}%")
+                    $sub->where('english_name', 'like', "%{$q}%")
+                        ->orWhere('number', 'like', "%{$q}%")
                         ->orWhere('email', 'like', "%{$q}%");
                 });
             })
@@ -35,11 +38,17 @@ class AppraisalOfficialController extends Controller
 
     private function currentEmployeeId(): int
     {
-        return (int) auth()->user()->employee->id;
+        $employeeId = auth()->user()?->employee?->id;
+
+        abort_if(is_null($employeeId), 403);
+
+        return (int) $employeeId;
     }
 
     public function show(AppraisalPeriod $period, Employee $employee, \App\Services\Appraisals\AppraisalAttendanceService $attendanceService)
     {
+        $this->authorizeOfficialView($employee);
+
         $official = AppraisalOfficial::with([
             'scores.formVersionItem.item',
             'period',
@@ -105,6 +114,13 @@ class AppraisalOfficialController extends Controller
             if (! $user->hasAnyRole(['manager', 'supervisor', 'superintendent', 'fieldcoordinator'])) {
                 abort(403, 'Only an authorized manager may approve.');
             }
+
+            abort_unless(
+                $this->manageableEmployeeQuery()->whereKey($official->employee_id)->exists(),
+                403,
+                'Only the assigned manager may approve.'
+            );
+
             $official->update([
                 'manager_user_id' => $user->id,
                 'manager_signed_at' => now(),
@@ -131,5 +147,28 @@ class AppraisalOfficialController extends Controller
             403,
             'Only HR or Admin may manage official appraisals.'
         );
+    }
+
+    private function authorizeOfficialView(Employee $employee): void
+    {
+        $user = auth()->user();
+
+        if ($user->hasAnyRole(['hr', 'admin', 'super-admin'])) {
+            return;
+        }
+
+        if ((int) optional($user->employee)->id === (int) $employee->id) {
+            return;
+        }
+
+        abort_unless(
+            $this->manageableEmployeeQuery()->whereKey($employee->id)->exists(),
+            403
+        );
+    }
+
+    private function manageableEmployeeQuery(): Builder
+    {
+        return auth()->user()->managedEmployeesQuery('general');
     }
 }
