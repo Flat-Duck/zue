@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
-use App\Models\Flight;
 use App\Models\Employee;
-
-use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Flight;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class EmployeeFlightsTest extends TestCase
 {
@@ -42,7 +41,7 @@ class EmployeeFlightsTest extends TestCase
             route('api.employees.flights.index', $employee)
         );
 
-        $response->assertOk()->assertSee($flight->date);
+        $response->assertOk()->assertSee($flight->date->toISOString());
     }
 
     /**

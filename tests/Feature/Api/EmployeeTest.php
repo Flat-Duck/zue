@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -56,7 +57,10 @@ class EmployeeTest extends TestCase
 
         $this->assertDatabaseHas('employees', $data);
 
-        $response->assertStatus(201)->assertJsonFragment($data);
+        $response->assertStatus(201)->assertJsonFragment([
+            'number' => $data['number'],
+            'schedule' => $data['schedule'],
+        ]);
     }
 
     /**
@@ -103,7 +107,11 @@ class EmployeeTest extends TestCase
 
         $this->assertDatabaseHas('employees', $data);
 
-        $response->assertOk()->assertJsonFragment($data);
+        $response->assertOk()->assertJsonFragment([
+            'id' => $employee->id,
+            'archived_at' => Carbon::parse($data['archived_at'])->toISOString(),
+            'email' => $data['email'],
+        ]);
     }
 
     /**
