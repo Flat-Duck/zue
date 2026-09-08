@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Passenger;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class PassengerControllerTest extends TestCase
 {
@@ -21,14 +22,12 @@ class PassengerControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_passengers(): void
     {
         $passengers = Passenger::factory()
@@ -43,9 +42,7 @@ class PassengerControllerTest extends TestCase
             ->assertViewHas('passengers');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_passenger(): void
     {
         $response = $this->get(route('passengers.create'));
@@ -53,9 +50,7 @@ class PassengerControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.passengers.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_passenger(): void
     {
         $data = Passenger::factory()
@@ -71,9 +66,7 @@ class PassengerControllerTest extends TestCase
         $response->assertRedirect(route('passengers.edit', $passenger));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_passenger(): void
     {
         $passenger = Passenger::factory()->create();
@@ -86,9 +79,7 @@ class PassengerControllerTest extends TestCase
             ->assertViewHas('passenger');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_passenger(): void
     {
         $passenger = Passenger::factory()->create();
@@ -101,9 +92,7 @@ class PassengerControllerTest extends TestCase
             ->assertViewHas('passenger');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_passenger(): void
     {
         $passenger = Passenger::factory()->create();
@@ -124,9 +113,7 @@ class PassengerControllerTest extends TestCase
         $response->assertRedirect(route('passengers.edit', $passenger));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_passenger(): void
     {
         $passenger = Passenger::factory()->create();

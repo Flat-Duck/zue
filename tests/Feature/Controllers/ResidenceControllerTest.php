@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Residence;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ResidenceControllerTest extends TestCase
 {
@@ -21,14 +22,12 @@ class ResidenceControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_residences(): void
     {
         $residences = Residence::factory()
@@ -43,9 +42,7 @@ class ResidenceControllerTest extends TestCase
             ->assertViewHas('residences');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_residence(): void
     {
         $response = $this->get(route('residences.create'));
@@ -53,9 +50,7 @@ class ResidenceControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.residences.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_residence(): void
     {
         $data = Residence::factory()
@@ -71,9 +66,7 @@ class ResidenceControllerTest extends TestCase
         $response->assertRedirect(route('residences.edit', $residence));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_residence(): void
     {
         $residence = Residence::factory()->create();
@@ -86,9 +79,7 @@ class ResidenceControllerTest extends TestCase
             ->assertViewHas('residence');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_residence(): void
     {
         $residence = Residence::factory()->create();
@@ -101,9 +92,7 @@ class ResidenceControllerTest extends TestCase
             ->assertViewHas('residence');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_residence(): void
     {
         $residence = Residence::factory()->create();
@@ -122,9 +111,7 @@ class ResidenceControllerTest extends TestCase
         $response->assertRedirect(route('residences.edit', $residence));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_residence(): void
     {
         $residence = Residence::factory()->create();

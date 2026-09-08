@@ -5,8 +5,10 @@ namespace Tests\Feature\Controllers;
 use App\Models\Residence;
 use App\Models\Room;
 use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RoomControllerTest extends TestCase
@@ -21,14 +23,12 @@ class RoomControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_rooms(): void
     {
         $rooms = Room::factory()
@@ -43,9 +43,7 @@ class RoomControllerTest extends TestCase
             ->assertViewHas('rooms');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_room(): void
     {
         $response = $this->get(route('rooms.create'));
@@ -53,9 +51,7 @@ class RoomControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.rooms.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_room(): void
     {
         $data = Room::factory()
@@ -71,9 +67,7 @@ class RoomControllerTest extends TestCase
         $response->assertRedirect(route('rooms.edit', $room));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_room(): void
     {
         $room = Room::factory()->create();
@@ -86,9 +80,7 @@ class RoomControllerTest extends TestCase
             ->assertViewHas('room');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_room(): void
     {
         $room = Room::factory()->create();
@@ -101,9 +93,7 @@ class RoomControllerTest extends TestCase
             ->assertViewHas('room');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_room(): void
     {
         $room = Room::factory()->create();
@@ -125,9 +115,7 @@ class RoomControllerTest extends TestCase
         $response->assertRedirect(route('rooms.edit', $room));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_room(): void
     {
         $room = Room::factory()->create();

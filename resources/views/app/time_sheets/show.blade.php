@@ -93,7 +93,10 @@
             >
 
             @can('create', App\Models\TimeSheet::class)
-            <a href="{{ route('time-sheets.create') }}" class="btn btn-primary">
+            <a
+                href="{{ route('time-sheets.fill', $timeSheet->employee_id) }}"
+                class="btn btn-primary"
+            >
                 @lang('crud.common.create')
             </a>
             @endcan

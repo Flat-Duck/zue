@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
-use App\Models\Department;
-
 use App\Models\Administration;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Department;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class DepartmentControllerTest extends TestCase
 {
@@ -23,14 +23,12 @@ class DepartmentControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_departments(): void
     {
         $departments = Department::factory()
@@ -45,9 +43,7 @@ class DepartmentControllerTest extends TestCase
             ->assertViewHas('departments');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_department(): void
     {
         $response = $this->get(route('departments.create'));
@@ -55,9 +51,7 @@ class DepartmentControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.departments.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_department(): void
     {
         $data = Department::factory()
@@ -73,9 +67,7 @@ class DepartmentControllerTest extends TestCase
         $response->assertRedirect(route('departments.edit', $department));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_department(): void
     {
         $department = Department::factory()->create();
@@ -88,9 +80,7 @@ class DepartmentControllerTest extends TestCase
             ->assertViewHas('department');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_department(): void
     {
         $department = Department::factory()->create();
@@ -103,9 +93,7 @@ class DepartmentControllerTest extends TestCase
             ->assertViewHas('department');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_department(): void
     {
         $department = Department::factory()->create();
@@ -126,9 +114,7 @@ class DepartmentControllerTest extends TestCase
         $response->assertRedirect(route('departments.edit', $department));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_department(): void
     {
         $department = Department::factory()->create();

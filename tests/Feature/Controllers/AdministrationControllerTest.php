@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Administration;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class AdministrationControllerTest extends TestCase
 {
@@ -21,14 +22,12 @@ class AdministrationControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_administrations(): void
     {
         $administrations = Administration::factory()
@@ -43,9 +42,7 @@ class AdministrationControllerTest extends TestCase
             ->assertViewHas('administrations');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_administration(): void
     {
         $response = $this->get(route('administrations.create'));
@@ -53,9 +50,7 @@ class AdministrationControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.administrations.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_administration(): void
     {
         $data = Administration::factory()
@@ -73,9 +68,7 @@ class AdministrationControllerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_administration(): void
     {
         $administration = Administration::factory()->create();
@@ -88,9 +81,7 @@ class AdministrationControllerTest extends TestCase
             ->assertViewHas('administration');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_administration(): void
     {
         $administration = Administration::factory()->create();
@@ -103,9 +94,7 @@ class AdministrationControllerTest extends TestCase
             ->assertViewHas('administration');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_administration(): void
     {
         $administration = Administration::factory()->create();
@@ -128,9 +117,7 @@ class AdministrationControllerTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_administration(): void
     {
         $administration = Administration::factory()->create();

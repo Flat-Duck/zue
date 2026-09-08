@@ -3,8 +3,10 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -19,14 +21,12 @@ class UserControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_users(): void
     {
         $users = User::factory()
@@ -41,9 +41,7 @@ class UserControllerTest extends TestCase
             ->assertViewHas('users');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_user(): void
     {
         $response = $this->get(route('users.create'));
@@ -51,9 +49,7 @@ class UserControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.users.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_user(): void
     {
         $data = User::factory()
@@ -73,9 +69,7 @@ class UserControllerTest extends TestCase
         $response->assertRedirect(route('users.edit', $user));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_user(): void
     {
         $user = User::factory()->create();
@@ -88,9 +82,7 @@ class UserControllerTest extends TestCase
             ->assertViewHas('user');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_user(): void
     {
         $user = User::factory()->create();
@@ -103,9 +95,7 @@ class UserControllerTest extends TestCase
             ->assertViewHas('user');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_user(): void
     {
         $user = User::factory()->create();
@@ -129,9 +119,7 @@ class UserControllerTest extends TestCase
         $response->assertRedirect(route('users.edit', $user));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_user(): void
     {
         $user = User::factory()->create();

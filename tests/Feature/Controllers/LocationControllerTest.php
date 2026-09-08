@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
 use App\Models\Location;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class LocationControllerTest extends TestCase
 {
@@ -21,14 +22,12 @@ class LocationControllerTest extends TestCase
             User::factory()->create(['email' => 'admin@admin.com'])
         );
 
-        $this->seed(\Database\Seeders\PermissionsSeeder::class);
+        $this->seed(PermissionsSeeder::class);
 
         $this->withoutExceptionHandling();
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_index_view_with_locations(): void
     {
         $locations = Location::factory()
@@ -43,9 +42,7 @@ class LocationControllerTest extends TestCase
             ->assertViewHas('locations');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_create_view_for_location(): void
     {
         $response = $this->get(route('locations.create'));
@@ -53,9 +50,7 @@ class LocationControllerTest extends TestCase
         $response->assertOk()->assertViewIs('app.locations.create');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_stores_the_location(): void
     {
         $data = Location::factory()
@@ -71,9 +66,7 @@ class LocationControllerTest extends TestCase
         $response->assertRedirect(route('locations.edit', $location));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_show_view_for_location(): void
     {
         $location = Location::factory()->create();
@@ -86,9 +79,7 @@ class LocationControllerTest extends TestCase
             ->assertViewHas('location');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_displays_edit_view_for_location(): void
     {
         $location = Location::factory()->create();
@@ -101,9 +92,7 @@ class LocationControllerTest extends TestCase
             ->assertViewHas('location');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_updates_the_location(): void
     {
         $location = Location::factory()->create();
@@ -122,9 +111,7 @@ class LocationControllerTest extends TestCase
         $response->assertRedirect(route('locations.edit', $location));
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_deletes_the_location(): void
     {
         $location = Location::factory()->create();

@@ -29,6 +29,7 @@
         </div>
     </div>
 </form>
+@endsection
 
 {{-- @extends('layouts.app', ['page' => 'rooms'])
 
