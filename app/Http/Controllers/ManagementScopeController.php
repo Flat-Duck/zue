@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ManagementScopeStoreRequest;
+use App\Models\Center;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
-use App\Models\Department;
-use App\Models\Center;
 use App\Models\ManagementScope;
-use App\Http\Requests\ManagementScopeStoreRequest;
 use App\Services\ManagementScopeService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ManagementScopeController extends Controller
 {
@@ -27,22 +26,22 @@ class ManagementScopeController extends Controller
             ->orderBy('scope_type');
 
         // Filter by manager (check if manager is in the shared list)
-        if (!empty($managerId)) {
+        if (! empty($managerId)) {
             $query->whereHas('managers', function ($q) use ($managerId) {
                 $q->where('employees.id', $managerId);
             });
         }
 
         // Text search (manager name, subordinate name, scope_type)
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('manager', function ($q2) use ($search) {
-                    $q2->where('english_name', 'like', '%' . $search . '%');
+                    $q2->where('english_name', 'like', '%'.$search.'%');
                 })
                     ->orWhereHas('subordinate', function ($q2) use ($search) {
-                        $q2->where('english_name', 'like', '%' . $search . '%');
+                        $q2->where('english_name', 'like', '%'.$search.'%');
                     })
-                    ->orWhere('scope_type', 'like', '%' . $search . '%');
+                    ->orWhere('scope_type', 'like', '%'.$search.'%');
             });
         }
 
@@ -145,11 +144,11 @@ class ManagementScopeController extends Controller
             ->with('success', 'Management scope updated successfully.');
     }
 
-    public function destroy(ManagementScope $managementScope)
+    public function destroy(ManagementScope $managementScope, ManagementScopeService $service)
     {
         $this->authorize('delete', $managementScope);
 
-        $managementScope->delete();
+        $service->deleteScope($managementScope);
 
         return redirect()
             ->route('management-scopes.index')

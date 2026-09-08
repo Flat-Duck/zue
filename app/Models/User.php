@@ -5,9 +5,13 @@ namespace App\Models;
 use App\Models\Scopes\Searchable;
 use App\Services\TimeSheetAuth\ActorResolver;
 use App\Services\TimeSheetAuthorizationService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -33,14 +37,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function employee()
+    public function employee(): HasOne
     {
-        return $this->hasOne(Employee::class, 'id', 'id');
-        // If you want to use employees.user_id instead, change to:
-        // return $this->hasOne(Employee::class, 'user_id', 'id');
+        return $this->hasOne(Employee::class, 'user_id', 'id');
     }
 
-    public function timeSheets()
+    public function timeSheets(): HasMany
     {
         return $this->hasMany(TimeSheet::class);
     }
@@ -80,32 +82,27 @@ class User extends Authenticatable
         return $this->signature?->image_path;
     }
 
-    public function signature()
+    public function signature(): HasOne
     {
         return $this->hasOne(Signature::class);
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($user) {
             $user->id = (int) $user->number;
         });
 
-        static::updating(function ($user) {
-            if ($user->isDirty('number')) {
-                $user->id = (int) $user->number;
-            }
-        });
     }
 
     /**
      * Employees managed by this user (via linked employee).
      */
-    public function managedEmployees()
+    public function managedEmployees(): Collection
     {
         if (config('timesheet_auth.v2_read_enabled', false)) {
             return app(TimeSheetAuthorizationService::class)
-                ->managedEmployeesQuery($this, 'time_sheet')
+                ->managedEmployeesQuery($this, 'general')
                 ->get();
         }
 
@@ -121,9 +118,9 @@ class User extends Authenticatable
      * Query builder for employees managed by this user.
      * Useful for pagination and eager loading.
      */
-    public function managedEmployeesQuery($context = 'general')
+    public function managedEmployeesQuery(string $context = 'general'): Builder
     {
-        if (config('timesheet_auth.v2_read_enabled', false) && $context === 'time_sheet') {
+        if (config('timesheet_auth.v2_read_enabled', false)) {
             return app(TimeSheetAuthorizationService::class)->managedEmployeesQuery($this, $context);
         }
 
@@ -137,9 +134,8 @@ class User extends Authenticatable
 
     /**
      * Users corresponding to the employees this user manages.
-     * This assumes user.id == employee.id (like in your booted override).
      */
-    public function managedUsers()
+    public function managedUsers(): Collection
     {
         $employeeIds = $this->managedEmployees()->pluck('id');
 
@@ -147,8 +143,13 @@ class User extends Authenticatable
             return collect();
         }
 
-        return static::query()
+        $managedUserIds = Employee::query()
             ->whereIn('id', $employeeIds)
+            ->whereNotNull('user_id')
+            ->pluck('user_id');
+
+        return static::query()
+            ->whereIn('id', $managedUserIds)
             ->get();
     }
 

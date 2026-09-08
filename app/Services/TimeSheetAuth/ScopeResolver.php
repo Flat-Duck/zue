@@ -11,9 +11,7 @@ use Illuminate\Support\Collection;
 
 class ScopeResolver
 {
-    public function __construct(private readonly ActorResolver $actorResolver)
-    {
-    }
+    public function __construct(private readonly ActorResolver $actorResolver) {}
 
     /**
      * Returns map of visible employee IDs keyed by employee id.
@@ -25,10 +23,9 @@ class ScopeResolver
         User $user,
         string $context = 'time_sheet',
         ?int $selectedPolicyId = null
-    ): array
-    {
+    ): array {
         $actorEmployee = $this->actorResolver->resolveEmployee($user);
-        if (!$actorEmployee) {
+        if (! $actorEmployee) {
             return [];
         }
 
@@ -44,14 +41,14 @@ class ScopeResolver
 
         $actorPolicies = $policies->filter(function (ScopePolicy $policy) use ($actorEmployee) {
             $actor = $policy->actors->firstWhere('actor_employee_id', $actorEmployee->id);
-            if (!$actor) {
+            if (! $actor) {
                 return false;
             }
 
             return $actor->can_fill || $actor->can_approve || $actor->can_revise;
         })->values();
 
-        if (!is_null($selectedPolicyId)) {
+        if (! is_null($selectedPolicyId)) {
             $actorPolicies = $actorPolicies
                 ->where('id', (int) $selectedPolicyId)
                 ->values();
@@ -84,7 +81,7 @@ class ScopeResolver
         $result = [];
         foreach ($employees as $employee) {
             $matching = $policies
-                ->filter(fn(ScopePolicy $policy) => $this->policyMatchesEmployee($policy, $employee))
+                ->filter(fn (ScopePolicy $policy) => $this->policyMatchesEmployee($policy, $employee))
                 ->values();
 
             if ($matching->isEmpty()) {
@@ -106,12 +103,12 @@ class ScopeResolver
                 return $b->id <=> $a->id;
             })->first();
 
-            if (!$winner) {
+            if (! $winner) {
                 continue;
             }
 
             $actorRecord = $winner->actors->firstWhere('actor_employee_id', $actorEmployee->id);
-            if (!$actorRecord) {
+            if (! $actorRecord) {
                 continue;
             }
 
@@ -119,7 +116,7 @@ class ScopeResolver
             $canApprove = (bool) $actorRecord->can_approve;
             $canRevise = (bool) $actorRecord->can_revise;
 
-            if (!$canFill && !$canApprove && !$canRevise) {
+            if (! $canFill && ! $canApprove && ! $canRevise) {
                 continue;
             }
 
@@ -131,6 +128,40 @@ class ScopeResolver
             ];
         }
 
+        if ($context === 'time_sheet') {
+            // Match the legacy ownership rule: an employee assigned to another
+            // manager's active scope is not visible unless this actor explicitly
+            // owns that employee through an employee-type policy.
+            $explicitlyAllowedIds = [];
+            $disallowedIds = [(int) $actorEmployee->id];
+            foreach ($policies as $policy) {
+                $actorRecord = $policy->actors->firstWhere('actor_employee_id', $actorEmployee->id);
+                if ($actorRecord && $policy->match_type === ScopePolicy::MATCH_EMPLOYEE) {
+                    $explicitlyAllowedIds = array_merge($explicitlyAllowedIds, $this->matchedEmployeeIdsForPolicy($policy));
+                }
+
+                foreach ($policy->actors as $policyActor) {
+                    if ((int) $policyActor->actor_employee_id === (int) $actorEmployee->id) {
+                        continue;
+                    }
+
+                    $disallowedIds[] = (int) $policyActor->actor_employee_id;
+                    foreach ($employees as $employee) {
+                        if ($this->policyMatchesEmployee($policy, $employee)) {
+                            $disallowedIds[] = (int) $employee->id;
+                        }
+                    }
+                }
+            }
+
+            $explicitlyAllowedLookup = array_fill_keys(array_map('intval', $explicitlyAllowedIds), true);
+            foreach (array_unique(array_map('intval', $disallowedIds)) as $employeeId) {
+                if (! isset($explicitlyAllowedLookup[$employeeId])) {
+                    unset($result[$employeeId]);
+                }
+            }
+        }
+
         ksort($result);
 
         return $result;
@@ -140,10 +171,9 @@ class ScopeResolver
         User $user,
         string $context = 'time_sheet',
         ?int $selectedPolicyId = null
-    ): Collection
-    {
+    ): Collection {
         return collect(array_keys($this->resolveEmployeeAccessMap($user, $context, $selectedPolicyId)))
-            ->map(fn($id) => (int) $id)
+            ->map(fn ($id) => (int) $id)
             ->values();
     }
 
@@ -151,8 +181,7 @@ class ScopeResolver
         User $user,
         string $context = 'time_sheet',
         ?int $selectedPolicyId = null
-    ): Builder
-    {
+    ): Builder {
         $ids = $this->resolveVisibleEmployeeIds($user, $context, $selectedPolicyId);
         if ($ids->isEmpty()) {
             return Employee::query()->whereRaw('0 = 1');
@@ -164,7 +193,7 @@ class ScopeResolver
     public function selectablePolicies(User $user, string $context = 'time_sheet'): Collection
     {
         $actorEmployee = $this->actorResolver->resolveEmployee($user);
-        if (!$actorEmployee) {
+        if (! $actorEmployee) {
             return collect();
         }
 
@@ -181,7 +210,7 @@ class ScopeResolver
             })
             ->orderBy('id')
             ->pluck('policy_id')
-            ->map(fn($id) => (int) $id)
+            ->map(fn ($id) => (int) $id)
             ->unique()
             ->values();
 
@@ -196,7 +225,7 @@ class ScopeResolver
             ->keyBy('id');
 
         return $policyIds
-            ->map(fn(int $policyId) => $policiesById->get($policyId))
+            ->map(fn (int $policyId) => $policiesById->get($policyId))
             ->filter()
             ->values();
     }
@@ -211,7 +240,7 @@ class ScopeResolver
             return null;
         }
 
-        if (!is_null($requestedPolicyId) && $requestedPolicyId > 0) {
+        if (! is_null($requestedPolicyId) && $requestedPolicyId > 0) {
             $requested = $selectablePolicies->firstWhere('id', (int) $requestedPolicyId);
             if ($requested) {
                 return (int) $requested->id;
@@ -264,8 +293,8 @@ class ScopeResolver
 
             case ScopePolicy::MATCH_EMPLOYEE:
                 $targetIds = collect($policy->target_employee_ids ?? [])
-                    ->map(fn($id) => (int) $id)
-                    ->filter(fn($id) => $id > 0)
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => $id > 0)
                     ->unique()
                     ->values();
 
@@ -279,7 +308,7 @@ class ScopeResolver
                 return [];
         }
 
-        return $query->pluck('id')->map(fn($id) => (int) $id)->all();
+        return $query->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     private function policyMatchesEmployee(ScopePolicy $policy, Employee $employee): bool
@@ -312,7 +341,8 @@ class ScopeResolver
                 return (int) $policy->center_id === (int) $employee->center_id;
 
             case ScopePolicy::MATCH_EMPLOYEE:
-                $targetIds = collect($policy->target_employee_ids ?? [])->map(fn($id) => (int) $id);
+                $targetIds = collect($policy->target_employee_ids ?? [])->map(fn ($id) => (int) $id);
+
                 return $targetIds->contains((int) $employee->id);
 
             default:

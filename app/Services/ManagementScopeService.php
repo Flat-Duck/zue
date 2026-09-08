@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\ManagementScope;
+use App\Models\ScopePolicy;
+use App\Models\ScopePolicyActor;
 use Illuminate\Support\Facades\DB;
 
 class ManagementScopeService
@@ -56,11 +58,11 @@ class ManagementScopeService
                     break;
 
                 case ManagementScope::TYPE_EMPLOYEE:
-                    if (!empty($subIds)) {
+                    if (! empty($subIds)) {
                         // Filter out any IDs that might be in the manager list to prevent self-management
                         $validSubIds = array_diff($subIds, $managerIds);
 
-                        if (!empty($validSubIds)) {
+                        if (! empty($validSubIds)) {
                             $newSettings = (array) $settings;
                             $newSettings['target_employee_ids'] = array_values($validSubIds);
 
@@ -84,7 +86,7 @@ class ManagementScopeService
 
         // Explicitly extract fields for update
         $updateData = [
-            'manager_id' => !empty($managerIds) ? $managerIds[0] : $scope->manager_id,
+            'manager_id' => ! empty($managerIds) ? $managerIds[0] : $scope->manager_id,
             'name' => array_key_exists('name', $data) ? $data['name'] : $scope->name,
             'template' => $data['template'] ?? $scope->template,
             'context' => $data['context'] ?? $scope->context,
@@ -97,7 +99,7 @@ class ManagementScopeService
         $subIds = $data['subordinate_employee_ids'] ?? [];
         $settings = $data['settings'] ?? $scope->settings;
 
-        if ($updateData['scope_type'] === ManagementScope::TYPE_EMPLOYEE && !empty($subIds)) {
+        if ($updateData['scope_type'] === ManagementScope::TYPE_EMPLOYEE && ! empty($subIds)) {
             $validSubIds = array_diff($subIds, $managerIds);
             $settings = (array) $settings;
             $settings['target_employee_ids'] = array_values($validSubIds);
@@ -112,9 +114,22 @@ class ManagementScopeService
         DB::transaction(function () use ($scope, $updateData, $managerIds) {
             $scope->update($updateData);
 
-            if (!empty($managerIds)) {
+            if (! empty($managerIds)) {
                 $scope->managers()->sync($managerIds);
             }
+
+            $this->syncAuthoritativePolicy(
+                $scope->refresh(),
+                ! empty($managerIds) ? $managerIds : [$scope->manager_id]
+            );
+        });
+    }
+
+    public function deleteScope(ManagementScope $scope): void
+    {
+        DB::transaction(function () use ($scope): void {
+            $this->findAuthoritativePolicy($scope)?->update(['is_active' => false]);
+            $scope->delete();
         });
     }
 
@@ -135,8 +150,74 @@ class ManagementScopeService
             ], $attributes));
 
             $scope->managers()->attach($managerIds);
+            $this->syncAuthoritativePolicy($scope, $managerIds);
 
             return $scope;
         });
+    }
+
+    /**
+     * Synchronize the V2 policy store used for authorization decisions.
+     * The legacy row remains available until existing data is imported.
+     *
+     * @param  array<int, int|string>  $managerIds
+     */
+    private function syncAuthoritativePolicy(ManagementScope $scope, array $managerIds): void
+    {
+        $settings = is_array($scope->settings) ? $scope->settings : [];
+        $targetIds = collect($settings['target_employee_ids'] ?? [])
+            ->map(fn ($id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($scope->subordinate_employee_id) {
+            $targetIds[] = (int) $scope->subordinate_employee_id;
+            $targetIds = array_values(array_unique($targetIds));
+        }
+
+        $policy = $this->findAuthoritativePolicy($scope);
+        $attributes = [
+            'name' => $scope->name ?: ('Management Scope #'.$scope->id),
+            'context' => $scope->context ?: 'general',
+            'match_type' => (string) $scope->scope_type,
+            'location_id' => $scope->location_id,
+            'department_id' => $scope->department_id,
+            'center_id' => $scope->center_id,
+            'target_employee_ids' => $scope->scope_type === ManagementScope::TYPE_EMPLOYEE ? $targetIds : null,
+            'priority' => 0,
+            'is_active' => true,
+            'settings' => array_merge($settings, ['legacy_scope_id' => (int) $scope->id]),
+        ];
+
+        if ($policy) {
+            $policy->update($attributes);
+        } else {
+            $policy = ScopePolicy::query()->create($attributes);
+        }
+
+        ScopePolicyActor::query()->where('policy_id', $policy->id)->delete();
+
+        foreach (array_unique(array_map('intval', $managerIds)) as $managerId) {
+            if ($managerId < 1) {
+                continue;
+            }
+
+            ScopePolicyActor::query()->create([
+                'policy_id' => $policy->id,
+                'actor_employee_id' => $managerId,
+                'can_fill' => true,
+                'can_approve' => true,
+                'can_revise' => true,
+            ]);
+        }
+    }
+
+    private function findAuthoritativePolicy(ManagementScope $scope): ?ScopePolicy
+    {
+        return ScopePolicy::query()
+            ->where('settings->legacy_scope_id', (int) $scope->id)
+            ->first();
     }
 }

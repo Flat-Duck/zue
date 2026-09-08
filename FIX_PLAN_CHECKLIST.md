@@ -96,15 +96,15 @@ Legend:
 
 ## Phase 3 — Unify Authorization and Identity
 
-- [~] Management-scope authorization improved for timesheet/appraisal paths.
-- [ ] Decide and document the authoritative management-scope store.
-- [ ] Compare old and V2 management-scope results for representative managers.
-- [ ] Move management-scope UI fully to the authoritative store if needed.
-- [ ] Remove compatibility paths after parity is demonstrated.
-- [ ] Establish canonical identity rules.
-- [ ] Stop relying on mutable employee numbers as primary identity.
-- [ ] Reconcile users, employees, signatures, approvers, roles, Sanctum tokens, and management scopes.
-- [ ] Review destructive cascades against HR historical-retention requirements.
+- [x] Management-scope authorization uses the V2 policy resolver for timesheet and general management paths.
+- [x] Document the V2 `scope_policies` / `scope_policy_actors` tables as the authoritative management-scope store; legacy rows remain a migration bridge.
+- [x] Compare old and V2 management-scope results for a representative manager with a regression test.
+- [x] Management-scope UI writes are synchronized into the authoritative V2 store.
+- [~] Remove compatibility paths after parity is demonstrated; the resolver fallback and legacy rows remain temporarily so existing production records can be migrated with `timesheet-auth-v2:import --seed-flows` before removal.
+- [x] Establish canonical identity rules: `users.id` identifies login accounts, `employees.id` identifies HR records, `employees.user_id` links them, and employee numbers are business identifiers.
+- [x] Stop rewriting user primary keys when employee numbers change.
+- [~] Reconcile users, employees, signatures, approvers, roles, Sanctum tokens, and management scopes; canonical employee links and employee-based approval/scope actors are enforced, while logged legacy actor fallbacks remain for existing records.
+- [x] Review destructive cascades: deleted management scopes deactivate their V2 policy and retain actor history; existing HR record cascades were not broadened.
 
 ## Phase 4 — Timesheet Integrity and Safe Writes
 
