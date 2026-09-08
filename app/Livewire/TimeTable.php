@@ -6,30 +6,42 @@ use App\Helpers\MomentsJs;
 use App\Helpers\TimeSheetBuilder;
 use App\Jobs\CalculateBalance;
 use App\Models\Employee;
+use App\Models\TimeSheet;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class TimeTable extends Component
 {
     public $years = [];
+
     public $ov = 0;
+
     public $year = 2025;
+
     public $times = [];
+
     // public $number = 1 ;
     public $range;
+
     public $val;
+
     public $dep_employees = [];
+
     public Employee $employee;
+
     public bool $revise = false;
 
-    function boot()
+    public function boot(): void
     {
         //  $this->year = now()->year;
     }
 
-    function mount()
+    public function mount(): void
     {
+        Gate::authorize('view', $this->employee);
         $this->year = now()->year;
         if ($this->employee->id > 0) {
             $this->getOtherEmployees();
@@ -38,20 +50,25 @@ class TimeTable extends Component
         $this->updateUi();
     }
 
-    private function valid()
+    private function valid(): bool
     {
 
         if (is_null($this->range) || is_null($this->val)) {
             return false;
         }
+
         return true;
     }
-    public function save()
-    {
-       // dd($this->ov);
 
-        if (!$this->valid()) {
-            dd("Not Valid");
+    public function save(): void
+    {
+        Gate::authorize('create', TimeSheet::class);
+
+        if (! $this->valid()) {
+            throw ValidationException::withMessages([
+                'range' => 'A valid date or date range is required.',
+                'val' => 'An attendance value is required.',
+            ]);
         }
 
         if (str_contains($this->range, 'to')) {
@@ -66,8 +83,10 @@ class TimeTable extends Component
         CalculateBalance::dispatch($this->employee);
         $this->loadByYear();
     }
-    public function destroy()
+
+    public function destroy(): void
     {
+        Gate::authorize('delete', new TimeSheet(['employee_id' => $this->employee->id]));
 
         if (str_contains($this->range, 'to')) {
             $period = MomentsJs::getRange($this->range);
@@ -85,23 +104,23 @@ class TimeTable extends Component
     public function render()
     {
         $this->loadByYear();
+
         return view('livewire.time-table')->with(
             [
-            'employee' => $this->employee,
-            'times' => $this->times,
-            'years' => $this->years
+                'employee' => $this->employee,
+                'times' => $this->times,
+                'years' => $this->years,
             ]
         );
     }
 
-
-    function loadByYear()
+    public function loadByYear(): void
     {
         $this->times = TimeSheetBuilder::build($this->year, $this->employee->id);
         $this->updateUi();
     }
 
-    function updateUi()
+    public function updateUi(): void
     {
         $this->years[0] = $this->year - 1;
         $this->years[1] = $this->year;
@@ -109,22 +128,25 @@ class TimeTable extends Component
     }
 
     #[On('employee-found')]
-    function employee(Employee $employee)
+    public function employee(Employee $employee): void
     {
+        Gate::authorize('view', $employee);
         Debugbar::critical('called');
         $this->employee = $employee;
         $this->loadByYear();
         $this->getOtherEmployees();
     }
-    function updateyear($val)
+
+    public function updateyear(int $val): void
     {
         $this->year += $val;
         $this->loadByYear();
         $this->updateUi();
     }
-    function getOtherEmployees()
+
+    public function getOtherEmployees(): void
     {
         $this->dep_employees = $this->employee->center->employees()->pluck('id', 'number');
-        //dd($this->dep_employees);
+        // dd($this->dep_employees);
     }
 }

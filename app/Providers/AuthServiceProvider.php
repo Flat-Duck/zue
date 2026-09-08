@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,10 +23,15 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Automatically finding the Policies
         Gate::guessPolicyNamesUsing(function ($modelClass) {
-            return 'App\\Policies\\' . class_basename($modelClass) . 'Policy';
+            return 'App\\Policies\\'.class_basename($modelClass).'Policy';
         });
 
         $this->registerPolicies();
+
+        Gate::define('maintenance', function ($user): bool {
+            return $user->isSuperAdmin()
+                || $user->permissions()->where('name', 'manage maintenance')->exists();
+        });
 
         // Implicitly grant "Super Admin" role all permission checks using can()
         Gate::before(function ($user, $ability) {

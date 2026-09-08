@@ -1,34 +1,33 @@
 <?php
 
+use App\Http\Controllers\AdministrationController;
+use App\Http\Controllers\CenterController;
 use App\Http\Controllers\ClinicApointmentController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\FlightController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ManagementScopeController;
+use App\Http\Controllers\OccupationalInjuryReportController;
+use App\Http\Controllers\OperationsController;
+use App\Http\Controllers\PassengerController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlaneController;
-use App\Http\Controllers\RunController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ResidenceController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\TimeSheetController;
+use App\Http\Controllers\UserController;
 use App\Imports\RoomsImport;
 use App\Models\Employee;
 use App\Models\Residence;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RoomController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\CenterController;
-use App\Http\Controllers\FlightController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\PassengerController;
-use App\Http\Controllers\ResidenceController;
-use App\Http\Controllers\TimeSheetController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\OperationsController;
-use App\Http\Controllers\MaintenanceController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\AdministrationController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReportController;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Controllers\OccupationalInjuryReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,7 +55,7 @@ Route::post('/rr', function () {
     Excel::import(new RoomsImport, request()->file('rooms'));
 
     return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days', 'employees'));
-})->name('rr');
+})->middleware(['auth', 'can:maintenance'])->name('rr');
 // Route::get('/ss', function () {
 
 //     $month_name = "April";
@@ -85,26 +84,20 @@ Route::prefix('/')
     ->middleware('auth')
 
     ->group(function () {
-Route::get('time-sheets/approve_preview', [TimeSheetController::class, 'approve_preview'])->name('time-sheets.approve_preview');
-Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
-Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
+        Route::get('time-sheets/approve_preview', [TimeSheetController::class, 'approve_preview'])->name('time-sheets.approve_preview');
+        Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
+        Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
 
+        Route::get('/', [HomeController::class, 'index'])->name('home1');
 
-Route::get('/', [HomeController::class, 'index'])->name('home1');
+        Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
 
-Route::post('time-sheets/print', [TimeSheetController::class, 'print'])->name('time-sheets.print');
+        Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
+        Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
+        Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
+        Route::resource('time-sheets', TimeSheetController::class);
 
-
-Route::get('time-sheets/print_preview', [TimeSheetController::class, 'print_preview'])->name('time-sheets.print_preview');
-Route::get('time-sheets/create/{employee}', [TimeSheetController::class, 'create'])->name('time-sheets.fill');
-Route::get('time-sheets/edit/{employee}', [TimeSheetController::class, 'edit'])->name('time-sheets.revise');
-Route::resource('time-sheets', TimeSheetController::class);
-
-
-
-
-
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+        Route::get('/home', [HomeController::class, 'index'])->name('home');
 
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
@@ -119,8 +112,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
         Route::get('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
         Route::get('clinic/history/{employee}', [ClinicApointmentController::class, 'history'])->name('clinic.history');
         Route::get('clinic/diagnosis/{employee}', [ClinicApointmentController::class, 'diagnosis'])->name('clinic.diagnosis');
-        Route::resource('clinic', ClinicApointmentController::class);//->name('clinic');
-    
+        Route::resource('clinic', ClinicApointmentController::class); // ->name('clinic');
 
         Route::resource('departments', DepartmentController::class);
         Route::delete('flights/{flight}/approve', [FlightController::class, 'approve'])->name('flights.approve');
@@ -169,4 +161,4 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
         Route::post('maintenance/quick-backup', [MaintenanceController::class, 'runQuickBackup'])->name('maintenance.quick-backup');
     });
 
-include __DIR__ . '/appraisals.php';
+include __DIR__.'/appraisals.php';

@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\PerformBackupJob;
+use App\Models\BackupLog;
+use App\Models\MaintenanceSetting;
+use App\Services\BackupService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
-use App\Services\BackupService;
-use App\Models\MaintenanceSetting;
-use App\Models\BackupLog;
-use App\Jobs\PerformBackupJob;
+use Illuminate\Support\Str;
 
 class MaintenanceController extends Controller
 {
@@ -24,12 +24,14 @@ class MaintenanceController extends Controller
 
     public function index()
     {
+        $this->authorize('maintenance');
+
         $backups = Storage::disk('local')->files('backups');
         $backups = array_map(function ($file) {
             return [
                 'name' => basename($file),
                 'path' => $file,
-                'size' => round(Storage::disk('local')->size($file) / 1024, 2) . ' KB',
+                'size' => round(Storage::disk('local')->size($file) / 1024, 2).' KB',
                 'created_at' => Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file))->toDateTimeString(),
             ];
         }, $backups);
@@ -40,7 +42,7 @@ class MaintenanceController extends Controller
 
         $tables = DB::select('SHOW TABLES');
         $dbName = config('database.connections.mysql.database');
-        $tableKey = 'Tables_in_' . $dbName;
+        $tableKey = 'Tables_in_'.$dbName;
         $tables = array_map(function ($table) use ($tableKey) {
             return $table->$tableKey;
         }, $tables);
@@ -67,14 +69,22 @@ class MaintenanceController extends Controller
             'logs' => $logs,
             'stats' => [
                 'total_count' => count($backups),
-                'total_size' => round($totalSize / 1024, 2) . ' MB',
+                'total_size' => round($totalSize / 1024, 2).' MB',
                 'storage_path' => storage_path('app/backups'),
-            ]
+            ],
         ]);
     }
 
     public function export(Request $request)
     {
+        $this->authorize('maintenance');
+
+        $request->validate([
+            'type' => ['nullable', 'in:structure,data,both'],
+            'tables' => ['nullable', 'array'],
+            'tables.*' => ['string', 'regex:/^[A-Za-z0-9_]+$/'],
+        ]);
+
         $type = $request->input('type', 'both');
         $selectedTables = $request->input('tables', []);
 
@@ -91,16 +101,18 @@ class MaintenanceController extends Controller
         }
 
         $sql = $this->backupService->performBackup($type, $selectedTables, false);
-        $filename = "export_" . now()->format('Ymd_His') . ".sql";
+        $filename = 'export_'.now()->format('Ymd_His').'.sql';
 
         return response($sql, 200, [
             'Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
     public function updateSettings(Request $request)
     {
+        $this->authorize('maintenance');
+
         $request->validate([
             'backup_interval' => 'required|in:daily,weekly,monthly',
             'backup_time' => 'required',
@@ -117,6 +129,8 @@ class MaintenanceController extends Controller
 
     public function runQuickBackup()
     {
+        $this->authorize('maintenance');
+
         $log = BackupLog::create([
             'type' => 'quick',
             'status' => 'pending',
@@ -133,52 +147,75 @@ class MaintenanceController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'sql_file' => 'required|file',
+            'sql_file' => ['required', 'file', 'max:512000', 'mimetypes:text/plain,application/sql,application/octet-stream'],
         ]);
+
+        $this->authorize('maintenance');
 
         $path = $request->file('sql_file')->getRealPath();
         $sql = file_get_contents($path);
 
         try {
             DB::unprepared($sql);
+
             return redirect()->back()->with('success', 'Import completed successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Import failed: '.$e->getMessage());
         }
     }
 
     public function restore($filename)
     {
-        if (!Storage::disk('local')->exists('backups/' . $filename)) {
+        $this->authorize('maintenance');
+
+        abort_unless($this->isSafeBackupFilename($filename), 404);
+
+        if (! Storage::disk('local')->exists('backups/'.$filename)) {
             return redirect()->back()->with('error', 'Backup file not found.');
         }
 
-        $sql = Storage::disk('local')->get('backups/' . $filename);
+        $sql = Storage::disk('local')->get('backups/'.$filename);
 
         try {
             DB::unprepared($sql);
-            return redirect()->back()->with('success', 'Database restored successfully from ' . $filename);
+
+            return redirect()->back()->with('success', 'Database restored successfully from '.$filename);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Restore failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Restore failed: '.$e->getMessage());
         }
     }
 
     public function download($filename)
     {
-        if (!Storage::disk('local')->exists('backups/' . $filename)) {
+        $this->authorize('maintenance');
+
+        abort_unless($this->isSafeBackupFilename($filename), 404);
+
+        if (! Storage::disk('local')->exists('backups/'.$filename)) {
             abort(404);
         }
 
-        return response()->download(storage_path('app/backups/' . $filename));
+        return response()->download(storage_path('app/backups/'.$filename));
     }
 
     public function delete($filename)
     {
-        if (Storage::disk('local')->exists('backups/' . $filename)) {
-            Storage::disk('local')->delete('backups/' . $filename);
+        $this->authorize('maintenance');
+
+        abort_unless($this->isSafeBackupFilename($filename), 404);
+
+        if (Storage::disk('local')->exists('backups/'.$filename)) {
+            Storage::disk('local')->delete('backups/'.$filename);
+
             return redirect()->back()->with('success', 'Backup deleted.');
         }
 
         return redirect()->back()->with('error', 'Backup file not found.');
+    }
+
+    private function isSafeBackupFilename(string $filename): bool
+    {
+        return Str::is(['backup_*.sql', 'export_*.sql'], $filename)
+            && basename($filename) === $filename;
     }
 }

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Employee;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EmployeeFactory extends Factory
@@ -23,7 +22,7 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => $this->faker->randomNumber(),
+            'number' => $this->faker->unique()->numberBetween(100000, 999999),
             'job' => $this->faker->text(255),
             'english_name' => $this->faker->text(255),
             'id_card' => $this->faker->text(255),
@@ -34,11 +33,11 @@ class EmployeeFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->email(),
             'transfered_balance' => $this->faker->randomNumber(0),
-            'schedule' => $this->faker->text(255),
-            'start_date' => $this->faker->date(),
-            'last_date' => $this->faker->date(),
+            'schedule' => '5/5',
+            'start_date' => now()->subYear()->toDateString(),
+            'last_date' => null,
             'total_balance' => $this->faker->randomNumber(0),
-            'archived_at' => $this->faker->dateTime(),
+            'archived_at' => null,
             'user_id' => \App\Models\User::factory(),
             'department_id' => \App\Models\Department::factory(),
             'location_id' => \App\Models\Location::factory(),
