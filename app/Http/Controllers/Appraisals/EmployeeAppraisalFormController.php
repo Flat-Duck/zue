@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
 use App\Models\Appraisals\AppraisalForm;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 
 class EmployeeAppraisalFormController extends Controller
 {
     public function edit(Employee $employee)
     {
+        $this->authorize('update', $employee);
+
         $forms = AppraisalForm::query()
             ->where('is_active', true)
             ->orderBy('name_ar')
@@ -23,6 +25,8 @@ class EmployeeAppraisalFormController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
+        $this->authorize('update', $employee);
+
         $data = $request->validate([
             'appraisal_form_id' => 'nullable|exists:appraisal_forms,id',
         ]);

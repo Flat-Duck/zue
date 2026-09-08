@@ -8,7 +8,6 @@ use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Employee;
 use App\Services\Appraisals\AppraisalFinalizeService;
 use Carbon\Carbon;
-
 use Illuminate\Http\Request;
 
 class AppraisalOfficialController extends Controller
@@ -19,7 +18,7 @@ class AppraisalOfficialController extends Controller
         $year = $request->get('year', now()->year);
 
         $officialAppraisals = AppraisalOfficial::with(['employee', 'period'])
-            ->whereHas('period', fn($query) => $query->where('year', $year)->where('type', 'yearly'))
+            ->whereHas('period', fn ($query) => $query->where('year', $year)->where('type', 'yearly'))
             ->when($q, function ($query) use ($q) {
                 $query->whereHas('employee', function ($sub) use ($q) {
                     $sub->where('first_name', 'like', "%{$q}%")
@@ -45,7 +44,7 @@ class AppraisalOfficialController extends Controller
             'scores.formVersionItem.item',
             'period',
             'manager.signature',
-            'hr.signature'
+            'hr.signature',
         ])->where('appraisal_period_id', $period->id)
             ->where('employee_id', $employee->id)
             ->first();
@@ -80,7 +79,8 @@ class AppraisalOfficialController extends Controller
 
     public function finalize(AppraisalFinalizeService $service, AppraisalPeriod $period, Employee $employee)
     {
-        // هنا افتراضياً أي HR/مدير يقدر يفنّلز، انت زيد Policy لو تبي
+        $this->authorizeOfficialManagement();
+
         $official = $service->finalizeForEmployee($period, $employee->id, $this->currentEmployeeId());
 
         return redirect()->route('appraisals.official.show', [$period->id, $employee->id])
@@ -97,30 +97,39 @@ class AppraisalOfficialController extends Controller
         $user = auth()->user();
 
         if ($type === 'employee') {
-            if ($user->employee_id !== $official->employee_id) {
+            if ((int) optional($user->employee)->id !== (int) $official->employee_id) {
                 abort(403, 'Unauthorized');
             }
             $official->update(['employee_signed_at' => now()]);
         } elseif ($type === 'manager') {
-            // Simple check: user must be manager role or the actual manager
-            // For now, let's allow anyone with 'manager' role or 'supervisor'
-            if (!$user->hasRole('manager') && !$user->hasRole('supervisor')) {
-                // Relaxed for demo, or you can check exact hierarchy
+            if (! $user->hasAnyRole(['manager', 'supervisor', 'superintendent', 'fieldcoordinator'])) {
+                abort(403, 'Only an authorized manager may approve.');
             }
             $official->update([
                 'manager_user_id' => $user->id,
-                'manager_signed_at' => now()
+                'manager_signed_at' => now(),
             ]);
         } elseif ($type === 'hr') {
-            if (!$user->hasRole('hr') && !$user->hasRole('admin')) {
+            if (! $user->hasAnyRole(['hr', 'admin', 'super-admin'])) {
                 abort(403, 'Only HR or Admin');
             }
             $official->update([
                 'hr_user_id' => $user->id,
-                'hr_signed_at' => now()
+                'hr_signed_at' => now(),
             ]);
+        } else {
+            abort(422, 'Invalid approval type.');
         }
 
         return back()->with('success', 'Approved successfully.');
+    }
+
+    private function authorizeOfficialManagement(): void
+    {
+        abort_unless(
+            auth()->user()->hasAnyRole(['hr', 'admin', 'super-admin']),
+            403,
+            'Only HR or Admin may manage official appraisals.'
+        );
     }
 }
