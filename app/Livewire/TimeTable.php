@@ -2,11 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Helpers\MomentsJs;
 use App\Helpers\TimeSheetBuilder;
-use App\Jobs\CalculateBalance;
 use App\Models\Employee;
 use App\Models\TimeSheet;
+use App\Services\TimeSheetMutationService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
@@ -59,7 +58,7 @@ class TimeTable extends Component
         return true;
     }
 
-    public function save(): void
+    public function save(TimeSheetMutationService $timeSheetMutationService): void
     {
         $this->authorizeEmployeeMutation();
         Gate::authorize('create', TimeSheet::class);
@@ -71,34 +70,22 @@ class TimeTable extends Component
             ]);
         }
 
-        if (str_contains($this->range, 'to')) {
-            $period = MomentsJs::getRange($this->range);
-
-            foreach ($period as $dt) {
-                TimeSheetBuilder::create($dt, $this->employee->id, $this->val, $this->ov);
-            }
-        } else {
-            TimeSheetBuilder::create($this->range, $this->employee->id, $this->val, $this->ov);
-        }
-        CalculateBalance::dispatch($this->employee);
+        $timeSheetMutationService->fillDateOrRange(
+            $this->employee,
+            (string) $this->range,
+            (string) $this->val,
+            (int) $this->ov,
+            auth()->user()
+        );
         $this->loadByYear();
     }
 
-    public function destroy(): void
+    public function destroy(TimeSheetMutationService $timeSheetMutationService): void
     {
         $this->authorizeEmployeeMutation();
         Gate::authorize('delete', new TimeSheet(['employee_id' => $this->employee->id]));
 
-        if (str_contains($this->range, 'to')) {
-            $period = MomentsJs::getRange($this->range);
-
-            foreach ($period as $dt) {
-                TimeSheetBuilder::destroy($dt, $this->employee->id);
-            }
-        } else {
-            TimeSheetBuilder::destroy($this->range, $this->employee->id);
-        }
-        CalculateBalance::dispatch($this->employee);
+        $timeSheetMutationService->deleteDateOrRange($this->employee, (string) $this->range);
         $this->loadByYear();
     }
 

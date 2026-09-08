@@ -113,17 +113,18 @@ Legend:
 - [x] Stop `TimeTable` from reloading yearly timesheet data on every render.
 - [x] Remove production debug logging from `TimeTable` employee switching.
 - [x] Remove broken resource create/edit routes that conflicted with employee-specific timesheet routes.
-- [~] Timesheet authorization service integration exists and focused tests pass.
-- [ ] Create a central timesheet mutation service for create/revise/delete/audit/balance/approval behavior.
-- [ ] Define action-specific permissions for fill, revise, approve, and delete.
-- [ ] Normalize and validate attendance values in one mutation path.
-- [ ] Validate schedule ratios and overtime in the mutation path.
-- [ ] Prevent unauthorized timesheet employee reassignment explicitly.
-- [ ] Make approval operations transactional with conditional updates/locks where justified.
-- [ ] Make monthly approval-step creation idempotent.
-- [ ] Convert remaining state-changing approval GET operations to POST with CSRF where applicable.
+- [x] Timesheet authorization service integration exists and focused tests pass.
+- [x] Create a central timesheet mutation service for create/revise/delete/audit/balance/approval behavior.
+- [x] Define action-specific permissions for fill, revise, approve, and delete.
+- [x] Normalize and validate attendance values in one mutation path.
+- [x] Validate schedule ratios and overtime in the mutation path.
+- [x] Prevent unauthorized timesheet employee reassignment explicitly.
+- [x] Make approval operations transactional with conditional updates/locks where justified.
+- [x] Make monthly approval-step creation idempotent under concurrent requests by locking employee rows.
+- [x] Convert remaining state-changing approval GET operations to POST with CSRF where applicable.
 - [ ] Reconcile duplicate `employee_id + day` rows before adding a uniqueness constraint.
-- [ ] Add concurrency/double-approval/reassignment tests.
+- [~] Add concurrency/double-approval/reassignment tests.
+  - Reassignment, idempotent writes, and conditional approval behavior are covered; a database-level concurrent worker test remains pending.
 
 ## Phase 5 — Remove Measured Query Inefficiencies
 
@@ -258,18 +259,21 @@ Legend:
   - `tests/Feature/Controllers/UserControllerTest.php`
   - `tests/Feature/MaintenanceAuthorizationTest.php`
   - `tests/Feature/TimeSheetAuthorizationServiceTest.php`
+- [x] Phase 4 focused verification:
+  - `tests/Feature/TimeSheetMutationServiceTest.php`
+  - `tests/Feature/TimeSheetApprovalRouteTest.php`
+  - 10 tests passed, 26 assertions.
 - [x] Result: `54 passed`, `1 risky existing RoomController test`, `111 assertions`.
 - [ ] PHPStan/Larastan could not be run because it is not installed.
 
 ## Highest-Value Remaining Implementation Order
 
-1. Finish timesheet mutation service and approval transaction/idempotency work.
-2. Reconcile duplicate timesheet rows and add the `employee_id + day` uniqueness constraint if business rules confirm it.
-3. Finish management-scope/identity reconciliation before changing identity constraints.
-4. Add query-budget/performance measurements for employee, timesheet, report, dashboard, and clinic pages.
-5. Finish backup restore verification using a disposable database.
-6. Finish appraisal version freezing and scoring business-rule tests.
-7. Queue large exports/yearly appraisal aggregation only where production size justifies it.
-8. Run dependency audits and patch approved compatible security updates.
-9. Add PHPStan/Larastan baseline after dependency approval.
-10. Reassess Octane only after the PHP-FPM app is secure, stable, and measured.
+1. Reconcile duplicate timesheet rows and add the `employee_id + day` uniqueness constraint if business rules confirm it.
+2. Finish management-scope/identity reconciliation before changing identity constraints.
+3. Add query-budget/performance measurements for employee, timesheet, report, dashboard, and clinic pages.
+4. Finish backup restore verification using a disposable database.
+5. Finish appraisal version freezing and scoring business-rule tests.
+6. Queue large exports/yearly appraisal aggregation only where production size justifies it.
+7. Run dependency audits and patch approved compatible security updates.
+8. Add PHPStan/Larastan baseline after dependency approval.
+9. Reassess Octane only after the PHP-FPM app is secure, stable, and measured.

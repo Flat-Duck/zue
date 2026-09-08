@@ -3,23 +3,32 @@
 namespace App\Helpers;
 
 use App\Models\Center;
+use App\Models\Employee;
 use App\Models\TimeSheet;
+use App\Services\TimeSheetAuth\ActorResolver;
+use App\Services\TimeSheetMutationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class TimeSheetBuilder
 {
-    public static function create($day, int $employee_id, string $value, int $over_time)
+    public static function create($day, int $employee_id, string $value, int $over_time): TimeSheet
     {
-        return TimeSheet::firstOrCreate(
-            ['day' => $day, 'employee_id' => $employee_id],
-            ['value' => $value, 'user_id' => auth()->id(), 'over_time' => $over_time]
+        return app(TimeSheetMutationService::class)->createForEmployee(
+            Employee::query()->findOrFail($employee_id),
+            $day,
+            $value,
+            $over_time,
+            auth()->user()
         );
     }
 
-    public static function destroy($day, int $employee_id)
+    public static function destroy($day, int $employee_id): int
     {
-        return TimeSheet::where(['day' => $day, 'employee_id' => $employee_id])->delete();
+        return app(TimeSheetMutationService::class)->deleteDateOrRange(
+            Employee::query()->findOrFail($employee_id),
+            (string) $day
+        );
     }
 
     public static function build(int $year, int $employee_id)
@@ -168,6 +177,18 @@ class TimeSheetBuilder
 
     public static function approvrTimeSheets($employee_id, $approved_by)
     {
-        return TimeSheet::where('employee_id', $employee_id)->update([$approved_by => auth()->id()]);
+        if (! in_array($approved_by, ['timekeeper_id', 'supervisor_id', 'superintendent_id'], true)) {
+            return 0;
+        }
+
+        $actor = app(ActorResolver::class)->resolveEmployee(auth()->user());
+
+        if (! $actor) {
+            abort(403);
+        }
+
+        return TimeSheet::where('employee_id', $employee_id)
+            ->whereNull($approved_by)
+            ->update([$approved_by => $actor->id]);
     }
 }

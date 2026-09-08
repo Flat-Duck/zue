@@ -342,12 +342,20 @@
                                             {{ $stage['signature']['name'] ?? '' }}
                                         </div>
                                     @elseif(!empty($stage['can_approve']))
-                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                            class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => $stage['key'], 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
-                                            <i class="ti ti-check"></i>
-                                            @lang('crud.common.time_sheet_approve')
-                                        </a>
+                                        <form method="POST" action="{{ route('time-sheets.approves') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="level" value="{{ $stage['key'] }}">
+                                            <input type="hidden" name="month" value="{{ $selected_month }}">
+                                            <input type="hidden" name="year" value="{{ $selected_year }}">
+                                            @if(!is_null($selectedScopePolicyId ?? null))
+                                                <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
+                                            @endif
+                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                                class="pull-right btn btn-yellow">
+                                                <i class="ti ti-check"></i>
+                                                @lang('crud.common.time_sheet_approve')
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             @endforeach
@@ -377,12 +385,20 @@
                                         {{ $signatures['time_keeper']['name'] }}
                                     </div>
                                 @elseif(auth()->user()->hasRole('timekeeper') && $canTimekeeperApprove)
-                                    <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                        class="pull-right btn btn-yellow"
-                                        href="{{ route('time-sheets.approves', ['level' => 'timekeeper', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
-                                        <i class="ti ti-check"></i>
-                                        @lang('crud.common.time_sheet_approve')
-                                    </a>
+                                    <form method="POST" action="{{ route('time-sheets.approves') }}" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="level" value="timekeeper">
+                                        <input type="hidden" name="month" value="{{ $selected_month }}">
+                                        <input type="hidden" name="year" value="{{ $selected_year }}">
+                                        @if(!is_null($selectedScopePolicyId ?? null))
+                                            <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
+                                        @endif
+                                        <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            class="pull-right btn btn-yellow">
+                                            <i class="ti ti-check"></i>
+                                            @lang('crud.common.time_sheet_approve')
+                                        </button>
+                                    </form>
                                 @endif
                             </div>
 
@@ -399,12 +415,20 @@
                                             {{ $signatures['super_visor']['name'] }}
                                         </div>
                                     @elseif(auth()->user()->hasRole('supervisor') && $canSupervisorApprove)
-                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                            class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'supervisor', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
-                                            <i class="ti ti-check"></i>
-                                            @lang('crud.common.time_sheet_approve')
-                                        </a>
+                                        <form method="POST" action="{{ route('time-sheets.approves') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="level" value="supervisor">
+                                            <input type="hidden" name="month" value="{{ $selected_month }}">
+                                            <input type="hidden" name="year" value="{{ $selected_year }}">
+                                            @if(!is_null($selectedScopePolicyId ?? null))
+                                                <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
+                                            @endif
+                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                                class="pull-right btn btn-yellow">
+                                                <i class="ti ti-check"></i>
+                                                @lang('crud.common.time_sheet_approve')
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             @endif
@@ -422,12 +446,20 @@
                                             {{ $signatures['field_coordinator']['name'] }}
                                         </div>
                                     @elseif(auth()->user()->hasRole('fieldcoordinator') && $canFieldCoordinatorApprove)
-                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                            class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'fieldcoordinator', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
-                                            <i class="ti ti-check"></i>
-                                            @lang('crud.common.time_sheet_approve')
-                                        </a>
+                                        <form method="POST" action="{{ route('time-sheets.approves') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="level" value="fieldcoordinator">
+                                            <input type="hidden" name="month" value="{{ $selected_month }}">
+                                            <input type="hidden" name="year" value="{{ $selected_year }}">
+                                            @if(!is_null($selectedScopePolicyId ?? null))
+                                                <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
+                                            @endif
+                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                                class="pull-right btn btn-yellow">
+                                                <i class="ti ti-check"></i>
+                                                @lang('crud.common.time_sheet_approve')
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             @endif
@@ -445,12 +477,20 @@
                                             {{ $signatures['super_intendent']['name'] }}
                                         </div>
                                     @elseif(auth()->user()->hasRole('superintendent') && $canSuperintendentApprove)
-                                        <a data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
-                                            class="pull-right btn btn-yellow"
-                                            href="{{ route('time-sheets.approves', ['level' => 'superintendent', 'month' => $selected_month, 'year' => $selected_year, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}">
-                                            <i class="ti ti-check"></i>
-                                            @lang('crud.common.time_sheet_approve')
-                                        </a>
+                                        <form method="POST" action="{{ route('time-sheets.approves') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="level" value="superintendent">
+                                            <input type="hidden" name="month" value="{{ $selected_month }}">
+                                            <input type="hidden" name="year" value="{{ $selected_year }}">
+                                            @if(!is_null($selectedScopePolicyId ?? null))
+                                                <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
+                                            @endif
+                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                                class="pull-right btn btn-yellow">
+                                                <i class="ti ti-check"></i>
+                                                @lang('crud.common.time_sheet_approve')
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             @endif

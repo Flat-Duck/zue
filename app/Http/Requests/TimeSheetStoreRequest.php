@@ -2,33 +2,35 @@
 
 namespace App\Http\Requests;
 
+use App\Models\TimeSheet;
+use App\Services\TimeSheetMutationService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class TimeSheetStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', TimeSheet::class) === true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('value')) {
+            $this->merge(['value' => strtoupper(trim((string) $this->input('value')))]);
+        }
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
-            'value' => [
-                'required',
-                'in:a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z',
-            ],
+            'value' => ['required', Rule::in(TimeSheetMutationService::attendanceValues())],
             'day' => ['required', 'date'],
-            'employee_id' => ['required', 'exists:employees,id'],
-            'revised_at' => ['nullable', 'date'],
-            'old_value' => ['nullable', 'max:255', 'string'],
-            'user_id' => ['nullable', 'exists:users,id'],
+            'employee_id' => ['required', 'integer', 'exists:employees,id'],
+            'over_time' => ['nullable', 'integer', 'min:0', 'max:24'],
         ];
     }
 }

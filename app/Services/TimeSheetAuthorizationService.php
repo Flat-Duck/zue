@@ -17,6 +17,7 @@ use App\Services\TimeSheetAuth\WorkflowResolver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class TimeSheetAuthorizationService
 {
@@ -402,10 +403,24 @@ class TimeSheetAuthorizationService
 
         $this->workflowResolver->ensureMonthlyStepsForEmployees($managedEmployeeIds, $month, $year, 'time_sheet');
 
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $until = $from->copy()->addMonth();
+
+        $employeeIdsWithSheets = TimeSheet::query()
+            ->whereIn('employee_id', $managedEmployeeIds)
+            ->where('day', '>=', $from)
+            ->where('day', '<', $until)
+            ->distinct()
+            ->pluck('employee_id');
+
+        if ($employeeIdsWithSheets->isEmpty()) {
+            return 0;
+        }
+
         $accessMap = $this->scopeResolver->resolveEmployeeAccessMap($user, 'time_sheet', $selectedScopePolicyId);
 
         $steps = TimeSheetApprovalStep::query()
-            ->whereIn('employee_id', $managedEmployeeIds)
+            ->whereIn('employee_id', $employeeIdsWithSheets)
             ->where('month', $month)
             ->where('year', $year)
             ->where('step_key', $stepKey)
@@ -421,51 +436,63 @@ class TimeSheetAuthorizationService
             ->get()
             ->keyBy(fn (ApprovalFlowStep $step) => $this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
 
-        $approvedEmployeeIds = [];
-        foreach ($steps as $step) {
-            $capabilities = $accessMap[(int) $step->employee_id] ?? null;
-            if (! $capabilities || ! $capabilities['can_approve']) {
-                continue;
+        return DB::transaction(function () use ($steps, $accessMap, $flowStepMap, $user, $actor, $stepKey, $from, $until): int {
+            $approvedEmployeeIds = [];
+
+            foreach ($steps as $step) {
+                $lockedStep = TimeSheetApprovalStep::query()
+                    ->whereKey($step->id)
+                    ->whereNull('approved_at')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedStep) {
+                    continue;
+                }
+
+                $capabilities = $accessMap[(int) $lockedStep->employee_id] ?? null;
+                if (! $capabilities || ! $capabilities['can_approve']) {
+                    continue;
+                }
+
+                $flowStep = $flowStepMap->get($this->flowStepKey((int) $lockedStep->flow_id, (int) $lockedStep->step_order));
+                if (! $flowStep || ! $flowStep->can_approve) {
+                    continue;
+                }
+
+                if (! $this->userHasRoleForStep($user, $flowStep->required_role)) {
+                    continue;
+                }
+
+                if (! $this->workflowResolver->dependencyIsSatisfied($lockedStep)) {
+                    continue;
+                }
+
+                $lockedStep->approved_by_employee_id = (int) $actor->id;
+                $lockedStep->approved_at = now();
+                $lockedStep->save();
+
+                $approvedEmployeeIds[(int) $lockedStep->employee_id] = true;
             }
 
-            $flowStep = $flowStepMap->get($this->flowStepKey((int) $step->flow_id, (int) $step->step_order));
-            if (! $flowStep || ! $flowStep->can_approve) {
-                continue;
+            if (empty($approvedEmployeeIds)) {
+                return 0;
             }
 
-            if (! $this->userHasRoleForStep($user, $flowStep->required_role)) {
-                continue;
+            $legacyColumn = $this->legacyColumnForStep($stepKey);
+            if (is_null($legacyColumn)) {
+                return count($approvedEmployeeIds);
             }
 
-            if (! $this->workflowResolver->dependencyIsSatisfied($step)) {
-                continue;
-            }
+            TimeSheet::query()
+                ->whereIn('employee_id', array_keys($approvedEmployeeIds))
+                ->where('day', '>=', $from)
+                ->where('day', '<', $until)
+                ->whereNull($legacyColumn)
+                ->update([$legacyColumn => (int) $actor->id]);
 
-            $step->approved_by_employee_id = (int) $actor->id;
-            $step->approved_at = now();
-            $step->save();
-
-            $approvedEmployeeIds[(int) $step->employee_id] = true;
-        }
-
-        if (empty($approvedEmployeeIds)) {
-            return 0;
-        }
-
-        $legacyColumn = $this->legacyColumnForStep($stepKey);
-        if (is_null($legacyColumn)) {
             return count($approvedEmployeeIds);
-        }
-
-        $from = Carbon::create($year, $month, 1)->startOfMonth();
-        $until = $from->copy()->addMonth();
-
-        return (int) TimeSheet::query()
-            ->whereIn('employee_id', array_keys($approvedEmployeeIds))
-            ->where('day', '>=', $from)
-            ->where('day', '<', $until)
-            ->whereNull($legacyColumn)
-            ->update([$legacyColumn => (int) $actor->id]);
+        });
     }
 
     private function resolveSignatureForApprover(int $employeeId): array

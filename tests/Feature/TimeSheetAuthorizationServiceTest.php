@@ -95,6 +95,16 @@ class TimeSheetAuthorizationServiceTest extends TestCase
             'over_time' => 0,
         ]);
 
+        $service->approvalStages($actorUser, 3, 2026, collect([$targetEmployee->id]), $policy->id);
+        $service->approvalStages($actorUser, 3, 2026, collect([$targetEmployee->id]), $policy->id);
+
+        $this->assertSame(1, TimeSheetApprovalStep::query()
+            ->where('employee_id', $targetEmployee->id)
+            ->where('month', 3)
+            ->where('year', 2026)
+            ->where('step_key', 'timekeeper')
+            ->count());
+
         $updated = $service->approve($actorUser, 3, 2026, 'timekeeper');
 
         $this->assertSame(1, $updated);

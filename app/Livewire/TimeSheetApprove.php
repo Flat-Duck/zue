@@ -3,8 +3,9 @@
 namespace App\Livewire;
 
 use App\Helpers\TimeSheetBuilder;
-use App\Models\TimeSheet;
-use Carbon\Carbon;
+use App\Models\Employee;
+use App\Services\TimeSheetMutationService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -21,57 +22,42 @@ class TimeSheetApprove extends Component
         $this->level = TimeSheetBuilder::unApprovedTimeSheetLevel($this->employee_id);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.time-sheet-approve');
     }
 
-    // public function approve(){
-
-    //     TimeSheet::where('employee_id', $this->employee_id)
-
-    //     // ->where('created_at', '>=', Carbon::now()->subHour())
-    //     ->whereNull('timekeeper_id')
-    //     ->where('created_at', '<=', Carbon::now())->update(['timekeeper_id' => auth()->id()]);
-
-    // }
-    public function approveAsTimekeeper(): void
+    public function approveAsTimekeeper(TimeSheetMutationService $timeSheetMutationService): void
     {
-        $this->authorizeEmployee();
+        $employee = $this->authorizeEmployee();
 
-        TimeSheet::where('employee_id', $this->employee_id)
-            ->whereNull('timekeeper_id')
-            ->where('created_at', '<=', Carbon::now())
-            ->update(['timekeeper_id' => auth()->id()]);
+        $timeSheetMutationService->approveEmployeeLegacy(auth()->user(), $employee, 'timekeeper');
+        $this->level = TimeSheetBuilder::unApprovedTimeSheetLevel($employee->id);
     }
 
-    public function approveAsSupervisor(): void
+    public function approveAsSupervisor(TimeSheetMutationService $timeSheetMutationService): void
     {
-        $this->authorizeEmployee();
+        $employee = $this->authorizeEmployee();
 
-        TimeSheet::where('employee_id', $this->employee_id)
-            ->whereNull('supervisor_id')
-            ->where('created_at', '<=', Carbon::now())
-            ->update(['supervisor_id' => auth()->id()]);
+        $timeSheetMutationService->approveEmployeeLegacy(auth()->user(), $employee, 'supervisor');
+        $this->level = TimeSheetBuilder::unApprovedTimeSheetLevel($employee->id);
     }
 
-    public function approveAsSuperintendent(): void
+    public function approveAsSuperintendent(TimeSheetMutationService $timeSheetMutationService): void
     {
-        $this->authorizeEmployee();
+        $employee = $this->authorizeEmployee();
 
-        TimeSheet::where('employee_id', $this->employee_id)
-            ->whereNull('superintendent_id')
-            ->where('created_at', '<=', Carbon::now())
-            ->update(['superintendent_id' => auth()->id()]);
+        $timeSheetMutationService->approveEmployeeLegacy(auth()->user(), $employee, 'superintendent');
+        $this->level = TimeSheetBuilder::unApprovedTimeSheetLevel($employee->id);
     }
 
-    private function authorizeEmployee(): void
+    private function authorizeEmployee(): Employee
     {
         if (! auth()->check() || ! is_numeric($this->employee_id) || (int) $this->employee_id < 1) {
             throw ValidationException::withMessages(['employee_id' => 'A valid employee is required.']);
         }
 
-        $employee = \App\Models\Employee::findOrFail((int) $this->employee_id);
+        $employee = Employee::query()->findOrFail((int) $this->employee_id);
 
         Gate::authorize('view', $employee);
 
@@ -79,5 +65,7 @@ class TimeSheetApprove extends Component
             && ! auth()->user()->managedEmployeesQuery('time_sheet')->whereKey($employee->getKey())->exists()) {
             abort(403);
         }
+
+        return $employee;
     }
 }

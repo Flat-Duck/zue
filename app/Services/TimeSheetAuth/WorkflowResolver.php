@@ -7,12 +7,11 @@ use App\Models\ApprovalFlowStep;
 use App\Models\Employee;
 use App\Models\TimeSheetApprovalStep;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class WorkflowResolver
 {
-    public function __construct(private readonly ActorResolver $actorResolver)
-    {
-    }
+    public function __construct(private readonly ActorResolver $actorResolver) {}
 
     public function ensureMonthlyStepsForEmployees(
         Collection $employeeIds,
@@ -20,60 +19,63 @@ class WorkflowResolver
         int $year,
         string $context = 'time_sheet'
     ): void {
-        $ids = $employeeIds->map(fn($id) => (int) $id)->unique()->values();
+        $ids = $employeeIds->map(fn ($id) => (int) $id)->unique()->values();
         if ($ids->isEmpty()) {
             return;
         }
 
-        $employees = Employee::query()
-            ->with('department:id,name')
-            ->whereIn('id', $ids)
-            ->get(['id', 'department_id', 'location_id', 'center_id', 'user_id']);
+        DB::transaction(function () use ($ids, $month, $year, $context): void {
+            $employees = Employee::query()
+                ->with('department:id,name')
+                ->whereIn('id', $ids)
+                ->lockForUpdate()
+                ->get(['id', 'department_id', 'location_id', 'center_id', 'user_id']);
 
-        if ($employees->isEmpty()) {
-            return;
-        }
-
-        $existingByEmployee = TimeSheetApprovalStep::query()
-            ->whereIn('employee_id', $ids)
-            ->where('month', $month)
-            ->where('year', $year)
-            ->get(['employee_id', 'step_order'])
-            ->groupBy('employee_id')
-            ->map(fn(Collection $rows) => $rows->pluck('step_order')->map(fn($n) => (int) $n)->flip());
-
-        $flows = ApprovalFlow::query()
-            ->where('context', $context)
-            ->where('is_active', true)
-            ->with('steps')
-            ->get();
-
-        foreach ($employees as $employee) {
-            $flow = $this->resolveFlowForEmployee($employee, $context, $flows);
-            if (!$flow || $flow->steps->isEmpty()) {
-                continue;
+            if ($employees->isEmpty()) {
+                return;
             }
 
-            $existingOrders = $existingByEmployee->get($employee->id, collect());
+            $existingByEmployee = TimeSheetApprovalStep::query()
+                ->whereIn('employee_id', $ids)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->get(['employee_id', 'step_order'])
+                ->groupBy('employee_id')
+                ->map(fn (Collection $rows) => $rows->pluck('step_order')->map(fn ($n) => (int) $n)->flip());
 
-            foreach ($flow->steps as $step) {
-                if ($existingOrders->has((int) $step->step_order)) {
+            $flows = ApprovalFlow::query()
+                ->where('context', $context)
+                ->where('is_active', true)
+                ->with('steps')
+                ->get();
+
+            foreach ($employees as $employee) {
+                $flow = $this->resolveFlowForEmployee($employee, $context, $flows);
+                if (! $flow || $flow->steps->isEmpty()) {
                     continue;
                 }
 
-                TimeSheetApprovalStep::query()->create([
-                    'employee_id' => (int) $employee->id,
-                    'month' => $month,
-                    'year' => $year,
-                    'flow_id' => (int) $flow->id,
-                    'step_order' => (int) $step->step_order,
-                    'step_key' => $step->step_key,
-                    'approved_by_employee_id' => null,
-                    'approved_at' => null,
-                    'meta' => null,
-                ]);
+                $existingOrders = $existingByEmployee->get($employee->id, collect());
+
+                foreach ($flow->steps as $step) {
+                    if ($existingOrders->has((int) $step->step_order)) {
+                        continue;
+                    }
+
+                    TimeSheetApprovalStep::query()->create([
+                        'employee_id' => (int) $employee->id,
+                        'month' => $month,
+                        'year' => $year,
+                        'flow_id' => (int) $flow->id,
+                        'step_order' => (int) $step->step_order,
+                        'step_key' => $step->step_key,
+                        'approved_by_employee_id' => null,
+                        'approved_at' => null,
+                        'meta' => null,
+                    ]);
+                }
             }
-        }
+        });
     }
 
     public function resolveFlowForEmployee(
@@ -94,7 +96,7 @@ class WorkflowResolver
         }
 
         $matching = $flows
-            ->filter(fn(ApprovalFlow $flow) => $this->flowMatchesEmployee($flow, $employee))
+            ->filter(fn (ApprovalFlow $flow) => $this->flowMatchesEmployee($flow, $employee))
             ->sort(function (ApprovalFlow $a, ApprovalFlow $b) {
                 $aScore = $this->flowSpecificityScore($a);
                 $bScore = $this->flowSpecificityScore($b);
@@ -112,7 +114,7 @@ class WorkflowResolver
     public function hasRole(Employee $employee, string $role): bool
     {
         $user = $this->actorResolver->resolveUserForEmployee($employee);
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -131,7 +133,7 @@ class WorkflowResolver
             ->where('step_order', $step->step_order)
             ->first();
 
-        if (!$flowStep) {
+        if (! $flowStep) {
             return true;
         }
 
@@ -160,47 +162,47 @@ class WorkflowResolver
             return true;
         }
 
-        $employeeIds = collect($rules['employee_ids'] ?? [])->map(fn($id) => (int) $id)->values();
-        if ($employeeIds->isNotEmpty() && !$employeeIds->contains((int) $employee->id)) {
+        $employeeIds = collect($rules['employee_ids'] ?? [])->map(fn ($id) => (int) $id)->values();
+        if ($employeeIds->isNotEmpty() && ! $employeeIds->contains((int) $employee->id)) {
             return false;
         }
 
-        $locationIds = collect($rules['location_ids'] ?? [])->map(fn($id) => (int) $id)->values();
-        if ($locationIds->isNotEmpty() && !$locationIds->contains((int) $employee->location_id)) {
+        $locationIds = collect($rules['location_ids'] ?? [])->map(fn ($id) => (int) $id)->values();
+        if ($locationIds->isNotEmpty() && ! $locationIds->contains((int) $employee->location_id)) {
             return false;
         }
 
-        $departmentIds = collect($rules['department_ids'] ?? [])->map(fn($id) => (int) $id)->values();
-        if ($departmentIds->isNotEmpty() && !$departmentIds->contains((int) $employee->department_id)) {
+        $departmentIds = collect($rules['department_ids'] ?? [])->map(fn ($id) => (int) $id)->values();
+        if ($departmentIds->isNotEmpty() && ! $departmentIds->contains((int) $employee->department_id)) {
             return false;
         }
 
-        $centerIds = collect($rules['center_ids'] ?? [])->map(fn($id) => (int) $id)->values();
-        if ($centerIds->isNotEmpty() && !$centerIds->contains((int) $employee->center_id)) {
+        $centerIds = collect($rules['center_ids'] ?? [])->map(fn ($id) => (int) $id)->values();
+        if ($centerIds->isNotEmpty() && ! $centerIds->contains((int) $employee->center_id)) {
             return false;
         }
 
         $departmentKeys = collect($rules['department_keys'] ?? [])->map(
-            fn($name) => $this->normalizeDepartmentName($name)
+            fn ($name) => $this->normalizeDepartmentName($name)
         );
         if ($departmentKeys->isNotEmpty()) {
             $employeeKey = $this->normalizeDepartmentName((string) $employee->department?->name);
-            if (!$departmentKeys->contains($employeeKey)) {
+            if (! $departmentKeys->contains($employeeKey)) {
                 return false;
             }
         }
 
-        $rolesAny = collect($rules['employee_roles_any'] ?? [])->map(fn($name) => strtolower((string) $name));
+        $rolesAny = collect($rules['employee_roles_any'] ?? [])->map(fn ($name) => strtolower((string) $name));
         if ($rolesAny->isNotEmpty()) {
-            $hasAny = $rolesAny->contains(fn($role) => $this->hasRole($employee, $role));
-            if (!$hasAny) {
+            $hasAny = $rolesAny->contains(fn ($role) => $this->hasRole($employee, $role));
+            if (! $hasAny) {
                 return false;
             }
         }
 
-        $rolesNone = collect($rules['employee_roles_none'] ?? [])->map(fn($name) => strtolower((string) $name));
+        $rolesNone = collect($rules['employee_roles_none'] ?? [])->map(fn ($name) => strtolower((string) $name));
         if ($rolesNone->isNotEmpty()) {
-            $hasAnyForbidden = $rolesNone->contains(fn($role) => $this->hasRole($employee, $role));
+            $hasAnyForbidden = $rolesNone->contains(fn ($role) => $this->hasRole($employee, $role));
             if ($hasAnyForbidden) {
                 return false;
             }
@@ -213,19 +215,19 @@ class WorkflowResolver
     {
         $rules = is_array($flow->applies_to) ? $flow->applies_to : [];
 
-        if (!empty($rules['employee_ids'])) {
+        if (! empty($rules['employee_ids'])) {
             return 500;
         }
 
-        if (!empty($rules['center_ids'])) {
+        if (! empty($rules['center_ids'])) {
             return 400;
         }
 
-        if (!empty($rules['department_ids']) || !empty($rules['department_keys'])) {
+        if (! empty($rules['department_ids']) || ! empty($rules['department_keys'])) {
             return 300;
         }
 
-        if (!empty($rules['location_ids'])) {
+        if (! empty($rules['location_ids'])) {
             return 200;
         }
 

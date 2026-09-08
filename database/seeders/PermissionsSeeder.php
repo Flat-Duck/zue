@@ -80,6 +80,9 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'create timesheets']);
         Permission::create(['name' => 'update timesheets']);
         Permission::create(['name' => 'delete timesheets']);
+        Permission::create(['name' => 'fill timesheets']);
+        Permission::create(['name' => 'revise timesheets']);
+        Permission::create(['name' => 'approve timesheets']);
 
         // Create user role and assign existing permissions
         $currentPermissions = Permission::all();

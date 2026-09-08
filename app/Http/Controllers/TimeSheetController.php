@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TimeSheetApprovalRequest;
 use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
 use App\Models\Employee;
 use App\Models\TimeSheet;
 use App\Services\TimeSheetAuthorizationService;
+use App\Services\TimeSheetMutationService;
 use App\Services\TimeSheetService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +23,8 @@ class TimeSheetController extends Controller
 
     public function __construct(
         TimeSheetService $timeSheetService,
-        TimeSheetAuthorizationService $timeSheetAuthorizationService
+        TimeSheetAuthorizationService $timeSheetAuthorizationService,
+        private readonly TimeSheetMutationService $timeSheetMutationService
     ) {
         $this->timeSheetService = $timeSheetService;
         $this->timeSheetAuthorizationService = $timeSheetAuthorizationService;
@@ -92,14 +95,17 @@ class TimeSheetController extends Controller
      */
     public function store(TimeSheetStoreRequest $request): RedirectResponse
     {
-        $this->authorize('create', TimeSheet::class);
-
         $validated = $request->validated();
-        $this->ensureManageableForTimeSheet((int) $validated['employee_id'], $this->selectedScopePolicyIdFromRequest($request));
+        $employee = Employee::query()->findOrFail((int) $validated['employee_id']);
+        $this->ensureManageableForTimeSheet($employee->id, $this->selectedScopePolicyIdFromRequest($request));
 
-        $validated['user_id'] = auth()->id();
-
-        $timeSheet = TimeSheet::create($validated);
+        $timeSheet = $this->timeSheetMutationService->createForEmployee(
+            $employee,
+            $validated['day'],
+            $validated['value'],
+            (int) ($validated['over_time'] ?? 0),
+            auth()->user()
+        );
 
         return redirect()
             ->route('time-sheets.revise', ['employee' => $timeSheet->employee_id])
@@ -185,14 +191,17 @@ class TimeSheetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function approves(Request $request): RedirectResponse
+    public function approvesViaGet(): never
     {
-        $year = (int) $request->get('year');
-        $month = (int) $request->get('month');
-        $level = strtolower((string) $request->get('level')); // timekeeper / supervisor / superintendent / fieldcoordinator
-        if ($level === 'coordinator') {
-            $level = 'fieldcoordinator';
-        }
+        abort(405);
+    }
+
+    public function approves(TimeSheetApprovalRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $year = (int) $validated['year'];
+        $month = (int) $validated['month'];
+        $level = $this->timeSheetMutationService->normalizeApprovalLevel($validated['level']);
 
         if (config('timesheet_auth.v2_write_enabled', false)) {
             $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
@@ -208,90 +217,13 @@ class TimeSheetController extends Controller
         }
 
         $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
-        $workflow = $this->timeSheetService->getManagedApprovalBuckets($managedEmployeeIds);
-        $from = Carbon::create($year, $month, 1)->startOfMonth();
-        $until = $from->copy()->addMonth();
-
-        $query = TimeSheet::whereIn('employee_id', $managedEmployeeIds)
-            ->where('day', '>=', $from)
-            ->where('day', '<', $until);
-
-        if (
-            ($level === 'timekeeper' && ! auth()->user()->hasRole('timekeeper')) ||
-            ($level === 'supervisor' && ! auth()->user()->hasRole('supervisor')) ||
-            ($level === 'fieldcoordinator' && ! auth()->user()->hasRole('fieldcoordinator')) ||
-            ($level === 'superintendent' && ! auth()->user()->hasRole('superintendent'))
-        ) {
-            abort(403);
-        }
-
-        if (! in_array($level, ['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'], true)) {
-            return back()->with('error', 'Invalid approval level.');
-        }
-
-        $updated = 0;
-
-        if ($level === 'timekeeper') {
-            $updated = (clone $query)
-                ->whereNull('timekeeper_id')
-                ->update(['timekeeper_id' => auth()->id()]);
-        } elseif ($level === 'supervisor') {
-            if (! empty($workflow['needs_supervisor_ids'])) {
-                $updated = (clone $query)
-                    ->whereIn('employee_id', $workflow['needs_supervisor_ids'])
-                    ->whereNotNull('timekeeper_id')
-                    ->whereNull('supervisor_id')
-                    ->update(['supervisor_id' => auth()->id()]);
-            }
-        } elseif ($level === 'fieldcoordinator') {
-            $idsA2 = $workflow['A2'];
-            $idsA3 = $workflow['A3'];
-            if (! empty($workflow['needs_fieldcoordinator_ids'])) {
-                $updated = (clone $query)
-                    ->whereIn('employee_id', $workflow['needs_fieldcoordinator_ids'])
-                    ->whereNull('superintendent_id')
-                    ->where(function ($builder) use ($idsA2, $idsA3) {
-                        if (! empty($idsA2)) {
-                            $builder->orWhere(function ($q) use ($idsA2) {
-                                $q->whereIn('employee_id', $idsA2)
-                                    ->whereNotNull('timekeeper_id');
-                            });
-                        }
-
-                        if (! empty($idsA3)) {
-                            $builder->orWhere(function ($q) use ($idsA3) {
-                                $q->whereIn('employee_id', $idsA3)
-                                    ->whereNotNull('supervisor_id');
-                            });
-                        }
-                    })
-                    ->update(['superintendent_id' => auth()->id()]);
-            }
-        } elseif ($level === 'superintendent') {
-            $idsA1 = $workflow['A1'];
-            $idsLegacy = $workflow['LEGACY'];
-            if (! empty($workflow['needs_superintendent_ids'])) {
-                $updated = (clone $query)
-                    ->whereIn('employee_id', $workflow['needs_superintendent_ids'])
-                    ->whereNull('superintendent_id')
-                    ->where(function ($builder) use ($idsA1, $idsLegacy) {
-                        if (! empty($idsA1)) {
-                            $builder->orWhere(function ($q) use ($idsA1) {
-                                $q->whereIn('employee_id', $idsA1)
-                                    ->whereNotNull('timekeeper_id');
-                            });
-                        }
-
-                        if (! empty($idsLegacy)) {
-                            $builder->orWhere(function ($q) use ($idsLegacy) {
-                                $q->whereIn('employee_id', $idsLegacy)
-                                    ->whereNotNull('supervisor_id');
-                            });
-                        }
-                    })
-                    ->update(['superintendent_id' => auth()->id()]);
-            }
-        }
+        $updated = $this->timeSheetMutationService->approveLegacy(
+            auth()->user(),
+            $month,
+            $year,
+            $level,
+            $managedEmployeeIds
+        );
 
         return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
     }
@@ -313,16 +245,16 @@ class TimeSheetController extends Controller
         TimeSheetUpdateRequest $request,
         TimeSheet $timeSheet
     ): RedirectResponse {
-        $this->authorize('update', $timeSheet);
         $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id, $this->selectedScopePolicyIdFromRequest($request));
 
         $validated = $request->validated();
-        $validated['employee_id'] = $timeSheet->employee_id;
-        $validated['user_id'] = auth()->id();
-        $validated['revised_at'] = now();
-        $validated['old_value'] = $timeSheet->value;
-
-        $timeSheet->update($validated);
+        $timeSheet = $this->timeSheetMutationService->revise(
+            $timeSheet,
+            $validated['day'],
+            $validated['value'],
+            (int) ($validated['over_time'] ?? $timeSheet->over_time ?? 0),
+            auth()->user()
+        );
 
         return redirect()
             ->route('time-sheets.revise', ['employee' => $timeSheet->employee_id])
@@ -339,7 +271,7 @@ class TimeSheetController extends Controller
         $this->authorize('delete', $timeSheet);
         $this->ensureManageableForTimeSheet((int) $timeSheet->employee_id, $this->selectedScopePolicyIdFromRequest($request));
 
-        $timeSheet->delete();
+        $this->timeSheetMutationService->delete($timeSheet);
 
         return redirect()
             ->route('time-sheets.index')

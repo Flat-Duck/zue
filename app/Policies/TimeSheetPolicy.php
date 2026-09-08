@@ -2,75 +2,73 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\TimeSheet;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Spatie\Permission\Models\Permission;
 
 class TimeSheetPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the timeSheet can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list timesheets');
+        return $this->hasAnyExistingPermission($user, ['list timesheets']);
     }
 
-    /**
-     * Determine whether the timeSheet can view the model.
-     */
     public function view(User $user, TimeSheet $model): bool
     {
-        return $user->hasPermissionTo('view timesheets');
+        return $this->hasAnyExistingPermission($user, ['view timesheets']);
     }
 
-    /**
-     * Determine whether the timeSheet can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create timesheets');
+        return $this->hasAnyExistingPermission($user, ['fill timesheets', 'create timesheets']);
     }
 
-    /**
-     * Determine whether the timeSheet can update the model.
-     */
     public function update(User $user, TimeSheet $model): bool
     {
-        return $user->hasPermissionTo('update timesheets');
+        return $this->hasAnyExistingPermission($user, ['revise timesheets', 'update timesheets']);
     }
 
-    /**
-     * Determine whether the timeSheet can delete the model.
-     */
+    public function approve(User $user): bool
+    {
+        return $this->hasAnyExistingPermission($user, ['approve timesheets', 'update timesheets']);
+    }
+
     public function delete(User $user, TimeSheet $model): bool
     {
-        return $user->hasPermissionTo('delete timesheets');
+        return $this->hasAnyExistingPermission($user, ['delete timesheets']);
     }
 
-    /**
-     * Determine whether the user can delete multiple instances of the model.
-     */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete timesheets');
+        return $this->hasAnyExistingPermission($user, ['delete timesheets']);
     }
 
-    /**
-     * Determine whether the timeSheet can restore the model.
-     */
     public function restore(User $user, TimeSheet $model): bool
     {
         return false;
     }
 
-    /**
-     * Determine whether the timeSheet can permanently delete the model.
-     */
     public function forceDelete(User $user, TimeSheet $model): bool
     {
         return false;
+    }
+
+    /**
+     * @param  array<int, string>  $permissions
+     */
+    private function hasAnyExistingPermission(User $user, array $permissions): bool
+    {
+        $existingPermissions = Permission::query()
+            ->whereIn('name', $permissions)
+            ->pluck('name');
+
+        if ($existingPermissions->isEmpty()) {
+            return false;
+        }
+
+        return $user->hasAnyPermission($existingPermissions->all());
     }
 }

@@ -85,8 +85,9 @@ Route::prefix('/')
 
     ->group(function () {
         Route::get('time-sheets/approve_preview', [TimeSheetController::class, 'approve_preview'])->name('time-sheets.approve_preview');
-        Route::get('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
+        Route::post('time-sheets/approves', [TimeSheetController::class, 'approves'])->name('time-sheets.approves');
         Route::get('time-sheets/approve', [TimeSheetController::class, 'approve'])->name('time-sheets.approve');
+        Route::get('time-sheets/approves', [TimeSheetController::class, 'approvesViaGet']);
 
         Route::get('/', [HomeController::class, 'index'])->name('home1');
 
