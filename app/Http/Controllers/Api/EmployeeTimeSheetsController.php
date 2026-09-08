@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Employee;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TimeSheetResource;
 use App\Http\Resources\TimeSheetCollection;
+use App\Http\Resources\TimeSheetResource;
+use App\Models\Employee;
+use App\Models\TimeSheet;
+use Illuminate\Http\Request;
 
 class EmployeeTimeSheetsController extends Controller
 {
     public function index(
         Request $request,
         Employee $employee
-    ): TimeSheetCollection
-    {
+    ): TimeSheetCollection {
         $this->authorize('view', $employee);
 
         $search = $request->get('search', '');
@@ -31,14 +31,13 @@ class EmployeeTimeSheetsController extends Controller
     public function store(
         Request $request,
         Employee $employee
-    ): TimeSheetResource
-    {
+    ): TimeSheetResource {
         $this->authorize('create', TimeSheet::class);
 
         $validated = $request->validate([
             'value' => [
                 'required',
-                'in:a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z',
+                'in:a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z',
             ],
             'day' => ['required', 'date'],
             'revised_at' => ['nullable', 'date'],

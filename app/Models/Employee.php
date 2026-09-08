@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\TimeSheetBuilder;
-use App\Models\Scopes\ArchivedEmployees;
 use App\Models\Scopes\DepartmentEmployees;
 use App\Models\Scopes\Searchable;
 use App\Models\Scopes\SoftArchives;
@@ -11,20 +10,19 @@ use App\Models\Scopes\SoftArchivingScope;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ManagementScope;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Auth;
 
 class Employee extends Model
 {
     use HasFactory;
     use Searchable;
-    use SoftDeletes;
     use SoftArchives;
+    use SoftDeletes;
 
     public const SPECIAL_WORK_DAYS_THRESHOLD = 20;
 
@@ -85,10 +83,12 @@ class Employee extends Model
     {
         return $this->hasMany(TimeSheet::class);
     }
+
     public function clinicApointments()
     {
         return $this->hasMany(ClinicApointment::class);
     }
+
     public function apointments()
     {
         $appointments = $this->clinicApointments
@@ -102,11 +102,13 @@ class Employee extends Model
             ->map(function ($appointment) {
                 $appointment->year = Carbon::parse($appointment->date)->format('Y');
                 $appointment->month = Carbon::parse($appointment->date)->format('F');
+
                 return $appointment;
             });
-        // Group appointments by year and month 
+
+        // Group appointments by year and month
         return $appointments->groupBy(function ($appointment) {
-            return $appointment->year . '-' . $appointment->month;
+            return $appointment->year.'-'.$appointment->month;
         });
     }
 
@@ -127,7 +129,7 @@ class Employee extends Model
 
     public function rooms()
     {
-        return $this->belongsToMany(Room::class)->withPivot(['is_here', 'is_owner']);
+        return $this->belongsToMany(Room::class);
     }
 
     public function sick_leaves()
@@ -135,11 +137,11 @@ class Employee extends Model
         return 10;
     }
 
-    
     public function flights()
     {
         return $this->belongsToMany(Flight::class);
     }
+
     public function getOwnRoomAttribute()
     {
         return $this->rooms()->where('is_owner', true)->exists();
@@ -159,6 +161,7 @@ class Employee extends Model
     {
         return $this->location->name;
     }
+
     public function getCenterNameAttribute()
     {
         return $this->center->name;
@@ -168,6 +171,7 @@ class Employee extends Model
     {
         return date('Y/m/d', strtotime($date));
     }
+
     public function getLastDateAttribute($date)
     {
         return date('Y/m/d', strtotime($date));
@@ -177,13 +181,13 @@ class Employee extends Model
     {
         return $this->total_balance;
     }
+
     public function calculateBalance()
     {
         $balance = TimeSheetBuilder::calculateBalance($this->id, $this->schedule, $this->transfered_balance);
         $this->total_balance = $balance;
         $this->save();
     }
-
 
     public function getTotalWorkingDaysAttribute()
     {
@@ -199,7 +203,6 @@ class Employee extends Model
     {
         return 2;
     }
-
 
     public function isSupervisor(): bool
     {
@@ -241,7 +244,7 @@ class Employee extends Model
 
     public function isArchived(): bool
     {
-        return !is_null($this->archived_at);
+        return ! is_null($this->archived_at);
     }
 
     /**
@@ -319,7 +322,7 @@ class Employee extends Model
                             }
                             // 2. Grouped subordinates
                             $targetIds = $settings['target_employee_ids'] ?? [];
-                            if (!empty($targetIds)) {
+                            if (! empty($targetIds)) {
                                 $q->orWhereIn('id', $targetIds);
                             }
                             break;
@@ -334,7 +337,7 @@ class Employee extends Model
         // Strict ownership for time-sheet context:
         // - hide employees assigned as subordinate/target in another manager's scope
         // - hide employees that are managers in any time_sheet scope
-        $candidateIds = (clone $query)->pluck('id')->map(fn($id) => (int) $id)->values();
+        $candidateIds = (clone $query)->pluck('id')->map(fn ($id) => (int) $id)->values();
 
         if ($candidateIds->isEmpty()) {
             return static::query()->whereRaw('0 = 1');
@@ -360,7 +363,7 @@ class Employee extends Model
                 continue;
             }
 
-            if (!is_null($myScope->subordinate_employee_id)) {
+            if (! is_null($myScope->subordinate_employee_id)) {
                 $myEmployeeScopeAllowedIds[] = (int) $myScope->subordinate_employee_id;
             }
 
@@ -373,8 +376,8 @@ class Employee extends Model
         $myEmployeeScopeAllowedLookup = collect(array_unique($myEmployeeScopeAllowedIds))->flip();
 
         foreach ($timeSheetScopes as $scope) {
-            $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
-            if (empty($managerIds) && !is_null($scope->manager_id)) {
+            $managerIds = $scope->managers->pluck('id')->map(fn ($id) => (int) $id)->all();
+            if (empty($managerIds) && ! is_null($scope->manager_id)) {
                 $managerIds = [(int) $scope->manager_id];
             }
             foreach ($managerIds as $managerId) {
@@ -385,7 +388,7 @@ class Employee extends Model
                 continue;
             }
 
-            if (!is_null($scope->subordinate_employee_id)) {
+            if (! is_null($scope->subordinate_employee_id)) {
                 $subordinateId = (int) $scope->subordinate_employee_id;
                 if ($candidateLookup->has($subordinateId)) {
                     $disallowedIds[] = $subordinateId;

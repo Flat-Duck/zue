@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
 use App\Models\TimeSheet;
-
-use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class UserTimeSheetsTest extends TestCase
 {
@@ -41,7 +40,7 @@ class UserTimeSheetsTest extends TestCase
 
         $response = $this->getJson(route('api.users.time-sheets.index', $user));
 
-        $response->assertOk()->assertSee($timeSheets[0]->day);
+        $response->assertOk()->assertSee($timeSheets[0]->day->toISOString());
     }
 
     /**

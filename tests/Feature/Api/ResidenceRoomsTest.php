@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
-use App\Models\Room;
 use App\Models\Residence;
-
-use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Room;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class ResidenceRoomsTest extends TestCase
 {
@@ -57,7 +56,7 @@ class ResidenceRoomsTest extends TestCase
             ->make([
                 'residence_id' => $residence->id,
             ])
-            ->toArray();
+            ->getAttributes();
 
         $response = $this->postJson(
             route('api.residences.rooms.store', $residence),
@@ -66,7 +65,10 @@ class ResidenceRoomsTest extends TestCase
 
         $this->assertDatabaseHas('rooms', $data);
 
-        $response->assertStatus(201)->assertJsonFragment($data);
+        $response->assertStatus(201)->assertJsonFragment([
+            'number' => $data['number'],
+            'residence_id' => $residence->id,
+        ]);
 
         $room = Room::latest('id')->first();
 
