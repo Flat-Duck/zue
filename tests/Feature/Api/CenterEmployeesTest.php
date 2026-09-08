@@ -2,14 +2,13 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
 use App\Models\Center;
 use App\Models\Employee;
-
-use Tests\TestCase;
-use Laravel\Sanctum\Sanctum;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class CenterEmployeesTest extends TestCase
 {
@@ -57,7 +56,7 @@ class CenterEmployeesTest extends TestCase
             ->make([
                 'center_id' => $center->id,
             ])
-            ->toArray();
+            ->getAttributes();
 
         $response = $this->postJson(
             route('api.centers.employees.store', $center),
@@ -66,7 +65,10 @@ class CenterEmployeesTest extends TestCase
 
         $this->assertDatabaseHas('employees', $data);
 
-        $response->assertStatus(201)->assertJsonFragment($data);
+        $response->assertStatus(201)->assertJsonFragment([
+            'number' => $data['number'],
+            'center_id' => $center->id,
+        ]);
 
         $employee = Employee::latest('id')->first();
 

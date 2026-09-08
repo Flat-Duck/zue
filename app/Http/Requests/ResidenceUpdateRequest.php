@@ -22,6 +22,7 @@ class ResidenceUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'max:255', 'string'],
             'type' => ['required', 'in:Villa,Trailer'],
+            'location_id' => ['sometimes', 'exists:locations,id'],
         ];
     }
 }

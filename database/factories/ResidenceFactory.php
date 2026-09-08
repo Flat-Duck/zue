@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Location;
 use App\Models\Residence;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ResidenceFactory extends Factory
@@ -25,6 +25,7 @@ class ResidenceFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'type' => 'Villa',
+            'location_id' => Location::factory(),
         ];
     }
 }
