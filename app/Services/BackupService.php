@@ -77,6 +77,7 @@ class BackupService
 
             fwrite($handle, "-- Database Export\n");
             fwrite($handle, '-- Date: '.now()->toDateTimeString()."\n\n");
+            fwrite($handle, "SET FOREIGN_KEY_CHECKS=0;\n\n");
 
             foreach ($selectedTables as $table) {
                 try {
@@ -123,6 +124,8 @@ class BackupService
             }
 
             fclose($handle);
+
+            file_put_contents($tempPath, "SET FOREIGN_KEY_CHECKS=1;\n", FILE_APPEND);
 
             if ($saveToBackups) {
                 if (! Storage::disk('local')->exists('backups')) {

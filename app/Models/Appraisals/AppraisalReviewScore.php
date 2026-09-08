@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AppraisalReviewScore extends Model
 {
-    protected $fillable = ['appraisal_review_id', 'form_version_item_id', 'score'];
+    protected $fillable = ['appraisal_review_id', 'form_version_item_id', 'score', 'text_value'];
 
     public function review(): BelongsTo
     {

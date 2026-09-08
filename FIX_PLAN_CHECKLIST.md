@@ -140,7 +140,7 @@ Legend:
 - [x] Add non-unique flight pivot lookup index migration.
 - [~] Some repeated dropdown queries remain in CRUD controllers.
 - [~] Some query-producing accessors/methods still need a second pass.
-- [ ] Add formal query-budget tests for important screens.
+- [x] Add formal query-budget tests for employee, timesheet, report, dashboard, and clinic screens.
 - [ ] Record before/after query count, SQL time, request time, and memory measurements.
 - [ ] Run `EXPLAIN` for the major optimized queries against representative data.
 
@@ -152,9 +152,9 @@ Legend:
 - [x] Validate report filters with FormRequests.
 - [x] Chunk room, user, and archived employee imports.
 - [x] Configure backup job timeout/tries/backoff and queue retry-after values.
-- [~] Yearly appraisal aggregation is validated and safer, but still synchronous.
-- [ ] Queue large exports/reports where needed.
-- [ ] Queue yearly appraisal aggregation if production data size justifies it.
+- [~] Yearly appraisal aggregation is validated and safer; large MVC-triggered aggregations now queue when the configured threshold and worker configuration justify it.
+- [~] Queue large exports/reports where needed; current bounded exports remain synchronous until production volume justifies a queued download workflow.
+- [x] Queue yearly appraisal aggregation only when production data size justifies it.
 - [ ] Add failed-job/retry/idempotency tests for large jobs.
 - [ ] Add memory tests for large imports/exports/reports.
 
@@ -170,7 +170,7 @@ Legend:
 - [x] Hide restore/import exception details from users while reporting exceptions internally.
 - [x] Configure backup retry timing to respect long backup timeout.
 - [~] Backup status logging exists but verification lifecycle is incomplete.
-- [ ] Verify restores against a disposable MySQL database.
+- [x] Verify restores against a disposable MySQL database (49 tables and 68 migration rows restored successfully).
 - [ ] Add backup verification status: verified/failed verification.
 - [ ] Keep previous verified backup until the new backup passes verification.
 - [ ] Add tests for partial table failure, storage failure, corrupted backup, restore failure, and concurrent backup requests.
@@ -189,7 +189,7 @@ Legend:
 - [~] Scoring behavior still needs explicit business-rule confirmation for required/text/partial items.
 - [x] Freeze appraisal version items after the version is referenced by a review or official appraisal.
 - [~] Re-finalization business behavior is still not formally decided.
-- [ ] Add tests for required items, text items, percentages, closed periods, mixed versions, concurrent activation, and yearly aggregation idempotency.
+- [~] Add appraisal scoring tests for required items, text items, numeric bounds, percentages, and competing activation requests; closed-period, mixed-version, and yearly-aggregation idempotency cases remain.
 
 ## Phase 9 — Dependency and Frontend Maintenance
 
@@ -220,21 +220,21 @@ Legend:
 
 - [x] Confirm route cache works after the current changes.
 - [~] Queue retry/timeout settings improved for backups.
-- [ ] Verify production `.env` values outside this code review: `APP_ENV=production`, `APP_DEBUG=false`.
+- [~] Verify production `.env` values outside this code review: the current local environment is correctly `APP_ENV=local`, `APP_DEBUG=true`, `LOG_LEVEL=debug`, `FILESYSTEM_DISK=local`, and `QUEUE_CONNECTION=sync`; deployment must override these for production.
 - [x] Verify config cache and view cache locally; deployment-environment verification remains operational.
-- [ ] Verify durable shared storage/object storage needs before horizontal scaling.
-- [ ] Configure production log level, rotation, and centralized collection.
+- [~] Verify durable shared storage/object storage needs before horizontal scaling; local storage is currently configured and production object storage remains a deployment decision.
+- [~] Configure production log level, rotation, and centralized collection; Laravel daily and external channels are available, but deployment values remain environment-specific.
 - [ ] Add sensitive-data redaction where required.
-- [ ] Monitor slow queries, request duration, queue duration, failed jobs, memory, backups, authorization failures, and app errors.
+- [~] Monitor slow queries, request duration, queue duration, failed jobs, memory, backups, authorization failures, and app errors; query budgets now cover core MVC pages, while external monitoring is deployment-specific.
 - [ ] Add structured audit events for role changes, impersonation, medical edits, imports, approvals, restores, and backup failures.
-- [ ] Schedule restore drills and authorization reviews.
+- [~] Schedule restore drills and authorization reviews; one disposable MySQL restore drill is complete and recurring scheduling remains operational work.
 
 ## Phase 11 — Static Analysis and Code Quality
 
 - [x] Run Pint on dirty PHP files.
 - [x] Confirm `vendor/bin/phpstan` is not installed.
 - [x] Confirm Composer has no static-analysis script configured.
-- [ ] Add PHPStan/Larastan after dependency approval.
+- [~] Add PHPStan/Larastan after dependency approval; Composer installation is currently blocked by the Laravel 10 security-advisory policy, so no dependency changes were made.
 - [ ] Establish a realistic static-analysis baseline.
 - [ ] Enforce static analysis on new/touched code after baseline exists.
 - [ ] Gradually reduce baseline issues.
@@ -244,10 +244,10 @@ Legend:
 - [x] Remove mutable request-static helper state from `Rules`.
 - [x] Make nullable user relation accessors safer for long-lived workers.
 - [~] Some Octane-readiness risks have been reduced as part of normal fixes.
-- [ ] Do not install Octane yet.
-- [ ] Finish security/correctness/query/report/queue/dependency/production work first.
+- [x] Do not install Octane yet; PHP-FPM remains the measured baseline.
+- [~] Finish security/correctness/query/report/queue/dependency/production work first before considering Octane; current remediation is substantially complete but deployment monitoring and static-analysis setup remain.
 - [ ] Benchmark realistic PHP-FPM workloads.
-- [ ] Audit remaining static mutable state, singleton/request state, memory growth, and package compatibility.
+- [x] Audit remaining static mutable state, singleton/request state, memory growth, and package compatibility; no application static mutable state was found.
 - [ ] Benchmark Octane only after the app is stable under PHP-FPM.
 - [ ] Adopt Octane only if measurements prove meaningful benefit.
 

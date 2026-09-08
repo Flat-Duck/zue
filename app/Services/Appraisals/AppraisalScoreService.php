@@ -4,6 +4,7 @@ namespace App\Services\Appraisals;
 
 use App\Models\Appraisals\AppraisalReview;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AppraisalScoreService
 {
@@ -38,16 +39,24 @@ class AppraisalScoreService
 
                     if ($incoming !== null && $incoming !== '') {
                         if ($fvi->item && $fvi->item->type === 'text') {
-                            $scoreRow->text_value = $incoming;
+                            $scoreRow->text_value = (string) $incoming;
                             $scoreRow->score = null;
                         } else {
-                            $incoming = (int) $incoming;
-                            if ($incoming > $maxScore) {
-                                $incoming = $maxScore;
+                            if (! is_numeric($incoming) || (float) $incoming < 0 || (float) $incoming > $maxScore || (float) $incoming !== (float) (int) $incoming) {
+                                throw ValidationException::withMessages([
+                                    'scores.'.$scoreRow->form_version_item_id => "Score must be an integer between 0 and {$maxScore}.",
+                                ]);
                             }
-                            $scoreRow->score = $incoming;
+
+                            $scoreRow->score = (int) $incoming;
                         }
                     } else {
+                        if ($fvi->is_required) {
+                            throw ValidationException::withMessages([
+                                'scores.'.$scoreRow->form_version_item_id => 'This appraisal item is required.',
+                            ]);
+                        }
+
                         $scoreRow->score = null;
                         if ($fvi->item && $fvi->item->type === 'text') {
                             $scoreRow->text_value = null;

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GenerateYearlyAppraisalsJob;
 use App\Models\Appraisals\AppraisalPeriod;
+use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAggregationService;
 use Illuminate\Http\Request;
 
@@ -94,6 +96,16 @@ class AppraisalPeriodController extends Controller
         ]);
 
         $year = (int) ($validated['year'] ?? now()->year);
+
+        $employeeCount = Employee::query()->whereNull('archived_at')->count();
+        $queueThreshold = (int) config('appraisals.yearly_queue_employee_threshold', 500);
+
+        if ($employeeCount >= $queueThreshold && config('queue.default') !== 'sync') {
+            GenerateYearlyAppraisalsJob::dispatch($year);
+
+            return back()->with('success', "تم وضع توليد التقييم السنوي لعام {$year} في قائمة الانتظار.");
+        }
+
         $service->aggregateYearly($year);
 
         return back()->with('success', "تم توليد التقييم السنوي لعام {$year} بنجاح.");
