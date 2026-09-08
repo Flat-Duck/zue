@@ -66,7 +66,18 @@ class AppraisalScoringBusinessRulesTest extends TestCase
         $this->assertSame(0, $updated->fresh()->max_score);
     }
 
-    private function reviewWithItem(string $type, bool $required, int $maxScore): array
+    public function test_closed_periods_reject_score_updates(): void
+    {
+        [$review, $score] = $this->reviewWithItem('score', false, 10, 'closed');
+
+        $this->expectException(ValidationException::class);
+
+        app(AppraisalScoreService::class)->updateScores($review, [
+            $score->form_version_item_id => 5,
+        ]);
+    }
+
+    private function reviewWithItem(string $type, bool $required, int $maxScore, string $periodStatus = 'open'): array
     {
         $form = AppraisalForm::query()->create([
             'code' => 'FORM_'.uniqid(),
@@ -99,7 +110,7 @@ class AppraisalScoringBusinessRulesTest extends TestCase
             'quarter' => 1,
             'window_open_from' => '2026-01-01',
             'window_open_to' => '2026-03-31',
-            'status' => 'open',
+            'status' => $periodStatus,
         ]);
         $review = AppraisalReview::query()->create([
             'appraisal_period_id' => $period->id,

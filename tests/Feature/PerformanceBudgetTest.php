@@ -41,12 +41,45 @@ class PerformanceBudgetTest extends TestCase
 
         foreach ($budgets as $route => $budget) {
             $queriesBeforeRequest = $queries;
+            $startedAt = microtime(true);
+            $memoryBefore = memory_get_usage(true);
 
             $response = $this->get(route($route));
 
             $response->assertOk();
             $requestQueries = $queries - $queriesBeforeRequest;
+            $elapsedMilliseconds = (microtime(true) - $startedAt) * 1000;
+            $memoryDelta = max(0, memory_get_peak_usage(true) - $memoryBefore);
+
+            fwrite(STDOUT, sprintf(
+                "\n%s: %d queries, %.1f ms, %.2f MB peak delta",
+                $route,
+                $requestQueries,
+                $elapsedMilliseconds,
+                $memoryDelta / 1024 / 1024
+            ));
+
             $this->assertLessThanOrEqual($budget, $requestQueries, $route.' exceeded its query budget.');
+        }
+    }
+
+    public function test_major_queries_have_explain_plans(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            $this->markTestSkipped('EXPLAIN baseline uses the MySQL query planner.');
+        }
+
+        $plans = [
+            DB::select('EXPLAIN SELECT id FROM employees WHERE archived_at IS NULL ORDER BY english_name LIMIT 50'),
+            DB::select('EXPLAIN SELECT employee_id, day FROM time_sheets WHERE day >= ? AND day < ? ORDER BY day DESC LIMIT 100', [
+                '2026-01-01',
+                '2027-01-01',
+            ]),
+            DB::select('EXPLAIN SELECT employee_id, COUNT(*) FROM time_sheets GROUP BY employee_id'),
+        ];
+
+        foreach ($plans as $plan) {
+            $this->assertNotEmpty($plan);
         }
     }
 }

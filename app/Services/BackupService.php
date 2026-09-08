@@ -143,6 +143,24 @@ class BackupService
                 }
 
                 unlink($tempPath);
+
+                if ($log) {
+                    $log->update(['verification_status' => 'running']);
+                }
+
+                try {
+                    $this->verifyStoredBackup('backups/'.$filename);
+                } catch (Throwable $exception) {
+                    if ($log) {
+                        $log->update([
+                            'verification_status' => 'failed',
+                            'verification_error' => $exception->getMessage(),
+                        ]);
+                    }
+
+                    throw $exception;
+                }
+
                 $this->cleanupOldBackups();
 
                 if ($log) {
@@ -150,6 +168,8 @@ class BackupService
                         'status' => 'completed',
                         'filename' => $filename,
                         'completed_at' => now(),
+                        'verification_status' => 'passed',
+                        'verified_at' => now(),
                     ]);
                 }
 
@@ -228,5 +248,29 @@ class BackupService
         }
 
         return '`'.$identifier.'`';
+    }
+
+    private function verifyStoredBackup(string $path): void
+    {
+        $disk = Storage::disk('local');
+        if (! $disk->exists($path) || $disk->size($path) < 1) {
+            throw new RuntimeException('Backup verification failed: stored file is missing or empty.');
+        }
+
+        $stream = $disk->readStream($path);
+        if (! is_resource($stream)) {
+            throw new RuntimeException('Backup verification failed: stored file cannot be read.');
+        }
+
+        $content = fread($stream, 4096) ?: '';
+        if (fseek($stream, -4096, SEEK_END) === 0) {
+            $content .= fread($stream, 4096) ?: '';
+        }
+        fclose($stream);
+
+        if (! str_contains((string) $content, 'SET FOREIGN_KEY_CHECKS=0;')
+            || ! str_contains((string) $content, 'SET FOREIGN_KEY_CHECKS=1;')) {
+            throw new RuntimeException('Backup verification failed: foreign-key restore guards are missing.');
+        }
     }
 }

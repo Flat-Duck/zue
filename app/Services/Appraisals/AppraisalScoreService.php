@@ -21,6 +21,13 @@ class AppraisalScoreService
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            $review->load('period');
+            if (! $review->period?->isOpen()) {
+                throw ValidationException::withMessages([
+                    'review' => 'Scores cannot be changed after the appraisal period is closed.',
+                ]);
+            }
+
             $review->load(['scores.formVersionItem.item']);
 
             $total = 0;

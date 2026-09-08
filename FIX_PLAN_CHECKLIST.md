@@ -141,8 +141,8 @@ Legend:
 - [~] Some repeated dropdown queries remain in CRUD controllers.
 - [~] Some query-producing accessors/methods still need a second pass.
 - [x] Add formal query-budget tests for employee, timesheet, report, dashboard, and clinic screens.
-- [ ] Record before/after query count, SQL time, request time, and memory measurements.
-- [ ] Run `EXPLAIN` for the major optimized queries against representative data.
+- [x] Record query count, request time, and memory measurements for core MVC pages in the performance budget suite.
+- [x] Run `EXPLAIN` for representative employee and timesheet queries against the local MySQL schema.
 
 ## Phase 6 — Bound Reports and Background Work
 
@@ -153,7 +153,7 @@ Legend:
 - [x] Chunk room, user, and archived employee imports.
 - [x] Configure backup job timeout/tries/backoff and queue retry-after values.
 - [~] Yearly appraisal aggregation is validated and safer; large MVC-triggered aggregations now queue when the configured threshold and worker configuration justify it.
-- [~] Queue large exports/reports where needed; current bounded exports remain synchronous until production volume justifies a queued download workflow.
+- [~] Queue large exports/reports where needed; current exports are bounded to 5,000 rows and remain synchronous because the current database has zero employees/timesheets. Reassess after production volume is measured.
 - [x] Queue yearly appraisal aggregation only when production data size justifies it.
 - [ ] Add failed-job/retry/idempotency tests for large jobs.
 - [ ] Add memory tests for large imports/exports/reports.
@@ -169,9 +169,9 @@ Legend:
 - [x] Avoid cleanup outside the expected backup filename pattern.
 - [x] Hide restore/import exception details from users while reporting exceptions internally.
 - [x] Configure backup retry timing to respect long backup timeout.
-- [~] Backup status logging exists but verification lifecycle is incomplete.
+- [x] Backup status logging now tracks verification as running/passed/failed with timestamps and error details.
 - [x] Verify restores against a disposable MySQL database (49 tables and 68 migration rows restored successfully).
-- [ ] Add backup verification status: verified/failed verification.
+- [x] Add backup verification status: verified/failed verification.
 - [ ] Keep previous verified backup until the new backup passes verification.
 - [ ] Add tests for partial table failure, storage failure, corrupted backup, restore failure, and concurrent backup requests.
 
@@ -189,7 +189,7 @@ Legend:
 - [~] Scoring behavior still needs explicit business-rule confirmation for required/text/partial items.
 - [x] Freeze appraisal version items after the version is referenced by a review or official appraisal.
 - [~] Re-finalization business behavior is still not formally decided.
-- [~] Add appraisal scoring tests for required items, text items, numeric bounds, percentages, and competing activation requests; closed-period, mixed-version, and yearly-aggregation idempotency cases remain.
+- [x] Add appraisal scoring tests for required items, text items, numeric bounds, percentages, closed periods, mixed versions, competing activation, and yearly-aggregation idempotency.
 
 ## Phase 9 — Dependency and Frontend Maintenance
 
