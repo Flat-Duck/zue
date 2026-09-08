@@ -2,16 +2,14 @@
 
 namespace Tests\Feature\Controllers;
 
-use App\Models\User;
-use App\Models\Employee;
-
 use App\Models\Center;
-use App\Models\Location;
 use App\Models\Department;
-
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\Employee;
+use App\Models\Location;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 class EmployeeControllerTest extends TestCase
 {
@@ -64,7 +62,7 @@ class EmployeeControllerTest extends TestCase
     {
         $data = Employee::factory()
             ->make()
-            ->toArray();
+            ->getAttributes();
 
         $response = $this->post(route('employees.store'), $data);
 
@@ -133,7 +131,7 @@ class EmployeeControllerTest extends TestCase
             'start_date' => $this->faker->date(),
             'last_date' => $this->faker->date(),
             'total_balance' => $this->faker->randomNumber(0),
-            'archived_at' => $this->faker->dateTime(),
+            'archived_at' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
             'user_id' => $user->id,
             'department_id' => $department->id,
             'location_id' => $location->id,

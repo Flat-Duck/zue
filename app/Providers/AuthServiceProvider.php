@@ -33,6 +33,10 @@ class AuthServiceProvider extends ServiceProvider
                 || $user->permissions()->where('name', 'manage maintenance')->exists();
         });
 
+        Gate::define('manage-appraisals', function ($user): bool {
+            return $user->hasAnyRole(['hr', 'admin', 'super-admin']);
+        });
+
         // Implicitly grant "Super Admin" role all permission checks using can()
         Gate::before(function ($user, $ability) {
             if ($user->isSuperAdmin()) {
