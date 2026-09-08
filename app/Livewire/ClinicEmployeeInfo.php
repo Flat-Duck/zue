@@ -4,21 +4,22 @@ namespace App\Livewire;
 
 use App\Models\ClinicApointment;
 use App\Models\Employee;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ClinicEmployeeInfo extends Component
 {
-    public $prescription;
+    public ?string $prescription = null;
 
-    public $diagnosis;
+    public ?string $diagnosis = null;
 
-    public $year = 2024;
+    public int $year = 2024;
 
-    public $times = [];
+    public array $times = [];
 
-    public $aponitment_id = 0;
+    public int $aponitment_id = 0;
 
     public Employee $employee;
 
@@ -26,50 +27,68 @@ class ClinicEmployeeInfo extends Component
 
     protected $queryString = ['aponitment_id'];
 
-    protected $listeners = ['updateDiagnosis' => 'setDiagnosis',
-        'updatePrescription' => 'setPrescription'];
+    protected $listeners = [
+        'updateDiagnosis' => 'setDiagnosis',
+        'updatePrescription' => 'setPrescription',
+    ];
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function rules(): array
+    {
+        return [
+            'diagnosis' => ['nullable', 'string', 'max:65535'],
+            'prescription' => ['nullable', 'string', 'max:65535'],
+        ];
+    }
 
     #[On('updateDiagnosis')]
-    public function setDiagnosis($content)
+    public function setDiagnosis(?string $content): void
     {
         $this->diagnosis = $content;
     }
 
     #[On('updatePrescription')]
-    public function setPrescription($content)
+    public function setPrescription(?string $content): void
     {
         $this->prescription = $content;
     }
 
     public function mount(Employee $employee): void
     {
-        Gate::authorize('view', $employee);
+        $this->authorizeClinicAccess($employee);
         $this->employee = $employee;
+
         if ($this->aponitment_id !== 0) {
-            $this->aponitment = $this->employee->clinicApointments()->findOrFail($this->aponitment_id);
+            $this->load_apointment($this->aponitment_id);
         }
     }
 
-    public function render()
+    public function render(): View
     {
-        return view('livewire.clinic-employee-info')->with(
-            [
-                'employee' => $this->employee,
-            ]);
+        return view('livewire.clinic-employee-info')->with([
+            'employee' => $this->employee,
+        ]);
     }
 
     #[On('employee-found')]
     public function employee(Employee $employee): void
     {
-        Gate::authorize('view', $employee);
+        $this->authorizeClinicAccess($employee);
         $this->employee = $employee;
+        $this->aponitment = null;
+        $this->aponitment_id = 0;
+        $this->diagnosis = null;
+        $this->prescription = null;
     }
 
     public function load_apointment(int $id): void
     {
-        $this->aponitment_id = $id; // ← هذا السطر الجديد هو اللي يحدث الـ Query String
+        $this->authorizeClinicAccess($this->employee);
 
         $this->aponitment = $this->employee->clinicApointments()->findOrFail($id);
+        $this->aponitment_id = $this->aponitment->id;
         $this->diagnosis = $this->aponitment->diagnosis;
         $this->prescription = $this->aponitment->prescription;
 
@@ -79,31 +98,43 @@ class ClinicEmployeeInfo extends Component
 
     public function save_apointment(): void
     {
-        Gate::authorize('update', $this->employee);
+        $this->authorizeClinicAccess($this->employee);
 
-        $aponitment = ClinicApointment::updateOrCreate(
-            [
-                'id' => $this->aponitment->id,
-                'employee_id' => $this->employee->id,
-            ],
-            [
-                'employee_id' => $this->employee->id,
-                'diagnosis' => $this->diagnosis,
-                'prescription' => $this->prescription,
+        $validated = $this->validate();
+
+        if ($this->aponitment) {
+            $this->aponitment->update([
+                'diagnosis' => $validated['diagnosis'],
+                'prescription' => $validated['prescription'],
                 'date' => now(),
             ]);
+        } else {
+            $this->aponitment = $this->employee->clinicApointments()->create([
+                'diagnosis' => $validated['diagnosis'],
+                'prescription' => $validated['prescription'],
+                'date' => now(),
+            ]);
+        }
+
+        $this->aponitment_id = $this->aponitment->id;
     }
 
     public function new_apointment(): void
     {
-        Gate::authorize('update', $this->employee);
+        $this->authorizeClinicAccess($this->employee);
 
-        $aponitment = ClinicApointment::create([
-            'employee_id' => $this->employee->id,
+        $aponitment = $this->employee->clinicApointments()->create([
             'diagnosis' => '',
             'prescription' => '',
             'date' => now(),
         ]);
+
         $this->load_apointment($aponitment->id);
+    }
+
+    private function authorizeClinicAccess(Employee $employee): void
+    {
+        Gate::authorize('manage-clinic');
+        Gate::authorize('view', $employee);
     }
 }

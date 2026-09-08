@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Appraisals\AppraisalFormVersion;
 use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalItem;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppraisalFormVersionItemsController extends Controller
 {
@@ -67,31 +68,39 @@ class AppraisalFormVersionItemsController extends Controller
             'rows.*.section_override' => 'nullable|in:job_performance,personal_traits,initiative',
         ]);
 
-        foreach ($data['rows'] as $row) {
-            $vi = AppraisalFormVersionItem::where('appraisal_form_version_id', $version->id)
-                ->where('id', $row['id'])
-                ->first();
+        $versionItems = AppraisalFormVersionItem::query()
+            ->where('appraisal_form_version_id', $version->id)
+            ->whereIn('id', collect($data['rows'])->pluck('id'))
+            ->get()
+            ->keyBy('id');
 
-            if (!$vi)
-                continue;
+        DB::transaction(function () use ($data, $versionItems): void {
+            foreach ($data['rows'] as $row) {
+                $versionItem = $versionItems->get((int) $row['id']);
 
-            $vi->update([
-                'max_score_override' => $row['max_score_override'],
-                'sort_order' => $row['sort_order'],
-                'is_required' => (bool) ($row['is_required'] ?? false),
-                'is_active' => (bool) ($row['is_active'] ?? false),
-                'label_override' => $row['label_override'] ?? null,
-                'section_override' => $row['section_override'] ?? null,
-            ]);
-        }
+                if (! $versionItem) {
+                    continue;
+                }
+
+                $versionItem->update([
+                    'max_score_override' => $row['max_score_override'],
+                    'sort_order' => $row['sort_order'],
+                    'is_required' => (bool) ($row['is_required'] ?? false),
+                    'is_active' => (bool) ($row['is_active'] ?? false),
+                    'label_override' => $row['label_override'] ?? null,
+                    'section_override' => $row['section_override'] ?? null,
+                ]);
+            }
+        });
 
         return back()->with('success', 'تم تحديث البنود.');
     }
 
     public function destroy(AppraisalFormVersion $version, AppraisalFormVersionItem $versionItem)
     {
-        if ($versionItem->appraisal_form_version_id !== $version->id)
+        if ($versionItem->appraisal_form_version_id !== $version->id) {
             abort(404);
+        }
 
         $versionItem->delete();
 

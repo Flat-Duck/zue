@@ -34,14 +34,25 @@ class AppraisalFormVersionController extends Controller
         $data['appraisal_form_id'] = $form->id;
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
 
-        $version = AppraisalFormVersion::create($data);
+        $version = DB::transaction(function () use ($data, $form): AppraisalFormVersion {
+            if ($data['is_active']) {
+                AppraisalFormVersion::query()
+                    ->where('appraisal_form_id', $form->id)
+                    ->lockForUpdate()
+                    ->get();
+            }
 
-        // لو خلّيته active، سكّر باقي الـ versions
-        if ($version->is_active) {
-            AppraisalFormVersion::where('appraisal_form_id', $form->id)
-                ->where('id', '!=', $version->id)
-                ->update(['is_active' => false]);
-        }
+            $version = AppraisalFormVersion::create($data);
+
+            if ($version->is_active) {
+                AppraisalFormVersion::query()
+                    ->where('appraisal_form_id', $form->id)
+                    ->whereKeyNot($version->id)
+                    ->update(['is_active' => false]);
+            }
+
+            return $version;
+        });
 
         return redirect()->route('appraisals.version-items.edit', $version->id)
             ->with('success', 'تم إنشاء Version. توا ربط البنود.');

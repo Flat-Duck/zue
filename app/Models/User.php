@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\Searchable;
 use App\Services\TimeSheetAuth\ActorResolver;
 use App\Services\TimeSheetAuthorizationService;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\Scopes\Searchable;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasApiTokens;
+    use HasFactory;
     use HasRoles;
     use Notifiable;
-    use HasFactory;
     use Searchable;
-    use HasApiTokens;
 
     protected $fillable = ['number', 'name', 'email', 'password'];
 
@@ -36,7 +35,7 @@ class User extends Authenticatable
 
     public function employee()
     {
-        return $this->hasOne(Employee::class,'id','id');
+        return $this->hasOne(Employee::class, 'id', 'id');
         // If you want to use employees.user_id instead, change to:
         // return $this->hasOne(Employee::class, 'user_id', 'id');
     }
@@ -51,36 +50,38 @@ class User extends Authenticatable
         return $this->hasRole('super-admin');
     }
 
-    public function center()
+    public function center(): ?int
     {
-        return $this->employee->center_id;
+        return $this->employee?->center_id;
     }
 
-    public function department()
+    public function department(): ?int
     {
-        return $this->employee->department_id;
+        return $this->employee?->department_id;
     }
 
-    public function location()
+    public function location(): ?int
     {
-        return $this->employee->location_id;
+        return $this->employee?->location_id;
     }
 
-    public function employee_level()
+    public function employee_level(): ?int
     {
-        return $this->employee->employee_level;
+        return $this->employee?->employee_level;
     }
 
-    public function management_level()
+    public function management_level(): ?int
     {
-        return $this->employee->management_level;
+        return $this->employee?->management_level;
     }
 
-    public function getSignaturePathAttribute() {
-        return $this->signature->image_path;
+    public function getSignaturePathAttribute(): ?string
+    {
+        return $this->signature?->image_path;
     }
 
-    public function signature() {
+    public function signature()
+    {
         return $this->hasOne(Signature::class);
     }
 
@@ -109,7 +110,7 @@ class User extends Authenticatable
         }
 
         $employee = app(ActorResolver::class)->resolveEmployee($this);
-        if (!$employee) {
+        if (! $employee) {
             return collect();
         }
 
@@ -127,7 +128,7 @@ class User extends Authenticatable
         }
 
         $employee = app(ActorResolver::class)->resolveEmployee($this);
-        if (!$employee) {
+        if (! $employee) {
             return Employee::query()->whereRaw('0 = 1');
         }
 
@@ -159,7 +160,7 @@ class User extends Authenticatable
         $selfEmployee = app(ActorResolver::class)->resolveEmployee($this);
         $targetEmployee = app(ActorResolver::class)->resolveEmployee($target);
 
-        if (!$selfEmployee || !$targetEmployee) {
+        if (! $selfEmployee || ! $targetEmployee) {
             return false;
         }
 

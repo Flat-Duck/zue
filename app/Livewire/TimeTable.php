@@ -7,7 +7,6 @@ use App\Helpers\TimeSheetBuilder;
 use App\Jobs\CalculateBalance;
 use App\Models\Employee;
 use App\Models\TimeSheet;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
@@ -47,7 +46,7 @@ class TimeTable extends Component
             $this->getOtherEmployees();
             $this->ov = $this->employee->default_over_time_value;
         }
-        $this->updateUi();
+        $this->loadByYear();
     }
 
     private function valid(): bool
@@ -105,8 +104,6 @@ class TimeTable extends Component
 
     public function render()
     {
-        $this->loadByYear();
-
         return view('livewire.time-table')->with(
             [
                 'employee' => $this->employee,
@@ -133,7 +130,6 @@ class TimeTable extends Component
     public function employee(Employee $employee): void
     {
         Gate::authorize('view', $employee);
-        Debugbar::critical('called');
         $this->employee = $employee;
         $this->loadByYear();
         $this->getOtherEmployees();
@@ -148,8 +144,9 @@ class TimeTable extends Component
 
     public function getOtherEmployees(): void
     {
-        $this->dep_employees = $this->employee->center->employees()->pluck('id', 'number');
-        // dd($this->dep_employees);
+        $this->dep_employees = $this->employee->center
+            ? $this->employee->center->employees()->orderBy('number')->pluck('id', 'number')
+            : collect();
     }
 
     private function authorizeEmployeeMutation(): void

@@ -3,21 +3,25 @@
 namespace App\Livewire;
 
 use App\Models\Flight;
-use Livewire\Component;
-use Illuminate\View\View;
 use App\Models\Passenger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\View\View;
+use Livewire\Component;
 
 class FlightPassengersDetail extends Component
 {
     use AuthorizesRequests;
 
     public Flight $flight;
+
     public Passenger $passenger;
+
     public $passengersForSelect = [];
+
     public $passenger_id = null;
 
     public $showingModal = false;
+
     public $modalTitle = 'New Passenger';
 
     protected $rules = [
@@ -26,14 +30,16 @@ class FlightPassengersDetail extends Component
 
     public function mount(Flight $flight): void
     {
+        $this->authorize('view', $flight);
+
         $this->flight = $flight;
-        $this->passengersForSelect = Passenger::pluck('name', 'id');
+        $this->passengersForSelect = Passenger::query()->orderBy('name')->pluck('name', 'id');
         $this->resetPassengerData();
     }
 
     public function resetPassengerData(): void
     {
-        $this->passenger = new Passenger();
+        $this->passenger = new Passenger;
 
         $this->passenger_id = null;
 
@@ -42,16 +48,15 @@ class FlightPassengersDetail extends Component
 
     public function newPassenger(): void
     {
-
         $this->modalTitle = trans('crud.flight_passengers.new_title');
-      //  $this->resetPassengerData();
+        $this->resetPassengerData();
 
         $this->showModal();
     }
 
     public function showModal(): void
     {
-        //$this->resetErrorBag();
+        $this->resetErrorBag();
         $this->showingModal = true;
     }
 
@@ -64,16 +69,17 @@ class FlightPassengersDetail extends Component
     {
         $this->validate();
 
-        $this->authorize('create', Passenger::class);
+        $this->authorize('update', $this->flight);
+        $this->authorize('view', Passenger::query()->findOrFail($this->passenger_id));
 
-        $this->flight->passengers()->attach($this->passenger_id, []);
+        $this->flight->passengers()->syncWithoutDetaching([$this->passenger_id]);
 
         $this->hideModal();
     }
 
     public function detach($passenger): void
     {
-        $this->authorize('delete-any', Passenger::class);
+        $this->authorize('update', $this->flight);
 
         $this->flight->passengers()->detach($passenger);
 

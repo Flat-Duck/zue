@@ -12,6 +12,32 @@ components, Blade views, Eloquent behavior, authorization, reports, queues, and
 production operations. New tests will be written for those workflows after the
 application fixes are complete.
 
+## Current implementation status
+
+Completed remediation so far:
+
+* Legacy generated API surface archived and removed from active route loading.
+* Public registration disabled.
+* Maintenance operations protected by a dedicated server-side gate.
+* Backup/export/import/restore handling hardened.
+* Timesheet report inputs validated and bounded.
+* Monthly attendance report authorization moved into a Form Request.
+* Employee, room, clinic, report, dashboard, and timesheet list queries improved with eager loading, bounded result sets, or index-friendly date ranges.
+* Employee-room pivot metadata and timesheet employee/day index migrations added.
+* Operations archive/unarchive actions protected with an admin-only gate and bounded numeric input parsing.
+* Clinic and injury-report MVC routes protected with an admin-only clinic gate.
+* Clinic Livewire actions secured independently of controller routes.
+* SearchEmployee Livewire component now validates input, handles not-found results safely, and authorizes employee dispatch.
+* Flight employee/passenger Livewire components now authorize the flight being mutated and avoid duplicate pivot inserts.
+* Flight pivot lookup indexes added without forcing unique constraints on existing data.
+* Appraisal active-version writes are transactional, yearly generation validates its year, and version-item bulk updates avoid one query per row.
+* Timesheet approval-level query is correctly scoped to the requested employee.
+* TimeTable no longer reloads its yearly grid from render and no longer emits debug logs on employee changes.
+* Request-static helper state removed from `Rules` for long-lived worker safety.
+* Nullable user employee/signature accessors now fail safely instead of crashing.
+
+Remaining work should focus on the parts still not converted to dedicated Form Requests, broader database constraint/index cleanup that needs production-data review, dependency upgrades, and the new test suite the project needs after the application behavior is finalized.
+
 ## Purpose
 
 This plan converts the application audit into a controlled remediation program.

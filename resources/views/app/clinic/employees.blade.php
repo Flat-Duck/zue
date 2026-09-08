@@ -1,4 +1,4 @@
-@extends('layouts.app', ['page' => 'employees'])
+@extends('layouts.app', ['page' => 'clinic'])
 @section('content')
 <div class="card">
     <div class="card-body border-bottom py-3">

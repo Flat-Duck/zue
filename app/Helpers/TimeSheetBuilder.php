@@ -89,7 +89,7 @@ class TimeSheetBuilder
         $f = 0;
         $total = 0;
         $count = TimeSheet::where('employee_id', $employee_id)
-            ->whereDate('day', '<', Carbon::parse($date))
+            ->where('day', '<', Carbon::parse($date)->startOfDay())
             ->select('value', DB::raw('COUNT(value) as count'))
             ->groupBy('value')
             ->get();
@@ -110,7 +110,7 @@ class TimeSheetBuilder
     {
         // Fetch and organize the time sheet counts in a hash map
         $timeSheetValues = TimeSheet::whereIn('employee_id', $employeeIds)
-            ->whereDate('day', '<', $date)
+            ->where('day', '<', Carbon::parse($date)->startOfDay())
             ->select('employee_id', 'value', DB::raw('COUNT(value) as count'))
             ->groupBy('employee_id', 'value')
             ->get()
@@ -142,14 +142,23 @@ class TimeSheetBuilder
 
     public static function unApprovedTimeSheetLevel($employee_id)
     {
-        $TimeSheet = TimeSheet::where('employee_id', $employee_id)->orderByDesc('id')
-            ->whereNull('timekeeper_id')->OrwhereNull('supervisor_id')->OrwhereNull('superintendent_id')->limit(1)->first();
-        if ($TimeSheet) {
-            if ($TimeSheet->timekeeper_id === null) {
+        $timeSheet = TimeSheet::query()
+            ->where('employee_id', $employee_id)
+            ->where(function ($query): void {
+                $query
+                    ->whereNull('timekeeper_id')
+                    ->orWhereNull('supervisor_id')
+                    ->orWhereNull('superintendent_id');
+            })
+            ->orderByDesc('id')
+            ->first();
+
+        if ($timeSheet) {
+            if ($timeSheet->timekeeper_id === null) {
                 return 1;
-            } elseif ($TimeSheet->supervisor_id === null) {
+            } elseif ($timeSheet->supervisor_id === null) {
                 return 2;
-            } elseif ($TimeSheet->superintendent_id === null) {
+            } elseif ($timeSheet->superintendent_id === null) {
                 return 3;
             }
         }

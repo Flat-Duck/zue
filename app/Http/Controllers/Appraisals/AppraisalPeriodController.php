@@ -83,13 +83,18 @@ class AppraisalPeriodController extends Controller
     public function destroy(AppraisalPeriod $period)
     {
         $period->delete();
+
         return redirect()->route('appraisals.periods.index')->with('success', 'Period deleted successfully.');
     }
 
     public function generateYearly(Request $request, AppraisalAggregationService $service)
     {
-        $year = $request->input('year', now()->year);
-        $service->aggregateYearly((int) $year);
+        $validated = $request->validate([
+            'year' => ['nullable', 'integer', 'min:2020', 'max:2099'],
+        ]);
+
+        $year = (int) ($validated['year'] ?? now()->year);
+        $service->aggregateYearly($year);
 
         return back()->with('success', "تم توليد التقييم السنوي لعام {$year} بنجاح.");
     }

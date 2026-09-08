@@ -33,6 +33,14 @@ class AuthServiceProvider extends ServiceProvider
                 || $user->permissions()->where('name', 'manage maintenance')->exists();
         });
 
+        Gate::define('manage-operations', function ($user): bool {
+            return $user->permissions()->where('name', 'manage operations')->exists();
+        });
+
+        Gate::define('manage-clinic', function ($user): bool {
+            return $user->permissions()->where('name', 'manage clinic')->exists();
+        });
+
         Gate::define('manage-appraisals', function ($user): bool {
             return $user->hasAnyRole(['hr', 'admin', 'super-admin']);
         });

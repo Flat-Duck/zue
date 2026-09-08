@@ -3,27 +3,39 @@
 namespace App\Livewire;
 
 use App\Models\Employee;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
 class SearchEmployee extends Component
 {
-    public $number;
-    
-    public $employee;
-    
-    public function render()
+    public ?int $number = null;
+
+    public ?Employee $employee = null;
+
+    public function render(): View
     {
         return view('livewire.search-employee');
     }
 
-    public function searchEmployees()
+    public function searchEmployees(): void
     {
-        $this->employee = Employee::where('number', $this->number)->first();
-        if ($this->employee) {
-            $this->dispatch('employee-found', $this->employee);
-        } else {
+        $this->validate([
+            'number' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $this->employee = Employee::query()
+            ->where('number', $this->number)
+            ->first();
+
+        if (! $this->employee) {
             $this->js("alert('Employee Not Found')");
+
+            return;
         }
-        $this->redirect( $this->employee->id,  true);
+
+        Gate::authorize('view', $this->employee);
+
+        $this->dispatch('employee-found', $this->employee);
     }
 }

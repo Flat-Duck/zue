@@ -112,7 +112,7 @@ Route::prefix('/')
         Route::get('clinic/annual_screening/{employee}', [ClinicApointmentController::class, 'annual_screening'])->name('clinic.annual_screening');
         Route::get('clinic/history/{employee}', [ClinicApointmentController::class, 'history'])->name('clinic.history');
         Route::get('clinic/diagnosis/{employee}', [ClinicApointmentController::class, 'diagnosis'])->name('clinic.diagnosis');
-        Route::resource('clinic', ClinicApointmentController::class); // ->name('clinic');
+        Route::resource('clinic', ClinicApointmentController::class)->parameters(['clinic' => 'clinicApointment']);
 
         Route::resource('departments', DepartmentController::class);
         Route::delete('flights/{flight}/approve', [FlightController::class, 'approve'])->name('flights.approve');

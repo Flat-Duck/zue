@@ -3,97 +3,90 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClinicalExamStoreRequest;
+use App\Models\ClinicalExam;
 use App\Models\ClinicApointment;
 use App\Models\Employee;
-use App\Models\ClinicalExam;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ClinicApointmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('can:manage-clinic');
+    }
+
+    public function index(Request $request): View
     {
         $search = $request->get('search', '');
 
-        $employees = Employee::search($search)
+        $employees = Employee::query()
+            ->with(['location', 'department', 'center'])
+            ->search($search)
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
-        return view('app.clinic.employees',compact('employees', 'search'));
+        return view('app.clinic.employees', compact('employees', 'search'));
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function annual_screening(Request $request)
+
+    public function annual_screening(Request $request): View
     {
         $search = $request->get('search', '');
 
-        $employees = Employee::search($search)
+        $employees = Employee::query()
+            ->with(['location', 'department', 'center'])
+            ->search($search)
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
-        return view('app.clinic.employees',compact('employees', 'search'));
-    }
-    /**
-     * Display a listing of the resource.
-     */
-    public function diagnosis(Employee $employee)
-    {
-        $apointtmet = new ClinicApointment();
-        
-        return view('app.clinic.diagnosis',compact('employee'));
+        return view('app.clinic.employees', compact('employees', 'search'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function history(Employee $employee): View
+    {
+        return view('app.clinic.index', compact('employee'));
+    }
+
+    public function diagnosis(Employee $employee): View
+    {
+        return view('app.clinic.diagnosis', compact('employee'));
+    }
+
+    public function create(): View
     {
         return view('app.clinic.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(ClinicalExamStoreRequest $request)
+    public function store(ClinicalExamStoreRequest $request): RedirectResponse
     {
-        request()->all();
-        ClinicalExam::create();
+        ClinicalExam::query()->create($request->validated());
+
+        return redirect()->route('clinic.index')->with('success', 'Clinical exam created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ClinicApointment $clinicApointment)
+    public function show(ClinicApointment $clinicApointment): RedirectResponse
     {
-        //
+        return redirect()->route('clinic.diagnosis', $clinicApointment->employee_id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ClinicApointment $clinicApointment)
+    public function edit(ClinicApointment $clinicApointment): RedirectResponse
     {
-        //
+        return redirect()->route('clinic.diagnosis', $clinicApointment->employee_id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ClinicApointment $clinicApointment)
+    public function update(Request $request, ClinicApointment $clinicApointment): RedirectResponse
     {
-        //
+        return redirect()->route('clinic.diagnosis', $clinicApointment->employee_id);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ClinicApointment $clinicApointment)
+    public function destroy(ClinicApointment $clinicApointment): RedirectResponse
     {
-        //
+        $clinicApointment->delete();
+
+        return redirect()->route('clinic.index')->with('success', 'Clinic appointment deleted successfully.');
     }
 }
