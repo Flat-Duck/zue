@@ -6,6 +6,7 @@ export default defineConfig({
         laravel([
             'resources/sass/app.scss',
             'resources/js/app.js',
+            'resources/js/editor.js',
         ]),
     ],
 });

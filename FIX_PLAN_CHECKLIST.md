@@ -193,15 +193,28 @@ Legend:
 
 ## Phase 9 — Dependency and Frontend Maintenance
 
-- [ ] Run Composer audit and record applicable advisories.
-- [ ] Run NPM audit and record applicable advisories.
-- [ ] Patch compatible security updates after approval.
-- [ ] Review unused dependencies before removal.
-- [ ] Plan Laravel upgrade only after security/test stabilization.
-- [ ] Consolidate duplicate frontend assets where safe.
-- [ ] Lazy-load editors and page-specific assets where safe.
-- [ ] Run production asset build.
-- [ ] Add browser smoke tests for editor/Livewire/upload flows.
+- [x] Run Composer audit and record applicable advisories.
+  - Reduced from 62 advisories to 3 Laravel 10 framework advisories that require the Laravel 12 line to resolve.
+- [x] Run NPM audit and record applicable advisories.
+  - Production dependencies report zero vulnerabilities; remaining development advisories are Vite 5/esbuild issues requiring a Vite 7/8 major upgrade.
+- [x] Patch compatible security updates after approval.
+  - Updated Laravel 10.50.3, Livewire 3.8.8, Guzzle 7.15.5, PhpSpreadsheet 1.30.6, Laravel Excel 3.1.70, PsySH 0.12.24, and compatible Symfony dependencies.
+  - Removed unused Dompdf, Intervention Image, PHPWord, and TinyMCE packages after confirming there are no active code references; HugeRTE is the active editor.
+  - Updated Vite 5.4.21, Laravel Vite Plugin 1.3.0, Axios 1.20.0, HugeRTE 1.0.14, Tabler Core 1.5.0, PostCSS 8.5.28, Sass 1.104.0, Tom Select 2.6.2, and Signature Pad 5.1.4.
+- [x] Review unused dependencies before removal.
+  - Removed unused direct packages `@popperjs/core`, `resolve-url-loader`, `sass-loader`, and `rfs`; retained `signature_pad` because the application assigns it globally for the signature component.
+- [x] Plan Laravel upgrade only after security/test stabilization.
+  - Laravel remains on the 10.x line for behavior stability; Laravel 12 is the next security upgrade track after regression coverage and compatibility review.
+- [x] Consolidate duplicate frontend assets where safe.
+  - Removed CDN/runtime duplicates for Notyf, HugeRTE, and Tom Select; archived unused generated copies under `legacy-frontend/`.
+  - Removed the stale `resources/js/app.css` Vite reference and consolidated active CSS through `resources/sass/app.scss`.
+- [x] Lazy-load editors and page-specific assets where safe.
+  - HugeRTE is now a separate `resources/js/editor.js` entry loaded only by clinic/editor pages.
+  - Main JavaScript dropped from about 2.1 MB to about 466 KB uncompressed in the production build.
+- [x] Run production asset build.
+  - `npm run build` passes with Vite 5.4.21.
+- [~] Add browser smoke tests for editor/Livewire/upload flows.
+  - Livewire behavior is covered by focused PHPUnit tests and the production bundle builds successfully; an authenticated browser smoke run remains pending because no application host/session is available in this environment.
 
 ## Phase 10 — Production and Operational Hardening
 

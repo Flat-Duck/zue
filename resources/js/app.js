@@ -1,14 +1,6 @@
-import '../sass/tabler.scss';
 import './bootstrap';
 import './tabler-init';
-import './hugerte-init';
-// import './tom-select.js';
-// import './bootstrap';
 
-// Tabler core JS (optional if you use Tabler components)
-// import '@tabler/core/dist/js/tabler.min.js';
-
-// Tom Select
 import TomSelect from 'tom-select';
 
 // Init all multi-selects for management scopes

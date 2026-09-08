@@ -29,6 +29,7 @@
 
     @push('scripts')
         @livewireScripts
+        @vite('resources/js/editor.js')
         <script>
             document.addEventListener("DOMContentLoaded", function() {
 

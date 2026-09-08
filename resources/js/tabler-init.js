@@ -17,9 +17,7 @@
 Import the Tabler Js with Demo theme
 */
 import '@tabler/core/js/tabler';
-import '@tabler/core/dist/libs/signature_pad/dist/signature_pad.js'
 
 
 // import '@tabler/core/src/js/demo-theme';
 // import '../../node_modules/tom-select/src/tom-select';
-

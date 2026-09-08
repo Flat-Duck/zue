@@ -16,10 +16,6 @@
     {{-- @vite('resources/js/app.js') --}}
     @vite('resources/sass/app.scss')
 
-    @vite('resources/js/app.css')
-
-    <link rel="stylesheet" type="text/css" id="mce-u0"
-        href="https://preview.tabler.io/dist/libs/hugerte/skins/ui/oxide/skin.min.css">
     @livewireStyles
     @yield('styles')
 
@@ -56,11 +52,6 @@
     @livewireScripts
 
     @vite('resources/js/app.js')
-    <script src="{{asset('hugerte.js')}}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    {{--
-    <script src="https://preview.tabler.io/dist/libs/tom-select/dist/js/tom-select.base.min.js?1726507346"></script>
-    --}}
 
     @if (session()->has('success'))
         <script>

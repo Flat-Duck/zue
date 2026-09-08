@@ -28,6 +28,7 @@
 </form>
 @endsection
 @push('scripts')
+      @vite('resources/js/editor.js')
       <script>
             document.addEventListener("DOMContentLoaded", function() {
 

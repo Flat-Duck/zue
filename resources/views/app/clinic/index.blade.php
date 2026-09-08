@@ -31,8 +31,7 @@
     </div>
     
     @push('scripts')
-        {{-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> --}}
-        <script src="{{asset('hugerte.js')}}"></script>
+        @vite('resources/js/editor.js')
             <script>
       document.addEventListener("DOMContentLoaded", function () {
         let options = {
@@ -75,13 +74,5 @@
         hugeRTE.init(options);
       });
     </script>
-        <script>
-            tinymce.init({
-                selector: '#textEditor1, #textEditor2',
-                plugins: 'lists link image preview',
-                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | preview',
-                menubar: false
-            });
-        </script>
     @endpush
 @endsection

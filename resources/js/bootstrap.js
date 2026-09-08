@@ -9,11 +9,10 @@ window._ = _;
 
 import popper from 'popper.js';
 import jquery from 'jquery';
-import SignaturePad from '@tabler/core/dist/libs/signature_pad';
+import SignaturePad from 'signature_pad';
 import bootstrap from 'bootstrap';
-//import TomSelect from 'tom-select';
-// import 'tom-select'
 import TomSelect from 'tom-select';
+import { Notyf } from 'notyf';
 try {
 
     
@@ -21,8 +20,7 @@ try {
     window.$ = window.jQuery = jquery;    
     window.TomSelect = TomSelect || {};
     window.SignaturePad = SignaturePad;
-    // const selectElement = document.querySelector('#my-select');
-    // const tomSelect = new TomSelect(selectElement, { create: true });
+    window.Notyf = Notyf;
     
 } catch (e) {}
 
