@@ -145,12 +145,6 @@ table tr:last-child {
                     @endforeach
 
                     
-                    {{-- <tr class="bg-muted text-white">
-                        <td class="p-1" colspan="32"></td>
-                        <td class="p-1"> {{$tw}} </td>
-                        <td class="p-1"> {{$tf}} </td>
-                        <td class="p-1">-10</td>
-                    </tr> --}}
                 </tbody>
             </table>
         </div>

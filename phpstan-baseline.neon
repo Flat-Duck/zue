@@ -73,12 +73,6 @@ parameters:
 			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
 
 		-
-			message: '#^Class App\\Models\\ClinicalExam referenced with incorrect case\: App\\Models\\CLinicalExam\.$#'
-			identifier: class.nameCase
-			count: 5
-			path: app/Http/Controllers/CLinicalExamController.php
-
-		-
 			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
 			identifier: larastan.relationExistence
 			count: 2

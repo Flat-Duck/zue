@@ -77,12 +77,6 @@
                         <div class="h1 mb-0">{{ $attendanceStats['unpaid_leaves'] }}</div>
                         <div class="text-muted">بدون مرتب (Z)</div>
                     </div>
-                    {{--
-                    <div class="col">
-                        <div class="h1 mb-0">{{ $attendanceStats['penalties'] }}</div>
-                        <div class="text-muted">الجزاءات</div>
-                    </div>
-                    --}}
                 </div>
             </div>
         </div>

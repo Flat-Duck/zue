@@ -70,9 +70,6 @@
                                     <div class="list-group-header sticky-top" style="z-index: 1">{{ $group }}
                                     </div>
                                     @foreach ($groupedApointments as $apointment)
-                                        {{-- <a href="?apointment_id={{ $apointment->id }}" 
-                                            wire:click="load_apointment({{ $apointment->id }})"
-                                            class="list-group-item list-group-item-action py-2 @if($apointment->id == request()->query('apointment_id')) active @endif">{{ $apointment->created_at->format('d/m/Y h:m') }}</a> --}}
                                             <a href="#" wire:click="load_apointment({{ $apointment->id }})"
    class="list-group-item list-group-item-action py-2
    @if($apointment->id == $aponitment_id) active @endif">
@@ -81,10 +78,6 @@
 
                                     @endforeach
                                 @endforeach
-                                {{-- 
-                              <a href="#" class="list-group-item list-group-item-action py-2">A fourth link item</a>
-                              <a class="list-group-item list-group-item-action disabled">A disabled link item</a>
-                              <div class="list-group-header sticky-top">W</div> --}}
                             </div>
                         </div>
                     </div>

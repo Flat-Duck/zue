@@ -41,58 +41,6 @@
         
     @endforelse
 
-{{-- 
-
-    </div>
-    <tbody>
-        
-            <tr>
-                <td></td>
-                <td>{{ $employee->job ?? '-' }}</td>
-                <td></td>
-                <td>{{ $employee->id_card ?? '-' }}</td>
-                <td>{{ $employee->id_card_issue_date ?? '-' }}</td>
-                <td>{{ $employee->passport ?? '-' }}</td>
-                <td>{{ $employee->passport_issue_date ?? '-' }}</td>
-                <td>{{ $employee->address ?? '-' }}</td>
-                <td>{{ $employee->phone ?? '-' }}</td>
-                <td>{{ $employee->email ?? '-' }}</td>
-                <td>{{ optional($employee->user)->name ?? '-' }}</td>
-                <td>{{ optional($employee->location)->name ?? '-' }}</td>
-                <td>{{ optional($employee->department)->name ?? '-' }}</td>
-                <td>{{ optional($employee->center)->name ?? '-' }}</td>
-                <td>{{ $employee->transfered_balance ?? '-' }}</td>
-                <td>{{ $employee->schedule ?? '-' }}</td>
-                <td>{{ $employee->start_date ?? '-' }}</td>
-                <td>{{ $employee->last_date ?? '-' }}</td>
-                <td>{{ $employee->total_balance ?? '-' }}</td>
-                <td>{{ $employee->archived_at ?? '-' }}</td>
-                <td class="text-center" style="width: 134px;">
-                    <div role="group" aria-label="Row Actions" class="btn-group">
-                        @can('update', $employee)
-                            <a href="{{ route('employees.edit', $employee) }}" class="btn btn-icon btn-outline-warinig ms-1">
-                                <i class="ti ti-edit"></i>
-                            </a>
-                            @endcan @can('view', $employee)
-                            <a href="{{ route('employees.show', $employee) }}" class="btn btn-icon btn-outline-info ms-1">
-                                <i class="ti ti-eye"></i>
-                            </a>
-                            @endcan @can('delete', $employee)
-                            <form action="{{ route('employees.destroy', $employee) }}" method="POST"
-                                class="inline pointer ms-1" onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-icon btn-outline-danger">
-                                    <i class="ti ti-trash-x"></i>
-                                </button>
-                            </form>
-                        @endcan
-                    </div>
-                </td>
-            </tr>
-        
-    </tbody>
-    </table>
-    </div> --}}
     <div class="card-footer d-flex align-items-left">
         {!! $employees->render() !!}
     </div>

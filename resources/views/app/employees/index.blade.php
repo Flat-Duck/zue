@@ -148,13 +148,6 @@
                     <td>{{ $employee->number ?? '-' }}</td>
                     <td>{{ $employee->job ?? '-' }}</td>
                     <td>{{ $employee->english_name ?? '-' }}</td>
-                    {{-- <td>{{ $employee->id_card ?? '-' }}</td>
-                    <td>{{ $employee->id_card_issue_date ?? '-' }}</td>
-                    <td>{{ $employee->passport ?? '-' }}</td>
-                    <td>{{ $employee->passport_issue_date ?? '-' }}</td>
-                    <td>{{ $employee->address ?? '-' }}</td>
-                    <td>{{ $employee->phone ?? '-' }}</td>
-                    <td>{{ $employee->email ?? '-' }}</td> --}}
                     <td>{{ optional($employee->user)->name ?? '-' }}</td>
                     <td>{{ optional($employee->location)->name ?? '-' }}</td>
                     <td>{{ optional($employee->department)->name ?? '-' }}</td>

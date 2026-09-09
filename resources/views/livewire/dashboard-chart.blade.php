@@ -1,13 +1,4 @@
 <div class="card">
-    {{-- <div class="card-header">
-        <div>
-            <h3 class="card-title">Timesheet Coverage Summary</h3>
-            <p class="card-subtitle">Monthly distribution of filled vs pending timesheets</p>
-        </div>
-        <div class="card-actions">
-
-        </div>
-    </div> --}}
     <div class="card-body">
         <div class="d-flex align-items-center">
             <div class="subheader">Timesheet Coverage Summary</div>

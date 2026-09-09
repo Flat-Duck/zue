@@ -19,29 +19,8 @@
 
 
             @endforeach
-            {{-- <div class=" list-group-header bg-dark sticky-bottom list-group-item m-0 ps-1 p-0">
-                <div class="btn-group w-100" role="group">
-                    <label class="btn tag">
-                        < </label>
-                            <label class="btn tag"> > </label>
-                </div>
-            </div> --}}
         </div>
 
-        {{-- <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2"
-                style="background-image: url(./static/avatars/000m.jpg)"></span>
-            Paweł Kuna</a>
-        <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2">JL</span>
-            Jeffie Lewzey</a>
-        <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2"
-                style="background-image: url(./static/avatars/002m.jpg)"></span>
-            Mallory Hulme</a>
-        <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2"
-                style="background-image: url(./static/avatars/003m.jpg)"></span>
-            Dunn Slane</a>
-        <a href="#" class="dropdown-item"><span class="avatar avatar-xs rounded me-2"
-                style="background-image: url(./static/avatars/000f.jpg)"></span>
-            Emmy Levet</a> --}}
         <div class="col-5 mb-3">
             <div class="row row-cards">
                 <div class="col-2 mt-3">
@@ -193,19 +172,9 @@
                                 @for ($i = count($days); $i < 31; $i++)
                                     <td class="p-1 bg-dark"></td>
                                 @endfor
-                                {{-- <td class="p-1">@php $w = $days->where('value', 'A')->count(); $tw +=$w @endphp {{$w}}
-                                </td>
-                                <td class="p-1">@php $f = $days->where('value', 'F')->count(); $tf +=$f @endphp {{$f}}</td>
-                                --}}
                                 {{-- <td class="p-1">{{ $w*2 - count($days) }}</td> --}}
                             </tr>
                         @endforeach
-                        {{-- <tr class="bg-muted text-white">
-                            <td class="p-1" colspan="32"></td>
-                            <td class="p-1"> {{$tw}} </td>
-                            <td class="p-1"> {{$tf}} </td>
-                            <td class="p-1">-10</td>
-                        </tr> --}}
                     </tbody>
                 </table>
             </div>

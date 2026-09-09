@@ -125,14 +125,6 @@
                             aria-label="Row Actions"
                             class="btn-group"
                         >
-                            {{-- @can('update', $employee)
-                            <a
-                                href="{{ route('time-sheets.revise', $employee) }}"
-                                class="btn btn-icon btn-outline-warinig ms-1"
-                            >
-                                <i class="ti ti-edit"></i>
-                            </a>
-                            @endcan  --}}
                             @can('view', $employee)
                             <a
                                 href="{{ route('clinic.history', $employee) }}"
@@ -147,7 +139,6 @@
                                     class="btn btn-icon btn-outline-success ms-1" >
                                 <i class="ti ti-heart-rate-monitor"></i>
                             </a>
-                            {{-- //@livewire('icon-time-sheet' ,['employee' => $employee ]) --}}
                         </div>
                     </td>
                 </tr>

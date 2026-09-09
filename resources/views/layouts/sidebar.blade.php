@@ -16,30 +16,6 @@
                                 </a>
                             </li>
                         @endcan
-                        {{-- @can('view-any', App\Models\Employee::class)
-                        <li class="nav-item {{ $page == 'employees' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('employees.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-users"></i>
-                                </span>
-                                <span class="nav-link-title">
-                                    Employees
-                                </span>
-                            </a>
-                        </li>
-                        @endcan --}}
-                        {{-- @can('view-any', App\Models\Employee::class)
-                        <li class="nav-item {{ $page == 'clinic' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('clinic.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <i class="ti ti-building-hospital"></i>
-                                </span>
-                                <span class="nav-link-title">
-                                    clinic
-                                </span>
-                            </a>
-                        </li>
-                        @endcan --}}
 
                         @if (
                                 Auth::user()->can('view-any', App\Models\Flight::class) ||
@@ -302,19 +278,6 @@
                                 </a>
                             </li>
                         @endcan
-                        {{-- @can('view-any', App\Models\TimeSheet::class)
-                        <li class="nav-item {{ $page == 'run' ? 'active' : ''  }}">
-                            <a class="nav-link" href="{{ route('run.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/Time Sheets -->
-                                    <!-- Time Sheets Icon -->
-                                </span>
-                                <span class="nav-link-title">
-                                    RUN
-                                </span>
-                            </a>
-                        </li>
-                        @endcan --}}
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#navbar-appraisals" data-bs-toggle="dropdown"
