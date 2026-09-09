@@ -1,0 +1,781 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#4 \$logId of method App\\Services\\BackupService\:\:performBackup\(\) expects int\|null, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/DatabaseBackupCommand.php
+
+		-
+			message: '#^Match arm comparison between ''employee'' and ''employee'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Console/Commands/ImportManagementScopesToV2.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$count\.$#'
+			identifier: property.notFound
+			count: 10
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Binary operation "\*" between \(float\|int\) and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 2
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$formVersionItem\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$versionItems\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$window_open_from\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$window_open_to\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Parameter \#1 \$employee of method App\\Services\\Appraisals\\AppraisalAttendanceService\:\:getAttendanceStats\(\) expects App\\Models\\Employee, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
+
+		-
+			message: '#^Class App\\Models\\ClinicalExam referenced with incorrect case\: App\\Models\\CLinicalExam\.$#'
+			identifier: class.nameCase
+			count: 5
+			path: app/Http/Controllers/CLinicalExamController.php
+
+		-
+			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ClinicApointmentController.php
+
+		-
+			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ClinicApointmentController.php
+
+		-
+			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ClinicApointmentController.php
+
+		-
+			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/EmployeeController.php
+
+		-
+			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/EmployeeController.php
+
+		-
+			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/EmployeeController.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/EmployeeController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: app/Http/Controllers/EmployeeController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/FlightController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Employee\:\:onlyArchived\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/OperationsController.php
+
+		-
+			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 4
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Relation ''employees'' is not found in App\\Models\\Room model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/RoomController.php
+
+		-
+			message: '#^Relation ''residence'' is not found in App\\Models\\Room model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Http/Controllers/RoomController.php
+
+		-
+			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Model\|null is not subtype of native type App\\Models\\User\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Imports/UsersImport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/ClearRoomVacant.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/FillRoomVacant.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$center\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between string and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Livewire/UserSignature.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_label\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Appraisals/AppraisalFormVersionItem.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_section\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Appraisals/AppraisalFormVersionItem.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$center\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$clinicApointments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$location\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$center_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$department_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$scope_type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$subordinate_employee_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to undefined constant static\(App\\Models\\Employee\)\:\:ARCHIVED_AT\.$#'
+			identifier: classConstant.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Employee\:\:hasRole\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Eloquent\\Model\:\:setKeysForSaveQuery\(\) expects Illuminate\\Database\\Eloquent\\Builder\<static\(App\\Models\\Employee\)\>, Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Employee\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Property ''last_date'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Property ''start_date'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getDeletedAtColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getQualifiedDeletedAtColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Parameter \#1 \$scope of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:withoutGlobalScope\(\) expects Illuminate\\Database\\Eloquent\\Scope\|string, Illuminate\\Database\\Eloquent\\Builder given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getArchivedAtColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getQualifiedArchivedAtColumn\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:unpreserve\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Parameter \#1 \$scope of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:withoutGlobalScope\(\) expects Illuminate\\Database\\Eloquent\\Scope\|string, Illuminate\\Database\\Eloquent\\Builder given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$center_id is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$center_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$department_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$employee_level\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$management_level\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Appraisals\\AppraisalOfficialScore\:\:\$final_avg\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Appraisals/AppraisalAggregationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Appraisals\\AppraisalReviewScore\:\:\$avg_score\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Appraisals/AppraisalFinalizeService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$formVersionItem\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Appraisals/AppraisalScoreService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$form_version_item_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Appraisals/AppraisalScoreService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$score\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Services/Appraisals/AppraisalScoreService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$text_value\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Appraisals/AppraisalScoreService.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpen\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Appraisals/AppraisalScoreService.php
+
+		-
+			message: '#^Parameter \#1 \$array \(non\-empty\-list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: app/Services/BackupService.php
+
+		-
+			message: '#^Call to an undefined method Imagick\:\:setImageColorFuzz\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Offset ''b'' does not exist on array\{\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Offset ''g'' does not exist on array\{\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Offset ''quantumRangeLong'' on array\{quantumRangeLong\: int\<0, max\>, quantumRangeString\: numeric\-string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Offset ''r'' does not exist on array\{\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Parameter \#1 \$normalized of method ImagickPixel\:\:getColor\(\) expects 0\|1\|2, true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/ImageProcessingService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/SignatureService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetAuth/ActorResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_employee_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetAuth/ScopeResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_approve\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetAuth/ScopeResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_fill\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetAuth/ScopeResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_revise\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetAuth/ScopeResolver.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetAuth/WorkflowResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$step_key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetAuth/WorkflowResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$step_order\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetAuth/WorkflowResolver.php
+
+		-
+			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetAuth/WorkflowResolver.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetAuthorizationService\:\:groupedManagedEmployees\(\) should return array\{supervisors\: Illuminate\\Support\\Collection\<int, App\\Models\\Employee\>, normal_employees_by_department\: Illuminate\\Support\\Collection\<string, Illuminate\\Support\\Collection\<int, App\\Models\\Employee\>\>\} but returns array\{supervisors\: Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, normal_employees_by_department\: Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\Employee\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:reject\(\) expects bool\|\(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|Illuminate\\Database\\Eloquent\\Model, Closure\(App\\Models\\Employee\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Parameter \#1 \$groupBy of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:groupBy\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: string\)\|list\<Closure\|string\>\|string, Closure\(App\\Models\\Employee\)\: string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Relation ''administration'' is not found in App\\Models\\Department model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 5
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/TimeSheetMutationService.php
+
+		-
+			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetMutationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$super_intendent\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$super_visor\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$time_keeper\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Relation ''super_intendent'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Relation ''super_visor'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Relation ''time_keeper'' is not found in App\\Models\\TimeSheet model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 3
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\AdministrationFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/AdministrationFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\CenterFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/CenterFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\ClinicApointmentFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/ClinicApointmentFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\DepartmentFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/DepartmentFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\EmployeeFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/EmployeeFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\FlightFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/FlightFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\LocationFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/LocationFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\PassengerFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/PassengerFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\PlaneFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/PlaneFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\ResidenceFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/ResidenceFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\RoomFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/RoomFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\StockFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/StockFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\TimeSheetFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/TimeSheetFactory.php
+
+		-
+			message: '#^Access to an undefined property Faker\\Generator\:\:\$unique\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^PHPDoc type string of property Database\\Factories\\UserFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Call to an undefined static method Database\\Factories\\ClinicApointmentFactory\:\:factory\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: database/seeders/AdministrationSeeder.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Console\\Command\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 6
+			path: database/seeders/SqlDumpSeeder.php
+
+		-
+			message: '#^Access to protected property Illuminate\\Database\\Seeder\:\:\$command\.$#'
+			identifier: property.protected
+			count: 4
+			path: database/seeders/sql_dump/converted/all.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Illuminate\\Console\\Command\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 4
+			path: database/seeders/sql_dump/converted/all.php

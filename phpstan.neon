@@ -1,0 +1,21 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+
+    paths:
+        - app
+        - database
+        - routes
+
+    # Generated/legacy surfaces that are out of scope for the active application.
+    excludePaths:
+        - legacy-api (?)
+        - legacy-frontend (?)
+
+    ignoreErrors:
+        # Eloquent's dynamic query builder defeats static analysis in places
+        # where the code is correct at runtime.
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder#'

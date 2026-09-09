@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DepartmentPolicy
@@ -15,7 +15,7 @@ class DepartmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list departments');
+        return $user->checkPermissionTo('list departments');
     }
 
     /**
@@ -23,7 +23,7 @@ class DepartmentPolicy
      */
     public function view(User $user, Department $model): bool
     {
-        return $user->hasPermissionTo('view departments');
+        return $user->checkPermissionTo('view departments');
     }
 
     /**
@@ -31,7 +31,7 @@ class DepartmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create departments');
+        return $user->checkPermissionTo('create departments');
     }
 
     /**
@@ -39,7 +39,7 @@ class DepartmentPolicy
      */
     public function update(User $user, Department $model): bool
     {
-        return $user->hasPermissionTo('update departments');
+        return $user->checkPermissionTo('update departments');
     }
 
     /**
@@ -47,7 +47,7 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $model): bool
     {
-        return $user->hasPermissionTo('delete departments');
+        return $user->checkPermissionTo('delete departments');
     }
 
     /**
@@ -55,7 +55,7 @@ class DepartmentPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete departments');
+        return $user->checkPermissionTo('delete departments');
     }
 
     /**

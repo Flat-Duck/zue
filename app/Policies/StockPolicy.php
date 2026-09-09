@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Stock;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class StockPolicy
@@ -15,7 +15,7 @@ class StockPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list stocks');
+        return $user->checkPermissionTo('list stocks');
     }
 
     /**
@@ -23,7 +23,7 @@ class StockPolicy
      */
     public function view(User $user, Stock $model): bool
     {
-        return $user->hasPermissionTo('view stocks');
+        return $user->checkPermissionTo('view stocks');
     }
 
     /**
@@ -31,7 +31,7 @@ class StockPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create stocks');
+        return $user->checkPermissionTo('create stocks');
     }
 
     /**
@@ -39,7 +39,7 @@ class StockPolicy
      */
     public function update(User $user, Stock $model): bool
     {
-        return $user->hasPermissionTo('update stocks');
+        return $user->checkPermissionTo('update stocks');
     }
 
     /**
@@ -47,7 +47,7 @@ class StockPolicy
      */
     public function delete(User $user, Stock $model): bool
     {
-        return $user->hasPermissionTo('delete stocks');
+        return $user->checkPermissionTo('delete stocks');
     }
 
     /**
@@ -55,7 +55,7 @@ class StockPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete stocks');
+        return $user->checkPermissionTo('delete stocks');
     }
 
     /**

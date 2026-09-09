@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Location;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LocationPolicy
@@ -15,7 +15,7 @@ class LocationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list locations');
+        return $user->checkPermissionTo('list locations');
     }
 
     /**
@@ -23,7 +23,7 @@ class LocationPolicy
      */
     public function view(User $user, Location $model): bool
     {
-        return $user->hasPermissionTo('view locations');
+        return $user->checkPermissionTo('view locations');
     }
 
     /**
@@ -31,7 +31,7 @@ class LocationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create locations');
+        return $user->checkPermissionTo('create locations');
     }
 
     /**
@@ -39,7 +39,7 @@ class LocationPolicy
      */
     public function update(User $user, Location $model): bool
     {
-        return $user->hasPermissionTo('update locations');
+        return $user->checkPermissionTo('update locations');
     }
 
     /**
@@ -47,7 +47,7 @@ class LocationPolicy
      */
     public function delete(User $user, Location $model): bool
     {
-        return $user->hasPermissionTo('delete locations');
+        return $user->checkPermissionTo('delete locations');
     }
 
     /**
@@ -55,7 +55,7 @@ class LocationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete locations');
+        return $user->checkPermissionTo('delete locations');
     }
 
     /**

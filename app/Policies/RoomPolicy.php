@@ -15,7 +15,7 @@ class RoomPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list rooms');
+        return $user->checkPermissionTo('list rooms');
     }
 
     /**
@@ -23,7 +23,7 @@ class RoomPolicy
      */
     public function view(User $user, Room $model): bool
     {
-        return $user->hasPermissionTo('view rooms');
+        return $user->checkPermissionTo('view rooms');
     }
 
     /**
@@ -31,7 +31,7 @@ class RoomPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create rooms');
+        return $user->checkPermissionTo('create rooms');
     }
 
     /**
@@ -39,7 +39,7 @@ class RoomPolicy
      */
     public function update(User $user, Room $model): bool
     {
-        return $user->hasPermissionTo('update rooms');
+        return $user->checkPermissionTo('update rooms');
     }
 
     /**
@@ -47,7 +47,7 @@ class RoomPolicy
      */
     public function delete(User $user, Room $model): bool
     {
-        return $user->hasPermissionTo('delete rooms');
+        return $user->checkPermissionTo('delete rooms');
     }
 
     /**
@@ -55,7 +55,7 @@ class RoomPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete rooms');
+        return $user->checkPermissionTo('delete rooms');
     }
 
     /**

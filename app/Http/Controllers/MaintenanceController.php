@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\PerformBackupJob;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
+use App\Services\AuditLogger;
 use App\Services\BackupService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -176,9 +177,17 @@ class MaintenanceController extends Controller
         try {
             DB::unprepared($sql);
 
+            app(AuditLogger::class)->record('database.restored', [
+                'filename' => $filename,
+            ]);
+
             return redirect()->back()->with('success', 'Database restored successfully from '.$filename);
         } catch (\Exception $e) {
             report($e);
+
+            app(AuditLogger::class)->recordFailure('database.restore_failed', $e->getMessage(), [
+                'filename' => $filename,
+            ]);
 
             return redirect()->back()->with('error', 'Restore failed. Check the application logs for details.');
         }
@@ -194,6 +203,10 @@ class MaintenanceController extends Controller
             abort(404);
         }
 
+        app(AuditLogger::class)->record('backup.downloaded', [
+            'filename' => $filename,
+        ]);
+
         return response()->download(storage_path('app/backups/'.$filename));
     }
 
@@ -205,6 +218,10 @@ class MaintenanceController extends Controller
 
         if (Storage::disk('local')->exists('backups/'.$filename)) {
             Storage::disk('local')->delete('backups/'.$filename);
+
+            app(AuditLogger::class)->record('backup.deleted', [
+                'filename' => $filename,
+            ]);
 
             return redirect()->back()->with('success', 'Backup deleted.');
         }

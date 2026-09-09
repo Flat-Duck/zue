@@ -16,6 +16,12 @@ class Handler extends ExceptionHandler
         'current_password',
         'password',
         'password_confirmation',
+        // Medical and identity data must not survive in the session and be
+        // replayed into a re-rendered form or an error report.
+        'diagnosis',
+        'prescription',
+        'national_id',
+        'passport_number',
     ];
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Imports\UsersImport;
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Services\SignatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -70,6 +72,11 @@ class UserController extends Controller
         }
 
         $user->syncRoles($request->roles);
+
+        app(AuditLogger::class)->record('user.created', [
+            'user_id' => $user->id,
+            'roles' => $user->getRoleNames()->all(),
+        ]);
 
         return redirect()
             ->route('users.edit', $user)
@@ -131,7 +138,19 @@ class UserController extends Controller
             app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
         }
 
+        $rolesBefore = $user->getRoleNames()->all();
+
         $user->syncRoles($request->roles);
+
+        $rolesAfter = $user->fresh()->getRoleNames()->all();
+
+        if ($rolesBefore !== $rolesAfter) {
+            app(AuditLogger::class)->record('user.roles_changed', [
+                'user_id' => $user->id,
+                'from' => $rolesBefore,
+                'to' => $rolesAfter,
+            ]);
+        }
 
         return redirect()
             ->route('users.edit', $user)
@@ -177,7 +196,7 @@ class UserController extends Controller
 
         try {
             Excel::import(new UsersImport, $request->file('file'));
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
             $message = 'Import failed. Row '.$failures[0]->row().': '.$failures[0]->errors()[0];
 

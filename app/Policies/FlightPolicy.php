@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Flight;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FlightPolicy
@@ -15,7 +15,7 @@ class FlightPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list flights');
+        return $user->checkPermissionTo('list flights');
     }
 
     /**
@@ -23,7 +23,7 @@ class FlightPolicy
      */
     public function view(User $user, Flight $model): bool
     {
-        return $user->hasPermissionTo('view flights');
+        return $user->checkPermissionTo('view flights');
     }
 
     /**
@@ -31,7 +31,7 @@ class FlightPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create flights');
+        return $user->checkPermissionTo('create flights');
     }
 
     /**
@@ -39,7 +39,7 @@ class FlightPolicy
      */
     public function update(User $user, Flight $model): bool
     {
-        return $user->hasPermissionTo('update flights');
+        return $user->checkPermissionTo('update flights');
     }
 
     /**
@@ -47,7 +47,7 @@ class FlightPolicy
      */
     public function delete(User $user, Flight $model): bool
     {
-        return $user->hasPermissionTo('delete flights');
+        return $user->checkPermissionTo('delete flights');
     }
 
     /**
@@ -55,7 +55,7 @@ class FlightPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete flights');
+        return $user->checkPermissionTo('delete flights');
     }
 
     /**

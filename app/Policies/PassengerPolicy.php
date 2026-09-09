@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Passenger;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PassengerPolicy
@@ -15,7 +15,7 @@ class PassengerPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list passengers');
+        return $user->checkPermissionTo('list passengers');
     }
 
     /**
@@ -23,7 +23,7 @@ class PassengerPolicy
      */
     public function view(User $user, Passenger $model): bool
     {
-        return $user->hasPermissionTo('view passengers');
+        return $user->checkPermissionTo('view passengers');
     }
 
     /**
@@ -31,7 +31,7 @@ class PassengerPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create passengers');
+        return $user->checkPermissionTo('create passengers');
     }
 
     /**
@@ -39,7 +39,7 @@ class PassengerPolicy
      */
     public function update(User $user, Passenger $model): bool
     {
-        return $user->hasPermissionTo('update passengers');
+        return $user->checkPermissionTo('update passengers');
     }
 
     /**
@@ -47,7 +47,7 @@ class PassengerPolicy
      */
     public function delete(User $user, Passenger $model): bool
     {
-        return $user->hasPermissionTo('delete passengers');
+        return $user->checkPermissionTo('delete passengers');
     }
 
     /**
@@ -55,7 +55,7 @@ class PassengerPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete passengers');
+        return $user->checkPermissionTo('delete passengers');
     }
 
     /**

@@ -4,7 +4,7 @@ Tracking for [`claude_plan.md`](claude_plan.md). Evidence in [`claude_audit.md`]
 
 Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 
-**Status:** Stages 1–5 complete; Stage 6 in progress — Laravel 13.31.0, 190 tests green
+**Status:** Stages 1–5 complete; Stage 6 nearly complete — Laravel 13.31.0, 209 tests green, PHPStan level 5 clean against a 212-item baseline
 **Last updated:** 2026-09-09
 
 ---
@@ -58,17 +58,21 @@ Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 | Signal | Before | After |
 | --- | --- | --- |
 | Laravel | 10.50.3 | **13.31.0** |
-| Test suite | 8 failed, 1 risky, 149 passed | **190 passed, 0 failed, 0 risky** |
+| Test suite | 8 failed, 1 risky, 149 passed | **209 passed, 0 failed, 0 risky** |
 | `composer audit` | 3 advisories | **0 advisories** |
 | Direct dependencies | 17 | 15 |
 
 Also fixed in passing:
 
+- [x] **Rooms import returned a 500 on success.** Route `rr` (the target of the rooms create form) imported the file and then rendered the timesheet approval view with four undefined variables. It now validates the upload and redirects back with a success message, matching the other import endpoints. Found by PHPStan; covered by `RoomImportRouteTest.php`.
+
+
 - [x] `resources/views/app/rooms/create.blade.php` — unclosed `@section('content')` (its only `@endsection` was inside a Blade comment), which left an output buffer open
 
 Noted, not changed:
 
-- [ ] `layouts/sidebar.blade.php` uses bare `@can('list employees')`; Spatie throws `PermissionDoesNotExist` if the permission row is missing, so an unseeded deployment 500s on every page. The policies use `hasAnyExistingPermission` to avoid exactly this. Worth aligning.
+- [x] **Removed** `app/Http/Controllers/RunController.php` — nothing routed to it and the view it returned (`app.run.index`) did not exist. Verified unreferenced before deletion.
+- [x] **Fixed.** An unseeded permissions table used to return HTTP 500 on every authenticated page: the sidebar runs a policy check per menu section, and the 12 policies called Spatie's strict `hasPermissionTo()`, which throws `PermissionDoesNotExist` for an unknown permission name. All 72 policy call sites now use Spatie's non-throwing `checkPermissionTo()` — identical result when the permission exists, `false` instead of an exception when it does not. Covered by `tests/Feature/UnseededDeploymentTest.php`.
 
 ---
 
@@ -90,26 +94,27 @@ Noted, not changed:
 
 - [x] Keep the previous verified backup until the new backup passes verification — retention now protects the newest verified backup, and a file failing verification is discarded instead of occupying a retention slot
 - [x] Tests for corrupted backup, empty/missing stored file, invalid type, and retention ordering (`tests/Feature/BackupRetentionTest.php`, 7 tests)
-- [~] Partial table failure, storage failure, and concurrent-request paths remain untested
+- [x] Concurrent-request refusal, lock release after failure, partial table failure, and allowlist rejection (`BackupRetentionTest.php`, now 11 tests)
 
 ### Phase 8 — Appraisal lifecycle
 
 - [x] Required/text/numeric-bound/closed-period scoring rules are covered by `AppraisalScoringBusinessRulesTest` — on inspection these were already decided and encoded, not open
-- [~] Re-finalization behaviour is now **characterized, not decided** (`tests/Feature/AppraisalRefinalizationTest.php`). Current behaviour:
+- [ ] **DEFERRED — awaiting owner's decision (2026-09-09).** Do not change this behaviour until the rule is chosen. Re-finalization is **characterized, not decided** (`tests/Feature/AppraisalRefinalizationTest.php`). Current behaviour:
   - Finalization averages every `submitted` review, then locks them.
   - Re-finalizing with no new submissions **preserves** the original result and timestamp.
   - **Open question:** a review submitted *after* finalization is averaged **alone** (the earlier reviews are locked out), replacing rather than revising the result. Needs a decision: replace / combine / reject.
 
 ### Phase 10 — Production operations
 
-- [ ] Sensitive-data redaction in logs
-- [ ] Structured audit events (role changes, impersonation, medical edits, imports, approvals, restores, backup failures)
+- [x] Sensitive-data redaction — `AuditLogger` redacts credentials, tokens, medical fields (`diagnosis`, `prescription`) and identity numbers at any nesting depth; `Handler::$dontFlash` extended so medical and identity inputs are never flashed back into the session
+- [x] Structured audit events — dedicated `audit` log channel (daily, 365-day retention, separate file) plus `App\Services\AuditLogger`, wired into: database restore + restore failure, backup deletion, backup download, user creation, role changes (only when they actually change), and clinic appointment writes. Covered by `tests/Feature/AuditLoggingTest.php` (7 tests).
+- [~] Impersonation and approval events are not yet audited — no impersonation feature exists; approvals are a candidate for the next pass.
 - [~] Production env, storage, logging, monitoring remain deployment-specific
 
 ### Phase 11 — Static analysis
 
-- [ ] Install PHPStan/Larastan and establish a realistic baseline
-- [ ] Enforce on new/touched code; reduce baseline gradually
+- [x] Install PHPStan/Larastan and establish a realistic baseline — `larastan/larastan ^3.11`, level 5 over `app`/`database`/`routes`, baseline of 212 pre-existing findings in `phpstan-baseline.neon`; run with `composer analyse`
+- [~] Enforce on new/touched code; reduce baseline gradually — analysis is clean against the baseline, so new findings fail immediately. Baseline reduction is ongoing (220 → 212 so far).
 
 ### Phase 12 — Octane
 

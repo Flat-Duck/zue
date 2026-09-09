@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class EmployeePolicy
@@ -15,7 +15,7 @@ class EmployeePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list employees');
+        return $user->checkPermissionTo('list employees');
     }
 
     /**
@@ -23,7 +23,7 @@ class EmployeePolicy
      */
     public function view(User $user, Employee $model): bool
     {
-        return $user->hasPermissionTo('view employees');
+        return $user->checkPermissionTo('view employees');
     }
 
     /**
@@ -31,7 +31,7 @@ class EmployeePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create employees');
+        return $user->checkPermissionTo('create employees');
     }
 
     /**
@@ -39,7 +39,7 @@ class EmployeePolicy
      */
     public function update(User $user, Employee $model): bool
     {
-        return $user->hasPermissionTo('update employees');
+        return $user->checkPermissionTo('update employees');
     }
 
     /**
@@ -47,7 +47,7 @@ class EmployeePolicy
      */
     public function delete(User $user, Employee $model): bool
     {
-        return $user->hasPermissionTo('delete employees');
+        return $user->checkPermissionTo('delete employees');
     }
 
     /**
@@ -55,7 +55,7 @@ class EmployeePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete employees');
+        return $user->checkPermissionTo('delete employees');
     }
 
     /**

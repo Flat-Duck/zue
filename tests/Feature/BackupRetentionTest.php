@@ -6,6 +6,7 @@ use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
 use App\Services\BackupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use ReflectionMethod;
@@ -189,6 +190,75 @@ class BackupRetentionTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $method->invoke(app(BackupService::class), 'backups/does_not_exist.sql');
+    }
+
+    #[Test]
+    public function a_second_concurrent_backup_is_refused_while_one_holds_the_lock(): void
+    {
+        $lock = Cache::lock('database-backup', 1800);
+        $this->assertTrue($lock->get(), 'Precondition: the lock is available.');
+
+        try {
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('Another database backup is already running.');
+
+            app(BackupService::class)->performBackup('both');
+        } finally {
+            $lock->release();
+        }
+    }
+
+    #[Test]
+    public function the_lock_is_released_again_once_a_backup_fails(): void
+    {
+        try {
+            app(BackupService::class)->performBackup('not-a-type');
+        } catch (RuntimeException $e) {
+            // Expected: an invalid type is rejected inside the lock.
+        }
+
+        // A failed run must not strand the lock and block every later backup.
+        $lock = Cache::lock('database-backup', 1800);
+        $this->assertTrue($lock->get(), 'The lock should have been released by the failed run.');
+        $lock->release();
+    }
+
+    #[Test]
+    public function a_table_that_cannot_be_exported_aborts_the_backup_and_leaves_no_partial_file(): void
+    {
+        $log = BackupLog::create(['type' => 'both', 'status' => 'pending']);
+
+        // A table that passes the allowlist but fails mid-export.
+        $service = new class extends BackupService
+        {
+            public function baseTableNames(): array
+            {
+                return ['definitely_not_a_real_table'];
+            }
+        };
+
+        try {
+            $service->performBackup('both', ['definitely_not_a_real_table'], true, $log->id);
+            $this->fail('Exporting a broken table should abort the backup.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('Failed exporting table', $e->getMessage());
+        }
+
+        // No half-written dump may be left behind pretending to be a backup.
+        $this->assertSame([], Storage::disk('local')->files('backups'));
+
+        $fresh = $log->fresh();
+        $this->assertSame('failed', $fresh->status);
+        $this->assertNotNull($fresh->error);
+    }
+
+    #[Test]
+    public function a_table_outside_the_allowlist_is_rejected(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Invalid backup table selection.');
+
+        app(BackupService::class)->performBackup('both', ['users; DROP TABLE users']);
     }
 
     #[Test]

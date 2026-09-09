@@ -52,9 +52,13 @@ Route::post('/rr', function () {
     //     $re->save();
     // }
     // dd($re);
+    request()->validate([
+        'rooms' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
+
     Excel::import(new RoomsImport, request()->file('rooms'));
 
-    return view('app.time_sheets.approve', compact('chunks', 'month_name', 'month_days', 'employees'));
+    return back()->with('success', 'Rooms imported successfully.');
 })->middleware(['auth', 'can:maintenance'])->name('rr');
 // Route::get('/ss', function () {
 

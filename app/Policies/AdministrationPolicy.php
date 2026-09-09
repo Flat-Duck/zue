@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Administration;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AdministrationPolicy
@@ -15,7 +15,7 @@ class AdministrationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list administrations');
+        return $user->checkPermissionTo('list administrations');
     }
 
     /**
@@ -23,7 +23,7 @@ class AdministrationPolicy
      */
     public function view(User $user, Administration $model): bool
     {
-        return $user->hasPermissionTo('view administrations');
+        return $user->checkPermissionTo('view administrations');
     }
 
     /**
@@ -31,7 +31,7 @@ class AdministrationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create administrations');
+        return $user->checkPermissionTo('create administrations');
     }
 
     /**
@@ -39,7 +39,7 @@ class AdministrationPolicy
      */
     public function update(User $user, Administration $model): bool
     {
-        return $user->hasPermissionTo('update administrations');
+        return $user->checkPermissionTo('update administrations');
     }
 
     /**
@@ -47,7 +47,7 @@ class AdministrationPolicy
      */
     public function delete(User $user, Administration $model): bool
     {
-        return $user->hasPermissionTo('delete administrations');
+        return $user->checkPermissionTo('delete administrations');
     }
 
     /**
@@ -55,7 +55,7 @@ class AdministrationPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete administrations');
+        return $user->checkPermissionTo('delete administrations');
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Center;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CenterPolicy
@@ -15,7 +15,7 @@ class CenterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list centers');
+        return $user->checkPermissionTo('list centers');
     }
 
     /**
@@ -23,7 +23,7 @@ class CenterPolicy
      */
     public function view(User $user, Center $model): bool
     {
-        return $user->hasPermissionTo('view centers');
+        return $user->checkPermissionTo('view centers');
     }
 
     /**
@@ -31,7 +31,7 @@ class CenterPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create centers');
+        return $user->checkPermissionTo('create centers');
     }
 
     /**
@@ -39,7 +39,7 @@ class CenterPolicy
      */
     public function update(User $user, Center $model): bool
     {
-        return $user->hasPermissionTo('update centers');
+        return $user->checkPermissionTo('update centers');
     }
 
     /**
@@ -47,7 +47,7 @@ class CenterPolicy
      */
     public function delete(User $user, Center $model): bool
     {
-        return $user->hasPermissionTo('delete centers');
+        return $user->checkPermissionTo('delete centers');
     }
 
     /**
@@ -55,7 +55,7 @@ class CenterPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete centers');
+        return $user->checkPermissionTo('delete centers');
     }
 
     /**

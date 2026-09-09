@@ -73,6 +73,20 @@ return [
             'replace_placeholders' => true,
         ],
 
+        /*
+         * Security-relevant events (role changes, medical record edits,
+         * approvals, imports, backups and restores). Kept in its own file with
+         * a longer retention than the application log, because these entries
+         * exist to answer "who did what, when" long after the fact.
+         */
+        'audit' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/audit.log'),
+            'level' => 'info',
+            'days' => env('AUDIT_LOG_DAYS', 365),
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

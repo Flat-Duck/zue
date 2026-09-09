@@ -12,7 +12,7 @@ class ManagementScopePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list users') || $user->hasPermissionTo('list employees');
+        return $user->checkPermissionTo('list users') || $user->checkPermissionTo('list employees');
     }
 
     public function view(User $user, ManagementScope $model): bool
@@ -22,7 +22,7 @@ class ManagementScopePolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('update users') || $user->hasPermissionTo('update employees');
+        return $user->checkPermissionTo('update users') || $user->checkPermissionTo('update employees');
     }
 
     public function update(User $user, ManagementScope $model): bool
@@ -32,6 +32,6 @@ class ManagementScopePolicy
 
     public function delete(User $user, ManagementScope $model): bool
     {
-        return $user->hasPermissionTo('delete users') || $user->hasPermissionTo('delete employees');
+        return $user->checkPermissionTo('delete users') || $user->checkPermissionTo('delete employees');
     }
 }

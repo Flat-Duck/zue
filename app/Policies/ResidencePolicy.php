@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Residence;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ResidencePolicy
@@ -15,7 +15,7 @@ class ResidencePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('list residences');
+        return $user->checkPermissionTo('list residences');
     }
 
     /**
@@ -23,7 +23,7 @@ class ResidencePolicy
      */
     public function view(User $user, Residence $model): bool
     {
-        return $user->hasPermissionTo('view residences');
+        return $user->checkPermissionTo('view residences');
     }
 
     /**
@@ -31,7 +31,7 @@ class ResidencePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create residences');
+        return $user->checkPermissionTo('create residences');
     }
 
     /**
@@ -39,7 +39,7 @@ class ResidencePolicy
      */
     public function update(User $user, Residence $model): bool
     {
-        return $user->hasPermissionTo('update residences');
+        return $user->checkPermissionTo('update residences');
     }
 
     /**
@@ -47,7 +47,7 @@ class ResidencePolicy
      */
     public function delete(User $user, Residence $model): bool
     {
-        return $user->hasPermissionTo('delete residences');
+        return $user->checkPermissionTo('delete residences');
     }
 
     /**
@@ -55,7 +55,7 @@ class ResidencePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->hasPermissionTo('delete residences');
+        return $user->checkPermissionTo('delete residences');
     }
 
     /**
