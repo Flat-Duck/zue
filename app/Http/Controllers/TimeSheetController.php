@@ -7,6 +7,7 @@ use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
 use App\Models\Employee;
 use App\Models\TimeSheet;
+use App\Services\AuditLogger;
 use App\Services\TimeSheetAuthorizationService;
 use App\Services\TimeSheetMutationService;
 use App\Services\TimeSheetService;
@@ -213,6 +214,15 @@ class TimeSheetController extends Controller
                 $selectedScopePolicyId
             );
 
+            app(AuditLogger::class)->record('timesheets.approved', [
+                'month' => $month,
+                'year' => $year,
+                'level' => $level,
+                'rows_updated' => $updated,
+                'scope_policy_id' => $selectedScopePolicyId,
+                'path' => 'v2',
+            ]);
+
             return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
         }
 
@@ -224,6 +234,14 @@ class TimeSheetController extends Controller
             $level,
             $managedEmployeeIds
         );
+
+        app(AuditLogger::class)->record('timesheets.approved', [
+            'month' => $month,
+            'year' => $year,
+            'level' => $level,
+            'rows_updated' => $updated,
+            'path' => 'legacy',
+        ]);
 
         return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
     }

@@ -11,7 +11,21 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <!--
+            Representative volume benchmarks. Excluded from the default run
+            because they seed six figure row counts; run them explicitly with
+            the Performance testsuite.
+        -->
+        <testsuite name="Performance">
+            <directory>tests/Performance</directory>
+        </testsuite>
     </testsuites>
+
+    <groups>
+        <exclude>
+            <group>performance</group>
+        </exclude>
+    </groups>
     <source>
         <include>
             <directory>app</directory>

@@ -168,3 +168,22 @@ Laravel **13.31.0** is current (13.0.0 released 2026-08-12). Feasibility was est
 `resources/views/layouts/sidebar.blade.php` uses bare `@can('list employees')`. Spatie Permission throws `PermissionDoesNotExist` when the named permission row is absent, so a deployment whose permissions table has not been seeded returns HTTP 500 on **every** authenticated page, not a degraded menu.
 
 The application's own policies already avoid this pattern by routing through `hasAnyExistingPermission()`. The sidebar does not. This was left unchanged because it is a behavioural decision rather than a defect in the upgrade's path, and seeded deployments are unaffected. Recorded for a decision.
+
+---
+
+## 6. Performance baseline (added 2026-09-09)
+
+The original audit could not re-measure performance because the database was empty. `tests/Performance/RepresentativeVolumeBaselineTest.php` now seeds representative volume and measures the same pages at two table sizes, which is the only way to tell an expensive page apart from one whose cost *scales*.
+
+| page | 101 employees / 9k timesheets | 1,101 employees / 99k timesheets | query growth |
+| --- | --- | --- | ---: |
+| `home1` | 21 q / 29.2 ms | 19 q / 119.1 ms | **-2** |
+| `employees.index` | 18 q / 29.1 ms | 18 q / 37.2 ms | **0** |
+| `time-sheets.index` | 30 q / 17.6 ms | 30 q / 32.8 ms | **0** |
+| `reports.index` | 28 q / 6.1 ms | 28 q / 8.9 ms | **0** |
+
+**Eleven times the rows produced no additional queries.** This settles the 2026-08 finding that employee relationship access grew from 4 queries for one employee to 61 for twenty: that N+1 class is gone and stays gone under load.
+
+The one figure that does grow is `home1` wall time (29 → 119 ms) with *fewer* queries. That is aggregate work across the timesheet table, not an N+1, so it is a query-tuning question rather than an eager-loading one — the first place to look if the dashboard feels slow in production.
+
+These are single-request measurements on a development machine, not a concurrency benchmark. They establish that cost is flat with respect to data size; they do not establish throughput under load, which is what an Octane decision would need.

@@ -4,7 +4,7 @@ Tracking for [`claude_plan.md`](claude_plan.md). Evidence in [`claude_audit.md`]
 
 Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 
-**Status:** Stages 1–5 complete; Stage 6 nearly complete — Laravel 13.31.0, 209 tests green, PHPStan level 5 clean against a 212-item baseline
+**Status:** Stages 1–6 complete except the deferred appraisal decision — Laravel 13.31.0, 213 tests green, PHPStan level 5 clean, performance baseline measured at representative volume
 **Last updated:** 2026-09-09
 
 ---
@@ -58,7 +58,7 @@ Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 | Signal | Before | After |
 | --- | --- | --- |
 | Laravel | 10.50.3 | **13.31.0** |
-| Test suite | 8 failed, 1 risky, 149 passed | **209 passed, 0 failed, 0 risky** |
+| Test suite | 8 failed, 1 risky, 149 passed | **213 passed, 0 failed, 0 risky** |
 | `composer audit` | 3 advisories | **0 advisories** |
 | Direct dependencies | 17 | 15 |
 
@@ -81,13 +81,24 @@ Noted, not changed:
 ### Phase 0 / 2 — Test and deployment foundations
 
 - [x] Deployment smoke tests: login → dashboard → Livewire page → maintenance denial → authorised CRUD (`tests/Feature/DeploymentSmokeTest.php`, 11 tests)
-- [ ] Record formal performance baselines (blocked: database is empty)
+- [x] Record formal performance baselines — no longer blocked; `tests/Performance/RepresentativeVolumeBaselineTest.php` seeds representative volume and measures. Excluded from the default suite; run with `php artisan test --group=performance`.
+
+  **Baseline (2026-09-09).** The question is whether page cost grows with table size:
+
+  | page | 101 employees / 9k timesheets | 1,101 employees / 99k timesheets | query growth |
+  | --- | --- | --- | ---: |
+  | `home1` | 21 q / 29.2 ms | 19 q / 119.1 ms | **-2** |
+  | `employees.index` | 18 q / 29.1 ms | 18 q / 37.2 ms | **0** |
+  | `time-sheets.index` | 30 q / 17.6 ms | 30 q / 32.8 ms | **0** |
+  | `reports.index` | 28 q / 6.1 ms | 28 q / 8.9 ms | **0** |
+
+  Eleven times the rows, no additional queries. This confirms the Phase 5 N+1 work holds at scale, and directly answers the 2026-09-08 audit finding that employee relationship access grew from 4 queries for one employee to 61 for twenty. `home1` wall time still grows (29 → 119 ms) because the dashboard aggregates across the timesheet table; that is aggregate cost, not an N+1, and is the next thing to look at if the dashboard feels slow.
 
 ### Phase 6 — Reports and background work
 
 - [x] Failed-job / retry / idempotency tests for large jobs (`tests/Feature/QueuedJobReliabilityTest.php`, 9 tests)
 - [x] `GenerateYearlyAppraisalsJob` given timeout, tries, escalating backoff, and `ShouldBeUnique` overlap protection
-- [ ] Memory tests for large imports/exports/reports
+- [x] Memory and bounds tests for large imports/exports/reports (`tests/Feature/LargeDatasetBoundsTest.php`) — every import is asserted to read in chunks, the balance report is proven to cap at 5,000 of 5,200 rows, memory stays within budget, and eager loading is pinned by a query-count assertion
 - [~] Large exports remain synchronous, bounded to 5,000 rows — reassess with real data volume
 
 ### Phase 7 — Backups
@@ -108,7 +119,8 @@ Noted, not changed:
 
 - [x] Sensitive-data redaction — `AuditLogger` redacts credentials, tokens, medical fields (`diagnosis`, `prescription`) and identity numbers at any nesting depth; `Handler::$dontFlash` extended so medical and identity inputs are never flashed back into the session
 - [x] Structured audit events — dedicated `audit` log channel (daily, 365-day retention, separate file) plus `App\Services\AuditLogger`, wired into: database restore + restore failure, backup deletion, backup download, user creation, role changes (only when they actually change), and clinic appointment writes. Covered by `tests/Feature/AuditLoggingTest.php` (7 tests).
-- [~] Impersonation and approval events are not yet audited — no impersonation feature exists; approvals are a candidate for the next pass.
+- [x] Timesheet approvals are audited on both the v2 and legacy paths, recording month, year, level and rows updated.
+- [~] Impersonation is not audited because no impersonation feature exists.
 - [~] Production env, storage, logging, monitoring remain deployment-specific
 
 ### Phase 11 — Static analysis
@@ -118,5 +130,5 @@ Noted, not changed:
 
 ### Phase 12 — Octane
 
-- [ ] Benchmark PHP-FPM with realistic workloads (blocked: needs representative data)
+- [~] Benchmark PHP-FPM with realistic workloads — request-level baselines now exist at representative volume (above). A full FPM load benchmark under concurrency is still outstanding.
 - [ ] Adopt Octane only if measurements justify it
