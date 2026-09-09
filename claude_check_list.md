@@ -4,7 +4,7 @@ Tracking for [`claude_plan.md`](claude_plan.md). Evidence in [`claude_audit.md`]
 
 Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 
-**Status:** Stages 1–5 complete — application is on Laravel 13.31.0, suite green
+**Status:** Stages 1–5 complete; Stage 6 in progress — Laravel 13.31.0, 190 tests green
 **Last updated:** 2026-09-09
 
 ---
@@ -58,7 +58,7 @@ Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 | Signal | Before | After |
 | --- | --- | --- |
 | Laravel | 10.50.3 | **13.31.0** |
-| Test suite | 8 failed, 1 risky, 149 passed | **160 passed, 0 failed, 0 risky** |
+| Test suite | 8 failed, 1 risky, 149 passed | **190 passed, 0 failed, 0 risky** |
 | `composer audit` | 3 advisories | **0 advisories** |
 | Direct dependencies | 17 | 15 |
 
@@ -76,24 +76,29 @@ Noted, not changed:
 
 ### Phase 0 / 2 — Test and deployment foundations
 
-- [ ] Deployment smoke tests: login → dashboard → Livewire page → maintenance denial → authorised CRUD
+- [x] Deployment smoke tests: login → dashboard → Livewire page → maintenance denial → authorised CRUD (`tests/Feature/DeploymentSmokeTest.php`, 11 tests)
 - [ ] Record formal performance baselines (blocked: database is empty)
 
 ### Phase 6 — Reports and background work
 
-- [ ] Failed-job / retry / idempotency tests for large jobs
+- [x] Failed-job / retry / idempotency tests for large jobs (`tests/Feature/QueuedJobReliabilityTest.php`, 9 tests)
+- [x] `GenerateYearlyAppraisalsJob` given timeout, tries, escalating backoff, and `ShouldBeUnique` overlap protection
 - [ ] Memory tests for large imports/exports/reports
 - [~] Large exports remain synchronous, bounded to 5,000 rows — reassess with real data volume
 
 ### Phase 7 — Backups
 
-- [ ] Keep the previous verified backup until the new backup passes verification
-- [ ] Tests for partial table failure, storage failure, corrupted backup, restore failure, concurrent requests
+- [x] Keep the previous verified backup until the new backup passes verification — retention now protects the newest verified backup, and a file failing verification is discarded instead of occupying a retention slot
+- [x] Tests for corrupted backup, empty/missing stored file, invalid type, and retention ordering (`tests/Feature/BackupRetentionTest.php`, 7 tests)
+- [~] Partial table failure, storage failure, and concurrent-request paths remain untested
 
 ### Phase 8 — Appraisal lifecycle
 
-- [ ] Confirm and encode required/text/partial scoring rules (currently undecided — do not invent)
-- [ ] Decide re-finalization behaviour: replace, preserve, or prohibit
+- [x] Required/text/numeric-bound/closed-period scoring rules are covered by `AppraisalScoringBusinessRulesTest` — on inspection these were already decided and encoded, not open
+- [~] Re-finalization behaviour is now **characterized, not decided** (`tests/Feature/AppraisalRefinalizationTest.php`). Current behaviour:
+  - Finalization averages every `submitted` review, then locks them.
+  - Re-finalizing with no new submissions **preserves** the original result and timestamp.
+  - **Open question:** a review submitted *after* finalization is averaged **alone** (the earlier reviews are locked out), replacing rather than revising the result. Needs a decision: replace / combine / reject.
 
 ### Phase 10 — Production operations
 

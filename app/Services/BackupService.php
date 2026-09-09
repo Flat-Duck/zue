@@ -151,6 +151,8 @@ class BackupService
                 try {
                     $this->verifyStoredBackup('backups/'.$filename);
                 } catch (Throwable $exception) {
+                    Storage::disk('local')->delete('backups/'.$filename);
+
                     if ($log) {
                         $log->update([
                             'verification_status' => 'failed',
@@ -208,16 +210,45 @@ class BackupService
             ->values()
             ->all();
 
-        if (count($backups) > $keepCount) {
-            usort($backups, function (string $a, string $b): int {
-                return Storage::disk('local')->lastModified($a) <=> Storage::disk('local')->lastModified($b);
-            });
-
-            $toDelete = count($backups) - $keepCount;
-            for ($i = 0; $i < $toDelete; $i++) {
-                Storage::disk('local')->delete($backups[$i]);
-            }
+        if (count($backups) <= $keepCount) {
+            return;
         }
+
+        usort($backups, function (string $a, string $b): int {
+            return Storage::disk('local')->lastModified($a) <=> Storage::disk('local')->lastModified($b);
+        });
+
+        $protected = $this->newestVerifiedBackupPath();
+
+        $toDelete = count($backups) - $keepCount;
+        foreach ($backups as $backup) {
+            if ($toDelete < 1) {
+                break;
+            }
+
+            if ($backup === $protected) {
+                continue;
+            }
+
+            Storage::disk('local')->delete($backup);
+            $toDelete--;
+        }
+    }
+
+    /**
+     * The most recent backup this application has actually verified as
+     * restorable. Retention must never discard it, because it is the only file
+     * known to be good if a later backup turns out to be corrupt.
+     */
+    private function newestVerifiedBackupPath(): ?string
+    {
+        $filename = BackupLog::query()
+            ->where('verification_status', 'passed')
+            ->whereNotNull('filename')
+            ->latest('verified_at')
+            ->value('filename');
+
+        return $filename ? 'backups/'.$filename : null;
     }
 
     /**
@@ -250,7 +281,7 @@ class BackupService
         return '`'.$identifier.'`';
     }
 
-    private function verifyStoredBackup(string $path): void
+    protected function verifyStoredBackup(string $path): void
     {
         $disk = Storage::disk('local');
         if (! $disk->exists($path) || $disk->size($path) < 1) {
