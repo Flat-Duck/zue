@@ -3,29 +3,23 @@
 namespace Database\Factories;
 
 use App\Models\Plane;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PlaneFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Plane::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'capacity' => $this->faker->randomNumber(0),
-            'lines' => $this->faker->text(255),
+            'name' => $this->faker->unique()->bothify('Plane-###'),
+            'capacity' => 20,
+            'lines' => $this->faker->word(),
         ];
+    }
+
+    public function seats(int $capacity): self
+    {
+        return $this->state(fn (): array => ['capacity' => $capacity]);
     }
 }

@@ -68,6 +68,20 @@
     </div>
 </div>
 
+<div class="card mt-4">
+    <div class="card-body">
+        <h4 class="card-title w-100 mb-2">Manifest</h4>
+        <p class="text-muted">
+            {{ optional($flight->route)->name ?? 'No route selected' }}
+            @if ($flight->plane)
+                &mdash; {{ $flight->plane->name }} ({{ $flight->plane->capacity }} seats per leg)
+            @endif
+        </p>
+
+        <livewire:flight-manifest :flight="$flight" />
+    </div>
+</div>
+
 @can('view-any', App\Models\flight_passenger::class)
 <div class="card mt-4">
     <div class="card-body">

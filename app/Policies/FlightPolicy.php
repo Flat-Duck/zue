@@ -43,6 +43,17 @@ class FlightPolicy
     }
 
     /**
+     * Determine whether the user can seat travellers on this flight.
+     *
+     * Separate from update: a dispatcher fills manifests without necessarily
+     * being able to change the flight's date, plane or route.
+     */
+    public function dispatchTravellers(User $user, Flight $model): bool
+    {
+        return $user->checkPermissionTo('dispatch flights');
+    }
+
+    /**
      * Determine whether the flight can delete the model.
      */
     public function delete(User $user, Flight $model): bool

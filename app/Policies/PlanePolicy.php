@@ -2,73 +2,56 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Plane;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
+/**
+ * Planes were previously readable and writable by any authenticated user.
+ *
+ * That matters more than it looks: a plane's capacity is the seat limit copied
+ * onto every leg of a flight, so being able to edit or delete one changes who
+ * can fly.
+ */
 class PlanePolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the plane can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->checkPermissionTo('list planes');
     }
 
-    /**
-     * Determine whether the plane can view the model.
-     */
     public function view(User $user, Plane $model): bool
     {
-        return true;
+        return $user->checkPermissionTo('view planes');
     }
 
-    /**
-     * Determine whether the plane can create models.
-     */
     public function create(User $user): bool
     {
-        return true;
+        return $user->checkPermissionTo('create planes');
     }
 
-    /**
-     * Determine whether the plane can update the model.
-     */
     public function update(User $user, Plane $model): bool
     {
-        return true;
+        return $user->checkPermissionTo('update planes');
     }
 
-    /**
-     * Determine whether the plane can delete the model.
-     */
     public function delete(User $user, Plane $model): bool
     {
-        return true;
+        return $user->checkPermissionTo('delete planes');
     }
 
-    /**
-     * Determine whether the user can delete multiple instances of the model.
-     */
     public function deleteAny(User $user): bool
     {
-        return true;
+        return $user->checkPermissionTo('delete planes');
     }
 
-    /**
-     * Determine whether the plane can restore the model.
-     */
     public function restore(User $user, Plane $model): bool
     {
         return false;
     }
 
-    /**
-     * Determine whether the plane can permanently delete the model.
-     */
     public function forceDelete(User $user, Plane $model): bool
     {
         return false;

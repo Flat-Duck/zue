@@ -1,46 +1,38 @@
 @extends('layouts.app', ['page' => 'employees'])
 
 @section('content')
-<form
-    method="POST"
-    action="{{ route('employees.update', $employee) }}"
-    class="card"
->
+{{-- The form is not itself a card: the field sections render their own, the
+     same way the show page does. --}}
+<form method="POST" action="{{ route('employees.update', $employee) }}">
     @csrf @method('PUT')
-    <div class="card-header">
-        <a href="{{ route('employees.index') }}" class="mr-4"
-            ><i class="ti ti-arrow-back"></i
-        ></a>
-        <h3 class="card-title">@lang('crud.employees.edit_title')</h3>
-    </div>
-    <div class="card-body">
-        <div class="row g-5">
-            <div class="col-xl-4">
-                <div class="row">
-                    <div class="col-md-6 col-xl-12">
-                        @include('app.employees.form-inputs')
-                    </div>
-                </div>
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ route('employees.index') }}" class="me-3"><i class="ti ti-arrow-back"></i></a>
+            <h3 class="card-title">@lang('crud.employees.edit_title')</h3>
+
+            <div class="col-auto ms-auto d-print-none">
+                <a href="{{ route('employees.show', $employee) }}" class="btn btn-outline-secondary">
+                    <i class="ti ti-eye"></i> View
+                </a>
             </div>
         </div>
     </div>
-    <div class="card-footer text-end">
-        <div class="d-flex">
-            <a
-                href="{{ route('employees.index') }}"
-                class="btn btn-outline-secondary"
-                >@lang('crud.common.back')</a
-            >
-            @can('create', App\Models\Employee::class)
-            <a href="{{ route('employees.create') }}" class="btn btn-link">
-                @lang('crud.common.create')
-            </a>
-            @endcan
-            <button type="submit" class="btn btn-primary">
-                <i class="ti ti-device-floppy"></i> @lang('crud.common.update')
-            </button>
+
+    @include('app.employees.form-inputs')
+
+    <div class="card mt-3">
+        <div class="card-footer text-end">
+            <div class="d-flex">
+                <a href="{{ route('employees.index') }}" class="btn btn-outline-secondary">
+                    @lang('crud.common.back')
+                </a>
+
+                <button type="submit" class="btn btn-primary ms-auto">
+                    <i class="ti ti-device-floppy"></i> @lang('crud.common.update')
+                </button>
+            </div>
         </div>
     </div>
 </form>
-
 @endsection

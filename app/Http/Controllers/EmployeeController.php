@@ -6,13 +6,17 @@ use App\Http\Requests\EmployeeQuickStoreRequest;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Imports\ArchivedEmployeesImport;
+use App\Imports\EmployeeProfilesImport;
+use App\Models\Administration;
 use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -56,7 +60,10 @@ class EmployeeController extends Controller
      */
     public function imports(Request $request): View
     {
-        $this->authorize('view-any', Employee::class);
+        // The page exists to run an import, which creates and updates records,
+        // so it is gated the same way the import itself is.
+        $this->authorize('create', Employee::class);
+        $this->authorize('update', new Employee);
 
         return view('app.employees.imports');
     }
@@ -80,20 +87,83 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Import the personnel export, keyed on employee number.
+     *
+     * Existing employees are updated and new ones created, so the same export
+     * can be re-imported whenever HR refresh it.
+     */
+    public function importProfiles(Request $request): RedirectResponse
+    {
+        // Creating and updating personnel records, so both are required.
+        $this->authorize('create', Employee::class);
+        $this->authorize('update', new Employee);
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls,csv,txt'],
+        ]);
+
+        $import = new EmployeeProfilesImport;
+
+        Excel::import($import, $request->file('file'));
+
+        app(AuditLogger::class)->record('employees.profiles_imported', [
+            'created' => $import->created,
+            'updated' => $import->updated,
+            'skipped' => $import->skipped,
+            'problem_count' => count($import->errors),
+        ]);
+
+        $summary = "Import finished: {$import->created} created, {$import->updated} updated";
+
+        if ($import->skipped > 0) {
+            $summary .= ", {$import->skipped} skipped";
+        }
+
+        $response = back()->with('success', $summary.'.');
+
+        // Surface the values that could not be read rather than failing quietly.
+        if ($import->errors !== []) {
+            $response->with('import_problems', array_slice($import->errors, 0, 50));
+        }
+
+        return $response;
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
+    /**
+     * Options shared by the create and edit forms.
+     *
+     * The department-to-administration map lets the form narrow the department
+     * list without a round trip, since an employee's administration follows its
+     * department rather than being stored on the employee.
+     *
+     * @return array{0: Collection<int, string>, 1: Collection<int, string>, 2: Collection<int, string>, 3: Collection<int, string>, 4: Collection<int, string>, 5: array<int, int|string>}
+     */
+    private function formOptions(): array
+    {
+        $departmentRecords = Department::query()->orderBy('name')->get();
+
+        return [
+            User::orderBy('name')->pluck('name', 'id'),
+            Location::orderBy('name')->pluck('name', 'id'),
+            $departmentRecords->pluck('name', 'id'),
+            Center::orderBy('name')->pluck('name', 'id'),
+            Administration::query()->orderBy('name')->pluck('name', 'id'),
+            $departmentRecords->pluck('administration_id', 'id')->map(fn ($id) => (string) $id)->all(),
+        ];
+    }
+
     public function create(Request $request): View
     {
         $this->authorize('create', Employee::class);
 
-        $users = User::pluck('name', 'id');
-        $locations = Location::pluck('name', 'id');
-        $departments = Department::pluck('name', 'id');
-        $centers = Center::pluck('name', 'id');
+        [$users, $locations, $departments, $centers, $administrations, $departmentAdministrations] = $this->formOptions();
 
         return view(
             'app.employees.create',
-            compact('users', 'locations', 'departments', 'centers')
+            compact('users', 'locations', 'departments', 'centers', 'administrations', 'departmentAdministrations')
         );
     }
 
@@ -180,14 +250,11 @@ class EmployeeController extends Controller
     {
         $this->authorize('update', $employee);
 
-        $users = User::pluck('name', 'id');
-        $locations = Location::pluck('name', 'id');
-        $departments = Department::pluck('name', 'id');
-        $centers = Center::pluck('name', 'id');
+        [$users, $locations, $departments, $centers, $administrations, $departmentAdministrations] = $this->formOptions();
 
         return view(
             'app.employees.edit',
-            compact('employee', 'users', 'locations', 'departments', 'centers')
+            compact('employee', 'users', 'locations', 'departments', 'centers', 'administrations', 'departmentAdministrations')
         );
     }
 

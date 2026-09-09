@@ -6,6 +6,8 @@ use App\Http\Controllers\ClinicApointmentController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\FlightRouteController;
+use App\Http\Controllers\FlightStationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MaintenanceController;
@@ -121,6 +123,13 @@ Route::prefix('/')
 
         Route::resource('departments', DepartmentController::class);
         Route::delete('flights/{flight}/approve', [FlightController::class, 'approve'])->name('flights.approve');
+        // Printable manifest for one leg: the sheet carried to the airport.
+        Route::get('flights/{flight}/legs/{leg}/manifest', [FlightController::class, 'manifest'])->name('flights.manifest');
+
+        // Dispatcher reference data: the places flights call at and the
+        // itineraries built from them.
+        Route::resource('flight-stations', FlightStationController::class)->except(['show']);
+        Route::resource('flight-routes', FlightRouteController::class)->except(['show']);
         Route::resource('flights', FlightController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('passengers', PassengerController::class);
@@ -135,10 +144,12 @@ Route::prefix('/')
         Route::resource('users', UserController::class);
         Route::post('users/{user}/upload-signature', [UserController::class, 'uploadSignature'])->name('users.upload-signature');
         Route::get('dir', [EmployeeController::class, 'dir']);
-        Route::get('employees/imports', [EmployeeController::class, 'imports']);
+        Route::get('employees/imports', [EmployeeController::class, 'imports'])->name('employees.imports');
         Route::get('employees/quick-create', [EmployeeController::class, 'quickCreate'])->name('employees.quick-create');
         Route::post('employees/quick-create', [EmployeeController::class, 'quickStore'])->name('employees.quick-store');
         Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
+        // Full personnel export: creates or updates by employee number.
+        Route::post('employees/import-profiles', [EmployeeController::class, 'importProfiles'])->name('employees.import-profiles');
         Route::resource('employees', EmployeeController::class);
 
         Route::get('signature', [ProfileController::class, 'signature'])->name('signature.show');

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -38,6 +39,12 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'create employees']);
         Permission::create(['name' => 'update employees']);
         Permission::create(['name' => 'delete employees']);
+
+        Permission::create(['name' => 'list planes']);
+        Permission::create(['name' => 'view planes']);
+        Permission::create(['name' => 'create planes']);
+        Permission::create(['name' => 'update planes']);
+        Permission::create(['name' => 'delete planes']);
 
         Permission::create(['name' => 'list flights']);
         Permission::create(['name' => 'view flights']);
@@ -111,6 +118,12 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage operations']);
         Permission::create(['name' => 'manage clinic']);
 
+        // Seating travellers on a flight is a separate job from editing the
+        // flight itself: a dispatcher fills manifests without being able to
+        // change HR records.
+        Permission::findOrCreate('dispatch flights', 'web');
+        Permission::findOrCreate('manage flight routes', 'web');
+
         // Create roles and grant the complete permission set to super-admin.
         $allPermissions = Permission::all();
         $superAdminRole = Role::create(['name' => 'super-admin']);
@@ -122,12 +135,29 @@ class PermissionsSeeder extends Seeder
             'fieldcoordinator',
             'superintendent',
             'campboss',
-            'flightdispatcher',
         ] as $roleName) {
             Role::create(['name' => $roleName]);
         }
 
-        $user = \App\Models\User::whereEmail('admin@admin.com')->first();
+        // A flight dispatcher builds and fills flights, and needs to look up the
+        // people who travel on them. Nothing beyond that.
+        Role::create(['name' => 'flightdispatcher'])->givePermissionTo([
+            'list flights',
+            'view flights',
+            'create flights',
+            'update flights',
+            'delete flights',
+            'dispatch flights',
+            'manage flight routes',
+            'list passengers',
+            'view passengers',
+            'create passengers',
+            'update passengers',
+            'list employees',
+            'view employees',
+        ]);
+
+        $user = User::whereEmail('admin@admin.com')->first();
 
         if ($user) {
             $user->assignRole($superAdminRole);

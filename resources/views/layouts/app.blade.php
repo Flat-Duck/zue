@@ -55,8 +55,12 @@
 
     @if (session()->has('success'))
         <script>
-            var notyf = new Notyf({ dismissible: true })
-            notyf.success('{{ session('success') }}')
+            // app.js is a module and therefore deferred, so Notyf does not
+            // exist while this inline script is parsed. Wait for the document.
+            document.addEventListener('DOMContentLoaded', () => {
+                new window.Notyf({ dismissible: true })
+                    .success(@json(session('success')));
+            });
         </script>
     @endif
 

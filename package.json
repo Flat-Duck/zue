@@ -9,8 +9,6 @@
         "@tabler/core": "^1.4.0",
         "@tabler/icons-webfont": "^2.40.0",
         "axios": "^1.6.1",
-        "bootstrap": "^4.0.0",
-        "jquery": "^3.6",
         "laravel-vite-plugin": "^1.3.0",
         "lodash": "^4.0",
         "notyf": "^3.10.0",

@@ -715,12 +715,6 @@ parameters:
 			path: database/factories/PassengerFactory.php
 
 		-
-			message: '#^PHPDoc type string of property Database\\Factories\\PlaneFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: database/factories/PlaneFactory.php
-
-		-
 			message: '#^PHPDoc type string of property Database\\Factories\\ResidenceFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1

@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 
 /**
  * Records security-relevant events to a dedicated, long-retention channel.
@@ -43,6 +44,13 @@ class AuditLogger
     public const REDACTED = '[redacted]';
 
     /**
+     * Session keys written when a super-admin is impersonating someone.
+     */
+    public const IMPERSONATOR_ID_SESSION_KEY = 'impersonator_id';
+
+    public const IMPERSONATOR_NAME_SESSION_KEY = 'impersonator_name';
+
+    /**
      * @param  array<string, mixed>  $context
      */
     public function record(string $action, array $context = []): void
@@ -73,12 +81,28 @@ class AuditLogger
     {
         $user = Auth::user();
 
-        return [
+        $context = [
             'actor_id' => $user?->getAuthIdentifier(),
             'actor_name' => $user?->name,
             'ip' => Request::ip(),
             'at' => now()->toIso8601String(),
         ];
+
+        /*
+         * While a super-admin is impersonating, Auth::user() is the person being
+         * impersonated. Recording only that would attribute their actions to the
+         * wrong person, which defeats the purpose of an audit trail, so the real
+         * operator is named alongside them.
+         */
+        $impersonatorId = Session::get(self::IMPERSONATOR_ID_SESSION_KEY);
+
+        if ($impersonatorId !== null) {
+            $context['impersonated'] = true;
+            $context['impersonator_id'] = $impersonatorId;
+            $context['impersonator_name'] = Session::get(self::IMPERSONATOR_NAME_SESSION_KEY);
+        }
+
+        return $context;
     }
 
     /**

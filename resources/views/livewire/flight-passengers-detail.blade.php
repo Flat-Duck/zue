@@ -46,12 +46,12 @@
                     class="btn me-auto"
                     wire:click="$toggle('showingModal')"
                 >
-                    <i class="ti ti-close"></i>
+                    <i class="ti ti-x"></i>
                     @lang('crud.common.cancel')
                 </button>
 
                 <button type="button" class="btn btn-primary" wire:click="save">
-                    <i class="ti ti-save"></i>
+                    <i class="ti ti-device-floppy"></i>
                     @lang('crud.common.save')
                 </button>
             </div>

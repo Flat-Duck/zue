@@ -5,6 +5,11 @@
 @import "@tabler/core/dist/css/tabler.min.css";
 @import "@tabler/core/dist/css/tabler-vendors.min.css";
 
+// === Tabler icon webfont ===
+// Without this every `<i class="ti ti-*">` in the application renders as
+// nothing, which is why the interface looked unfinished.
+@import "@tabler/icons-webfont/tabler-icons.min.css";
+
 // === Tom Select Bootstrap 5 theme ===
 // (this is the one that should make it look like the demo)
 @import "tom-select/dist/css/tom-select.bootstrap5.min.css";

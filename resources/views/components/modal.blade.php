@@ -34,18 +34,16 @@ switch ($maxWidth ?? '') {
     x-data="{
         show: @entangle($attributes->wire('model')),
     }"
+    {{-- Bootstrap 5 removed the jQuery plugin API, so the modal is driven
+         through the instance that Tabler's Bootstrap bundle provides. --}}
     x-init="() => {
-        let modal = $('#{{ $id }}');
-        $watch('show', value => {
-            if (value) {
-                modal.modal('show')
-            } else {
-                modal.modal('hide')
-            }
-        });
-        modal.on('hide.bs.modal', function () {
-            show = false
-        })
+        const instance = window.bootstrap.Modal.getOrCreateInstance($el);
+
+        $watch('show', value => value ? instance.show() : instance.hide());
+
+        $el.addEventListener('hide.bs.modal', () => { show = false });
+
+        if (show) instance.show();
     }"
     wire:ignore.self
     class="modal modal-blur fade"

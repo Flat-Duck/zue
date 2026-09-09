@@ -3,7 +3,9 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Flight;
+use App\Models\FlightRoute;
 use App\Models\User;
+use Database\Seeders\FlightRoutesSeeder;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -53,8 +55,12 @@ class FlightControllerTest extends TestCase
     #[Test]
     public function it_stores_the_flight(): void
     {
+        $this->seed(FlightRoutesSeeder::class);
+        $route = FlightRoute::query()->firstOrFail();
+
         $data = Flight::factory()->make()->getAttributes();
         $data['time'] = $this->faker->time('H:i');
+        $data['flight_route_id'] = $route->id;
 
         $response = $this->post(route('flights.store'), $data);
 
@@ -62,7 +68,10 @@ class FlightControllerTest extends TestCase
 
         $flight = Flight::latest('id')->first();
 
-        $response->assertRedirect(route('flights.edit', $flight));
+        // The chosen route is copied onto the flight as its legs.
+        $this->assertSame($route->legs()->count(), $flight->legs()->count());
+
+        $response->assertRedirect(route('flights.show', $flight));
     }
 
     #[Test]
@@ -108,7 +117,7 @@ class FlightControllerTest extends TestCase
 
         $this->assertDatabaseHas('flights', $data);
 
-        $response->assertRedirect(route('flights.edit', $flight));
+        $response->assertRedirect(route('flights.show', $flight));
     }
 
     #[Test]

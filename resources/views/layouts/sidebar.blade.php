@@ -43,7 +43,10 @@
 
                         @if (
                                 Auth::user()->can('view-any', App\Models\Flight::class) ||
-                                Auth::user()->can('view-any', App\Models\Passenger::class)
+                                Auth::user()->can('view-any', App\Models\Passenger::class) ||
+                                Auth::user()->can('view-any', App\Models\Plane::class) ||
+                                Auth::user()->can('view-any', App\Models\FlightRoute::class) ||
+                                Auth::user()->can('view-any', App\Models\FlightStation::class)
                             )
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#navbar-access" data-bs-toggle="dropdown"
@@ -88,6 +91,36 @@
                                             </span>
                                             <span class="nav-link-title">
                                                 Passengers
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\Plane::class)
+                                        <a class="dropdown-item" href="{{ route('planes.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-plane"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Planes
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\FlightRoute::class)
+                                        <a class="dropdown-item" href="{{ route('flight-routes.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-route"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Routes
+                                            </span>
+                                        </a>
+                                    @endcan
+                                    @can('view-any', App\Models\FlightStation::class)
+                                        <a class="dropdown-item" href="{{ route('flight-stations.index') }}">
+                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                <i class="ti ti-map-pin"></i>
+                                            </span>
+                                            <span class="nav-link-title">
+                                                Stations
                                             </span>
                                         </a>
                                     @endcan

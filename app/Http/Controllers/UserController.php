@@ -238,12 +238,28 @@ class UserController extends Controller
         $actor = auth()->user();
 
         if (! $actor || ! $actor->hasRole('super-admin')) {
+            // A refused attempt to become someone else is worth recording.
+            app(AuditLogger::class)->recordFailure(
+                'impersonation.denied',
+                'Only a super-admin may impersonate.',
+                ['target_user_id' => $user->id]
+            );
+
             abort(403);
         }
 
         if ($actor->id === $user->id) {
             return back()->withErrors(['impersonation' => 'You are already signed in as this user.']);
         }
+
+        // Logged before the session switches, so the entry names the real actor
+        // rather than the person being impersonated.
+        app(AuditLogger::class)->record('impersonation.started', [
+            'impersonator_id' => $actor->id,
+            'impersonator_name' => $actor->name,
+            'target_user_id' => $user->id,
+            'target_user_name' => $user->name,
+        ]);
 
         $request->session()->put(self::IMPERSONATOR_ID_SESSION_KEY, $actor->id);
         $request->session()->put(self::IMPERSONATOR_NAME_SESSION_KEY, $actor->name);
@@ -262,12 +278,23 @@ class UserController extends Controller
         $request->session()->forget(self::IMPERSONATOR_NAME_SESSION_KEY);
 
         if (! $impersonatorId) {
+            app(AuditLogger::class)->recordFailure(
+                'impersonation.stop_failed',
+                'No active impersonation session found.'
+            );
+
             return back()->withErrors(['impersonation' => 'No active impersonation session found.']);
         }
 
         $impersonator = User::find($impersonatorId);
 
         if (! $impersonator || ! $impersonator->hasRole('super-admin')) {
+            app(AuditLogger::class)->recordFailure(
+                'impersonation.stop_failed',
+                'The recorded impersonator is missing or is no longer a super-admin.',
+                ['impersonator_id' => $impersonatorId]
+            );
+
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -276,6 +303,15 @@ class UserController extends Controller
                 ->route('login')
                 ->withErrors(['impersonation' => 'Unable to restore the super-admin session.']);
         }
+
+        $impersonatedUser = Auth::user();
+
+        app(AuditLogger::class)->record('impersonation.stopped', [
+            'impersonator_id' => $impersonator->id,
+            'impersonator_name' => $impersonator->name,
+            'target_user_id' => $impersonatedUser?->getAuthIdentifier(),
+            'target_user_name' => $impersonatedUser?->name,
+        ]);
 
         Auth::login($impersonator);
         $request->session()->migrate(true);

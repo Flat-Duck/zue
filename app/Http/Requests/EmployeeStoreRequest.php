@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EmployeeStoreRequest extends FormRequest
@@ -42,6 +43,6 @@ class EmployeeStoreRequest extends FormRequest
             'archived_at' => ['nullable', 'date'],
             'management_level' => ['nullable', 'numeric'],
             'employee_level' => ['nullable', 'numeric'],
-        ];
+        ] + Employee::profileValidationRules();
     }
 }

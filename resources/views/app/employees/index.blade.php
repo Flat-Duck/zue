@@ -54,7 +54,22 @@
                     <i class="ti ti-plus"></i>
                     @lang('crud.common.create')
                 </a>
-           
+                @endcan
+
+                {{-- Importing creates and updates records, so it needs both. --}}
+                @can('create', App\Models\Employee::class)
+                    @can('update', new App\Models\Employee)
+                        <a
+                            data-bs-original-title="Import employee data"
+                            data-bs-placement="top"
+                            data-bs-toggle="tooltip"
+                            class="pull-right btn btn-outline-secondary ms-2"
+                            href="{{ route('employees.imports') }}"
+                        >
+                            <i class="ti ti-upload"></i>
+                            Import
+                        </a>
+                    @endcan
                 @endcan
             </div>
         </div>

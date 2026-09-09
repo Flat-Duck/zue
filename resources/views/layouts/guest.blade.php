@@ -8,20 +8,21 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @yield('meta_tags')
     
-    <title>gujo</title>
+    <title>zue</title>
 
-    @vite('resources/js/app.js')
+    {{-- Styles first: the guest layout previously loaded only the script, so
+         every page using it rendered as unstyled HTML. --}}
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @yield('styles')
 
     {{-- @livewireStyles --}}
   </head>
-  <body>
-  <body class=" d-flex flex-column">
+  <body class="d-flex flex-column">
     <div class="page page-center">
       <div class="container container-tight py-4">
         <div class="text-center mb-4">
           <a href="." class="navbar-brand navbar-brand-autodark">
-            <img src="../img/logo.svg" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+            <img src="{{ asset('img/zue-logo.png') }}" height="32" alt="zue" class="navbar-brand-image">
           </a>
         </div>
         @yield('content')
@@ -32,11 +33,13 @@
     {{-- @livewireScripts --}}
     @stack('scripts')
 
-    @if (session()->has('success')) 
-    <script>
-        var notyf = new Notyf({dismissible: true})
-        notyf.success('{{ session('success') }}')
-    </script> 
+    @if (session()->has('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                new window.Notyf({ dismissible: true })
+                    .success(@json(session('success')));
+            });
+        </script>
     @endif
   </body>
 </html>

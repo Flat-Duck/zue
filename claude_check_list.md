@@ -4,7 +4,7 @@ Tracking for [`claude_plan.md`](claude_plan.md). Evidence in [`claude_audit.md`]
 
 Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 
-**Status:** Stages 1–6 complete except the deferred appraisal decision — Laravel 13.31.0, 213 tests green, PHPStan level 5 clean, performance baseline measured at representative volume
+**Status:** Stages 1–6 complete except the deferred appraisal decision — Laravel 13.31.0, 259 tests green, PHPStan level 5 clean, performance baseline measured at representative volume
 **Last updated:** 2026-09-09
 
 ---
@@ -58,21 +58,21 @@ Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 | Signal | Before | After |
 | --- | --- | --- |
 | Laravel | 10.50.3 | **13.31.0** |
-| Test suite | 8 failed, 1 risky, 149 passed | **213 passed, 0 failed, 0 risky** |
+| Test suite | 8 failed, 1 risky, 149 passed | **259 passed, 0 failed, 0 risky** |
 | `composer audit` | 3 advisories | **0 advisories** |
 | Direct dependencies | 17 | 15 |
 
 Also fixed in passing:
 
 - [x] **Rooms import returned a 500 on success.** Route `rr` (the target of the rooms create form) imported the file and then rendered the timesheet approval view with four undefined variables. It now validates the upload and redirects back with a success message, matching the other import endpoints. Found by PHPStan; covered by `RoomImportRouteTest.php`.
-
-
-- [x] `resources/views/app/rooms/create.blade.php` — unclosed `@section('content')` (its only `@endsection` was inside a Blade comment), which left an output buffer open
-
-Noted, not changed:
-
+- [x] `resources/views/app/rooms/create.blade.php` — unclosed `@section('content')` (its only `@endsection` was inside a Blade comment), which left an output buffer open.
+- [x] **Unseeded permissions table returned HTTP 500 on every authenticated page.** The sidebar runs a policy check per menu section, and the 12 policies called Spatie's strict `hasPermissionTo()`, which throws `PermissionDoesNotExist` for an unknown permission name. All 72 policy call sites now use the non-throwing `checkPermissionTo()`. Covered by `tests/Feature/UnseededDeploymentTest.php`.
+- [x] **`PlanePolicy` locked down.** It previously returned `true` for every ability, so any authenticated user could create, edit or delete a plane — and a plane's capacity becomes the seat limit on every leg of every flight flown with it. All six abilities now check `list/view/create/update/delete planes`. Existing roles keep access through `FlightDispatchPermissionsSeeder`, which mirrors what each role can already do with flights rather than guessing. Covered by `tests/Feature/PlaneAuthorizationTest.php` (8 tests).
 - [x] **Removed** `app/Http/Controllers/RunController.php` — nothing routed to it and the view it returned (`app.run.index`) did not exist. Verified unreferenced before deletion.
-- [x] **Fixed.** An unseeded permissions table used to return HTTP 500 on every authenticated page: the sidebar runs a policy check per menu section, and the 12 policies called Spatie's strict `hasPermissionTo()`, which throws `PermissionDoesNotExist` for an unknown permission name. All 72 policy call sites now use Spatie's non-throwing `checkPermissionTo()` — identical result when the permission exists, `false` instead of an exception when it does not. Covered by `tests/Feature/UnseededDeploymentTest.php`.
+
+Still open:
+
+- [ ] The plane screens have no navigation entry anywhere — they are reachable only by typing the URL, which is probably why the open policy went unnoticed. Worth a menu link for whoever manages aircraft.
 
 ---
 
@@ -120,7 +120,8 @@ Noted, not changed:
 - [x] Sensitive-data redaction — `AuditLogger` redacts credentials, tokens, medical fields (`diagnosis`, `prescription`) and identity numbers at any nesting depth; `Handler::$dontFlash` extended so medical and identity inputs are never flashed back into the session
 - [x] Structured audit events — dedicated `audit` log channel (daily, 365-day retention, separate file) plus `App\Services\AuditLogger`, wired into: database restore + restore failure, backup deletion, backup download, user creation, role changes (only when they actually change), and clinic appointment writes. Covered by `tests/Feature/AuditLoggingTest.php` (7 tests).
 - [x] Timesheet approvals are audited on both the v2 and legacy paths, recording month, year, level and rows updated.
-- [~] Impersonation is not audited because no impersonation feature exists.
+- [x] **Impersonation is audited.** Correcting an earlier claim of mine that no impersonation feature existed - it does (`users.impersonate` / `users.impersonate.stop`). Recorded events: `impersonation.started`, `impersonation.stopped`, `impersonation.denied` (a refused attempt), and `impersonation.stop_failed`.
+- [x] **The audit trail is impersonation-aware.** `AuditLogger` previously recorded only `Auth::user()`, which during impersonation is the person being impersonated - so every audited action would have been attributed to the wrong person. Entries now carry `impersonated`, `impersonator_id` and `impersonator_name` alongside the effective user. Covered by `tests/Feature/ImpersonationAuditTest.php` (6 tests).
 - [~] Production env, storage, logging, monitoring remain deployment-specific
 
 ### Phase 11 — Static analysis

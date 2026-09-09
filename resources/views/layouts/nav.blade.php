@@ -89,7 +89,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="dropdown-item">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <i class="ti ti-user-undo"></i>
+                                        <i class="ti ti-arrow-back-up"></i>
                                     </span>
                                     <span class="nav-link-title">
                                         Return to {{ session('impersonator_name', 'Super Admin') }}
