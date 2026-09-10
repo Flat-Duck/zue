@@ -3,21 +3,7 @@
 @section('title', 'Timesheet Report')
 
 @section('styles')
-    <style>
-        @media print {
-            .btn-print {
-                display: none;
-            }
-
-            .card {
-                border: none !important;
-            }
-
-            .card-header {
-                display: none !important;
-            }
-        }
-    </style>
+    @vite('resources/sass/print/report-timesheets.scss')
 @endsection
 
 @section('content')

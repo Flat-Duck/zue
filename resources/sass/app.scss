@@ -57,3 +57,15 @@ select.tomselected.ts-hidden-accessible {
 .dashboard-chart {
   min-height: 300px;
 }
+
+// The actions column at the end of every index table. Seventeen views set this
+// width inline; it is one rule, and an inline style is the first thing a content
+// security policy refuses.
+.table-actions {
+  width: 134px;
+}
+
+// Company and NOC marks in the printed headers.
+.print-logo {
+  height: 100px;
+}

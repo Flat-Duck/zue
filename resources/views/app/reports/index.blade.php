@@ -110,7 +110,7 @@
                                     </select>
                                 </div>
 
-                                <div id="threshold_options" style="display: none;">
+                                <div id="threshold_options" class="d-none">
                                     <div class="row mb-3">
                                         <div class="col-6">
                                             <label class="form-label">Condition</label>

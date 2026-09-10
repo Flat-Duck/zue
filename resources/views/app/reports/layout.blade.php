@@ -2,101 +2,7 @@
 @section('title', 'Balance Report')
 @section('content')
 @section('styles')
-    <style>
-        .centered {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Container holding the image and the text */
-        .container {
-            position: relative;
-            text-align: center;
-            color: white;
-            min-height: 60px;
-        }
-
-        @media print {
-
-            html,
-            body {
-                height: 100%;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            img {
-                /* width:100%; */
-                height: 100%;
-                display: block;
-            }
-
-
-            @page {
-                size: A4 portrait;
-                max-height: 100%;
-                max-width: 100%;
-                margin-bottom: 0px;
-                margin-top: 0px;
-                margin-left: 10px;
-                margin-right: 10px;
-            }
-
-            .pagebreak {
-                page-break-after: always;
-            }
-        }
-
-        .header {
-            max-height: 120px;
-            margin: 0px;
-            margin-top: 10px;
-        }
-
-        .box {
-            border: 1px solid black;
-            margin: 0px;
-            margin-left: 2px;
-        }
-
-        .divider {
-            margin: 0px;
-        }
-
-        h6 {
-            margin: 0;
-        }
-
-        table {
-            page-break-inside: auto;
-        }
-
-        thead {
-            display: table-header-group;
-        }
-
-        tfoot {
-            display: table-footer-group;
-        }
-
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-        }
-
-        table tr:last-child {
-            border-bottom: 1px solid black;
-        }
-
-        td,
-        th {
-            border: 1px solid black;
-            border-bottom: 0px;
-        }
-    </style>
+    @vite('resources/sass/print/report-balance.scss')
 @endsection
 <div class="page-body">
     <div class="container-xl">
@@ -109,7 +15,7 @@
                 <div class="header">
                     <div class="row mt-2">
                         <div class="col-3">
-                            <img src="/img/zue-logo.png" style="height: 100px" class="mx-auto d-block">
+                            <img src="/img/zue-logo.png" class="print-logo" class="mx-auto d-block">
                         </div>
                         <div class="col-6">
                             <h2 class="h2 text-center">
@@ -123,7 +29,7 @@
                             </h4>
                         </div>
                         <div class="col-3 d-flex align-items-end ">
-                            {{-- <img src="/img/noc-logo.png" style="height: 100px" class="mx-auto d-block"> --}}
+                            {{-- <img src="/img/noc-logo.png" class="print-logo" class="mx-auto d-block"> --}}
                             <h4 class="h4 text-right d-flex align-items-end">
                                 <span class="align-text-bottom">{{ now()->format('d/M/Y') }}</span>
                             </h4>

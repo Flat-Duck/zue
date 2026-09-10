@@ -1,69 +1,7 @@
 @extends('layouts.app', ['page' => 'employees'])
 @section('content')
 @section('styles')
-<style>
-    /* @page {size:landscape}  
-    @media print{
-        @page {size: A4 landscape;max-height:100%; max-width:100%}
-        use width if in portrait (use the smaller size to try 
-        and prevent image from overflowing page...
-        img { height: 90%; margin: 0; padding: 0; }
-        body{
-            width:100%;
-            height:100%;
-            visibility: hidden;
-            -webkit-transform: rotate(-90deg) scale(.68,.68); 
-            writing-mode: tb-rl;
-            @page { 
-                size: landscape;
-            }
-        #headTable {
-            width: 100%;
-            border: solid;
-            }
-        #section-to-print {
-            visibility: visible;
-            position: absolute;
-            left: 0; */
-            /* top: 0;
-            }
-        .row{
-            display: block;
-        }
-        .page-break {
-            page-break-after: always;
-        }
-    }
-}
-*/
-
-@media print {
-    .pagebreak { page-break-before: always; } page-break-after works, as well
-    /* #headTable {margin-bottom:200px } */
-    #pageHead {margin-bottom:200px;
-        position: fixed;
-        top:0;
-        left: 0;
-        A_CSS_ATTRIBUTE:all;
-        width: 100%;
-     }
-    table {page-break-inside: auto}
-    tr {page-break-inside:avoid; page-break-after: auto;}
-    thead {display: table-header-group}
-    tfoot {display: table-footer-group}
-    
-}
-
-/* -------------------- */
-td,th { 
-  border: 1px solid black;
-  border-bottom: 0px;
-}
-table tr:last-child {
-  border-bottom: 1px solid black;
-} 
-/* -------------------- */
-</style>
+    @vite('resources/sass/print/timesheet-print.scss')
 @endsection
 <div class="card">
     <div class="card-body border-bottom" id="section-to-print">
@@ -79,18 +17,18 @@ table tr:last-child {
                         <td style="width: 20%; height: 43px; text-align: center;"><img alt="" /></td>
                     </tr>
                     <tr style="height: 30px; text-align: center;">
-                        <td style="width: 20%; height: 30px;">السنة</td>
-                        <td style="width: 20%; height: 30px;">الشهر</td>
-                        <td style="width: 20%; height: 30px;">مركز التكلفة</td>
-                        <td style="width: 20%; height: 30px;">القسم</td>
-                        <td style="width: 20%; height: 30px;">الادارة&nbsp;</td>
+                        <td class="signature-cell">السنة</td>
+                        <td class="signature-cell">الشهر</td>
+                        <td class="signature-cell">مركز التكلفة</td>
+                        <td class="signature-cell">القسم</td>
+                        <td class="signature-cell">الادارة&nbsp;</td>
                     </tr>
                     <tr style="height: 30px; text-align: center;">
-                        <td style="width: 20%; height: 30px;"></td>
-                        <td style="width: 20%; height: 30px;"></td>
-                        <td style="width: 20%; height: 30px;"></td>
-                        <td style="width: 20%; height: 30px;"></td>
-                        <td style="width: 20%; height: 30px;"></td>
+                        <td class="signature-cell"></td>
+                        <td class="signature-cell"></td>
+                        <td class="signature-cell"></td>
+                        <td class="signature-cell"></td>
+                        <td class="signature-cell"></td>
                     </tr>
                 </tbody>
             </table>
@@ -148,7 +86,7 @@ table tr:last-child {
                 </tbody>
             </table>
         </div>
-        <div style="A_CSS_ATTRIBUTE:all;position: fixed;bottom: 10px; left: 10px; ">THIS IS MY FOOTER</div>
+        <div class="print-corner-note">THIS IS MY FOOTER</div>
 
     </div>
 </div>

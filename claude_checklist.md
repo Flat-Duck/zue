@@ -430,26 +430,54 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   layout, and `livewire/clinic-employee-info.blade copy.php` — 9.3 KB of duplicate that could
   never have been rendered, given the space in its name.
 
-- [~] 5.2 **Held deliberately, pending browser tests.** 131 inline `style=` attributes across 38
-  views, and 11 `<style>` blocks. The blocks are the problem: **ten of the eleven redefine bare
-  `body`, `table`, `td`, `th`, `.card`, `.container` or `.header`**. Those rules are only safe
-  today because each block is scoped to the page it sits on. Moving them into a shared stylesheet
-  without wrapping every one in a per-view class would have `.container` from the balance report
-  reaching Bootstrap's container everywhere.
+- [x] 5.2 **Every `<style>` block is out of the views, and inline styles are down 131 → 57.**
 
-  Doing it safely means restructuring eleven print layouts — the flight manifest used at the
-  airport, the time sheet approval sheet, the appraisal forms. That needed verification stronger
-  than "the page returns 200".
+  The eleven blocks could not simply be merged: ten of them redefine bare `body`, `table`, `td`,
+  `.card`, `.container` or `.header`, and they are only safe today because each is scoped to the
+  page it sits on. So each became its own Vite entry, loaded where the block used to be —
+  identical scoping, no cross-view leakage, and now inside the build.
 
-  **Now unblocked:** 4.5's browser tests landed, and they screenshot the manifest and the
-  approval sheet. This is the next thing to take, one view at a time, each block scoped under a
-  per-view class with a before-and-after screenshot.
+  Verified rather than assumed. Before touching the manifest I pinned its *computed* geometry in
+  a browser — A4 sheet width, `table-layout: fixed`, ruled cells, `direction: rtl` — moved the
+  CSS, and re-ran: identical. The approval sheet is pinned the same way, down to the `#87ceeb`
+  of a highlighted attendance cell. Screenshots confirm both still look right.
 
-- [~] 5.3 **The two that mattered are done; the rest waits with 5.2.** The time sheet fill and
-  time table screens each carried an inline script that re-initialised the *same* date picker
-  Alpine had already set up — so what a user got was whichever ran last, and it was the inline
-  one. Both are gone; the options moved into the Blade prop that Alpine reads, and a test asserts
-  the picker is initialised exactly once.
+  Of the inline attributes, 74 were repeated markup: the actions column set `width: 134px` in
+  **seventeen** index tables, and the appraisal sheet set column widths cell by cell. Those are
+  classes now. The 57 that remain are genuinely one-off print dimensions — `height: 30mm` on a
+  signature block — spread one or two to a view.
+
+- [ ] **The last 57 inline styles, for a strict content security policy.** `style-src` refuses
+  `style=` attributes as well as `<style>` blocks, so a strict policy needs all of them gone, or
+  it needs `'unsafe-hashes'`. What is left is mechanical but low value per edit, and it is worth
+  doing in one pass alongside phase 7's CSP work rather than piecemeal now.
+
+- [x] **Three pieces of dead CSS found by moving it.** Sass refuses what browsers silently drop.
+  `tbody tr th:nth-child(1, 2, 3)` is invalid — `nth-child` takes one argument — and the rule
+  directly beneath it said the same thing correctly, so it had never applied. `tbody
+  td:last-child()` likewise. Both were **deleted rather than corrected**: fixing them would add
+  borders the printed sheet has never had, which is a decision, not tidying. And one style
+  attribute still carried a placeholder, `A_CSS_ATTRIBUTE:all`, that was never a property.
+
+  `reports/layout.blade.php` and `reports/printable.blade.php` turned out to have byte-identical
+  CSS — the build deduplicates them into one file, which is how it surfaced.
+
+- [x] 5.3 **Inline scripts 22 → 14, and the two that were actually wrong are gone.**
+
+  The time sheet fill and time table screens each carried a script that re-initialised the *same*
+  date picker Alpine had already set up, so what a user got was whichever ran last. Both removed;
+  the options moved into the Blade prop Alpine reads, and a browser test asserts the picker is
+  initialised exactly once.
+
+  The appraisal period create and edit forms each had their own copy of "hide the quarter field
+  when the type is yearly" — and had **already drifted**: only the edit form cleared the field, so
+  creating a yearly period could submit a quarter left over from an earlier choice. One module
+  now, with a browser test that selects a quarter, switches to yearly, and asserts the field is
+  both hidden and empty.
+
+  The 14 that remain are single-page behaviours with no duplication between them — a score
+  subtotal, a popover initialiser. Moving them buys nothing on its own; it buys something only as
+  part of the content security policy pass, alongside the last inline styles.
 
 - [ ] **Found doing it: the date picker had a ceiling that was about to expire.** The inline
   script restricted the fill screen's picker to `from: "2024-01-01", to: '2026-10-10'` — a date
@@ -481,7 +509,32 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   loaded only by the four clinic views, so it costs nothing elsewhere; the 1,688 KB is HugeRTE
   itself. Splitting it further is not really available — replacing it is a product decision.
 
-- [ ] 5.5 Decide the i18n story (38 views hard-code Arabic; only `en` exists)
+- [ ] 5.5 **The i18n story needs your decision.** Measured rather than guessed:
+
+  - 96 of 184 views already go through `@lang`/`__()`, against a single `lang/en/crud.php` of
+    627 lines. That is the scaffolded chrome — buttons, table headings, "are you sure".
+  - 38 views (20%) contain hard-coded Arabic — **286 lines of it**. It is concentrated in the
+    documents: the appraisal sheet (68 lines), the appraisal review form (36), the injury report
+    (28), the flight manifest (25), the time sheet approval sheet (16).
+  - `config/app.php` sets locale and fallback to `en`, and no `ar` directory exists.
+
+  So the application is not half-translated; it is two things at once. The **chrome is English and
+  translatable**, and the **printed documents are Arabic and fixed** — because they reproduce
+  forms the company already uses, where the wording is the form. Nobody would want
+  `الجنسية` on the airport manifest to follow a locale switch.
+
+  Three ways forward, and it is a question about who uses this system, not about code:
+
+  1. **Leave it.** Declare the documents Arabic by definition and stop counting them as
+     untranslated. Cheapest, and honest about what those pages are.
+  2. **Translate the chrome to Arabic** — add `lang/ar`, set the locale, and give staff an Arabic
+     interface end to end. Real work: 627 keys, plus RTL for every screen, not just the printed
+     ones.
+  3. **Make it switchable**, so an English-speaking contractor and an Arabic-speaking clerk each
+     get their own. The most work by far, and only worth it if you actually have both.
+
+  **My recommendation is (1) unless staff are asking for an Arabic interface**, in which case (2).
+  I would not build (3) without someone actually needing it. Which is it?
 - [x] No view references an external host — asserted by `FrontendAssetTest`, not assumed
 
 ## Phase 6 — Quality gates
@@ -560,10 +613,11 @@ only through HTTP; the role access matrix asserted; coverage measured at 58.43% 
 guessed) and **Authorization 8 → 9** (the policy layer now has 706 assertions behind it,
 including the negative cases). Overall **7.4**.
 
-After phase 5's first half, **Frontend 6 → 7** (no view reaches another host, `app.js` 1,298 →
-345 KB with the chart chunk split out, the picker initialised once instead of twice) and
-**Security 8 → 9** (a content security policy is now possible on the JavaScript side; the
-remaining blocker is 5.2's inline styles). **Operations 5 → 6** — `migrate:reset` works end to
-end, which rollback rehearsal depends on. Overall **7.7**.
+After phase 5, **Frontend 6 → 8** (no view reaches another host, every `<style>` block is in the
+build, inline styles 131 → 57, `app.js` 345 KB with the chart chunk split out, the date picker
+initialised once instead of twice) and **Security 8 → 9** (the CDN and inline-script blockers to
+a content security policy are gone; 57 inline styles and 14 page scripts remain, best cleared in
+one pass with phase 7's CSP work). **Operations 5 → 6** — `migrate:reset` works end to end, which
+rollback rehearsal depends on. Overall **7.8**.
 
 Still at baseline: **Scalability 5** — phase 6 has not started.

@@ -3,71 +3,7 @@
 @section('title', 'Official Monthly Time Sheet')
 
 @section('styles')
-    <style>
-        @media print {
-            @page {
-                size: A4 landscape;
-                margin: 10mm;
-            }
-
-            .d-print-none {
-                display: none !important;
-            }
-
-            .card {
-                border: none !important;
-                box-shadow: none !important;
-            }
-
-            .page-break {
-                page-break-after: always;
-            }
-        }
-
-        .attendance-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-        }
-
-        .attendance-table th,
-        .attendance-table td {
-            border: 1px solid #000;
-            text-align: center;
-            padding: 2px;
-        }
-
-        .header-box {
-            border: 1px solid #000;
-            padding: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .skyblue {
-            background-color: #d1ecf1 !important;
-        }
-
-        .grassgreen {
-            background-color: #d4edda !important;
-        }
-
-        .signature-box {
-            border: 1px solid #000;
-            height: 100px;
-            position: relative;
-            text-align: center;
-            padding-top: 5px;
-        }
-
-        .signature-img {
-            max-height: 60px;
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-    </style>
+    @vite('resources/sass/print/report-attendance.scss')
 @endsection
 
 @section('content')

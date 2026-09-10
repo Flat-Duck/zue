@@ -90,21 +90,5 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const typeSelect = document.getElementById('typeSelect');
-            const quarterField = document.getElementById('quarterField');
-
-            function toggleQuarter() {
-                if (typeSelect.value === 'yearly') {
-                    quarterField.style.display = 'none';
-                } else {
-                    quarterField.style.display = 'block';
-                }
-            }
-
-            typeSelect.addEventListener('change', toggleQuarter);
-            toggleQuarter(); // check on load
-        });
-    </script>
+    @vite('resources/js/appraisal-period-form.js')
 @endsection

@@ -1,164 +1,7 @@
 @extends('layouts.app', ['page' => 'employees'])
 @section('content')
     @section('styles')
-        <style>
-            .centered {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
-
-            /* Container holding the image and the text */
-            .container {
-                position: relative;
-                text-align: center;
-                color: white;
-                min-height: 60px;
-            }
-
-            @media print {
-
-                html,
-                body {
-                    height: 100%;
-                    width: 100%;
-                    margin: 0;
-                    padding: 0;
-                }
-
-                img {
-                    /* width:100%; */
-                    height: 100%;
-                    display: block;
-                }
-
-
-                @page {
-                    size: A4 landscape;
-                    max-height: 100%;
-                    max-width: 100%;
-                    margin-bottom: 0px;
-                    margin-top: 0px;
-                    margin-left: 10px;
-                    margin-right: 10px;
-                }
-
-                .pagebreak {
-                    page-break-after: always;
-                }
-            }
-
-            .header {
-                max-height: 120px;
-                margin: 0px;
-                margin-top: 10px;
-            }
-
-            .box {
-                border: 1px solid black;
-                margin: 0px;
-                margin-left: 2px;
-            }
-
-            .divider {
-                margin: 0px;
-            }
-
-            h6 {
-                margin: 0;
-            }
-
-            table {
-                page-break-inside: auto;
-            }
-
-            thead {
-                display: table-header-group;
-            }
-
-            tfoot {
-                display: table-footer-group;
-            }
-
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            table tr:last-child {
-                border-bottom: 1px solid black;
-            }
-
-            td,
-            th {
-                border: 1px solid black;
-                border-bottom: 0px;
-            }
-
-            .name {
-                font-size: small;
-                padding: 0px;
-                margin: 0px;
-            }
-
-            .skyblue {
-                background-color: #87ceeb !important;
-            }
-
-            .grassgreen {
-                background-color: #7cb378 !important;
-            }
-
-            .expnded {
-                /* font-size: x-large !important; */
-                font-size: larger !important;
-                color: black !important;
-
-
-            }
-
-            /* table {
-                                                                                border-collapse: collapse;
-                                                                                width: 100%;
-                                                                            } */
-
-            tbody tr:nth-child(even) {
-                border-bottom: 4px double #000 !important;
-                border-left: 4px double #000 !important;
-                border-right: 4px double #000 !important;
-
-            }
-
-            tbody tr:nth-child(odd) {
-                border-top: 4px double #000 !important;
-                border-left: 4px double #000 !important;
-                border-right: 4px double #000 !important;
-            }
-
-            tbody tr th:nth-child(1, 2, 3) {
-                border-top: 4px double #000 !important;
-                border-left: 4px double #000 !important;
-                border-right: 4px double #000 !important;
-            }
-
-            tbody th:nth-child(-n+3) {
-                border-top: 4px double #000 !important;
-                border-left: 4px double #000 !important;
-                border-right: 4px double #000 !important;
-            }
-
-            tbody td:last-child() {
-                border-top: 4px double #000 !important;
-                border-left: 4px double #000 !important;
-                border-right: 4px double #000 !important;
-            }
-
-            /* tbody th, tbody td {
-                                                                                border: 1px solid #ccc;
-                                                                                padding: 4px;
-                                                                            } */
-        </style>
+    @vite('resources/sass/print/timesheet-approve.scss')
     @endsection
     <div class="card">
         <div class="card-body">
@@ -196,7 +39,7 @@
                 <div class="header">
                     <div class="row mt-2">
                         <div class="col-3">
-                            <img src="{{ asset('/img/zue-logo.png') }}" style="height: 100px" class="mx-auto d-block">
+                            <img src="{{ asset('/img/zue-logo.png') }}" class="print-logo" class="mx-auto d-block">
                         </div>
                         <div class="col-6">
                             <h2 class="h2 text-center">
@@ -207,7 +50,7 @@
                             </h3>
                         </div>
                         <div class="col-3">
-                            <img src="{{ asset('/img/noc-logo.png') }}" style="height: 100px" class="mx-auto d-block">
+                            <img src="{{ asset('/img/noc-logo.png') }}" class="print-logo" class="mx-auto d-block">
                         </div>
                     </div>
                     <div class="row mt-2">
@@ -337,7 +180,7 @@
                                         <div>
                                             <h6 class="container">
                                                 <img src="{{ asset('storage/' . $stage['signature']['path']) }}"
-                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                                    class="signature-space" class="mx-auto d-block centered">
                                             </h6>
                                             {{ $stage['signature']['name'] ?? '' }}
                                         </div>
@@ -380,7 +223,7 @@
                                     <div>
                                         <h6 class="container">
                                             <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
-                                                style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                                class="signature-space" class="mx-auto d-block centered">
                                         </h6>
                                         {{ $signatures['time_keeper']['name'] }}
                                     </div>
@@ -410,7 +253,7 @@
                                         <div>
                                             <h6 class="container">
                                                 <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
-                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                                    class="signature-space" class="mx-auto d-block centered">
                                             </h6>
                                             {{ $signatures['super_visor']['name'] }}
                                         </div>
@@ -441,7 +284,7 @@
                                         <div>
                                             <h6 class="container">
                                                 <img src="{{ asset('storage/' . $signatures['field_coordinator']['sign']) }}"
-                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                                    class="signature-space" class="mx-auto d-block centered">
                                             </h6>
                                             {{ $signatures['field_coordinator']['name'] }}
                                         </div>
@@ -472,7 +315,7 @@
                                         <div>
                                             <h6 class="container">
                                                 <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
-                                                    style="height: 70px; margin-top: 12px;" class="mx-auto d-block centered">
+                                                    class="signature-space" class="mx-auto d-block centered">
                                             </h6>
                                             {{ $signatures['super_intendent']['name'] }}
                                         </div>

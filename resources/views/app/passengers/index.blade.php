@@ -75,7 +75,7 @@
                     <td>{{ $passenger->company ?? '-' }}</td>
                     <td>{{ $passenger->number ?? '-' }}</td>
                     <td>{{ $passenger->nationality ?? '-' }}</td>
-                    <td class="text-center" style="width: 134px;">
+                    <td class="text-center table-actions">
                         <div
                             role="group"
                             aria-label="Row Actions"

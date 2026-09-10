@@ -1,26 +1,9 @@
+@section('styles')
+    @vite('resources/sass/print/appraisal-review.scss')
+@endsection
 @extends('layouts.app', ['page' => 'appraisals'])
 
 @section('content')
-    <style>
-        .sticky-footer {
-            position: sticky;
-            bottom: 0;
-            background: #fff;
-            padding: 1rem;
-            border-top: 1px solid #ddd;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .progress-container {
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            background: #f8fafc;
-            padding-top: 1rem;
-            padding-bottom: 0.5rem;
-        }
-    </style>
 
     <div class="container-xl">
         <div class="page-header d-print-none">

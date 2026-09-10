@@ -1,0 +1,20 @@
+// Extracted from app/reports/timesheets_printable.blade.php.
+//
+// It keeps its own entry rather than joining a shared print stylesheet: these
+// rules set `body`, `table` and in places `.card` and `.container` outright, and
+// the page they belong to also loads Bootstrap. Loading them only where they were
+// already scoped is what makes moving them out of the view safe.
+
+@media print {
+    .btn-print {
+        display: none;
+    }
+
+    .card {
+        border: none !important;
+    }
+
+    .card-header {
+        display: none !important;
+    }
+}

@@ -102,8 +102,7 @@
                 <div class="col-7">
                     <div class="flatpickr" wire:ignore>
                         <input id="time" wire:model.live="range" x-data
-                            x-init="flatpickr($refs.input, {{ $options }} );" x-ref="input" type="hidden" data-input
-                            style="display: none;" />
+                            x-init="flatpickr($refs.input, {{ $options }} );" x-ref="input" type="hidden" data-input class="d-none" />
                     </div>
                 </div>
                 <div class="col-5">

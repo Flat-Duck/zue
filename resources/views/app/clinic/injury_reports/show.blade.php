@@ -1,3 +1,6 @@
+@section('styles')
+    @vite('resources/sass/print/injury-report.scss')
+@endsection
 @extends('layouts.app', ['page' => 'clinic'])
 @section('title','عرض التقرير')
 
@@ -8,32 +11,6 @@
 @endphp
 
 {{-- ===== Tabler Print Helpers ===== --}}
-<style>
-  /* لو عندك Tabler مركّب عبر Vite/CDN خلاص؛
-     هنا بس تحسينات للطباعة والقراءة فقط */
-  .read-only input.form-control[readonly],
-  .read-only textarea.form-control[readonly]{
-      background: #f8f9fa;
-      color:#111;
-      border-color:#e9ecef;
-  }
-  .read-only .form-check-input:disabled{
-      border-color:#cbd5e1;
-      background:#fff;
-  }
-  .section-title{
-      font-weight:700; font-size:1rem; color:#0f172a;
-      border-bottom:1px solid #e9ecef; padding-bottom:.4rem; margin-bottom:1rem;
-  }
-  .muted{ color:#6b7280; }
-  @media print{
-      nav, .navbar, .btn, .card-footer, .print-hide{ display:none !important; }
-      body{ background:#fff; }
-      .card{ box-shadow:none !important; border:0 !important; }
-      .container{ max-width: 100% !important; }
-      @page { size: A4; margin: 12mm; }
-  }
-</style>
 
 <div class="page-header print-hide mb-3">
   <div class="row align-items-center">

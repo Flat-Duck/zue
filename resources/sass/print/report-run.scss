@@ -1,0 +1,44 @@
+// Extracted from app/reports/run.blade.php.
+//
+// It keeps its own entry rather than joining a shared print stylesheet: these
+// rules set `body`, `table` and in places `.card` and `.container` outright, and
+// the page they belong to also loads Bootstrap. Loading them only where they were
+// already scoped is what makes moving them out of the view safe.
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
+
+    .d-print-none {
+        display: none !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.report-table th,
+.report-table td {
+    border: 1px solid #000;
+    padding: 4px;
+    text-align: center;
+}
+
+.report-table th {
+    background-color: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+}
+
+.text-start {
+    text-align: left !important;
+}

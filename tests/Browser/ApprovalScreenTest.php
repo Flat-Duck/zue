@@ -111,6 +111,39 @@ class ApprovalScreenTest extends DuskTestCase
                 ->screenshot('timesheet-approve');
 
             $this->assertNoBrowserErrors($browser);
+
+            // Read back from the browser, not from the source. The approval sheet's
+            // CSS moved out of the view in phase 5.2, and this is what proves the
+            // move preserved it: the page overrides Bootstrap's `.container` and
+            // rules every cell, and both have to still be true.
+            $computed = $browser->driver->executeScript(<<<'JS'
+                const read = (selector, properties) => {
+                    const el = document.querySelector(selector);
+                    if (! el) return null;
+                    const style = getComputedStyle(el);
+                    return Object.fromEntries(properties.map((p) => [p, style.getPropertyValue(p)]));
+                };
+
+                return {
+                    cell: read('th', ['border-top-width', 'border-top-style', 'border-bottom-width']),
+                    table: read('table', ['border-collapse']),
+                    marked: read('.skyblue', ['background-color']),
+                };
+            JS);
+
+            $this->assertNotNull($computed['cell'], 'The sheet has no header cells.');
+            $this->assertSame('1px', $computed['cell']['border-top-width'], 'The cells lost their rules.');
+            $this->assertSame('solid', $computed['cell']['border-top-style']);
+            $this->assertSame('0px', $computed['cell']['border-bottom-width'], 'Cells should carry no bottom rule.');
+
+            $this->assertSame('collapse', $computed['table']['border-collapse']);
+
+            $this->assertNotNull($computed['marked'], 'The highlighted attendance cell is missing.');
+            $this->assertSame(
+                'rgb(135, 206, 235)',
+                $computed['marked']['background-color'],
+                'The attendance colour coding was lost.'
+            );
         });
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Browser;
 
 use App\Models\Employee;
 use App\Models\Flight;
+use App\Models\FlightLeg;
 use App\Models\FlightRoute;
 use App\Models\Plane;
 use App\Models\User;
@@ -104,5 +105,92 @@ class PrintLayoutTest extends DuskTestCase
                 'The employee number was not rendered as written. Cells: '.$cells->implode(' | ')
             );
         });
+    }
+
+    /**
+     * The manifest's layout, read back from the browser rather than from the source.
+     *
+     * These are the properties that make it the sheet the airport expects: an A4
+     * page width, a fixed table layout with ruled cells, and right-to-left text. They
+     * are asserted as *computed* values so that moving the CSS out of the view — which
+     * is what phase 5.2 does — has to preserve them, not merely keep the file parsing.
+     */
+    public function test_the_manifest_keeps_its_printed_geometry(): void
+    {
+        [$flight, $leg] = $this->flightWithATraveller();
+
+        $this->browse(function (Browser $browser) use ($flight, $leg): void {
+            $browser->loginAs($this->superAdmin())
+                ->visit(route('flights.manifest', [$flight, $leg], false));
+
+            $computed = $browser->driver->executeScript(<<<'JS'
+                const read = (selector, properties) => {
+                    const el = document.querySelector(selector);
+                    if (! el) return null;
+                    const style = getComputedStyle(el);
+                    return Object.fromEntries(properties.map((p) => [p, style.getPropertyValue(p)]));
+                };
+
+                return {
+                    sheet: read('.sheet', ['width', 'background-color', 'box-sizing']),
+                    table: read('table', ['table-layout', 'border-collapse', 'width']),
+                    cell: read('td', ['border-top-width', 'border-top-style']),
+                    body: read('body', ['direction']),
+                };
+            JS);
+
+            $this->assertNotNull($computed['sheet'], 'The A4 sheet is missing.');
+            // 210mm, as the browser resolves it.
+            $this->assertEqualsWithDelta(
+                793.688,
+                (float) $computed['sheet']['width'],
+                0.5,
+                'The sheet is no longer A4 wide.'
+            );
+            $this->assertSame('rgb(255, 255, 255)', $computed['sheet']['background-color']);
+            $this->assertSame('border-box', $computed['sheet']['box-sizing']);
+
+            $this->assertSame('fixed', $computed['table']['table-layout']);
+            $this->assertSame('collapse', $computed['table']['border-collapse']);
+
+            $this->assertSame('1px', $computed['cell']['border-top-width'], 'The cells lost their rules.');
+            $this->assertSame('solid', $computed['cell']['border-top-style']);
+
+            $this->assertSame('rtl', $computed['body']['direction']);
+        });
+    }
+
+    /**
+     * @return array{0: Flight, 1: FlightLeg}
+     */
+    private function flightWithATraveller(): array
+    {
+        $this->seed(PermissionsSeeder::class);
+        $this->seed(FlightRoutesSeeder::class);
+
+        $flight = app(FlightDispatchService::class)->buildLegsFromRoute(
+            Flight::factory()->create([
+                'plane_id' => Plane::factory()->seats(4)->create(['name' => 'Dash-8'])->id,
+                'date' => '2026-09-08',
+            ]),
+            FlightRoute::query()->where('name', 'Tripoli - 103A - Benghazi - 103A - Tripoli')->firstOrFail()
+        );
+
+        $leg = $flight->legs->first();
+
+        app(FlightDispatchService::class)->book(
+            $leg,
+            Employee::factory()->create(['number' => 9812, 'arabic_name' => 'احمد سالم'])
+        );
+
+        return [$flight, $leg];
+    }
+
+    private function superAdmin(): User
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        return $admin->fresh();
     }
 }

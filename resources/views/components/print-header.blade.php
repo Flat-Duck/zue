@@ -2,7 +2,7 @@
 <div class="header">
     <div class="row mt-2">
         <div class="col-3">
-            <img src="/img/zue-logo.png" style="height: 100px" class="mx-auto d-block">
+            <img src="/img/zue-logo.png" class="print-logo" class="mx-auto d-block">
         </div>
         <div class="col-6">
             <h2 class="h2 text-center">
@@ -16,7 +16,7 @@
             </h4>
         </div>
         <div class="col-3 d-flex align-items-end">
-            {{-- <img src="/img/noc-logo.png" style="height: 100px" class="mx-auto d-block"> --}}
+            {{-- <img src="/img/noc-logo.png" class="print-logo" class="mx-auto d-block"> --}}
             <h4 class="h4 text-right d-flex align-items-end">
                 <span class="align-text-bottom">{{ now()->format('d/M/Y') }}</span>
             </h4>

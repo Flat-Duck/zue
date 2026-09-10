@@ -3,45 +3,7 @@
 @section('title', 'Run Report')
 
 @section('styles')
-    <style>
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm;
-            }
-
-            .d-print-none {
-                display: none !important;
-            }
-
-            .card {
-                border: none !important;
-                box-shadow: none !important;
-            }
-        }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-
-        .report-table th,
-        .report-table td {
-            border: 1px solid #000;
-            padding: 4px;
-            text-align: center;
-        }
-
-        .report-table th {
-            background-color: #f8f9fa !important;
-            -webkit-print-color-adjust: exact;
-        }
-
-        .text-start {
-            text-align: left !important;
-        }
-    </style>
+    @vite('resources/sass/print/report-run.scss')
 @endsection
 
 @section('content')

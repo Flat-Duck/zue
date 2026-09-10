@@ -1,0 +1,166 @@
+// Extracted from app/time_sheets/approve.blade.php.
+//
+// It keeps its own entry rather than joining a shared print stylesheet: these
+// rules set `body`, `table` and in places `.card` and `.container` outright, and
+// the page they belong to also loads Bootstrap. Loading them only where they were
+// already scoped is what makes moving them out of the view safe.
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Container holding the image and the text */
+.container {
+    position: relative;
+    text-align: center;
+    color: white;
+    min-height: 60px;
+}
+
+@media print {
+
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    img {
+        /* width:100%; */
+        height: 100%;
+        display: block;
+    }
+
+
+    @page {
+        size: A4 landscape;
+        max-height: 100%;
+        max-width: 100%;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .pagebreak {
+        page-break-after: always;
+    }
+}
+
+.header {
+    max-height: 120px;
+    margin: 0px;
+    margin-top: 10px;
+}
+
+.box {
+    border: 1px solid black;
+    margin: 0px;
+    margin-left: 2px;
+}
+
+.divider {
+    margin: 0px;
+}
+
+h6 {
+    margin: 0;
+}
+
+table {
+    page-break-inside: auto;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+
+table tr:last-child {
+    border-bottom: 1px solid black;
+}
+
+td,
+th {
+    border: 1px solid black;
+    border-bottom: 0px;
+}
+
+.name {
+    font-size: small;
+    padding: 0px;
+    margin: 0px;
+}
+
+.skyblue {
+    background-color: #87ceeb !important;
+}
+
+.grassgreen {
+    background-color: #7cb378 !important;
+}
+
+.expnded {
+    /* font-size: x-large !important; */
+    font-size: larger !important;
+    color: black !important;
+
+
+}
+
+/* table {
+                                                                    border-collapse: collapse;
+                                                                    width: 100%;
+                                                                } */
+
+tbody tr:nth-child(even) {
+    border-bottom: 4px double #000 !important;
+    border-left: 4px double #000 !important;
+    border-right: 4px double #000 !important;
+
+}
+
+tbody tr:nth-child(odd) {
+    border-top: 4px double #000 !important;
+    border-left: 4px double #000 !important;
+    border-right: 4px double #000 !important;
+}
+
+// Removed on extraction: `tbody tr th:nth-child(1, 2, 3)`. `nth-child` takes one
+// argument, so no browser ever applied it — and the rule immediately below says the
+// same thing correctly. Deleting it preserves what the sheet prints today.
+
+tbody th:nth-child(-n+3) {
+    border-top: 4px double #000 !important;
+    border-left: 4px double #000 !important;
+    border-right: 4px double #000 !important;
+}
+
+// Removed on extraction: `tbody td:last-child()`. `:last-child` takes no arguments,
+// so this never matched either. Correcting it would add borders the printed sheet has
+// never had, which is a change to make deliberately rather than by tidying.
+
+/* tbody th, tbody td {
+                                                                    border: 1px solid #ccc;
+                                                                    padding: 4px;
+                                                                } */
+
+
+// Column widths and signature spacing that were set inline on every cell.
+.signature-space {
+    height: 70px;
+    margin-top: 12px;
+}

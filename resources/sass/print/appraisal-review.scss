@@ -1,0 +1,25 @@
+// Extracted from app/appraisals/reviews/edit.blade.php.
+//
+// It keeps its own entry rather than joining a shared print stylesheet: these
+// rules set `body`, `table` and in places `.card` and `.container` outright, and
+// the page they belong to also loads Bootstrap. Loading them only where they were
+// already scoped is what makes moving them out of the view safe.
+
+.sticky-footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.progress-container {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: #f8fafc;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+}

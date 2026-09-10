@@ -1,0 +1,96 @@
+// The printed flight manifest: a standalone A4 document, not part of the
+// application's chrome. It has its own Vite entry so these rules reach only
+// that page — they set `body`, `table`, `th` and `td` outright, which would be
+// unsafe anywhere Bootstrap is loaded.
+
+@page { size: A4 portrait; margin: 10mm; }
+
+body {
+    font-family: "Segoe UI", Tahoma, "Traditional Arabic", Arial, sans-serif;
+    color: #000;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.sheet {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 12px auto;
+    padding: 10mm;
+    box-sizing: border-box;
+}
+
+.toolbar {
+    width: 210mm;
+    margin: 12px auto 0;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.toolbar button, .toolbar a {
+    font: inherit;
+    padding: 8px 14px;
+    border: 1px solid #206bc4;
+    background: #206bc4;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.toolbar a.secondary { background: #fff; color: #206bc4; }
+
+.head { display: flex; align-items: center; justify-content: space-between; }
+.head img { height: 46px; }
+.head .titles { text-align: center; flex: 1; }
+.head .titles .company { font-weight: 700; letter-spacing: .5px; font-size: 15pt; }
+.head .titles .subject { font-size: 12pt; margin-top: 2px; }
+
+.meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11pt;
+    margin: 8px 0 6px;
+}
+
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+th, td {
+    border: 1px solid #000;
+    padding: 2px 4px;
+    font-size: 9.5pt;
+    text-align: center;
+    height: 19px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+th { font-weight: 700; }
+td.name { text-align: right; }
+
+/* Column widths, right to left. */
+td.ltr { direction: ltr; unicode-bidi: bidi-override; }
+
+.c-seq { width: 6%; }
+.c-num { width: 12%; }
+.c-name { width: 26%; }
+.c-nat { width: 9%; }
+.c-comp { width: 14%; }
+.c-site { width: 11%; }
+.c-dept { width: 12%; }
+.c-dest { width: 10%; }
+
+.signatures { display: flex; justify-content: space-around; margin-top: 18mm; }
+.signatures div { text-align: center; font-size: 10pt; width: 60mm; }
+.signatures .line { border-top: 1px solid #000; margin-top: 16mm; padding-top: 4px; }
+
+@media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .sheet { width: auto; min-height: auto; margin: 0; padding: 0; box-shadow: none; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+}

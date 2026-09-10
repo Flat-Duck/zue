@@ -48,4 +48,39 @@ class AppraisalScreenTest extends DuskTestCase
             }
         });
     }
+
+    /**
+     * The quarter field is hidden for a yearly period, and cleared so a leftover
+     * quarter is not submitted with it. The create and edit forms each carried their
+     * own copy of this behaviour and had already drifted — only one of them cleared
+     * the field.
+     */
+    public function test_a_yearly_period_hides_and_clears_the_quarter(): void
+    {
+        $this->seed(PermissionsSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+
+        $this->browse(function (Browser $browser) use ($admin): void {
+            $browser->loginAs($admin->fresh())
+                ->visit(route('appraisals.periods.create', [], false))
+                ->waitFor('#typeSelect', 10)
+                ->select('#typeSelect', 'quarter')
+                ->assertVisible('#quarterField')
+                ->select('#quarterField select', '3')
+                ->select('#typeSelect', 'yearly')
+                ->assertMissing('#quarterField');
+
+            $this->assertSame(
+                '',
+                $browser->driver->executeScript(
+                    'return document.querySelector("#quarterField select").value;'
+                ),
+                'Switching to yearly left a quarter selected.'
+            );
+
+            $this->assertNoBrowserErrors($browser, 'The appraisal period form');
+        });
+    }
 }
