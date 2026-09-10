@@ -30,6 +30,9 @@ class PerformanceBudgetTest extends TestCase
         // slack in them that was hiding lazy loads. A budget only protects a page
         // while it sits close to what the page actually costs.
         $budgets = [
+            // home1 sits closest to its budget of any page here, which makes it the
+            // likeliest source of the intermittent suite failure recorded in the
+            // checklist. If that is what it is, the message below will say so.
             'home1' => 22,
             'employees.index' => 10,
             'time-sheets.index' => 10,
@@ -37,33 +40,57 @@ class PerformanceBudgetTest extends TestCase
             'clinic.index' => 10,
         ];
 
-        $queries = 0;
-        DB::listen(static function () use (&$queries): void {
-            $queries++;
+        // The statements themselves are kept, not just a tally. A budget that fails
+        // with a number tells you nothing; one that fails with the queries it ran
+        // tells you which relation went unloaded.
+        $statements = [];
+        DB::listen(static function ($query) use (&$statements): void {
+            $statements[] = $query->sql;
         });
 
         foreach ($budgets as $route => $budget) {
-            $queriesBeforeRequest = $queries;
+            $before = count($statements);
             $startedAt = microtime(true);
             $memoryBefore = memory_get_usage(true);
 
             $response = $this->get(route($route));
 
             $response->assertOk();
-            $requestQueries = $queries - $queriesBeforeRequest;
+            $requestStatements = array_slice($statements, $before);
             $elapsedMilliseconds = (microtime(true) - $startedAt) * 1000;
             $memoryDelta = max(0, memory_get_peak_usage(true) - $memoryBefore);
 
             fwrite(STDOUT, sprintf(
                 "\n%s: %d queries, %.1f ms, %.2f MB peak delta",
                 $route,
-                $requestQueries,
+                count($requestStatements),
                 $elapsedMilliseconds,
                 $memoryDelta / 1024 / 1024
             ));
 
-            $this->assertLessThanOrEqual($budget, $requestQueries, $route.' exceeded its query budget.');
+            $this->assertLessThanOrEqual(
+                $budget,
+                count($requestStatements),
+                $route.' exceeded its query budget. The queries it ran were:'.PHP_EOL
+                    .$this->summarise($requestStatements)
+            );
         }
+    }
+
+    /**
+     * Repeated statements are the interesting ones — a relation loaded per row shows
+     * up as the same SQL twenty times — so they are counted rather than listed out.
+     *
+     * @param  list<string>  $statements
+     */
+    private function summarise(array $statements): string
+    {
+        $counts = array_count_values($statements);
+        arsort($counts);
+
+        return collect($counts)
+            ->map(fn (int $times, string $sql): string => sprintf('  %3dx  %s', $times, $sql))
+            ->implode(PHP_EOL);
     }
 
     public function test_major_queries_have_explain_plans(): void

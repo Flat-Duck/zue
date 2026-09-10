@@ -114,4 +114,85 @@ class TimeSheetMutationServiceTest extends TestCase
             'timekeeper_id' => $actorEmployee->id,
         ]);
     }
+
+    /**
+     * The fill screen accepts either a single day or `start to end`, and the range
+     * path had never run under a test. Getting it wrong writes attendance for days
+     * nobody worked.
+     */
+    public function test_filling_a_range_writes_every_day_in_it_inclusive(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+
+        $written = app(TimeSheetMutationService::class)
+            ->fillDateOrRange($employee, '2026-03-02 to 2026-03-06', 'A', 0);
+
+        $this->assertSame(5, $written);
+        $this->assertSame(
+            ['2026-03-02', '2026-03-03', '2026-03-04', '2026-03-05', '2026-03-06'],
+            TimeSheet::query()->where('employee_id', $employee->id)
+                ->orderBy('day')->pluck('day')
+                ->map(fn ($day) => $day->toDateString())->all()
+        );
+    }
+
+    public function test_filling_a_single_day_writes_exactly_that_day(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+
+        $written = app(TimeSheetMutationService::class)
+            ->fillDateOrRange($employee, '2026-03-02', 'A', 0);
+
+        $this->assertSame(1, $written);
+        $this->assertSame(1, TimeSheet::query()->where('employee_id', $employee->id)->count());
+    }
+
+    public function test_an_empty_range_is_rejected_rather_than_filling_nothing_silently(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+
+        $this->expectException(ValidationException::class);
+
+        app(TimeSheetMutationService::class)->fillDateOrRange($employee, '   ', 'A', 0);
+    }
+
+    public function test_deleting_a_range_removes_only_the_days_in_it(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+        $service = app(TimeSheetMutationService::class);
+
+        $service->fillDateOrRange($employee, '2026-03-01 to 2026-03-10', 'A', 0);
+
+        $deleted = $service->deleteDateOrRange($employee, '2026-03-03 to 2026-03-05');
+
+        $this->assertSame(3, $deleted);
+        $this->assertSame(7, TimeSheet::query()->where('employee_id', $employee->id)->count());
+        $this->assertDatabaseMissing('time_sheets', ['employee_id' => $employee->id, 'day' => '2026-03-04']);
+        $this->assertDatabaseHas('time_sheets', ['employee_id' => $employee->id, 'day' => '2026-03-02']);
+    }
+
+    public function test_deleting_days_that_are_not_there_reports_nothing_removed(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+
+        $this->assertSame(
+            0,
+            app(TimeSheetMutationService::class)->deleteDateOrRange($employee, '2026-03-03 to 2026-03-05')
+        );
+    }
+
+    public function test_one_employees_range_never_touches_anothers_days(): void
+    {
+        $employee = Employee::factory()->create(['schedule' => '1/1']);
+        $colleague = Employee::factory()->create(['schedule' => '1/1']);
+        $service = app(TimeSheetMutationService::class);
+
+        $service->fillDateOrRange($employee, '2026-03-01 to 2026-03-03', 'A', 0);
+        $service->fillDateOrRange($colleague, '2026-03-01 to 2026-03-03', 'A', 0);
+
+        $service->deleteDateOrRange($employee, '2026-03-01 to 2026-03-03');
+
+        $this->assertSame(0, TimeSheet::query()->where('employee_id', $employee->id)->count());
+        $this->assertSame(3, TimeSheet::query()->where('employee_id', $colleague->id)->count());
+    }
 }

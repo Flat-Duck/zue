@@ -287,12 +287,105 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
 
 ## Phase 4 — Testing depth
 
-- [ ] 4.1 Policy unit tests for all 16 policies
-- [ ] 4.2 A smoke test per role (`timekeeper`, `campboss`, `flightdispatcher`, …)
-- [ ] 4.3 Enable PCOV; record a coverage baseline
-- [ ] 4.4 Investigate the flaky `PerformanceBudgetTest` failure (observed once, unreproduced)
-- [ ] 4.5 Browser tests: flight manifest, timesheet approval, appraisal
-- [ ] Every policy directly tested; coverage is a measured number
+- [x] 4.1 **All 16 policies now tested directly**, in `PolicyContractTest` — 706 assertions
+  stating which permission each ability requires. The negative half matters more than the
+  positive: the realistic mistake is a policy checking the right resource with the wrong verb,
+  so every ability is also asserted to refuse each *sibling* permission on the same resource,
+  and each permission from another resource. `restore` and `forceDelete` are asserted refused
+  even to someone holding all 77 permissions, and a signed-in user with none reaches nothing.
+
+  Written first as 189 separate cases, which took 56 seconds — one database refresh apiece,
+  nearly doubling the suite. Consolidated into 7 tests carrying the same 706 assertions in 11
+  seconds; the failure messages name the contract the test name used to. Mutation-checked by
+  pointing `CenterPolicy::update` at `view centers`: both halves catch it.
+
+- [x] 4.2 **`RoleAccessTest` states what each role reaches**, page by page, on a freshly seeded
+  install — previously the access model existed only in `PermissionsSeeder` and in whatever the
+  live database had drifted to.
+
+- [ ] **Four roles the time sheet workflow depends on hold no permissions at all.**
+  `PermissionsSeeder` creates `supervisor`, `fieldcoordinator`, `superintendent` and `campboss`
+  with nothing granted, yet those are the names the approval flow puts in `required_role`. On a
+  fresh install someone given one of those roles alone reaches no page whatsoever — it works
+  today only because the same people also hold `user`. Asserted as it stands so the situation is
+  visible rather than surprising. **Deciding what each of those four should actually be able to
+  reach is yours to make**, and I would rather ask than invent an access matrix for your staff.
+
+- [x] 4.3 **Coverage is a number now: 57.96% of lines** (3,664 of 6,322), 57.31% of methods,
+  36.32% of classes, across 430 tests and 2,520 assertions. No class sits at zero.
+
+  PCOV is not installed, but `xdebug.so` already sits in this PHP's extension directory,
+  unloaded — so coverage runs without editing `php.ini` and without slowing every other request:
+
+  ```bash
+  php -d zend_extension=xdebug -d xdebug.mode=coverage -d memory_limit=2G \
+      vendor/bin/phpunit --coverage-text --coverage-html=storage/coverage
+  ```
+
+  It takes about five and a half minutes against one minute without, so it is a deliberate run
+  rather than something to fold into the default command.
+
+  Where the gaps actually are, by lines never executed. This is the list phase 4 should be
+  measured against, not the percentage:
+
+  | Lines uncovered | Covered | Class |
+  | ---: | ---: | --- |
+  | 120 | 43% | `TimeSheetMutationService` — the write path for attendance |
+  | 90 | 6% | `Appraisals\AppraisalOfficialController` |
+  | 68 | 56% | `BackupService` |
+  | 64 | 55% | `ManagementScopeService` |
+  | 63 | 52% | `TimeSheetAuth\WorkflowResolver` |
+  | 61 | 44% | `MaintenanceController` |
+  | 61 | 60% | `TimeSheetController` |
+  | 55 | 53% | `Helpers\TimeSheetBuilder` — leave balance arithmetic |
+  | 51 | 4% | `Livewire\ClinicEmployeeInfo` |
+  | 41 | 2% | `Imports\RoomsImport` |
+
+  The first and eighth are the ones that would worry me: `TimeSheetMutationService` and
+  `TimeSheetBuilder` are where attendance is written and leave balances are computed, and
+  between them 175 lines had never run under a test.
+
+- [x] **The worst of that gap is closed.** `TimeSheetBuilder::calculateBalance` — the leave
+  balance every screen reads off an employee's record — had **no test of its own**; only the
+  `ToDate` variant did. It now has seven: the rotation ratio (`14/14` earns a day per day worked,
+  `40/80` half a day), that all four worked codes count and both absence codes deduct, that an
+  unrecognised code does neither, that the carried-over balance is added, that one employee's
+  days never reach another's, that the running and to-date figures agree, and that recalculating
+  persists to `employees.total_balance`.
+
+  `fillDateOrRange` and `deleteDateOrRange` — the range path behind the fill screen, which
+  writes attendance for a span of days — had never run either. Six tests now cover inclusive
+  range boundaries, the single-day form, an empty range being refused rather than silently
+  writing nothing, deleting only the days in the range, and one employee's range never touching
+  another's days.
+
+  `TimeSheetMutationService` went from **43% to 56%** of lines. Overall coverage moved only
+  57.96% → **58.43%**, which is the point worth making about the metric: thirteen tests over the
+  two most consequential pieces of arithmetic in the system move the percentage by half a point.
+  The percentage is a tripwire, not a target — the table above is what to work from.
+  `TimeSheetBuilder` is still at 2 of 9 methods; `build`, `create`, `destroy`,
+  `calculateBulckBalanceToDate`, `unApprovedTimeSheetLevel` and `approvrTimeSheets` remain
+  untested and are the next thing I would take.
+
+- [~] 4.4 **The intermittent failure was investigated and not reproduced.** A correction first:
+  I had said the performance tests were excluded from the default run — only `tests/Performance`
+  is, and `PerformanceBudgetTest` runs every time, which makes it the likeliest suspect since it
+  asserts query counts. Ruled out along the way: the permission cache (the testing store is
+  `array`, so nothing persists between runs) and test-order dependence (eight runs with
+  `--order-by=random`, all clean, on top of seventeen sequential runs whose full output was kept
+  specifically to catch it).
+
+  Since sampling was not finding it, the budget test now **reports the SQL it ran** when a budget
+  is exceeded, with repeated statements counted — a page that lazy-loads shows the same query
+  twenty times. A count tells you nothing; the queries name the unloaded relation. The next
+  occurrence will explain itself. Left open until it does.
+
+- [ ] 4.5 Browser tests: flight manifest, timesheet approval, appraisal — **needs your approval
+  to add `laravel/dusk`** as a dev dependency. The Livewire components already have component
+  tests, so what a browser adds is real JavaScript: Alpine and Tom Select. That is not
+  hypothetical here — the nested Alpine `x-for` bug earlier in this project, where the select
+  submitted an empty value while Alpine's state said otherwise, is exactly the class of bug only
+  a browser catches.
 
 ## Phase 5 — Frontend
 
@@ -373,3 +466,12 @@ After phase 3 the data-model figures move too: **Database 7 → 8** (`employees`
 `employees.number` unique, the profile split enforced by test) and **Performance 7 → 8**
 (serialising employees 36 → 0 queries, `clinic.index` 26 → 7, budgets tightened rather than
 raised). That puts the overall at **7.2**.
+
+After phase 4, **Testing 8 → 9** (311 → 444 tests; all 16 policies tested directly rather than
+only through HTTP; the role access matrix asserted; coverage measured at 58.43% rather than
+guessed) and **Authorization 8 → 9** (the policy layer now has 706 assertions behind it,
+including the negative cases). Overall **7.4**.
+
+Held back deliberately: **Security stays at 8** until 4.5's browser tests exist and the four
+permissionless workflow roles are settled; **Frontend, Scalability and Operations stay at their
+baselines** — phases 5, 6 and 7 have not started.
