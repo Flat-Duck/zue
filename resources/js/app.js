@@ -1,7 +1,20 @@
 import './bootstrap';
 import './tabler-init';
 
+import flatpickr from 'flatpickr';
 import TomSelect from 'tom-select';
+
+import './dashboard-chart';
+
+import 'flatpickr/dist/flatpickr.min.css';
+
+/**
+ * The date pickers are initialised from Blade, and Alpine `x-init` expressions are
+ * evaluated against the global scope. Flatpickr was loaded from a CDN, which meant
+ * an outage or a content security policy took the time sheet screens with it; it is
+ * part of the build now and reaches Blade the same way it used to.
+ */
+window.flatpickr = flatpickr;
 
 /**
  * Tabler's "advanced select" is Tom Select. Initialising is idempotent and can

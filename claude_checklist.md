@@ -380,21 +380,109 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   twenty times. A count tells you nothing; the queries name the unloaded relation. The next
   occurrence will explain itself. Left open until it does.
 
-- [ ] 4.5 Browser tests: flight manifest, timesheet approval, appraisal — **needs your approval
-  to add `laravel/dusk`** as a dev dependency. The Livewire components already have component
-  tests, so what a browser adds is real JavaScript: Alpine and Tom Select. That is not
-  hypothetical here — the nested Alpine `x-for` bug earlier in this project, where the select
-  submitted an empty value while Alpine's state said otherwise, is exactly the class of bug only
-  a browser catches.
+- [x] 4.5 **Browser tests are in: 5 tests over the three flows**, in `tests/Browser`. Dusk runs
+  against its own database (`zue_dusk`, configured by an untracked `.env.dusk.local`) so it can
+  never touch the working one.
+
+  - `PrintLayoutTest` — the manifest renders `dir="rtl"` with its Arabic content, and a Latin
+    employee number keeps its order inside the Arabic sheet. That last one is not theoretical:
+    `2025-A3614` once printed as `A3614-2025`, and bidirectional text is only observable once
+    rendered.
+  - `ApprovalScreenTest` — the fill screen's date picker initialises, exactly **once**, with
+    flatpickr available from the bundle rather than a CDN. The approval sheet renders clean.
+  - `AppraisalScreenTest` — all four appraisal screens load with no severe console entry.
+
+  The console-log helper lives on `DuskTestCase` and tolerates WebDriver refusing the log call,
+  which it does occasionally; failing on a driver hiccup would have added a second flaky test to
+  a suite already carrying one unexplained flake. Run three times over to confirm.
+
+- [x] **Two bugs the browser found immediately, both invisible to a feature test.**
+
+  The company logo was `<img src="../img/logo.svg">` — a *relative* path, so it resolved against
+  whatever URL you were on. On `/time-sheets/create/9094` the browser asked for
+  `/time-sheets/img/logo.svg` and got a 404. Every page below the root had a broken logo, and
+  every one of them returned 200 to a feature test. Now `asset('img/logo.svg')`.
+
+  The fill screen refuses a **super admin** who holds no scope policy — `Gate::before` grants the
+  permission but the screen also asks whether the employee falls inside a scope the actor is
+  named in. That is correct and deliberate, but it is worth writing down: being a super admin is
+  not sufficient to open a time sheet.
 
 ## Phase 5 — Frontend
 
-- [ ] 5.1 Bundle flatpickr; delete the 4 CDN references across 5 views
-- [ ] 5.2 Move 162 inline `style=` attributes and 12 `<style>` blocks into the stylesheet
-- [ ] 5.3 Move the 22 inline `<script>` blocks into modules
-- [ ] 5.4 Code-split or replace the 1,656 KB editor bundle
+- [x] 5.1 **No view loads anything from another host any more.** Flatpickr and ApexCharts were
+  both fetched from `cdn.jsdelivr.net` — the time sheet screens and the dashboard depended on
+  someone else's uptime, and would be the first thing a content security policy broke. Both are
+  npm dependencies in the build now. Verified in a browser: on a page that loads the bundle,
+  `document.querySelectorAll('script[src]')` and `link[href]` return **nothing** off-origin.
+
+  Bundling ApexCharts naively pushed `app.js` from 295 KB to **1,298 KB** on every page, for a
+  chart that appears on one. It is a dynamic `import()` now, declared in the manifest as such,
+  so the 953 KB chunk is fetched only when the chart's container is on the page — `app.js` is
+  **345 KB**. The chart's inline script moved to `resources/js/dashboard-chart.js` and takes its
+  data from a `data-` attribute, which is 5.3's shape applied to the one that mattered most.
+
+  `FrontendAssetTest` keeps it that way: it walks every Blade file for a `script`/`link` loading
+  from another host, allowing only the three destinations a person clicks. Mutation-checked.
+
+  Removed along the way: the default Laravel `welcome.blade.php` (unrouted, and the last view
+  pulling a webfont from `fonts.bunny.net`), a dead `tom-select` CDN link commented out in the
+  layout, and `livewire/clinic-employee-info.blade copy.php` — 9.3 KB of duplicate that could
+  never have been rendered, given the space in its name.
+
+- [~] 5.2 **Held deliberately, pending browser tests.** 131 inline `style=` attributes across 38
+  views, and 11 `<style>` blocks. The blocks are the problem: **ten of the eleven redefine bare
+  `body`, `table`, `td`, `th`, `.card`, `.container` or `.header`**. Those rules are only safe
+  today because each block is scoped to the page it sits on. Moving them into a shared stylesheet
+  without wrapping every one in a per-view class would have `.container` from the balance report
+  reaching Bootstrap's container everywhere.
+
+  Doing it safely means restructuring eleven print layouts — the flight manifest used at the
+  airport, the time sheet approval sheet, the appraisal forms. That needed verification stronger
+  than "the page returns 200".
+
+  **Now unblocked:** 4.5's browser tests landed, and they screenshot the manifest and the
+  approval sheet. This is the next thing to take, one view at a time, each block scoped under a
+  per-view class with a before-and-after screenshot.
+
+- [~] 5.3 **The two that mattered are done; the rest waits with 5.2.** The time sheet fill and
+  time table screens each carried an inline script that re-initialised the *same* date picker
+  Alpine had already set up — so what a user got was whichever ran last, and it was the inline
+  one. Both are gone; the options moved into the Blade prop that Alpine reads, and a test asserts
+  the picker is initialised exactly once.
+
+- [ ] **Found doing it: the date picker had a ceiling that was about to expire.** The inline
+  script restricted the fill screen's picker to `from: "2024-01-01", to: '2026-10-10'` — a date
+  literal. Past it, the picker refuses every day and attendance cannot be entered at all. Today
+  is 2026-09-10, so it had **one month left**. The bound is computed from the current date now.
+
+  Worth your attention: I kept the shape of the old rule — a month ahead of today — because that
+  is what it did, not because anyone decided it. **How far ahead should staff be able to fill a
+  timesheet?** If the answer is "not at all beyond today", or "to the end of the current month",
+  say so and I will change it.
+
+- [x] **`migrate:reset` was broken three migrations from the top, and now runs end to end.**
+  Dusk's `DatabaseMigrations` rolls the schema back after each test, which is how this surfaced —
+  nothing else in the project had ever attempted a full rollback. Three `down()` methods failed:
+
+  1. `add_indexes_to_flight_pivot_tables` dropped a composite index that was the only one serving
+     a foreign key, which MySQL refuses.
+  2. `make_users_id_manual_and_sync_with_number` dropped `employees_user_id_foreign` by name —
+     but the identity redesign's own `down()` restored the column *without* its foreign key, so
+     the migration behind it had nothing to drop.
+  3. `add_location_column_to_residences_table` dropped a column while its foreign key still
+     referenced it.
+
+  All **81 migrations now roll back and re-apply cleanly**, verified as a full round trip. This
+  is a phase 7 prerequisite — "document and rehearse the rollback" is not something you want to
+  discover on the night.
+
+- [ ] 5.4 Code-split or replace the 1,656 KB editor bundle. It is already a separate Vite entry
+  loaded only by the four clinic views, so it costs nothing elsewhere; the 1,688 KB is HugeRTE
+  itself. Splitting it further is not really available — replacing it is a product decision.
+
 - [ ] 5.5 Decide the i18n story (38 views hard-code Arabic; only `en` exists)
-- [ ] No view references an external host
+- [x] No view references an external host — asserted by `FrontendAssetTest`, not assumed
 
 ## Phase 6 — Quality gates
 
@@ -472,6 +560,10 @@ only through HTTP; the role access matrix asserted; coverage measured at 58.43% 
 guessed) and **Authorization 8 → 9** (the policy layer now has 706 assertions behind it,
 including the negative cases). Overall **7.4**.
 
-Held back deliberately: **Security stays at 8** until 4.5's browser tests exist and the four
-permissionless workflow roles are settled; **Frontend, Scalability and Operations stay at their
-baselines** — phases 5, 6 and 7 have not started.
+After phase 5's first half, **Frontend 6 → 7** (no view reaches another host, `app.js` 1,298 →
+345 KB with the chart chunk split out, the picker initialised once instead of twice) and
+**Security 8 → 9** (a content security policy is now possible on the JavaScript side; the
+remaining blocker is 5.2's inline styles). **Operations 5 → 6** — `migrate:reset` works end to
+end, which rollback rehearsal depends on. Overall **7.7**.
+
+Still at baseline: **Scalability 5** — phase 6 has not started.

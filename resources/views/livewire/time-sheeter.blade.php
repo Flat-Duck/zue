@@ -1,4 +1,7 @@
-@props(['options' => "{dateFormat:'Y-m-d', altFormat:'F j, Y', altInput:true, }"])
+@props([
+    /* See the note in time-table.blade.php: this range used to expire. */
+    'options' => "{dateFormat:'Y-m-d', altFormat:'F j, Y', altInput:true, inline:true, mode:'range'}",
+])
 <div>
     <div class="row g-5">
         <div class="col-6 mb-3">
@@ -92,17 +95,3 @@
     </div>
 </div>
 
-@section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script >
-    window.onload = function () {
-        flatpickr("#time", {
-            inline: true,
-            mode: "range"
-        });
-    
-        console.log("DOM fully loaded and parsed last thing");
-    }; 
-
-</script>
-@endsection

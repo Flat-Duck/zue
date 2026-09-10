@@ -20,3 +20,8 @@ yarn-error.log
 /.vscode
 /database/seeders/sql_dump/new.sql
 /database/seeders/sql_dump/mysql.sql
+# Dusk's own environment: points at a throwaway database, never the working one.
+.env.dusk.local
+tests/Browser/screenshots
+tests/Browser/console
+tests/Browser/source

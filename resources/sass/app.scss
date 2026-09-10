@@ -51,3 +51,9 @@ select.tomselected.ts-hidden-accessible {
 .ts-control .item .remove {
   margin-left: 0.35rem;
 }
+
+// The dashboard chart reserves its height before ApexCharts loads, so the card
+// does not jump once the chunk arrives.
+.dashboard-chart {
+  min-height: 300px;
+}

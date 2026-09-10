@@ -11,9 +11,6 @@
 
     <title>zue</title>
 
-    {{--
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet"> --}}
-    {{-- @vite('resources/js/app.js') --}}
     @vite('resources/sass/app.scss')
 
     @livewireStyles

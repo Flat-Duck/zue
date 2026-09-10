@@ -1,7 +1,4 @@
 @extends('layouts.app', ['page' => 'time-sheets'])
-@section('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-@endsection
 @section('content')
     <form action="{{ route('time-sheets.approve') }}" method="get" class="card">
         @csrf

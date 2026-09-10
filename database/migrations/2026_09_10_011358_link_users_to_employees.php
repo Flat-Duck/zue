@@ -112,11 +112,18 @@ return new class extends Migration
 
     public function down(): void
     {
+        // Restored with its foreign key, not just the column: the migration that
+        // rolls back after this one drops `employees_user_id_foreign` by name, and
+        // a down() that leaves the schema half-restored breaks the one behind it.
         Schema::table('employees', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->nullable();
         });
 
         DB::statement('UPDATE employees e JOIN users u ON u.employee_id = e.id SET e.user_id = u.id');
+
+        Schema::table('employees', function (Blueprint $table) {
+            $table->foreign('user_id')->references('id')->on('users');
+        });
 
         Schema::table('users', function (Blueprint $table) {
             $table->integer('number')->nullable();

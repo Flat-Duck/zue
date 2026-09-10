@@ -27,6 +27,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // The column carries a foreign key, and MySQL will not drop a column a
+        // constraint still depends on.
+        Schema::table('residences', function (Blueprint $table) {
+            $table->dropForeign(['location_id']);
+        });
+
         Schema::table('residences', function (Blueprint $table) {
             $table->dropColumn('location_id');
         });

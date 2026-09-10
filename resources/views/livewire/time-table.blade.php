@@ -1,4 +1,15 @@
-@props(['options' => "{dateFormat:'Y-m-d', altFormat:'F j, Y', altInput:true, }"])
+@props([
+    /*
+     * Flatpickr's options, rendered into the Alpine `x-init` below.
+     *
+     * The upper bound used to be the literal `2026-10-10`, written into an inline
+     * script that re-initialised this same input after Alpine had already set it up.
+     * A hard-coded ceiling silently stops the picker accepting any date once it
+     * passes, so the bound is worked out from today instead.
+     */
+    'options' => "{dateFormat:'Y-m-d', altFormat:'F j, Y', altInput:true, inline:true, mode:'range', enable:[{from:'2024-01-01', to:'"
+        .now()->addMonth()->toDateString()."'}]}",
+])
 <div>
     <div class="row g-3">
         <div class="col-1 p-0 overflow-auto" style="max-height: 20rem">
@@ -182,23 +193,3 @@
     </div>
 
 </div>
-@section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        window.onload = function () {
-            flatpickr("#time", {
-                inline: true,
-                mode: "range",
-                enable: [
-                    {
-                        from: "2024-01-01",
-                        to: '2026-10-10',
-                    }
-                ]
-            });
-
-            console.log("DOM fully loaded and parsed last thing");
-        };
-
-    </script>
-@endsection
