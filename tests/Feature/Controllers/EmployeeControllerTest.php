@@ -129,9 +129,12 @@ class EmployeeControllerTest extends TestCase
 
         $response = $this->put(route('employees.update', $employee), $data);
 
-        $data['id'] = $employee->id;
+        // The form posts one flat set of fields; they land in the two tables that
+        // between them hold an employee.
+        $profileFields = array_intersect_key($data, array_flip(Employee::detailFields()));
 
-        $this->assertDatabaseHas('employees', $data);
+        $this->assertDatabaseHas('employees', array_diff_key($data, $profileFields) + ['id' => $employee->id]);
+        $this->assertDatabaseHas('employee_details', $profileFields + ['employee_id' => $employee->id]);
 
         $response->assertRedirect(route('employees.edit', $employee));
     }

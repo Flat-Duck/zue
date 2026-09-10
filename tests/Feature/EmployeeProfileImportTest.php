@@ -10,6 +10,7 @@ use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use PHPUnit\Framework\Attributes\Test;
@@ -158,11 +159,9 @@ class EmployeeProfileImportTest extends TestCase
     #[Test]
     public function it_updates_an_employee_that_already_exists(): void
     {
-        $existing = Employee::factory()->create([
-            'number' => 3438,
-            'english_name' => 'Existing Person',
-            'nationality' => null,
-        ]);
+        $existing = Employee::factory()
+            ->withProfile(['nationality' => null])
+            ->create(['number' => 3438, 'english_name' => 'Existing Person']);
 
         $import = $this->import();
 
@@ -355,5 +354,32 @@ class EmployeeProfileImportTest extends TestCase
 
         // The acting user brings its own employee, so count the imported ones.
         $this->assertSame(3, Employee::query()->whereNotNull('arabic_name')->count());
+    }
+
+    /**
+     * A spreadsheet turns a long cost centre code into `5.00E+10` and the original
+     * digits are gone. Creating a centre and a department under that name, and filing
+     * staff beneath them, is worse than leaving the employee unlinked and saying so.
+     */
+    #[Test]
+    public function a_cost_centre_corrupted_into_scientific_notation_is_refused(): void
+    {
+        $path = storage_path('framework/testing/corrupt-codes-'.uniqid().'.csv');
+        $header = explode("\n", file_get_contents($this->fixture()))[0];
+
+        File::put($path, $header."\n"
+            .'7777,موظف اختبار,موظف اختبار,5.00E+10,ادارة العمليات,قسم الترجمة,5.00E+20,B099,ميناء الزويتينة'."\n");
+
+        $import = new EmployeeProfilesImport;
+        Excel::import($import, $path);
+
+        $this->assertDatabaseMissing('centers', ['name' => '5.00E+10']);
+        $this->assertDatabaseMissing('centers', ['code' => '5.00E+10']);
+        $this->assertDatabaseMissing('departments', ['code' => '5.00E+20']);
+
+        $this->assertNotEmpty($import->errors);
+        $this->assertStringContainsString('scientific notation', implode(' ', $import->errors));
+
+        File::delete($path);
     }
 }

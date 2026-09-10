@@ -214,9 +214,7 @@ class EmployeeController extends Controller
     {
         $this->authorize('create', Employee::class);
 
-        $validated = $request->validated();
-
-        $employee = Employee::create($validated);
+        $employee = (new Employee)->saveProfile($request->validated());
 
         return redirect()
             ->route('employees.edit', $employee)
@@ -257,9 +255,7 @@ class EmployeeController extends Controller
     ): RedirectResponse {
         $this->authorize('update', $employee);
 
-        $validated = $request->validated();
-
-        $employee->update($validated);
+        $employee->saveProfile($request->validated());
 
         return redirect()
             ->route('employees.edit', $employee)

@@ -6,6 +6,7 @@ use App\Models\Administration;
 use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeDetail;
 use App\Models\Location;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
@@ -70,18 +71,49 @@ class EmployeeProfileFormTest extends TestCase
         );
     }
 
+    /**
+     * Each section declares where it is stored. This walks that declaration and
+     * checks the field really is fillable on the owning model and really has a
+     * column on the owning table, so a field cannot be added to the form and then
+     * silently fail to save.
+     */
     #[Test]
     public function every_profile_field_is_fillable_and_has_a_column(): void
     {
-        $employee = new Employee;
+        $owners = [
+            'employees' => [new Employee, 'employees'],
+            'details' => [new EmployeeDetail, 'employee_details'],
+        ];
 
-        foreach ($this->storedFieldNames() as $name) {
-            $this->assertContains($name, $employee->getFillable(), "[{$name}] is not fillable.");
-            $this->assertTrue(
+        foreach (Employee::profileSections() as $title => $section) {
+            [$model, $table] = $owners[$section['stored_in'] ?? 'employees'];
+
+            foreach ($section['fields'] as $name => $field) {
+                if ($field['type'] === 'administration') {
+                    continue;
+                }
+
+                $this->assertContains($name, $model->getFillable(), "[{$name}] is not fillable on ".$model::class.'.');
+                $this->assertTrue(Schema::hasColumn($table, $name), "[{$name}] has no column on {$table}.");
+            }
+        }
+    }
+
+    /**
+     * The split only pays for itself if the operational table stays small, so the
+     * profile fields must not linger on `employees` as well.
+     */
+    #[Test]
+    public function the_profile_fields_are_gone_from_the_employees_table(): void
+    {
+        foreach (Employee::detailFields() as $name) {
+            $this->assertFalse(
                 Schema::hasColumn('employees', $name),
-                "[{$name}] has no database column."
+                "[{$name}] is still a column on employees."
             );
         }
+
+        $this->assertLessThan(25, count(Schema::getColumnListing('employees')));
     }
 
     #[Test]
@@ -121,13 +153,14 @@ class EmployeeProfileFormTest extends TestCase
     #[Test]
     public function the_show_page_displays_the_profile(): void
     {
-        $employee = Employee::factory()->create([
-            'arabic_name' => 'صالح خليفة',
-            'nationality' => 'ليبي',
-            'basic_salary' => 5797,
-            'bank_name' => 'مصرف الوحدة',
-            'education_level' => 'ثـانــوي',
-        ]);
+        $employee = Employee::factory()
+            ->withProfile([
+                'nationality' => 'ليبي',
+                'basic_salary' => 5797,
+                'bank_name' => 'مصرف الوحدة',
+                'education_level' => 'ثـانــوي',
+            ])
+            ->create(['arabic_name' => 'صالح خليفة']);
 
         $response = $this->get(route('employees.show', $employee))->assertOk();
 

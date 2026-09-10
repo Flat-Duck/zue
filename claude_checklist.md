@@ -195,10 +195,14 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   and why so much of the baseline was `Relation 'x' is not found`. Adding the return types (and
   `@property-read` on `User` and `TimeSheet`) took the **PHPStan baseline from 194 to 158**.
 
-- [ ] **One unexplained test failure.** A single full-suite run reported `1 failed, 404 passed`
-  and I did not capture which test it was; nine consecutive runs since have been clean, and the
-  performance benchmarks are excluded from the default run so it was not those. Recorded rather
-  than dismissed. If it recurs, capture the failing test name before re-running.
+- [ ] **An unexplained intermittent test failure, seen twice and never captured.** Two separate
+  full-suite runs reported one failure (`1 failed, 404 passed`, later `1 failed, 416 passed`);
+  both times only the summary line was kept, so the failing test is unknown. Roughly thirty
+  runs since — including seventeen consecutive runs whose full output was saved specifically to
+  catch it — have all been clean. It is not the performance benchmarks: those are excluded from
+  the default run. Best guess is a test with an order or timing dependency that only bites on a
+  particular interleaving. Recorded rather than dismissed; the next sighting needs the full
+  output kept, not the summary.
 
 **Phase 2 result (2026-09-10).**
 
@@ -214,11 +218,72 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
 
 ## Phase 3 — Data model
 
-- [ ] 3.1 Move the HR profile to a 1:1 `employee_details` table (`employees` is 87 columns)
-- [ ] 3.2 Review `Employee::$appends` — 4 of 8 traverse relations
-- [ ] 3.3 Split `Employee` (791 lines) once its profile has moved
-- [ ] 3.4 Decide whether `centers` duplicates `departments.code`
-- [ ] Employee list queries no longer carry salaries or national IDs
+- [x] 3.1 The HR profile moved to a 1:1 `employee_details` table. **`employees` went from 87
+  columns to 21**; the 65 that moved are identity documents, payroll, education, family,
+  banking and notes. Reading one still works through the employee — `$employee->nationality`
+  resolves via the relation — but writing goes through `Employee::saveProfile()`, which splits
+  a flat set of form fields across both tables. Which section lives where is declared once, in
+  the section definitions, and `EmployeeProfileStorageTest` asserts the employee list never
+  reads the profile table at all.
+
+  Moving it surfaced an N+1 the old shape had been hiding: the clinic employee list showed a
+  phone number per row. Eager-loading the profile took that page from **26 queries to 7**, and
+  the query budgets were tightened to match (`clinic.index` 25 → 10, `employees.index` 20 → 10)
+  so they protect the pages rather than merely sitting above them.
+
+- [x] 3.2 `Employee::$appends` is now empty. Four of the eight appended accessors walked a
+  relation, so **serialising ten employees ran 36 queries of its own**. Every accessor is still
+  there; nothing appends them. Serialising ten employees now costs **0** extra queries, pinned
+  by a test. Nothing consumed them from serialized output — they are read as properties in
+  Blade, and Livewire serializes an Eloquent model by class and key, not by `toArray()`.
+
+- [~] 3.3 `Employee` **830 → 425 lines**. The profile definition (sections, validation rules,
+  relation rules) moved to `App\Services\Employees\ProfileDefinition`, and the 179-line
+  `managedEmployeesQuery()` to `App\Services\Employees\ManagedEmployeeQuery`; the model keeps
+  the same public surface and delegates. A commented-out duplicate `canManage()` and a `boot()`
+  that only re-registered a scope the trait already adds were removed.
+
+  **Not the ~300 the roadmap asked for, and I stopped rather than force it.** What remains is 41
+  methods averaging seven lines: relations, accessors and small predicates. Moving those into
+  traits would move lines without making anything clearer.
+
+- [ ] 3.4 **`centers` does not duplicate `departments.code` — it is worse than that, and this
+  needs your decision.** Measured against the real data:
+
+  - 132 centres and 126 departments are in use, across **153 distinct pairings** — so the two
+    are not 1:1, and a centre does not determine a department.
+  - `centers.name` is almost always identical to `centers.code` (`5W20` / `5W20`). Centres have
+    no names; the import created them from the cost centre code.
+  - The codes usually match across the pair but not always: centre `5J09` sits under department
+    `8J09`, centre `5G30` under `8G30`, centre `5S40` under `5M16`.
+  - Centres are duplicated across the `5`/`8` prefix: `5G30` and `8G30` are separate centres
+    pointing at the same department.
+  - **Two generations of records coexist.** Departments from the legacy dump are English and
+    have no code (`MAINT`, `PROD`, `Gas Plant`); departments from the personnel export are
+    Arabic and do. 1,115 staff are still filed under the codeless legacy ones.
+
+  What that means is a question about the business, not the schema: is a cost centre a budget
+  line that a department reports against — in which case the tables are right and the data
+  needs reconciling — or is it another name for the department, in which case one of them goes?
+  **My recommendation:** keep both tables, treat the cost centre as the budget line, and
+  reconcile the two generations during the fresh import rather than by migration. Tell me which
+  it is and I will do it.
+
+- [x] Employee list queries no longer carry salaries or national IDs — asserted, not assumed
+
+**Findings raised during Phase 3**
+
+- [x] **The personnel importer was creating organisation records out of spreadsheet
+  corruption.** It already refused bank account numbers mangled into scientific notation, but
+  not cost centre or department codes — so `5.00E+10` became a real centre, `5.00E+20` a real
+  department, and staff were filed under both. The guard now covers organisation codes too, and
+  a corrupted value leaves the employee unlinked with the problem reported rather than inventing
+  a place to put them. The development database still holds 3 such centres and 2 departments;
+  they disappear on the fresh import rather than needing a cleanup migration.
+
+- [x] **Two model relations had no generic annotation**, which is why `ManagementScope`'s
+  attributes read as undefined all through the scope resolver. Annotating them, plus a
+  `@property` block on `ManagementScope`, took the **PHPStan baseline from 158 to 147**.
 
 ## Phase 4 — Testing depth
 
@@ -293,13 +358,18 @@ go-live**, and 7.1 is the highest-risk item in the whole roadmap.
 | Authorization | 8 | 8 | 9 | the identity fix restored intended behaviour |
 | Database | 7 | 7 | 8 | `employees.number` is unique now; the rest is phase 3 |
 | Performance | 7 | 7 | 8 | untouched this phase |
-| Testing | 7 | 8 | 9 | 311 → 405 tests, two characterization suites |
+| Testing | 7 | 8 | 9 | 311 → 417 tests, three characterization suites |
 | MVC / layering | 7 | 8 | 8 | validation in form requests, logic out of controllers |
 | Laravel practice | 7 | 8 | 8 | form requests, typed relations, an enum, generics |
 | Code quality | 6 | 7 | 8 | return types everywhere, ~850 duplicated lines gone |
 | DRY | 6 | 7 | 8 | `CrudController`, `ApprovalEligibility`, `ApprovalStep` |
-| Frontend | 6 | 6 | 8 | untouched this phase |
+| Frontend | 6 | 6 | 8 | untouched so far |
 | SOLID | 5 | 7 | 8 | the 614-line service is four collaborators |
-| Scalability | 5 | 5 | 8 | untouched this phase |
-| Operations | 5 | 5 | 8 | untouched this phase |
+| Scalability | 5 | 5 | 8 | untouched so far |
+| Operations | 5 | 5 | 8 | untouched so far |
 | **Overall** | **6.5** | **7.0** | **8.3** | |
+
+After phase 3 the data-model figures move too: **Database 7 → 8** (`employees` 87 → 21 columns,
+`employees.number` unique, the profile split enforced by test) and **Performance 7 → 8**
+(serialising employees 36 → 0 queries, `clinic.index` 26 → 7, budgets tightened rather than
+raised). That puts the overall at **7.2**.

@@ -211,13 +211,13 @@ class EmployeeProfilesImport extends StringValueBinder implements ToCollection, 
         $employee = Employee::query()->withArchived()->where('number', $number)->first();
 
         if ($employee) {
-            $employee->fill($attributes)->save();
+            $employee->saveProfile($attributes);
             $this->updated++;
 
             return;
         }
 
-        Employee::query()->create($attributes + ['number' => $number]);
+        (new Employee)->saveProfile($attributes + ['number' => $number]);
         $this->created++;
     }
 
@@ -237,7 +237,16 @@ class EmployeeProfilesImport extends StringValueBinder implements ToCollection, 
         $source = [];
 
         foreach (self::ORGANISATION_COLUMNS as $field => $position) {
-            $source[$field] = $this->clean($this->raw($values, $position));
+            $value = $this->clean($this->raw($values, $position));
+
+            // A corrupted code would otherwise be created as a centre or department
+            // in its own right, and staff filed under it.
+            if ($value !== null && $this->isCorruptedByTheSpreadsheet($value)) {
+                $this->errors[] = "Organisation code [{$value}] for {$field} was corrupted into scientific notation by the spreadsheet and has been skipped.";
+                $value = null;
+            }
+
+            $source[$field] = $value;
         }
 
         $references = [];
@@ -408,13 +417,22 @@ class EmployeeProfilesImport extends StringValueBinder implements ToCollection, 
      */
     private function accountNumber(string $value): ?string
     {
-        if (preg_match('/^\d(?:\.\d+)?[eE][+-]?\d+$/', $value) === 1) {
+        if ($this->isCorruptedByTheSpreadsheet($value)) {
             $this->errors[] = "Bank account number [{$value}] was corrupted into scientific notation by the spreadsheet and has been skipped.";
 
             return null;
         }
 
         return $value;
+    }
+
+    /**
+     * A long identifier that a spreadsheet decided was a number: `5.00E+10`. The
+     * original digits are gone, so the value cannot be recovered, only rejected.
+     */
+    private function isCorruptedByTheSpreadsheet(string $value): bool
+    {
+        return preg_match('/^\d(?:\.\d+)?[eE][+-]?\d+$/', $value) === 1;
     }
 
     public function chunkSize(): int

@@ -6,6 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property int|null $manager_id
+ * @property string|null $name
+ * @property string|null $template
+ * @property string|null $scope_type
+ * @property string|null $context
+ * @property int|null $location_id
+ * @property int|null $department_id
+ * @property int|null $center_id
+ * @property int|null $subordinate_employee_id
+ * @property array<string, mixed>|null $settings
+ */
 class ManagementScope extends Model
 {
     protected $fillable = [
@@ -26,9 +39,13 @@ class ManagementScope extends Model
     ];
 
     public const TYPE_GLOBAL = 'global';     // whole company
+
     public const TYPE_LOCATION = 'location';   // specific location/site
+
     public const TYPE_DEPARTMENT = 'department'; // specific department in a location
+
     public const TYPE_CENTER = 'center';     // specific center
+
     public const TYPE_EMPLOYEE = 'employee';   // specific employee
 
     public function managers(): BelongsToMany
@@ -71,11 +88,11 @@ class ManagementScope extends Model
         $jobTitle = $settings['job_title'] ?? null;
 
         $matchesJob = true;
-        if (!empty($jobTitle)) {
-            $matchesJob = !empty($target->job) && (trim(strtolower($target->job)) === trim(strtolower($jobTitle)));
+        if (! empty($jobTitle)) {
+            $matchesJob = ! empty($target->job) && (trim(strtolower($target->job)) === trim(strtolower($jobTitle)));
         }
 
-        if (!$matchesJob) {
+        if (! $matchesJob) {
             return false;
         }
 
@@ -84,22 +101,22 @@ class ManagementScope extends Model
                 return true;
 
             case self::TYPE_LOCATION:
-                return !is_null($this->location_id)
+                return ! is_null($this->location_id)
                     && $this->location_id === $target->location_id;
 
             case self::TYPE_DEPARTMENT:
-                return !is_null($this->location_id)
-                    && !is_null($this->department_id)
+                return ! is_null($this->location_id)
+                    && ! is_null($this->department_id)
                     && $this->location_id === $target->location_id
                     && $this->department_id === $target->department_id;
 
             case self::TYPE_CENTER:
-                return !is_null($this->center_id)
+                return ! is_null($this->center_id)
                     && $this->center_id === $target->center_id;
 
             case self::TYPE_EMPLOYEE:
                 // Check direct subordinate
-                if (!is_null($this->subordinate_employee_id) && $this->subordinate_employee_id === $target->id) {
+                if (! is_null($this->subordinate_employee_id) && $this->subordinate_employee_id === $target->id) {
                     return true;
                 }
                 // Check grouped employees via settings
@@ -107,6 +124,7 @@ class ManagementScope extends Model
                 if (in_array($target->id, $targetIds)) {
                     return true;
                 }
+
                 return false;
 
             default:

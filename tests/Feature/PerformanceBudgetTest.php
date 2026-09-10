@@ -26,12 +26,15 @@ class PerformanceBudgetTest extends TestCase
 
     public function test_core_mvc_pages_stay_within_query_budgets(): void
     {
+        // Tightened after the HR profile moved to its own table: these pages had
+        // slack in them that was hiding lazy loads. A budget only protects a page
+        // while it sits close to what the page actually costs.
         $budgets = [
-            'home1' => 25,
-            'employees.index' => 20,
-            'time-sheets.index' => 30,
-            'reports.index' => 20,
-            'clinic.index' => 25,
+            'home1' => 22,
+            'employees.index' => 10,
+            'time-sheets.index' => 10,
+            'reports.index' => 6,
+            'clinic.index' => 10,
         ];
 
         $queries = 0;

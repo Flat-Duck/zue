@@ -48,9 +48,11 @@ class TimeSheetController extends Controller
 
             $employees = $this->timeSheetAuthorizationService
                 ->managedEmployeesQueryForScope(auth()->user(), 'time_sheet', $selectedScopePolicyId)
+                ->with('details')
                 ->paginate(20);
         } else {
             $employees = auth()->user()->managedEmployeesQuery('time_sheet')
+                ->with('details')
                 ->paginate(20);
         }
 

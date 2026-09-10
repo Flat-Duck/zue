@@ -168,13 +168,14 @@ class FlightManifestPrintTest extends TestCase
             'arabic_name' => 'ميناء الزويتينة',
         ]);
 
-        $employee = Employee::factory()->create([
-            'english_name' => 'Ahmed Salem',
-            'arabic_name' => 'احمد سالم',
-            'nationality' => 'ليبي',
-            'department_id' => $department->id,
-            'location_id' => $location->id,
-        ]);
+        $employee = Employee::factory()
+            ->withProfile(['nationality' => 'ليبي'])
+            ->create([
+                'english_name' => 'Ahmed Salem',
+                'arabic_name' => 'احمد سالم',
+                'department_id' => $department->id,
+                'location_id' => $location->id,
+            ]);
 
         app(FlightDispatchService::class)->book($leg, $employee);
 

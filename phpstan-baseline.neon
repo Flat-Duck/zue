@@ -139,37 +139,19 @@ parameters:
 			path: app/Models/Appraisals/AppraisalFormVersionItem.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\ClinicApointment\:\:\$month\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ClinicApointment\:\:\$year\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Employee.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$center_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$department_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$month\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Models/Employee.php
@@ -178,30 +160,6 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 3
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$scope_type\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$settings\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$subordinate_employee_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$year\.$#'
-			identifier: property.notFound
-			count: 1
 			path: app/Models/Employee.php
 
 		-
@@ -217,20 +175,20 @@ parameters:
 			path: app/Models/Employee.php
 
 		-
-			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Eloquent\\Model\:\:setKeysForSaveQuery\(\) expects Illuminate\\Database\\Eloquent\\Builder\<static\(App\\Models\\Employee\)\>, Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Employee\> given\.$#'
+			message: '#^Method App\\Models\\Employee\:\:apointments\(\) should return Illuminate\\Support\\Collection\<string, Illuminate\\Support\\Collection\<int, App\\Models\\ClinicApointment\>\> but returns Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\ClinicApointment\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: App\\Models\\ClinicApointment, Closure\(App\\Models\\ClinicApointment\)\: App\\Models\\ClinicApointment given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Models/Employee.php
 
 		-
-			message: '#^Property ''last_date'' is not a computed property, remove from \$appends\.$#'
-			identifier: rules.modelAppends
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Property ''start_date'' is not a computed property, remove from \$appends\.$#'
-			identifier: rules.modelAppends
+			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Eloquent\\Model\:\:setKeysForSaveQuery\(\) expects Illuminate\\Database\\Eloquent\\Builder\<static\(App\\Models\\Employee\)\>, Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Employee\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/Employee.php
 
@@ -481,12 +439,6 @@ parameters:
 			path: database/factories/DepartmentFactory.php
 
 		-
-			message: '#^PHPDoc type string of property Database\\Factories\\EmployeeFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: database/factories/EmployeeFactory.php
-
-		-
 			message: '#^PHPDoc type string of property Database\\Factories\\FlightFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
@@ -530,12 +482,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Faker\\Generator\:\:\$unique\.$#'
-			identifier: property.notFound
-			count: 1
-			path: database/factories/UserFactory.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: database/factories/UserFactory.php

@@ -8,18 +8,14 @@ use App\Models\Employee;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Employee>
+ */
 class EmployeeFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Employee::class;
 
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -28,13 +24,6 @@ class EmployeeFactory extends Factory
             'number' => $this->faker->unique()->numberBetween(100000, 999999),
             'job' => $this->faker->text(255),
             'english_name' => $this->faker->text(255),
-            'id_card' => $this->faker->text(255),
-            'id_card_issue_date' => $this->faker->date(),
-            'passport' => $this->faker->text(255),
-            'passport_issue_date' => $this->faker->date(),
-            'address' => $this->faker->address(),
-            'phone' => $this->faker->phoneNumber(),
-            'email' => $this->faker->email(),
             'transfered_balance' => $this->faker->randomNumber(0),
             'schedule' => '5/5',
             'start_date' => now()->subYear()->toDateString(),
@@ -45,5 +34,30 @@ class EmployeeFactory extends Factory
             'location_id' => Location::factory(),
             'center_id' => Center::factory(),
         ];
+    }
+
+    /**
+     * Every employee has an HR profile, so the factory makes one too. Its contents
+     * are deliberately sparse: a test that cares about a profile field should say so
+     * with {@see withProfile()} rather than depend on what the faker happened to pick.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Employee $employee): void {
+            if (! $employee->details()->exists()) {
+                $employee->details()->create([]);
+            }
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public function withProfile(array $attributes): static
+    {
+        return $this->afterCreating(function (Employee $employee) use ($attributes): void {
+            $employee->details()->updateOrCreate([], $attributes);
+            $employee->unsetRelation('details');
+        });
     }
 }

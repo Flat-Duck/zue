@@ -23,7 +23,7 @@ class ClinicApointmentController extends Controller
         $search = $request->get('search', '');
 
         $employees = Employee::query()
-            ->with(['location', 'department', 'center'])
+            ->with(['location', 'department', 'center', 'details'])
             ->search($search)
             ->latest()
             ->paginate(20)
@@ -37,7 +37,7 @@ class ClinicApointmentController extends Controller
         $search = $request->get('search', '');
 
         $employees = Employee::query()
-            ->with(['location', 'department', 'center'])
+            ->with(['location', 'department', 'center', 'details'])
             ->search($search)
             ->latest()
             ->paginate(20)

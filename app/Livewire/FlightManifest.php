@@ -219,6 +219,10 @@ class FlightManifest extends Component
             ->orderBy('sequence')
             ->get();
 
+        // Travellers are employees or passengers, and only employees carry an HR
+        // profile — which is where the nationality the manifest prints now lives.
+        $legs->loadMorph('bookings.bookable', [Employee::class => ['details']]);
+
         $selectedLeg = $legs->firstWhere('id', $this->selectedLegId) ?? $legs->first();
 
         return view('livewire.flight-manifest', [
