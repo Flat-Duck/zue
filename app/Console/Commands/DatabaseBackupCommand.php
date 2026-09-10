@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\BackupService;
-use App\Models\BackupLog;
+use Illuminate\Console\Command;
 
 class DatabaseBackupCommand extends Command
 {
     protected $signature = 'backup:database {--type=both} {--log-id=}';
+
     protected $description = 'Perform a database backup';
 
     public function handle(BackupService $backupService)
@@ -21,7 +21,8 @@ class DatabaseBackupCommand extends Command
             $filename = $backupService->performBackup($type, [], true, $logId);
             $this->info("Backup completed successfully: $filename");
         } catch (\Exception $e) {
-            $this->error("Backup failed: " . $e->getMessage());
+            $this->error('Backup failed: '.$e->getMessage());
+
             return 1;
         }
 

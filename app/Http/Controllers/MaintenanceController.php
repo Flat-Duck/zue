@@ -11,6 +11,7 @@ use App\Jobs\PerformBackupJob;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -98,7 +99,7 @@ class MaintenanceController extends Controller
         ]);
     }
 
-    public function updateSettings(MaintenanceSettingsRequest $request)
+    public function updateSettings(MaintenanceSettingsRequest $request): RedirectResponse
     {
         MaintenanceSetting::set('auto_backup_enabled', $request->has('auto_backup_enabled') ? '1' : '0');
         MaintenanceSetting::set('backup_interval', $request->backup_interval);
@@ -108,7 +109,7 @@ class MaintenanceController extends Controller
         return redirect()->back()->with('success', 'Maintenance settings updated successfully.');
     }
 
-    public function runQuickBackup()
+    public function runQuickBackup(): RedirectResponse
     {
         $this->authorize('maintenance');
 
@@ -125,7 +126,7 @@ class MaintenanceController extends Controller
 
     // runInBackground method removed in favor of Laravel Queues
 
-    public function import(DatabaseImportRequest $request)
+    public function import(DatabaseImportRequest $request): RedirectResponse
     {
         $path = $request->file('sql_file')->getRealPath();
         $sql = file_get_contents($path);
@@ -141,7 +142,7 @@ class MaintenanceController extends Controller
         }
     }
 
-    public function restore($filename)
+    public function restore($filename): RedirectResponse
     {
         $this->authorize('maintenance');
 
@@ -189,7 +190,7 @@ class MaintenanceController extends Controller
         return response()->download(storage_path('app/backups/'.$filename));
     }
 
-    public function delete($filename)
+    public function delete($filename): RedirectResponse
     {
         $this->authorize('maintenance');
 

@@ -7,29 +7,30 @@ use stdClass;
 
 class MomentsJs
 {
-   public $months;
+    public $months;
 
+    public static function getRange(string $dates): CarbonPeriod
+    {
+        $range = explode(' to ', $dates);
 
-   public static function getRange($dates)
-   {
-        $range = explode(" to ", $dates);
-        return  CarbonPeriod::create($range[0], $range[1]);
-   }
-   public static function isLeapYear($year)
-   {
-       return ($year % 4 == 0 && $year % 100 != 0) || ($year % 400 == 0);
-   }
+        return CarbonPeriod::create($range[0], $range[1]);
+    }
 
-   public static function getDaysInMonth($month, $year)
-   {
+    public static function isLeapYear(int $year): bool
+    {
+        return ($year % 4 == 0 && $year % 100 != 0) || ($year % 400 == 0);
+    }
+
+    public static function getDaysInMonth($month, $year)
+    {
         $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-        
+
         $days = [];
         for ($day = 1; $day <= $days_in_month; $day++) {
-            $date = new stdClass();
+            $date = new stdClass;
             $date->fday = sprintf('%04d-%02d-%02d', $year, $month, $day);
             $date->value = 0;
-            $date->idk = sprintf('%02d' ,$day);
+            $date->idk = sprintf('%02d', $day);
             $days[$date->fday] = json_decode(json_encode($date), true);
         }
 
@@ -39,41 +40,41 @@ class MomentsJs
     public static function getMonthsInYear()
     {
         $months = [
-            1  => "January",
-            2  => "February",
-            3  => "March",
-            4  => "April",
-            5  => "May",
-            6  => "June",
-            7  => "July",
-            8  => "August",
-            9  => "September",
-            10 => "October",
-            11 => "November",
-            12 => "December"
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
         ];
 
         return collect($months);
     }
 
-        //  $date = date_parse($month_name);
- 
-        //  $month = $date['month'];         
-        //  $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
- 
-        //  $days = [];
- 
-        //  for ($day = 1; $day <= $days_in_month; $day++) {
-        //     $date = new stdClass();
-        //      $date->fday = sprintf('%04d-%02d-%02d', $year, $month, $day);
-        //      $date->value = 0;
-        //      $date->idk = sprintf('%02d' ,$day);
-        //      //$date->toArray();
-        //      $days[$date->fday] = json_decode(json_encode($date), true);
- 
-        //  }
- 
-        //  return collect($days);
+    //  $date = date_parse($month_name);
+
+    //  $month = $date['month'];
+    //  $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+    //  $days = [];
+
+    //  for ($day = 1; $day <= $days_in_month; $day++) {
+    //     $date = new stdClass();
+    //      $date->fday = sprintf('%04d-%02d-%02d', $year, $month, $day);
+    //      $date->value = 0;
+    //      $date->idk = sprintf('%02d' ,$day);
+    //      //$date->toArray();
+    //      $days[$date->fday] = json_decode(json_encode($date), true);
+
+    //  }
+
+    //  return collect($days);
     // }
 
 }

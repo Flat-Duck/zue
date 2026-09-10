@@ -2,9 +2,7 @@
 
 namespace Database\Factories;
 
-
 use App\Models\ClinicApointment;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClinicApointmentFactory extends Factory

@@ -14,6 +14,7 @@ class ClearRoomVacant implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected Flight $flight;
+
     /**
      * Create a new job instance.
      */
@@ -27,10 +28,9 @@ class ClearRoomVacant implements ShouldQueue
      */
     public function handle(): void
     {
-        //$employees = Employee::with('rooms')->where('number','>',2000)->get();
-        $employees  = $this->flight->employees;
-        foreach ($employees as $employee)
-        {
+        // $employees = Employee::with('rooms')->where('number','>',2000)->get();
+        $employees = $this->flight->employees;
+        foreach ($employees as $employee) {
             // if($employee->rooms->first()->pivot->is_owner)
             //     {
             //         $employee->rooms->first()->pivot->is_here = false;
@@ -38,23 +38,17 @@ class ClearRoomVacant implements ShouldQueue
             //         $employee->rooms->first()->pivot->delete();
             //     }
 
-            foreach($employee->rooms as $room)
-            {
+            foreach ($employee->rooms as $room) {
                 // return dd($room);
-                if($room->pivot->is_owner)
-                {
+                if ($room->pivot->is_owner) {
                     $room->pivot->is_here = false;
                     $room->pivot->save();
-                }else{
+                } else {
                     $room->pivot->delete();
                 }
             }
         }
 
-
-
-
-        
         // foreach ($employees as $employee)
         // {
         //     // if($employee->rooms->first()->pivot->is_owner)

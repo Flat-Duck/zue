@@ -8,12 +8,14 @@ use App\Http\Requests\Appraisals\AppraisalFormVersionItemStoreRequest;
 use App\Models\Appraisals\AppraisalFormVersion;
 use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalItem;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class AppraisalFormVersionItemsController extends Controller
 {
-    public function edit(AppraisalFormVersion $version)
+    public function edit(AppraisalFormVersion $version): View
     {
         $version->load('form');
 
@@ -27,7 +29,7 @@ class AppraisalFormVersionItemsController extends Controller
         return view('app.appraisals.version_items.edit', compact('version', 'versionItems', 'items'));
     }
 
-    public function addItem(AppraisalFormVersionItemStoreRequest $request, AppraisalFormVersion $version)
+    public function addItem(AppraisalFormVersionItemStoreRequest $request, AppraisalFormVersion $version): RedirectResponse
     {
         $this->ensureVersionIsMutable($version);
 
@@ -51,7 +53,7 @@ class AppraisalFormVersionItemsController extends Controller
         return back()->with('success', 'تمت إضافة البند للـ Version.');
     }
 
-    public function bulkUpdate(AppraisalFormVersionItemBulkUpdateRequest $request, AppraisalFormVersion $version)
+    public function bulkUpdate(AppraisalFormVersionItemBulkUpdateRequest $request, AppraisalFormVersion $version): RedirectResponse
     {
         $this->ensureVersionIsMutable($version);
 
@@ -85,7 +87,7 @@ class AppraisalFormVersionItemsController extends Controller
         return back()->with('success', 'تم تحديث البنود.');
     }
 
-    public function destroy(AppraisalFormVersion $version, AppraisalFormVersionItem $versionItem)
+    public function destroy(AppraisalFormVersion $version, AppraisalFormVersionItem $versionItem): RedirectResponse
     {
         $this->ensureVersionIsMutable($version);
 

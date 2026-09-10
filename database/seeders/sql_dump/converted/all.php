@@ -62,6 +62,7 @@ return static function (Seeder $seeder): void {
                     $trimmed = preg_replace('/^\x{FEFF}/u', '', $trimmed) ?? $trimmed;
 
                     $insertHead = rtrim($trimmed);
+
                     continue;
                 }
 
@@ -83,16 +84,18 @@ return static function (Seeder $seeder): void {
                 }
 
                 if ($sqlBuffer === null) {
-                    $sqlBuffer = $insertHead . "\n  " . $row;
+                    $sqlBuffer = $insertHead."\n  ".$row;
                     $bufferRows = 1;
+
                     continue;
                 }
 
-                $candidate = $sqlBuffer . ",\n  " . $row;
+                $candidate = $sqlBuffer.",\n  ".$row;
                 if (strlen($candidate) > $maxStatementBytes) {
-                    DB::unprepared($sqlBuffer . "\n;");
-                    $sqlBuffer = $insertHead . "\n  " . $row;
+                    DB::unprepared($sqlBuffer."\n;");
+                    $sqlBuffer = $insertHead."\n  ".$row;
                     $bufferRows = 1;
+
                     continue;
                 }
 
@@ -105,7 +108,7 @@ return static function (Seeder $seeder): void {
             }
 
             if ($sqlBuffer !== null && $bufferRows > 0) {
-                DB::unprepared($sqlBuffer . "\n;");
+                DB::unprepared($sqlBuffer."\n;");
             }
         } finally {
             fclose($handle);
@@ -119,6 +122,7 @@ return static function (Seeder $seeder): void {
 
     if ($files->isEmpty()) {
         $seeder->command?->warn("No chunk .sql files found in: {$dir}");
+
         return;
     }
 
@@ -137,19 +141,19 @@ return static function (Seeder $seeder): void {
             $importChunkFile($file->getRealPath(), $name);
 
             DB::commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             try {
                 DB::rollBack();
-            } catch (\Throwable $ignored) {
+            } catch (Throwable $ignored) {
             }
 
-            $seeder->command?->error("Failed on {$name}: " . $e->getMessage());
+            $seeder->command?->error("Failed on {$name}: ".$e->getMessage());
             throw $e;
         } finally {
             try {
                 DB::statement('SET UNIQUE_CHECKS=1;');
                 DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            } catch (\Throwable $ignored) {
+            } catch (Throwable $ignored) {
             }
 
             $connectionName = DB::getDefaultConnection();

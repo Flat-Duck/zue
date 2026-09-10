@@ -13,6 +13,7 @@ use App\Models\Employee;
 use App\Models\Location;
 use App\Models\TimeSheet;
 use App\Services\TimeSheetService;
+use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -22,7 +23,7 @@ class ReportController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(): View
     {
         abort_unless(
             auth()->user()?->can('view-any', TimeSheet::class) || auth()->user()?->can('view-any', Employee::class),
@@ -116,7 +117,7 @@ class ReportController extends Controller
         return view('app.reports.printable', compact('departments'));
     }
 
-    public function monthlyAttendance(MonthlyAttendanceReportRequest $request, TimeSheetService $service)
+    public function monthlyAttendance(MonthlyAttendanceReportRequest $request, TimeSheetService $service): View
     {
         $validated = $request->validated();
 
@@ -126,7 +127,7 @@ class ReportController extends Controller
         return view('app.reports.monthly_attendance', $data);
     }
 
-    public function run(EmployeeRunReportRequest $request)
+    public function run(EmployeeRunReportRequest $request): View
     {
         $validated = $request->validated();
         $query = Employee::with(['department', 'center', 'location']);

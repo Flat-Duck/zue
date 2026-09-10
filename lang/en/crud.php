@@ -1,4 +1,5 @@
 <?php
+
 return [
     'common' => [
         'actions' => ' Actions',
@@ -562,7 +563,7 @@ return [
 //             'employee_id' => 'Number',
 //         ],
 //     ],
-    
+
 //     'room_employees' => [
 //         'name' => 'Room Employees',
 //         'index_title' => ' List',

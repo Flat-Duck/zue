@@ -14,6 +14,8 @@ use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAttendanceService;
 use App\Services\Appraisals\AppraisalScoreService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AppraisalReviewController extends Controller
 {
@@ -26,7 +28,7 @@ class AppraisalReviewController extends Controller
         return (int) $employeeId;
     }
 
-    public function index()
+    public function index(): View
     {
         $myEmployeeId = $this->currentEmployeeId();
 
@@ -38,7 +40,7 @@ class AppraisalReviewController extends Controller
         return view('app.appraisals.reviews.index', compact('reviews'));
     }
 
-    public function create()
+    public function create(): View
     {
         $periods = AppraisalPeriod::query()->where('status', 'open')->orderByDesc('year')->get();
 
@@ -50,7 +52,7 @@ class AppraisalReviewController extends Controller
         return view('app.appraisals.reviews.create', compact('periods', 'employees'));
     }
 
-    public function store(AppraisalReviewStoreRequest $request)
+    public function store(AppraisalReviewStoreRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -110,7 +112,7 @@ class AppraisalReviewController extends Controller
         return redirect()->route('appraisals.reviews.edit', $review)->with('success', 'تم إنشاء التقييم.');
     }
 
-    public function edit(AppraisalReview $review, AppraisalAttendanceService $attendanceService)
+    public function edit(AppraisalReview $review, AppraisalAttendanceService $attendanceService): View
     {
         $myEmployeeId = $this->currentEmployeeId();
 
@@ -175,7 +177,7 @@ class AppraisalReviewController extends Controller
         return back()->with('success', 'تم حفظ الدرجات.');
     }
 
-    public function submit(AppraisalReview $review)
+    public function submit(AppraisalReview $review): RedirectResponse
     {
         $myEmployeeId = $this->currentEmployeeId();
         if ($review->appraiser_id !== $myEmployeeId) {

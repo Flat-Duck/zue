@@ -106,6 +106,9 @@ class EmployeeDetail extends Model
         'family_members_count' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);

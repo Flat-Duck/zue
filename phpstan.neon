@@ -3,7 +3,13 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
-    level: 5
+    # Level 6 adds missing-type reporting: parameters, properties, return types and
+    # the value types inside arrays and collections. Raising it caught 712 places;
+    # 451 were fixed outright — a trait whose scopes crashed on fourteen models,
+    # seventy-seven untyped relations, thirty form request rule sets and forty-eight
+    # controller return types. The remainder is baselined below and is a long tail of
+    # untyped parameters, visible and enumerated rather than merely unreported.
+    level: 6
 
     paths:
         - app

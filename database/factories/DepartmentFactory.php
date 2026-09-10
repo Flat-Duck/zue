@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Administration;
 use App\Models\Department;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DepartmentFactory extends Factory
@@ -24,7 +24,7 @@ class DepartmentFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'administration_id' => \App\Models\Administration::factory(),
+            'administration_id' => Administration::factory(),
         ];
     }
 }

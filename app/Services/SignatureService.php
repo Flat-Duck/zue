@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Signature;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,8 +31,8 @@ class SignatureService
         }
 
         // 3. Store new file
-        $fileName = 'signature_' . $user->id . '_' . time() . '.png';
-        $filePath = 'signatures/' . $fileName;
+        $fileName = 'signature_'.$user->id.'_'.time().'.png';
+        $filePath = 'signatures/'.$fileName;
         Storage::disk('public')->put($filePath, $processed);
 
         // 4. Update Database

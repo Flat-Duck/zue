@@ -1,21 +1,24 @@
 <?php
+
 namespace App\Exports;
 
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeSheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooter;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class EmployeeSheetExport implements FromCollection, WithHeadings, WithTitle, WithStyles, WithEvents
+class EmployeeSheetExport implements FromCollection, WithEvents, WithHeadings, WithStyles, WithTitle
 {
     protected $sheetName;
+
     protected $employees;
 
     public function __construct($sheetName, $employees)
@@ -67,10 +70,10 @@ class EmployeeSheetExport implements FromCollection, WithHeadings, WithTitle, Wi
     {
         return [
             2 => ['font' => ['bold' => true]], // Make the headings row (row 2) bold
-            'A2:J' . ($sheet->getHighestRow() + 2) => [
+            'A2:J'.($sheet->getHighestRow() + 2) => [
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'borderStyle' => Border::BORDER_THIN,
                         'color' => ['argb' => '000000'],
                     ],
                 ],
@@ -90,14 +93,14 @@ class EmployeeSheetExport implements FromCollection, WithHeadings, WithTitle, Wi
                 $sheet->getPageSetup()->setFitToHeight(0); // Adjust height based on content
 
                 // Add header text (center)
-              //  $sheet->getHeaderFooter()->setOddHeader();
-                
+                //  $sheet->getHeaderFooter()->setOddHeader();
+
                 // Add the date to the header (right)
                 $currentDate = Carbon::now()->format('d/M/Y');
-                $sheet->getHeaderFooter()->setOddHeader('&C&BZUEITINA OIL COMPANY \n ACCOUNTING DEPARTMENT 103 \n DETAILED FIELD-BREAK BALANCE &R' . $currentDate);
+                $sheet->getHeaderFooter()->setOddHeader('&C&BZUEITINA OIL COMPANY \n ACCOUNTING DEPARTMENT 103 \n DETAILED FIELD-BREAK BALANCE &R'.$currentDate);
 
                 // Add logo to the header (left)
-                $logoDrawing = new HeaderFooterDrawing();
+                $logoDrawing = new HeaderFooterDrawing;
                 $logoDrawing->setName('ZUE Logo');
                 $logoDrawing->setPath(public_path('img/zue-logo.png')); // Path to your logo file
                 $logoDrawing->setHeight(36); // Adjust as needed

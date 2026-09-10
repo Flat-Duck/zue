@@ -2,6 +2,8 @@
 
 namespace App\Models\Appraisals;
 
+use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,28 +38,43 @@ class AppraisalOfficial extends Model
         'hr_signed_at' => 'datetime',
     ];
 
+    /**
+     * @return HasMany<AppraisalOfficialScore, $this>
+     */
     public function scores(): HasMany
     {
         return $this->hasMany(AppraisalOfficialScore::class, 'appraisals_official_id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function manager(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'manager_user_id');
+        return $this->belongsTo(User::class, 'manager_user_id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function hr(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'hr_user_id');
+        return $this->belongsTo(User::class, 'hr_user_id');
     }
 
+    /**
+     * @return BelongsTo<AppraisalPeriod, $this>
+     */
     public function period(): BelongsTo
     {
         return $this->belongsTo(AppraisalPeriod::class, 'appraisal_period_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Employee::class);
+        return $this->belongsTo(Employee::class);
     }
 }

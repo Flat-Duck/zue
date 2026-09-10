@@ -24,6 +24,15 @@ use Illuminate\Support\Collection;
  * @property-read User|null $user
  * @property-read Signature|null $signature
  */
+/**
+ * The archive macros come from SoftArchivingScope, which registers them on the query
+ * builder rather than declaring them here. Naming them makes them visible to static
+ * analysis and to an editor.
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<Employee> withArchived(bool $withArchived = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<Employee> withoutArchived()
+ * @method static \Illuminate\Database\Eloquent\Builder<Employee> onlyArchived()
+ */
 class Employee extends Model
 {
     use HasFactory;
@@ -90,6 +99,8 @@ class Employee extends Model
      *
      * The link is owned by `users.employee_id`: every user is an employee, but
      * most employees have no login.
+     *
+     * @return HasOne<User, $this>
      */
     public function user(): HasOne
     {
@@ -98,6 +109,8 @@ class Employee extends Model
 
     /**
      * The signature belongs to the login account, so it is reached through it.
+     *
+     * @return HasOneThrough<Signature, User, $this>
      */
     public function signature(): HasOneThrough
     {
@@ -111,11 +124,17 @@ class Employee extends Model
         );
     }
 
+    /**
+     * @return HasMany<TimeSheet, $this>
+     */
     public function timeSheets(): HasMany
     {
         return $this->hasMany(TimeSheet::class);
     }
 
+    /**
+     * @return HasMany<ClinicApointment, $this>
+     */
     public function clinicApointments(): HasMany
     {
         return $this->hasMany(ClinicApointment::class);
@@ -147,6 +166,8 @@ class Employee extends Model
      * It is a strict 1:1 kept in its own table so that the queries this system runs
      * constantly — listing staff, filling time sheets, printing manifests — do not
      * read a salary or a passport number they will never show.
+     *
+     * @return HasOne<EmployeeDetail, $this>
      */
     public function details(): HasOne
     {
@@ -222,21 +243,33 @@ class Employee extends Model
         return $this;
     }
 
+    /**
+     * @return BelongsTo<Department, $this>
+     */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
+    /**
+     * @return BelongsTo<Location, $this>
+     */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
 
+    /**
+     * @return BelongsTo<Center, $this>
+     */
     public function center(): BelongsTo
     {
         return $this->belongsTo(Center::class);
     }
 
+    /**
+     * @return BelongsToMany<Room, $this>
+     */
     public function rooms(): BelongsToMany
     {
         return $this->belongsToMany(Room::class)->withPivot(['is_owner', 'is_here']);
@@ -247,6 +280,9 @@ class Employee extends Model
         return 10;
     }
 
+    /**
+     * @return BelongsToMany<Flight, $this>
+     */
     public function flights(): BelongsToMany
     {
         return $this->belongsToMany(Flight::class);
@@ -300,10 +336,20 @@ class Employee extends Model
         return $this->total_balance;
     }
 
-    public function calculateBalance()
+    /**
+     * Recalculates the leave balance and stores it.
+     *
+     * The rounding is explicit because the column is an integer and the arithmetic
+     * is not: a 37/42 rotation earns 8.81 days for ten worked, and eighteen people
+     * are on rotations like it. This is what the database was already doing
+     * silently. Whether a part-day of leave should be kept, rounded or floored is a
+     * question for the company, not something to settle by choosing a cast.
+     */
+    public function calculateBalance(): void
     {
         $balance = TimeSheetBuilder::calculateBalance($this->id, $this->schedule, $this->transfered_balance);
-        $this->total_balance = $balance;
+
+        $this->total_balance = (int) round($balance);
         $this->save();
     }
 

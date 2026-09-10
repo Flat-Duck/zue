@@ -18,7 +18,7 @@ class AdministrationSeeder extends Seeder
         //     ->create();
 
         ClinicApointmentFactory::factory()
-        ->count(2)
-        ->create();
+            ->count(2)
+            ->create();
     }
 }

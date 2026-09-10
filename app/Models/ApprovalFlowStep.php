@@ -25,6 +25,9 @@ class ApprovalFlowStep extends Model
         'can_approve' => 'bool',
     ];
 
+    /**
+     * @return BelongsTo<ApprovalFlow, $this>
+     */
     public function flow(): BelongsTo
     {
         return $this->belongsTo(ApprovalFlow::class, 'flow_id');

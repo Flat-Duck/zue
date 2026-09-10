@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('signatures', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id'); // optional, if linked to a user
-            $table->string('image_path'); // path to the stored PNG        
+            $table->string('image_path'); // path to the stored PNG
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

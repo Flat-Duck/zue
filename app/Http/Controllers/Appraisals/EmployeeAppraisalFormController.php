@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Appraisals\EmployeeAppraisalFormUpdateRequest;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Employee;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class EmployeeAppraisalFormController extends Controller
 {
-    public function edit(Employee $employee)
+    public function edit(Employee $employee): View
     {
         $this->authorize('update', $employee);
 
@@ -23,7 +25,7 @@ class EmployeeAppraisalFormController extends Controller
         return view('app.appraisals.employees.appraisal_form.edit', compact('employee', 'forms'));
     }
 
-    public function update(EmployeeAppraisalFormUpdateRequest $request, Employee $employee)
+    public function update(EmployeeAppraisalFormUpdateRequest $request, Employee $employee): RedirectResponse
     {
         $data = $request->validated();
 

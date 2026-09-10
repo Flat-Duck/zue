@@ -16,7 +16,7 @@ class ImageProcessingService
         // ====== 1) Imagick (Preferred) ======
         if (extension_loaded('imagick')) {
             try {
-                $img = new Imagick();
+                $img = new Imagick;
                 $img->readImageBlob($binary);
                 $img->setImageColorspace(Imagick::COLORSPACE_SRGB);
                 $img->setImageAlphaChannel(Imagick::ALPHACHANNEL_SET);
@@ -68,6 +68,7 @@ class ImageProcessingService
                 $out = $img->getImageBlob();
                 $img->clear();
                 $img->destroy();
+
                 return $out;
             } catch (\Throwable $e) {
                 // Fallback to GD
@@ -76,8 +77,9 @@ class ImageProcessingService
 
         // ====== 2) GD fallback ======
         $gd = @imagecreatefromstring($binary);
-        if (!$gd)
+        if (! $gd) {
             return $binary;
+        }
 
         if (function_exists('imagepalettetotruecolor')) {
             @imagepalettetotruecolor($gd);
@@ -91,6 +93,7 @@ class ImageProcessingService
         // Determine background color from corners
         $sample = function ($x, $y) use ($gd) {
             $c = imagecolorat($gd, $x, $y);
+
             return [($c >> 16) & 0xFF, ($c >> 8) & 0xFF, $c & 0xFF];
         };
         $p1 = $sample(5, 5);
@@ -128,6 +131,7 @@ class ImageProcessingService
         imagepng($gd);
         $out = ob_get_clean();
         imagedestroy($gd);
+
         return $out ?: $binary;
     }
 }

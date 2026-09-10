@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Contracts\AuditLoggerContract;
 use App\Contracts\BackupServiceContract;
 use App\Contracts\FlightDispatchContract;
+use App\Models\TimeSheet;
+use App\Observers\TimeSheetObserver;
 use App\Services\AuditLogger;
 use App\Services\BackupService;
 use App\Services\Flights\FlightDispatchService;
@@ -39,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        TimeSheet::observe(TimeSheetObserver::class);
+
         //
     }
 }

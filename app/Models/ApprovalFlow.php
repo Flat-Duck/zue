@@ -22,6 +22,9 @@ class ApprovalFlow extends Model
         'applies_to' => 'array',
     ];
 
+    /**
+     * @return HasMany<ApprovalFlowStep, $this>
+     */
     public function steps(): HasMany
     {
         return $this->hasMany(ApprovalFlowStep::class, 'flow_id')->orderBy('step_order');

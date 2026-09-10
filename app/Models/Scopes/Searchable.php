@@ -3,106 +3,87 @@
 namespace App\Models\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
+/**
+ * A `LIKE` search across a model's columns, plus the narrow-by filters the index
+ * screens use.
+ *
+ * Removed from this trait: `scopeWithArchived()` and `scopeWithoutArchived()`.
+ * They filtered on `archived_at`, which only `Employee` has — on the other fourteen
+ * models using this trait, calling either raised "Unknown column 'archived_at'".
+ * On `Employee` they never ran at all: `SoftArchivingScope` registers builder
+ * macros of the same names, and a macro takes precedence over a local scope, so the
+ * working implementations were always the ones on that scope.
+ */
 trait Searchable
 {
     /**
-     * Search paginated items ordering by ID descending
-     */
-    public function scopeSearchLatestPaginated(
-        Builder $query,
-        string $search,
-        int $paginationQuantity = 10
-    ): Builder
-    {
-        return $query
-            ->search($search)
-            ->orderBy('updated_at', 'desc')
-            ->paginate($paginationQuantity);
-    }
-
-    /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
-     */
-    public function scopeWithArchived(Builder $query): Builder
-    {
-        return $query->orWhereNotNull('archived_at');
-    }
-    /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
-     */
-    public function scopeWithoutArchived(Builder $query): Builder
-    {
-        return $query->WhereNull('archived_at');
-    }
-
-    /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
+     * Search the columns named by the model's `$searchableFields`.
+     *
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
      */
     public function scopeSearch(Builder $query, string $search): Builder
     {
-        $query->where(function ($query) use ($search) {
+        return $query->where(function (Builder $query) use ($search): void {
             foreach ($this->getSearchableFields() as $field) {
                 $query->orWhere($field, 'like', "%{$search}%");
             }
         });
-
-        return $query;
     }
 
     /**
-     * Returns the searchable fields. If $searchableFields is undefined,
-     * or is an empty array, or its first element is '*', it will search
-     * in all table fields
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
+     */
+    public function scopeByDepartment(Builder $query, int|string|null $departmentId): Builder
+    {
+        return $query->where('department_id', $departmentId);
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
+     */
+    public function scopeByCenter(Builder $query, int|string|null $centerId): Builder
+    {
+        return $query->where('center_id', $centerId);
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     * @return Builder<Model>
+     */
+    public function scopeByLocation(Builder $query, int|string|null $locationId): Builder
+    {
+        return $query->where('location_id', $locationId);
+    }
+
+    /**
+     * The fields to search. An unset or empty `$searchableFields`, or one whose first
+     * entry is `*`, means every column on the table.
+     *
+     * @return list<string>
      */
     protected function getSearchableFields(): array
     {
         if (isset($this->searchableFields) && count($this->searchableFields)) {
             return $this->searchableFields[0] === '*'
                 ? $this->getAllModelTableFields()
-                : $this->searchableFields;
+                : array_values($this->searchableFields);
         }
 
         return $this->getAllModelTableFields();
     }
 
     /**
-     * Gets all fields from Model's table
+     * @return list<string>
      */
     protected function getAllModelTableFields(): array
     {
-        $tableName = $this->getTable();
-
         return $this->getConnection()
             ->getSchemaBuilder()
-            ->getColumnListing($tableName);
-    }
-
-        /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
-     */
-    public function scopeByDepartment(Builder $query, $department_id): Builder
-    {
-        return $query->Where('department_id',$department_id);
-    }
-        /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
-     */
-    public function scopeByCenter(Builder $query, $center_id): Builder
-    {
-        return $query->Where('center_id',$center_id);
-    }
-        /**
-     * Adds a scope to search the table based on the
-     * $searchableFields array inside the model
-     */
-    public function scopeByLocation(Builder $query, $location_id): Builder
-    {
-        return $query->Where('location_id',$location_id);
+            ->getColumnListing($this->getTable());
     }
 }

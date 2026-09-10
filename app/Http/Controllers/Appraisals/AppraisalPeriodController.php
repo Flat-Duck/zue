@@ -9,10 +9,12 @@ use App\Jobs\GenerateYearlyAppraisalsJob;
 use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAggregationService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AppraisalPeriodController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $periods = AppraisalPeriod::orderByDesc('year')
             ->orderByRaw("FIELD(type,'yearly','quarter')")
@@ -22,12 +24,12 @@ class AppraisalPeriodController extends Controller
         return view('app.appraisals.periods.index', compact('periods'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('app.appraisals.periods.create');
     }
 
-    public function store(AppraisalPeriodRequest $request)
+    public function store(AppraisalPeriodRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -45,12 +47,12 @@ class AppraisalPeriodController extends Controller
         return redirect()->route('appraisals.periods.index')->with('success', 'Period created successfully.');
     }
 
-    public function edit(AppraisalPeriod $period)
+    public function edit(AppraisalPeriod $period): View
     {
         return view('app.appraisals.periods.edit', compact('period'));
     }
 
-    public function update(AppraisalPeriodRequest $request, AppraisalPeriod $period)
+    public function update(AppraisalPeriodRequest $request, AppraisalPeriod $period): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -69,14 +71,14 @@ class AppraisalPeriodController extends Controller
         return redirect()->route('appraisals.periods.index')->with('success', 'Period updated successfully.');
     }
 
-    public function destroy(AppraisalPeriod $period)
+    public function destroy(AppraisalPeriod $period): RedirectResponse
     {
         $period->delete();
 
         return redirect()->route('appraisals.periods.index')->with('success', 'Period deleted successfully.');
     }
 
-    public function generateYearly(GenerateYearlyAppraisalsRequest $request, AppraisalAggregationService $service)
+    public function generateYearly(GenerateYearlyAppraisalsRequest $request, AppraisalAggregationService $service): RedirectResponse
     {
         $validated = $request->validated();
 

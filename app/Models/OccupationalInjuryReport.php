@@ -10,21 +10,21 @@ class OccupationalInjuryReport extends Model
     use HasFactory;
 
     protected $fillable = [
-        'case_no','location','department','section','clinic','company','company_co_no',
-        'injured_name','nationality','job_title','incident_date','incident_time',
-        'classification','is_lost_time_case','total_days_lost',
-        'injury_nature','case_of_injury',
-        'reported_at_once','reported_next_day','reported_other_specify',
-        'method_by_tele','method_by_radio','method_in_person',
-        'doctor_on_site','doctor_out_of_site','ambulance_dispatched','company_vehicle_used',
-        'bring_patient_to_clinic','transport_doctor_to_scene','twin_otter_dispatched',
-        'occurred_during_working_hours','occurred_outside_working_hours','single_case','multiple_case',
+        'case_no', 'location', 'department', 'section', 'clinic', 'company', 'company_co_no',
+        'injured_name', 'nationality', 'job_title', 'incident_date', 'incident_time',
+        'classification', 'is_lost_time_case', 'total_days_lost',
+        'injury_nature', 'case_of_injury',
+        'reported_at_once', 'reported_next_day', 'reported_other_specify',
+        'method_by_tele', 'method_by_radio', 'method_in_person',
+        'doctor_on_site', 'doctor_out_of_site', 'ambulance_dispatched', 'company_vehicle_used',
+        'bring_patient_to_clinic', 'transport_doctor_to_scene', 'twin_otter_dispatched',
+        'occurred_during_working_hours', 'occurred_outside_working_hours', 'single_case', 'multiple_case',
         'past_medical_history',
-        'injuries_diagnose','medical_treatment','investigations',
-        'employee_report_attached','employee_report_under_completion',
-        'advised_light_duties','follow_up_on_site','referred_to_hospital','back_to_work',
-        'exempt_from_wearing_ppe','other_specify',
-        'comments','medical_officer_name','medical_officer_signature','medical_officer_signed_date',
+        'injuries_diagnose', 'medical_treatment', 'investigations',
+        'employee_report_attached', 'employee_report_under_completion',
+        'advised_light_duties', 'follow_up_on_site', 'referred_to_hospital', 'back_to_work',
+        'exempt_from_wearing_ppe', 'other_specify',
+        'comments', 'medical_officer_name', 'medical_officer_signature', 'medical_officer_signed_date',
     ];
 
     protected $casts = [

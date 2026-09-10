@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Appraisals\AppraisalFormVersionStoreRequest;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Appraisals\AppraisalFormVersion;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class AppraisalFormVersionController extends Controller
 {
-    public function index(AppraisalForm $form)
+    public function index(AppraisalForm $form): View
     {
         $versions = AppraisalFormVersion::query()
             ->where('appraisal_form_id', $form->id)
@@ -53,7 +55,7 @@ class AppraisalFormVersionController extends Controller
             ->with('success', 'تم إنشاء Version. توا ربط البنود.');
     }
 
-    public function activate(AppraisalFormVersion $version)
+    public function activate(AppraisalFormVersion $version): RedirectResponse
     {
         DB::transaction(function () use ($version): void {
             AppraisalFormVersion::query()

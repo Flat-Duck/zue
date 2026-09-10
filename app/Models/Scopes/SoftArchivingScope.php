@@ -18,8 +18,6 @@ class SoftArchivingScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
@@ -30,7 +28,6 @@ class SoftArchivingScope implements Scope
     /**
      * Extend the query builder with the needed functions.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     public function extend(Builder $builder)
@@ -51,7 +48,6 @@ class SoftArchivingScope implements Scope
     /**
      * Get the "archived at" column for the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return string
      */
     protected function getArchivedAtColumn(Builder $builder)
@@ -66,7 +62,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the unpreserve extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addUnpreserve(Builder $builder)
@@ -81,7 +76,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the unpreserve-or-create extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addUnpreserveOrCreate(Builder $builder)
@@ -98,7 +92,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the create-or-unpreserve extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addCreateOrUnpreserve(Builder $builder)
@@ -115,7 +108,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the with-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addWithArchived(Builder $builder)
@@ -132,7 +124,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the without-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addWithoutArchived(Builder $builder)
@@ -151,7 +142,6 @@ class SoftArchivingScope implements Scope
     /**
      * Add the only-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addOnlyArchived(Builder $builder)

@@ -2,12 +2,11 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Signature;
 use App\Services\SignatureService;
-
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class UserSignature extends Component
 {
@@ -26,6 +25,7 @@ class UserSignature extends Component
     {
         if (empty($this->signatureData)) {
             session()->flash('error', 'No signature data.');
+
             return;
         }
 
@@ -34,11 +34,12 @@ class UserSignature extends Component
 
         if ($image === false) {
             session()->flash('error', 'Invalid signature data.');
+
             return;
         }
 
-        $fileName = 'signature_' . auth()->id() . '_' . time() . '.png';
-        $filePath = 'signatures/' . $fileName;
+        $fileName = 'signature_'.auth()->id().'_'.time().'.png';
+        $filePath = 'signatures/'.$fileName;
 
         Storage::disk('public')->put($filePath, $image);
 

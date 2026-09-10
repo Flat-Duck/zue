@@ -13,6 +13,9 @@ class ManagementScopeStoreRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         $types = [
@@ -29,10 +32,10 @@ class ManagementScopeStoreRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:255'],
             'template' => ['required', 'string', Rule::in(['general', 'test1', 'test2', 'test3', 'test4'])],
             'scope_type' => ['required', Rule::in($types)],
-            'location_id' => ['nullable', 'exists:locations,id', 'required_if:scope_type,' . ManagementScope::TYPE_LOCATION, 'required_if:scope_type,' . ManagementScope::TYPE_DEPARTMENT],
-            'department_id' => ['nullable', 'exists:departments,id', 'required_if:scope_type,' . ManagementScope::TYPE_DEPARTMENT],
-            'center_id' => ['nullable', 'exists:centers,id', 'required_if:scope_type,' . ManagementScope::TYPE_CENTER],
-            'subordinate_employee_ids' => ['nullable', 'array', 'required_if:scope_type,' . ManagementScope::TYPE_EMPLOYEE],
+            'location_id' => ['nullable', 'exists:locations,id', 'required_if:scope_type,'.ManagementScope::TYPE_LOCATION, 'required_if:scope_type,'.ManagementScope::TYPE_DEPARTMENT],
+            'department_id' => ['nullable', 'exists:departments,id', 'required_if:scope_type,'.ManagementScope::TYPE_DEPARTMENT],
+            'center_id' => ['nullable', 'exists:centers,id', 'required_if:scope_type,'.ManagementScope::TYPE_CENTER],
+            'subordinate_employee_ids' => ['nullable', 'array', 'required_if:scope_type,'.ManagementScope::TYPE_EMPLOYEE],
             'subordinate_employee_ids.*' => ['exists:employees,id'],
             'context' => ['required', 'string', 'max:255'],
             'settings' => ['nullable', 'array'],
@@ -45,9 +48,9 @@ class ManagementScopeStoreRequest extends FormRequest
             if ($this->scope_type === ManagementScope::TYPE_EMPLOYEE) {
                 $subIds = (array) ($this->subordinate_employee_ids ?? []);
                 $managerIds = (array) ($this->manager_ids ?? []);
-                
+
                 $intersection = array_intersect($managerIds, $subIds);
-                if (!empty($intersection)) {
+                if (! empty($intersection)) {
                     $validator->errors()->add('subordinate_employee_ids', 'A manager cannot also be a subordinate in the same scope.');
                 }
             }

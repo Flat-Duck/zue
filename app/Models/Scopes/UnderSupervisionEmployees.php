@@ -2,7 +2,6 @@
 
 namespace App\Models\Scopes;
 
-use App\Models\Center;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -10,8 +9,11 @@ use Illuminate\Database\Eloquent\Scope;
 class UnderSupervisionEmployees implements Scope
 {
     private $center_id;
+
     private $department_id;
+
     private $location_id;
+
     private $management_case;
 
     public function __construct(?int $center, ?int $department, ?int $location)
@@ -27,8 +29,9 @@ class UnderSupervisionEmployees implements Scope
         } elseif (auth()->user()->management_level() == 4) {
             $this->management_case = 4;
         }
-        
+
     }
+
     /**
      * Apply the scope to a given Eloquent query builder.
      */
@@ -43,10 +46,10 @@ class UnderSupervisionEmployees implements Scope
                 ->where('management_level', 3)
                 ->where('employee_level', 2);
         } elseif ($this->management_case == 4) {
-        // dd(auth()->user());
+            // dd(auth()->user());
             $builder
                 ->where('employee_level', '>=', 2)
-                ->where('management_level','=', 4);
+                ->where('management_level', '=', 4);
         }
     }
 }

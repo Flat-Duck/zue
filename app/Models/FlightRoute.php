@@ -25,11 +25,17 @@ class FlightRoute extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return HasMany<FlightRouteLeg, $this>
+     */
     public function legs(): HasMany
     {
         return $this->hasMany(FlightRouteLeg::class)->orderBy('sequence');
     }
 
+    /**
+     * @return HasMany<Flight, $this>
+     */
     public function flights(): HasMany
     {
         return $this->hasMany(Flight::class);

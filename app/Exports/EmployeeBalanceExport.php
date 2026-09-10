@@ -1,6 +1,7 @@
 <?php
 
 // app/Exports/EmployeeBalanceExport.php
+
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -17,9 +18,9 @@ class EmployeeBalanceExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
-        
+
         $groupedEmployees = $this->employees->groupBy(function ($employee) {
-            return $employee->location->name . '-' . $employee->department->name;
+            return $employee->location->name.'-'.$employee->department->name;
         });
 
         foreach ($groupedEmployees as $sheetName => $employees) {
@@ -45,7 +46,7 @@ class EmployeeBalanceExport implements WithMultipleSheets
 
 //     protected $centers;
 //     protected $employees;
-    
+
 //     public function __construct($employees)
 //     {
 //         $this->employees = $employees;
@@ -57,11 +58,11 @@ class EmployeeBalanceExport implements WithMultipleSheets
 //     {
 //         return $this->employees->first();
 //     }
-    
+
 //     public function map($employee): array
 //     {
 //         return [
-//             // here should be counter for each row 
+//             // here should be counter for each row
 //             $employee->number,
 //             $employee->english_name,
 //             $employee->start_date,
@@ -91,7 +92,6 @@ class EmployeeBalanceExport implements WithMultipleSheets
 //         ];
 //     }
 
-    
 //     // /**
 //     //  * @return array
 //     //  */

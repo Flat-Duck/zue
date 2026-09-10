@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Appraisals\AppraisalFormVersion;
-use App\Models\Appraisals\AppraisalItem;
 use App\Models\Appraisals\AppraisalFormVersionItem;
+use App\Models\Appraisals\AppraisalItem;
 use App\Models\Appraisals\AppraisalPeriod;
-use \DB;
+use DB;
+use Illuminate\Database\Seeder;
+
 class AppraisalSeeder extends Seeder
 {
     public function run(): void
@@ -18,56 +19,55 @@ class AppraisalSeeder extends Seeder
          * - default_label is unified (generic)
          * - each form overrides max + sort only
          */
-
         $itemLibrary = [
             // ========= job_performance =========
             'work_requirements_knowledge' => ['section' => 'job_performance', 'label' => 'الإلمام بمتطلبات وحاجة العمل'],
-            'planning_time_management'    => ['section' => 'job_performance', 'label' => 'التخطيط وإدارة الوقت'],
-            'decision_making'            => ['section' => 'job_performance', 'label' => 'اتخاذ القرار المناسب'],
-            'unit_improved_results'      => ['section' => 'job_performance', 'label' => 'تحسين نتائج الوحدة التنظيمية'],
-            'meeting_discussion_style'   => ['section' => 'job_performance', 'label' => 'أسلوبه في المناقشة خلال الاجتماعات'],
+            'planning_time_management' => ['section' => 'job_performance', 'label' => 'التخطيط وإدارة الوقت'],
+            'decision_making' => ['section' => 'job_performance', 'label' => 'اتخاذ القرار المناسب'],
+            'unit_improved_results' => ['section' => 'job_performance', 'label' => 'تحسين نتائج الوحدة التنظيمية'],
+            'meeting_discussion_style' => ['section' => 'job_performance', 'label' => 'أسلوبه في المناقشة خلال الاجتماعات'],
             'followup_task_distribution' => ['section' => 'job_performance', 'label' => 'متابعة المهام وتوزيع العمل'],
-            'ideas_suggestions'          => ['section' => 'job_performance', 'label' => 'المبادرة وتقديم الأفكار والمقترحات'],
-            'problem_solving_simplify'   => ['section' => 'job_performance', 'label' => 'معالجة المشاكل وتبسيط العمل'],
-            'develop_gain_experience'    => ['section' => 'job_performance', 'label' => 'تطوير الأداء واكتساب الخبرات في العمل'],
-            'rules_compliance'           => ['section' => 'job_performance', 'label' => 'الالتزام بالتعليمات والقواعد المنظمة للعمل'],
-            'report_writing_skill'       => ['section' => 'job_performance', 'label' => 'المهارة في إعداد التقارير'],
-            'safety'                     => ['section' => 'job_performance', 'label' => 'اتباع قواعد ونظم الأمن والسلامة'],
+            'ideas_suggestions' => ['section' => 'job_performance', 'label' => 'المبادرة وتقديم الأفكار والمقترحات'],
+            'problem_solving_simplify' => ['section' => 'job_performance', 'label' => 'معالجة المشاكل وتبسيط العمل'],
+            'develop_gain_experience' => ['section' => 'job_performance', 'label' => 'تطوير الأداء واكتساب الخبرات في العمل'],
+            'rules_compliance' => ['section' => 'job_performance', 'label' => 'الالتزام بالتعليمات والقواعد المنظمة للعمل'],
+            'report_writing_skill' => ['section' => 'job_performance', 'label' => 'المهارة في إعداد التقارير'],
+            'safety' => ['section' => 'job_performance', 'label' => 'اتباع قواعد ونظم الأمن والسلامة'],
 
-            'technical_knowledge'        => ['section' => 'job_performance', 'label' => 'معرفة العمل والإلمام بالجوانب الفنية المتعلقة به'],
-            'details_understanding'      => ['section' => 'job_performance', 'label' => 'فهم واستيعاب التفاصيل المطلوبة لإنجاز الأعمال'],
-            'work_knowledge'             => ['section' => 'job_performance', 'label' => 'معرفة العمل ودرجة الإحاطة به'],
+            'technical_knowledge' => ['section' => 'job_performance', 'label' => 'معرفة العمل والإلمام بالجوانب الفنية المتعلقة به'],
+            'details_understanding' => ['section' => 'job_performance', 'label' => 'فهم واستيعاب التفاصيل المطلوبة لإنجاز الأعمال'],
+            'work_knowledge' => ['section' => 'job_performance', 'label' => 'معرفة العمل ودرجة الإحاطة به'],
 
-            'set_priorities'             => ['section' => 'job_performance', 'label' => 'القدرة على وضع الأولويات في العمل'],
-            'accuracy_speed'             => ['section' => 'job_performance', 'label' => 'الدقة والسرعة في إنجاز الأعمال وبأقل نسبة ممكنة من الأخطاء'],
-            'work_without_supervision'   => ['section' => 'job_performance', 'label' => 'أداء العمل بدون رقابة أو متابعة'],
-            'reliability'                => ['section' => 'job_performance', 'label' => 'درجة الاعتماد عليه'],
-            'maintain_tools_equipment'   => ['section' => 'job_performance', 'label' => 'المحافظة على أدوات ومعدات العمل'],
-            'overcome_difficulties'      => ['section' => 'job_performance', 'label' => 'التغلب على صعوبات العمل'],
-            'accept_others_opinions'     => ['section' => 'job_performance', 'label' => 'تقبل آراء الآخرين ومناقشتها'],
-            'attendance_punctuality'     => ['section' => 'job_performance', 'label' => 'المواظبة والمحافظة على مواعيد العمل'],
-            'training_commitment'        => ['section' => 'job_performance', 'label' => 'القابلية للتدريب والالتزام بحضور الدورات التدريبية'],
-            'training_benefit'           => ['section' => 'job_performance', 'label' => 'مدى الاستفادة من التدريب والالتزام بحضور الدورات التدريبية'],
+            'set_priorities' => ['section' => 'job_performance', 'label' => 'القدرة على وضع الأولويات في العمل'],
+            'accuracy_speed' => ['section' => 'job_performance', 'label' => 'الدقة والسرعة في إنجاز الأعمال وبأقل نسبة ممكنة من الأخطاء'],
+            'work_without_supervision' => ['section' => 'job_performance', 'label' => 'أداء العمل بدون رقابة أو متابعة'],
+            'reliability' => ['section' => 'job_performance', 'label' => 'درجة الاعتماد عليه'],
+            'maintain_tools_equipment' => ['section' => 'job_performance', 'label' => 'المحافظة على أدوات ومعدات العمل'],
+            'overcome_difficulties' => ['section' => 'job_performance', 'label' => 'التغلب على صعوبات العمل'],
+            'accept_others_opinions' => ['section' => 'job_performance', 'label' => 'تقبل آراء الآخرين ومناقشتها'],
+            'attendance_punctuality' => ['section' => 'job_performance', 'label' => 'المواظبة والمحافظة على مواعيد العمل'],
+            'training_commitment' => ['section' => 'job_performance', 'label' => 'القابلية للتدريب والالتزام بحضور الدورات التدريبية'],
+            'training_benefit' => ['section' => 'job_performance', 'label' => 'مدى الاستفادة من التدريب والالتزام بحضور الدورات التدريبية'],
 
-            'review_audit'               => ['section' => 'job_performance', 'label' => 'القدرة على المراجعة والتدقيق'],
-            'responsibility'             => ['section' => 'job_performance', 'label' => 'تحمل المسؤولية'],
-            'knows_procedures'           => ['section' => 'job_performance', 'label' => 'الإلمام بنظم وإجراءات العمل'],
-            'plan_steps'                 => ['section' => 'job_performance', 'label' => 'القدرة على تحديد خطوات العمل'],
+            'review_audit' => ['section' => 'job_performance', 'label' => 'القدرة على المراجعة والتدقيق'],
+            'responsibility' => ['section' => 'job_performance', 'label' => 'تحمل المسؤولية'],
+            'knows_procedures' => ['section' => 'job_performance', 'label' => 'الإلمام بنظم وإجراءات العمل'],
+            'plan_steps' => ['section' => 'job_performance', 'label' => 'القدرة على تحديد خطوات العمل'],
 
-            'execution_skill'            => ['section' => 'job_performance', 'label' => 'المهارة في التنفيذ'],
-            'cooperation_extra_tasks'    => ['section' => 'job_performance', 'label' => 'التعاون في الأعمال الإضافية'],
-            'protect_company_property'   => ['section' => 'job_performance', 'label' => 'المحافظة على ممتلكات الشركة'],
+            'execution_skill' => ['section' => 'job_performance', 'label' => 'المهارة في التنفيذ'],
+            'cooperation_extra_tasks' => ['section' => 'job_performance', 'label' => 'التعاون في الأعمال الإضافية'],
+            'protect_company_property' => ['section' => 'job_performance', 'label' => 'المحافظة على ممتلكات الشركة'],
 
             // ========= personal_traits =========
-            'confidentiality'            => ['section' => 'personal_traits', 'label' => 'المحافظة على أسرار العمل والمستندات السرية'],
-            'accept_change'              => ['section' => 'personal_traits', 'label' => 'تقبل التجديد في أساليب العمل'],
-            'work_under_pressure'        => ['section' => 'personal_traits', 'label' => 'القدرة على العمل تحت جملة من الضغوط'],
-            'accept_guidance'            => ['section' => 'personal_traits', 'label' => 'تقبل التوجيهات والاستعداد لتنفيذها'],
-            'behavior_appearance'        => ['section' => 'personal_traits', 'label' => 'السلوك العام والعناية بالمظهر بما يتناسب وطبيعة الوظيفة'],
+            'confidentiality' => ['section' => 'personal_traits', 'label' => 'المحافظة على أسرار العمل والمستندات السرية'],
+            'accept_change' => ['section' => 'personal_traits', 'label' => 'تقبل التجديد في أساليب العمل'],
+            'work_under_pressure' => ['section' => 'personal_traits', 'label' => 'القدرة على العمل تحت جملة من الضغوط'],
+            'accept_guidance' => ['section' => 'personal_traits', 'label' => 'تقبل التوجيهات والاستعداد لتنفيذها'],
+            'behavior_appearance' => ['section' => 'personal_traits', 'label' => 'السلوك العام والعناية بالمظهر بما يتناسب وطبيعة الوظيفة'],
 
             // ========= initiative =========
-            'distinct_achievement'       => ['section' => 'initiative', 'label' => 'إنجاز أعمال مميزة على مستوى الشركة (تذكر في تقرير مرفق)'],
-            'solve_complex_issues'       => ['section' => 'initiative', 'label' => 'حلحلة بعض المشاكل المعقدة بالإدارة (تذكر في تقرير مرفق)'],
+            'distinct_achievement' => ['section' => 'initiative', 'label' => 'إنجاز أعمال مميزة على مستوى الشركة (تذكر في تقرير مرفق)'],
+            'solve_complex_issues' => ['section' => 'initiative', 'label' => 'حلحلة بعض المشاكل المعقدة بالإدارة (تذكر في تقرير مرفق)'],
         ];
 
         // 1) Upsert all shared items once
@@ -77,7 +77,7 @@ class AppraisalSeeder extends Seeder
                 ['key' => $key],
                 [
                     'default_section' => $meta['section'],
-                    'default_label'   => $meta['label'],
+                    'default_label' => $meta['label'],
                 ]
             );
         }
@@ -231,7 +231,7 @@ class AppraisalSeeder extends Seeder
             foreach ($f['items'] as $row) {
                 $key = $row['key'];
 
-                if (!isset($itemsByKey[$key])) {
+                if (! isset($itemsByKey[$key])) {
                     // Safety fallback لو صادفت key مش موجود في المكتبة
                     continue;
                 }
@@ -240,9 +240,9 @@ class AppraisalSeeder extends Seeder
                     ['appraisal_form_version_id' => $version->id, 'item_id' => $itemsByKey[$key]->id],
                     [
                         'max_score_override' => $row['max'],
-                        'sort_order'         => $row['sort'],
-                        'is_required'        => true,
-                        'is_active'          => true,
+                        'sort_order' => $row['sort'],
+                        'is_required' => true,
+                        'is_active' => true,
                     ]
                 );
             }
@@ -269,7 +269,6 @@ class AppraisalSeeder extends Seeder
             ['year' => 2025, 'type' => 'yearly', 'quarter' => null],
             ['window_open_from' => '2025-12-25', 'window_open_to' => '2027-01-31', 'status' => 'planned']
         );
-
 
         AppraisalPeriod::updateOrCreate(
             ['year' => 2025, 'type' => 'yearly', 'quarter' => null],

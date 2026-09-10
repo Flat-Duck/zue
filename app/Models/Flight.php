@@ -31,26 +31,41 @@ class Flight extends Model
         'time' => 'datetime',
     ];
 
+    /**
+     * @return BelongsToMany<Passenger, $this>
+     */
     public function passengers(): BelongsToMany
     {
         return $this->belongsToMany(Passenger::class);
     }
 
+    /**
+     * @return BelongsToMany<Employee, $this>
+     */
     public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class);
     }
 
+    /**
+     * @return BelongsTo<Plane, $this>
+     */
     public function plane(): BelongsTo
     {
         return $this->belongsTo(Plane::class);
     }
 
+    /**
+     * @return BelongsTo<FlightRoute, $this>
+     */
     public function route(): BelongsTo
     {
         return $this->belongsTo(FlightRoute::class, 'flight_route_id');
     }
 
+    /**
+     * @return HasMany<FlightLeg, $this>
+     */
     public function legs(): HasMany
     {
         return $this->hasMany(FlightLeg::class)->orderBy('sequence');

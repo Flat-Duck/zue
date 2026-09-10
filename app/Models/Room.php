@@ -19,11 +19,17 @@ class Room extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return BelongsTo<Residence, $this>
+     */
     public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
     }
 
+    /**
+     * @return BelongsToMany<Employee, $this>
+     */
     public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class)->withPivot(['is_owner', 'is_here']);

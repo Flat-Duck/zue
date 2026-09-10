@@ -25,11 +25,17 @@ class ScopePolicyActor extends Model
         'can_revise' => 'bool',
     ];
 
+    /**
+     * @return BelongsTo<ScopePolicy, $this>
+     */
     public function policy(): BelongsTo
     {
         return $this->belongsTo(ScopePolicy::class, 'policy_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function actorEmployee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'actor_employee_id');

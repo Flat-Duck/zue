@@ -16,6 +16,9 @@ class Plane extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return HasMany<Flight, $this>
+     */
     public function flights(): HasMany
     {
         return $this->hasMany(Flight::class);

@@ -26,16 +26,25 @@ class FlightRouteLeg extends Model
         'sequence' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<FlightRoute, $this>
+     */
     public function route(): BelongsTo
     {
         return $this->belongsTo(FlightRoute::class, 'flight_route_id');
     }
 
+    /**
+     * @return BelongsTo<FlightStation, $this>
+     */
     public function fromStation(): BelongsTo
     {
         return $this->belongsTo(FlightStation::class, 'from_station_id');
     }
 
+    /**
+     * @return BelongsTo<FlightStation, $this>
+     */
     public function toStation(): BelongsTo
     {
         return $this->belongsTo(FlightStation::class, 'to_station_id');

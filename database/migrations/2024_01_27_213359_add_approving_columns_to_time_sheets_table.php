@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreign('supervisor_id')->references('id')->on('employees');
             $table->foreign('superintendent_id')->references('id')->on('employees');
             $table->foreign('admin_id')->references('id')->on('employees');
-            
+
         });
     }
 

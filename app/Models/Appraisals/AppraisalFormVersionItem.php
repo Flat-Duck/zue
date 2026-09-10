@@ -15,7 +15,7 @@ class AppraisalFormVersionItem extends Model
         'max_score_override',
         'sort_order',
         'is_required',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -23,11 +23,17 @@ class AppraisalFormVersionItem extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<AppraisalFormVersion, $this>
+     */
     public function version(): BelongsTo
     {
         return $this->belongsTo(AppraisalFormVersion::class, 'appraisal_form_version_id');
     }
 
+    /**
+     * @return BelongsTo<AppraisalItem, $this>
+     */
     public function item(): BelongsTo
     {
         return $this->belongsTo(AppraisalItem::class, 'item_id');

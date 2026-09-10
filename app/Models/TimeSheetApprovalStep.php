@@ -29,16 +29,25 @@ class TimeSheetApprovalStep extends Model
         'meta' => 'array',
     ];
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 
+    /**
+     * @return BelongsTo<ApprovalFlow, $this>
+     */
     public function flow(): BelongsTo
     {
         return $this->belongsTo(ApprovalFlow::class, 'flow_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function approverEmployee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'approved_by_employee_id');

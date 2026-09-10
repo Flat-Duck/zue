@@ -48,6 +48,7 @@ class SqlDumpSeeder extends Seeder
                     $trimmed = preg_replace('/^\x{FEFF}/u', '', $trimmed) ?? $trimmed;
 
                     $insertHead = rtrim($trimmed);
+
                     continue;
                 }
 
@@ -69,16 +70,18 @@ class SqlDumpSeeder extends Seeder
                 }
 
                 if ($sqlBuffer === null) {
-                    $sqlBuffer = $insertHead . "\n  " . $row;
+                    $sqlBuffer = $insertHead."\n  ".$row;
                     $bufferRows = 1;
+
                     continue;
                 }
 
-                $candidate = $sqlBuffer . ",\n  " . $row;
+                $candidate = $sqlBuffer.",\n  ".$row;
                 if (strlen($candidate) > $this->maxStatementBytes) {
-                    DB::unprepared($sqlBuffer . "\n;");
-                    $sqlBuffer = $insertHead . "\n  " . $row;
+                    DB::unprepared($sqlBuffer."\n;");
+                    $sqlBuffer = $insertHead."\n  ".$row;
                     $bufferRows = 1;
+
                     continue;
                 }
 
@@ -91,7 +94,7 @@ class SqlDumpSeeder extends Seeder
             }
 
             if ($sqlBuffer !== null && $bufferRows > 0) {
-                DB::unprepared($sqlBuffer . "\n;");
+                DB::unprepared($sqlBuffer."\n;");
             }
         } finally {
             fclose($handle);
@@ -102,8 +105,9 @@ class SqlDumpSeeder extends Seeder
     {
         $dir = database_path('seeders/sql_dump');
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             $this->command?->error("SQL folder not found: {$dir}");
+
             return;
         }
 
@@ -129,9 +133,10 @@ class SqlDumpSeeder extends Seeder
                 ->values()
                 ->all();
 
-            if (!empty($allSql)) {
-                $this->command?->warn('Available .sql files (not matching chunk pattern): ' . implode(', ', $allSql));
+            if (! empty($allSql)) {
+                $this->command?->warn('Available .sql files (not matching chunk pattern): '.implode(', ', $allSql));
             }
+
             return;
         }
 
@@ -158,7 +163,7 @@ class SqlDumpSeeder extends Seeder
                 } catch (\Throwable $ignored) {
                 }
 
-                $this->command?->error("Failed on {$name}: " . $e->getMessage());
+                $this->command?->error("Failed on {$name}: ".$e->getMessage());
                 throw $e;
             } finally {
                 try {
@@ -175,6 +180,6 @@ class SqlDumpSeeder extends Seeder
             }
         }
 
-        $this->command?->info("SQL dump import completed.");
+        $this->command?->info('SQL dump import completed.');
     }
 }

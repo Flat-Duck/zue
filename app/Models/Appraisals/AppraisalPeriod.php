@@ -12,7 +12,7 @@ class AppraisalPeriod extends Model
         'quarter',
         'window_open_from',
         'window_open_to',
-        'status'
+        'status',
     ];
 
     protected $casts = [
@@ -22,8 +22,10 @@ class AppraisalPeriod extends Model
 
     public function getLabelAttribute(): string
     {
-        if ($this->type === 'yearly')
+        if ($this->type === 'yearly') {
             return "Yearly {$this->year}";
+        }
+
         return "Q{$this->quarter} {$this->year}";
     }
 

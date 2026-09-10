@@ -38,16 +38,25 @@ class TimeSheet extends Model
         'revised_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function revisedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function time_keeper(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'timekeeper_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function super_intendent(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'superintendent_id');
@@ -58,17 +67,25 @@ class TimeSheet extends Model
      *
      * Carried over from the legacy system's `revised_by`, which held an
      * employee number.
+     *
+     * @return BelongsTo<Employee, $this>
      */
     public function revised_by(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'admin_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function super_visor(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'supervisor_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);

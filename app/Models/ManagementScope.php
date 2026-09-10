@@ -48,6 +48,9 @@ class ManagementScope extends Model
 
     public const TYPE_EMPLOYEE = 'employee';   // specific employee
 
+    /**
+     * @return BelongsToMany<Employee, $this>
+     */
     public function managers(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class, 'management_scope_manager', 'management_scope_id', 'manager_id');
@@ -59,21 +62,33 @@ class ManagementScope extends Model
         return $this->belongsTo(Employee::class, 'manager_id');
     }
 
+    /**
+     * @return BelongsTo<Employee, $this>
+     */
     public function subordinate(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'subordinate_employee_id');
     }
 
+    /**
+     * @return BelongsTo<Location, $this>
+     */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id');
     }
 
+    /**
+     * @return BelongsTo<Department, $this>
+     */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
 
+    /**
+     * @return BelongsTo<Center, $this>
+     */
     public function center(): BelongsTo
     {
         return $this->belongsTo(Center::class, 'center_id');

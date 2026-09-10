@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Method App\\Console\\Commands\\DatabaseBackupCommand\:\:handle\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Console/Commands/DatabaseBackupCommand.php
+
+		-
 			message: '#^Parameter \#4 \$logId of method App\\Services\\BackupService\:\:performBackup\(\) expects int\|null, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -11,6 +17,114 @@ parameters:
 			identifier: match.alwaysTrue
 			count: 1
 			path: app/Console/Commands/ImportManagementScopesToV2.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Console/Commands/ImportManagementScopesToV2.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Console/Commands/ImportManagementScopesToV2.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeBalanceExport\:\:__construct\(\) has parameter \$employees with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Exports/EmployeeBalanceExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeBalanceExport\:\:sheets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Exports/EmployeeBalanceExport.php
+
+		-
+			message: '#^Property App\\Exports\\EmployeeBalanceExport\:\:\$employees has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Exports/EmployeeBalanceExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:__construct\(\) has parameter \$employees with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:__construct\(\) has parameter \$sheetName with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:collection\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:headings\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:registerEvents\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Exports\\EmployeeSheetExport\:\:styles\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Property App\\Exports\\EmployeeSheetExport\:\:\$employees has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Property App\\Exports\\EmployeeSheetExport\:\:\$sheetName has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Exports/EmployeeSheetExport.php
+
+		-
+			message: '#^Method App\\Helpers\\MomentsJs\:\:getDaysInMonth\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/MomentsJs.php
+
+		-
+			message: '#^Method App\\Helpers\\MomentsJs\:\:getDaysInMonth\(\) has parameter \$month with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/MomentsJs.php
+
+		-
+			message: '#^Method App\\Helpers\\MomentsJs\:\:getDaysInMonth\(\) has parameter \$year with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/MomentsJs.php
+
+		-
+			message: '#^Method App\\Helpers\\MomentsJs\:\:getMonthsInYear\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/MomentsJs.php
+
+		-
+			message: '#^Property App\\Helpers\\MomentsJs\:\:\$months has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Helpers/MomentsJs.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$count\.$#'
@@ -25,38 +139,128 @@ parameters:
 			path: app/Helpers/TimeSheetBuilder.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$formVersionItem\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:approvrTimeSheets\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:approvrTimeSheets\(\) has parameter \$approved_by with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:approvrTimeSheets\(\) has parameter \$employee_id with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:build\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:calculateBulckBalanceToDate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:calculateBulckBalanceToDate\(\) has parameter \$employeeIds with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:calculateBulckBalanceToDate\(\) has parameter \$empls with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:create\(\) has parameter \$day with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:destroy\(\) has parameter \$day with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:unApprovedTimeSheetLevel\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:unApprovedTimeSheetLevel\(\) has parameter \$employee_id with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Helpers\\TimeSheetBuilder\:\:unApprovedTimeSheets\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Helpers/TimeSheetBuilder.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalFormVersionController\:\:store\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalFormVersionController.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalFormVersionItemsController.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalFormVersionItemsController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalOfficialController\:\:manageableEmployeeQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$versionItems\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalOfficialController\:\:show\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalReviewController\:\:reviewableEmployeesQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$window_open_from\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$window_open_to\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpen\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
-
-		-
-			message: '#^Parameter \#1 \$employee of method App\\Services\\Appraisals\\AppraisalAttendanceService\:\:getAttendanceStats\(\) expects App\\Models\\Employee, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
-			identifier: argument.type
+			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalReviewController\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
 
@@ -67,16 +271,130 @@ parameters:
 			path: app/Http/Controllers/EmployeeController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
+			message: '#^Access to an undefined property App\\Models\\Room\:\:\$pivot\.$#'
 			identifier: property.notFound
-			count: 1
+			count: 4
 			path: app/Http/Controllers/FlightController.php
 
 		-
-			message: '#^Call to an undefined static method App\\Models\\Employee\:\:onlyArchived\(\)\.$#'
-			identifier: staticMethod.notFound
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:delete\(\) has parameter \$filename with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
-			path: app/Http/Controllers/OperationsController.php
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:download\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:download\(\) has parameter \$filename with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:export\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:index\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\MaintenanceController\:\:restore\(\) has parameter \$filename with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/MaintenanceController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\ReportController\:\:balances\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\ReportController\:\:timesheets\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\ReportController\:\:to_date\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/ReportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\UserController\:\:downloadTemplate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\FlightRouteRequest\:\:withValidator\(\) has parameter \$validator with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Requests/FlightRouteRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\ManagementScopeStoreRequest\:\:withValidator\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Requests/ManagementScopeStoreRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\ManagementScopeStoreRequest\:\:withValidator\(\) has parameter \$validator with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Requests/ManagementScopeStoreRequest.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\OccupationalInjuryReportStoreRequest\:\:booleanFields\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/OccupationalInjuryReportStoreRequest.php
+
+		-
+			message: '#^Method App\\Imports\\ArchivedEmployeesImport\:\:collection\(\) has parameter \$rows with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Imports/ArchivedEmployeesImport.php
+
+		-
+			message: '#^Method App\\Imports\\EmployeeProfilesImport\:\:collection\(\) has parameter \$rows with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Imports/EmployeeProfilesImport.php
+
+		-
+			message: '#^Method App\\Imports\\EmployeeProfilesImport\:\:raw\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Imports/EmployeeProfilesImport.php
+
+		-
+			message: '#^Method App\\Imports\\RoomsImport\:\:collection\(\) has parameter \$rows with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Imports/RoomsImport.php
+
+		-
+			message: '#^Method App\\Imports\\UsersImport\:\:model\(\) has parameter \$row with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Imports/UsersImport.php
+
+		-
+			message: '#^Method App\\Imports\\UsersImport\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Imports/UsersImport.php
 
 		-
 			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Model\|null is not subtype of native type App\\Models\\User\.$#'
@@ -85,40 +403,268 @@ parameters:
 			path: app/Imports/UsersImport.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
+			message: '#^Method App\\Jobs\\CalculateBalance\:\:__construct\(\) has parameter \$employee with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/CalculateBalance.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Room\:\:\$pivot\.$#'
 			identifier: property.notFound
+			count: 4
+			path: app/Jobs/ClearRoomVacant.php
+
+		-
+			message: '#^Method App\\Jobs\\ClearRoomVacant\:\:__construct\(\) has parameter \$flight with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
 			path: app/Jobs/ClearRoomVacant.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$ownRoom\.$#'
+			message: '#^Access to an undefined property App\\Models\\Room\:\:\$pivot\.$#'
 			identifier: property.notFound
+			count: 3
+			path: app/Jobs/FillRoomVacant.php
+
+		-
+			message: '#^Method App\\Jobs\\FillRoomVacant\:\:__construct\(\) has parameter \$flight with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
 			path: app/Jobs/FillRoomVacant.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$logId with no type specified\.$#'
+			identifier: missingType.parameter
 			count: 1
-			path: app/Jobs/FillRoomVacant.php
+			path: app/Jobs/PerformBackupJob.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$selectedTables with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/PerformBackupJob.php
+
+		-
+			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$type with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Jobs/PerformBackupJob.php
+
+		-
+			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$logId has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Jobs/PerformBackupJob.php
+
+		-
+			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$selectedTables has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Jobs/PerformBackupJob.php
+
+		-
+			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$type has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Jobs/PerformBackupJob.php
+
+		-
+			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$listeners has no type specified\.$#'
+			identifier: missingType.property
 			count: 1
 			path: app/Livewire/ClinicEmployeeInfo.php
 
 		-
-			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$aponitment \(App\\Models\\ClinicApointment\|null\) does not accept Illuminate\\Database\\Eloquent\\Model\.$#'
-			identifier: assign.propertyType
-			count: 2
+			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$queryString has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
 			path: app/Livewire/ClinicEmployeeInfo.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:employees\(\)\.$#'
-			identifier: method.notFound
+			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$times type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/ClinicEmployeeInfo.php
+
+		-
+			message: '#^Method App\\Livewire\\DashboardChart\:\:getChartData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/DashboardChart.php
+
+		-
+			message: '#^Property App\\Livewire\\DashboardChart\:\:\$availableYears has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/DashboardChart.php
+
+		-
+			message: '#^Property App\\Livewire\\DashboardChart\:\:\$selectedYear has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/DashboardChart.php
+
+		-
+			message: '#^Method App\\Livewire\\FlightEmployeesDetail\:\:detach\(\) has parameter \$employee with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$employee_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$employeesForSelect has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$modalTitle has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$rules has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightEmployeesDetail\:\:\$showingModal has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightEmployeesDetail.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Livewire/FlightManifest.php
+
+		-
+			message: '#^Instanceof between App\\Models\\FlightLeg and App\\Models\\FlightLeg will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: app/Livewire/FlightManifest.php
+
+		-
+			message: '#^Method App\\Livewire\\FlightPassengersDetail\:\:detach\(\) has parameter \$passenger with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightPassengersDetail\:\:\$modalTitle has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightPassengersDetail\:\:\$passenger_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightPassengersDetail\:\:\$passengersForSelect has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightPassengersDetail\:\:\$rules has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\FlightPassengersDetail\:\:\$showingModal has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/FlightPassengersDetail.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeSheetApprove\:\:\$employee_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeSheetApprove.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeSheetApprove\:\:\$level has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeSheetApprove.php
+
+		-
+			message: '#^Method App\\Livewire\\TimeTable\:\:render\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$dep_employees has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$ov has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$range has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$times has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$val has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$year has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Property App\\Livewire\\TimeTable\:\:\$years has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/TimeTable.php
+
+		-
+			message: '#^Method App\\Livewire\\UserSignature\:\:render\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Livewire/UserSignature.php
+
+		-
+			message: '#^Property App\\Livewire\\UserSignature\:\:\$signatureFile has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Livewire/UserSignature.php
 
 		-
 			message: '#^Strict comparison using \=\=\= between string and false will always evaluate to false\.$#'
@@ -127,16 +673,64 @@ parameters:
 			path: app/Livewire/UserSignature.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_label\.$#'
-			identifier: property.notFound
+			message: '#^Class App\\Models\\Administration uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
 			count: 1
-			path: app/Models/Appraisals/AppraisalFormVersionItem.php
+			path: app/Models/Administration.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$default_section\.$#'
-			identifier: property.notFound
+			message: '#^Property App\\Models\\Administration\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
 			count: 1
-			path: app/Models/Appraisals/AppraisalFormVersionItem.php
+			path: app/Models/Administration.php
+
+		-
+			message: '#^Class App\\Models\\ApprovalFlow uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ApprovalFlow.php
+
+		-
+			message: '#^Class App\\Models\\ApprovalFlowStep uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ApprovalFlowStep.php
+
+		-
+			message: '#^Class App\\Models\\ClinicalExam uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/CLinicalExam.php
+
+		-
+			message: '#^Class App\\Models\\Center uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Center.php
+
+		-
+			message: '#^Property App\\Models\\Center\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Center.php
+
+		-
+			message: '#^Class App\\Models\\ClinicApointment uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ClinicApointment.php
+
+		-
+			message: '#^Class App\\Models\\Department uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Department.php
+
+		-
+			message: '#^Property App\\Models\\Department\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Department.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\ClinicApointment\:\:\$month\.$#'
@@ -148,18 +742,6 @@ parameters:
 			message: '#^Access to an undefined property App\\Models\\ClinicApointment\:\:\$year\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 3
 			path: app/Models/Employee.php
 
 		-
@@ -175,14 +757,104 @@ parameters:
 			path: app/Models/Employee.php
 
 		-
+			message: '#^Class App\\Models\\Employee uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Employee.php
+
+		-
 			message: '#^Method App\\Models\\Employee\:\:apointments\(\) should return Illuminate\\Support\\Collection\<string, Illuminate\\Support\\Collection\<int, App\\Models\\ClinicApointment\>\> but returns Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\ClinicApointment\>\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Models/Employee.php
 
 		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: App\\Models\\ClinicApointment, Closure\(App\\Models\\ClinicApointment\)\: App\\Models\\ClinicApointment given\.$#'
-			identifier: argument.type
+			message: '#^Method App\\Models\\Employee\:\:getAdministrationNameAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getBalanceAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getCenterNameAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getDefaultOverTimeValueAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getDepartmentNameAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getLastDateAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getLastDateAttribute\(\) has parameter \$date with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getLocationNameAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getOwnRoomAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getStartDateAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getStartDateAttribute\(\) has parameter \$date with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getTotalOffDaysAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:getTotalWorkingDaysAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:managedEmployees\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Method App\\Models\\Employee\:\:sick_leaves\(\) has no return type specified\.$#'
+			identifier: missingType.return
 			count: 1
 			path: app/Models/Employee.php
 
@@ -191,6 +863,216 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Models/Employee.php
+
+		-
+			message: '#^Property App\\Models\\Employee\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Class App\\Models\\EmployeeDetail uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EmployeeDetail.php
+
+		-
+			message: '#^Class App\\Models\\Flight uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Flight.php
+
+		-
+			message: '#^Method App\\Models\\Flight\:\:comingLegs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Flight.php
+
+		-
+			message: '#^Method App\\Models\\Flight\:\:leavingLegs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Flight.php
+
+		-
+			message: '#^Property App\\Models\\Flight\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Flight.php
+
+		-
+			message: '#^Class App\\Models\\FlightBooking uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightBooking.php
+
+		-
+			message: '#^Method App\\Models\\FlightBooking\:\:bookable\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\MorphTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightBooking.php
+
+		-
+			message: '#^Class App\\Models\\FlightLeg uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightLeg.php
+
+		-
+			message: '#^Class App\\Models\\FlightRoute uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightRoute.php
+
+		-
+			message: '#^Property App\\Models\\FlightRoute\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/FlightRoute.php
+
+		-
+			message: '#^Class App\\Models\\FlightRouteLeg uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightRouteLeg.php
+
+		-
+			message: '#^Class App\\Models\\FlightStation uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FlightStation.php
+
+		-
+			message: '#^Property App\\Models\\FlightStation\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/FlightStation.php
+
+		-
+			message: '#^Class App\\Models\\Location uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Property App\\Models\\Location\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Location.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:get\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:get\(\) has parameter \$default with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:get\(\) has parameter \$key with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:set\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:set\(\) has parameter \$key with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\MaintenanceSetting\:\:set\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Models/MaintenanceSetting.php
+
+		-
+			message: '#^Method App\\Models\\ManagementScope\:\:manager\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ManagementScope.php
+
+		-
+			message: '#^Class App\\Models\\OccupationalInjuryReport uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/OccupationalInjuryReport.php
+
+		-
+			message: '#^Class App\\Models\\Passenger uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Passenger.php
+
+		-
+			message: '#^Property App\\Models\\Passenger\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Passenger.php
+
+		-
+			message: '#^Class App\\Models\\Plane uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Plane.php
+
+		-
+			message: '#^Property App\\Models\\Plane\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Plane.php
+
+		-
+			message: '#^Class App\\Models\\Residence uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Residence.php
+
+		-
+			message: '#^Property App\\Models\\Residence\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Residence.php
+
+		-
+			message: '#^Class App\\Models\\Room uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Room.php
+
+		-
+			message: '#^Method App\\Models\\Room\:\:getAvailableAttribute\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Room.php
+
+		-
+			message: '#^Property App\\Models\\Room\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Room.php
+
+		-
+			message: '#^Class App\\Models\\ScopePolicy uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ScopePolicy.php
+
+		-
+			message: '#^Class App\\Models\\ScopePolicyActor uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ScopePolicyActor.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getDeletedAtColumn\(\)\.$#'
@@ -205,10 +1087,94 @@ parameters:
 			path: app/Models/Scopes/ArchivedEmployees.php
 
 		-
+			message: '#^Class App\\Models\\Scopes\\ArchivedEmployees implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:addOnlyArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:addRestore\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:addWithArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:addWithoutArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:extend\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:getDeletedAtColumn\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:scopeWithArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:scopeWithArchived\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:scopeWithoutArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\ArchivedEmployees\:\:scopeWithoutArchived\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
 			message: '#^Parameter \#1 \$scope of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:withoutGlobalScope\(\) expects Illuminate\\Database\\Eloquent\\Scope\|string, Illuminate\\Database\\Eloquent\\Builder given\.$#'
 			identifier: argument.type
 			count: 3
 			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\ArchivedEmployees\:\:\$extensions type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Scopes/ArchivedEmployees.php
+
+		-
+			message: '#^Class App\\Models\\Scopes\\DepartmentEmployees implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/DepartmentEmployees.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\DepartmentEmployees\:\:\$center_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Scopes/DepartmentEmployees.php
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getArchivedAtColumn\(\)\.$#'
@@ -229,10 +1195,76 @@ parameters:
 			path: app/Models/Scopes/SoftArchivingScope.php
 
 		-
+			message: '#^Class App\\Models\\Scopes\\SoftArchivingScope implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addCreateOrUnpreserve\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addOnlyArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addUnpreserve\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addUnpreserveOrCreate\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addWithArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:addWithoutArchived\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:extend\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\SoftArchivingScope\:\:getArchivedAtColumn\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
 			message: '#^Parameter \#1 \$scope of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:withoutGlobalScope\(\) expects Illuminate\\Database\\Eloquent\\Scope\|string, Illuminate\\Database\\Eloquent\\Builder given\.$#'
 			identifier: argument.type
 			count: 3
 			path: app/Models/Scopes/SoftArchivingScope.php
+
+		-
+			message: '#^Class App\\Models\\Scopes\\UnderSupervisionEmployees implements generic interface Illuminate\\Database\\Eloquent\\Scope but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$center_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
 
 		-
 			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$center_id is never read, only written\.$#'
@@ -241,10 +1273,112 @@ parameters:
 			path: app/Models/Scopes/UnderSupervisionEmployees.php
 
 		-
+			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$department_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$location_id has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
+
+		-
+			message: '#^Property App\\Models\\Scopes\\UnderSupervisionEmployees\:\:\$management_case has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Scopes/UnderSupervisionEmployees.php
+
+		-
+			message: '#^Class App\\Models\\Signature uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Signature.php
+
+		-
+			message: '#^Class App\\Models\\Stock uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Stock.php
+
+		-
+			message: '#^Property App\\Models\\Stock\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/Stock.php
+
+		-
+			message: '#^Class App\\Models\\TimeSheet uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TimeSheet.php
+
+		-
+			message: '#^Property App\\Models\\TimeSheet\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/TimeSheet.php
+
+		-
+			message: '#^Class App\\Models\\TimeSheetApprovalStep uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/TimeSheetApprovalStep.php
+
+		-
+			message: '#^Class App\\Models\\User uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:managedEmployees\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:managedEmployeesQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:managedUsers\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$searchableFields has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Models/User.php
+
+		-
 			message: '#^Access to an undefined property App\\Models\\Appraisals\\AppraisalOfficialScore\:\:\$final_avg\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/Appraisals/AppraisalAggregationService.php
+
+		-
+			message: '#^Method App\\Services\\Appraisals\\AppraisalAggregationService\:\:aggregateForEmployee\(\) has parameter \$quarterlyIds with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Services/Appraisals/AppraisalAggregationService.php
+
+		-
+			message: '#^Method App\\Services\\Appraisals\\AppraisalAggregationService\:\:aggregateForEmployee\(\) has parameter \$quarterlyPeriods with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Services/Appraisals/AppraisalAggregationService.php
+
+		-
+			message: '#^Method App\\Services\\Appraisals\\AppraisalAttendanceService\:\:getAttendanceStats\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Appraisals/AppraisalAttendanceService.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Appraisals\\AppraisalReviewScore\:\:\$avg_score\.$#'
@@ -253,40 +1387,28 @@ parameters:
 			path: app/Services/Appraisals/AppraisalFinalizeService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$formVersionItem\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\Appraisals\\AppraisalScoreService\:\:updateScores\(\) has parameter \$scores with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Services/Appraisals/AppraisalScoreService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$form_version_item_id\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\BackupService\:\:performBackupWithLock\(\) has parameter \$selectedTables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
-			path: app/Services/Appraisals/AppraisalScoreService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$score\.$#'
-			identifier: property.notFound
-			count: 4
-			path: app/Services/Appraisals/AppraisalScoreService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$text_value\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/Appraisals/AppraisalScoreService.php
-
-		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isOpen\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/Services/Appraisals/AppraisalScoreService.php
+			path: app/Services/BackupService.php
 
 		-
 			message: '#^Parameter \#1 \$array \(non\-empty\-list\<string\>\) of array_values is already a list, call has no effect\.$#'
 			identifier: arrayValues.list
 			count: 1
 			path: app/Services/BackupService.php
+
+		-
+			message: '#^Method App\\Services\\Employees\\ManagedEmployeeQuery\:\:forEmployee\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/Employees/ManagedEmployeeQuery.php
 
 		-
 			message: '#^Call to an undefined method Imagick\:\:setImageColorFuzz\(\)\.$#'
@@ -325,16 +1447,52 @@ parameters:
 			path: app/Services/ImageProcessingService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
-			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
+			path: app/Services/ManagementScopeService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
+			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$managerIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$scopeType with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Method App\\Services\\ManagementScopeService\:\:createScopes\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Method App\\Services\\ManagementScopeService\:\:updateScope\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Services/ManagementScopeService.php
+
+		-
+			message: '#^Property App\\Services\\SignatureService\:\:\$imageProcessingService has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: app/Services/SignatureService.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -343,50 +1501,56 @@ parameters:
 			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_employee_id\.$#'
-			identifier: property.notFound
-			count: 2
+			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:matchedEmployeeIdsForPolicy\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
 			path: app/Services/TimeSheetAuth/ScopeResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_approve\.$#'
-			identifier: property.notFound
-			count: 2
+			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:resolveVisibleEmployeeIds\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
 			path: app/Services/TimeSheetAuth/ScopeResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_fill\.$#'
-			identifier: property.notFound
-			count: 2
+			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:selectablePolicies\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
 			path: app/Services/TimeSheetAuth/ScopeResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$can_revise\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/TimeSheetAuth/ScopeResolver.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\TimeSheetAuth\\WorkflowResolver\:\:ensureMonthlyStepsForEmployees\(\) has parameter \$employeeIds with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Services/TimeSheetAuth/WorkflowResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$step_key\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\TimeSheetAuth\\WorkflowResolver\:\:resolveFlowForEmployee\(\) has parameter \$preloadedFlows with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Services/TimeSheetAuth/WorkflowResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$step_order\.$#'
-			identifier: property.notFound
-			count: 2
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 7
 			path: app/Services/TimeSheetAuth/WorkflowResolver.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 7
+			path: app/Services/TimeSheetAuth/WorkflowResolver.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetAuthorizationService\:\:managedEmployeeIds\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/TimeSheetAuthorizationService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetAuthorizationService\:\:managedEmployeeIdsForScope\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Services/TimeSheetAuthorizationService.php
 
@@ -397,15 +1561,51 @@ parameters:
 			path: app/Services/TimeSheetAuthorizationService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
-			identifier: property.notFound
+			message: '#^Method App\\Services\\TimeSheetMutationService\:\:approveLegacy\(\) has parameter \$managedEmployeeIds with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TimeSheetMutationService.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Services/TimeSheetMutationService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetService\:\:collectStageSignatures\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: app/Services/TimeSheetService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 3
+			message: '#^Method App\\Services\\TimeSheetService\:\:getApprovalData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetService\:\:getManagedApprovalBuckets\(\) has parameter \$managedEmployeeIds with generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetService\:\:getManagedApprovalBuckets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetService\:\:resolveApprovalAvailability\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Method App\\Services\\TimeSheetService\:\:stageIsWaiting\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
 			path: app/Services/TimeSheetService.php
 
 		-
@@ -413,6 +1613,12 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 3
 			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Class Database\\Factories\\AdministrationFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/AdministrationFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\AdministrationFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -421,10 +1627,22 @@ parameters:
 			path: database/factories/AdministrationFactory.php
 
 		-
+			message: '#^Class Database\\Factories\\CenterFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/CenterFactory.php
+
+		-
 			message: '#^PHPDoc type string of property Database\\Factories\\CenterFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: database/factories/CenterFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\ClinicApointmentFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/ClinicApointmentFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\ClinicApointmentFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -433,10 +1651,22 @@ parameters:
 			path: database/factories/ClinicApointmentFactory.php
 
 		-
+			message: '#^Class Database\\Factories\\DepartmentFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/DepartmentFactory.php
+
+		-
 			message: '#^PHPDoc type string of property Database\\Factories\\DepartmentFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: database/factories/DepartmentFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\FlightFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/FlightFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\FlightFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -445,10 +1675,34 @@ parameters:
 			path: database/factories/FlightFactory.php
 
 		-
+			message: '#^Class Database\\Factories\\FlightRouteFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/FlightRouteFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\FlightStationFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/FlightStationFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\LocationFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/LocationFactory.php
+
+		-
 			message: '#^PHPDoc type string of property Database\\Factories\\LocationFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: database/factories/LocationFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\PassengerFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/PassengerFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\PassengerFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -457,10 +1711,28 @@ parameters:
 			path: database/factories/PassengerFactory.php
 
 		-
+			message: '#^Class Database\\Factories\\PlaneFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/PlaneFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\ResidenceFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/ResidenceFactory.php
+
+		-
 			message: '#^PHPDoc type string of property Database\\Factories\\ResidenceFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: database/factories/ResidenceFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\RoomFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/RoomFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\RoomFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -469,10 +1741,22 @@ parameters:
 			path: database/factories/RoomFactory.php
 
 		-
+			message: '#^Class Database\\Factories\\StockFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/StockFactory.php
+
+		-
 			message: '#^PHPDoc type string of property Database\\Factories\\StockFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: database/factories/StockFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\TimeSheetFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/TimeSheetFactory.php
 
 		-
 			message: '#^PHPDoc type string of property Database\\Factories\\TimeSheetFactory\:\:\$model is not covariant with PHPDoc type class\-string\<Illuminate\\Database\\Eloquent\\Model\> of overridden property Illuminate\\Database\\Eloquent\\Factories\\Factory\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$model\.$#'
@@ -483,6 +1767,18 @@ parameters:
 		-
 			message: '#^Access to an undefined property Faker\\Generator\:\:\$unique\.$#'
 			identifier: property.notFound
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Class Database\\Factories\\UserFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Method Database\\Factories\\UserFactory\:\:unverified\(\) return type with generic class Illuminate\\Database\\Eloquent\\Factories\\Factory does not specify its types\: TModel$#'
+			identifier: missingType.generics
 			count: 1
 			path: database/factories/UserFactory.php
 

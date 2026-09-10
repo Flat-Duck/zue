@@ -34,6 +34,9 @@ class FlightBooking extends Model
         'sequence' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<FlightLeg, $this>
+     */
     public function leg(): BelongsTo
     {
         return $this->belongsTo(FlightLeg::class, 'flight_leg_id');
@@ -47,6 +50,9 @@ class FlightBooking extends Model
         return $this->morphTo();
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function bookedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'booked_by_user_id');

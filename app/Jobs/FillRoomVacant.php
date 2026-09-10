@@ -14,6 +14,7 @@ class FillRoomVacant implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected Flight $flight;
+
     /**
      * Create a new job instance.
      */
@@ -27,15 +28,11 @@ class FillRoomVacant implements ShouldQueue
      */
     public function handle(): void
     {
-        $employees  = $this->flight->employees;
-        foreach ($employees as $employee)
-        {
-            if($employee->ownRoom)
-            {
-                foreach($employee->rooms as $room)
-                {
-                    if($room->pivot->is_owner)
-                    {
+        $employees = $this->flight->employees;
+        foreach ($employees as $employee) {
+            if ($employee->ownRoom) {
+                foreach ($employee->rooms as $room) {
+                    if ($room->pivot->is_owner) {
                         $room->pivot->is_here = true;
                         $room->pivot->save();
                     }

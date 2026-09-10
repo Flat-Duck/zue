@@ -16,6 +16,9 @@ class Residence extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return HasMany<Room, $this>
+     */
     public function rooms(): HasMany
     {
         return $this->hasMany(Room::class);

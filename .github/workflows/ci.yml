@@ -1,0 +1,213 @@
+name: CI
+
+# The gates that were only ever habit: formatting, static analysis, the test suite
+# and the browser tests. A red one here blocks a merge without anyone having to
+# remember to look.
+#
+# This replaces the Laravel skeleton's own workflows. They tested PHP 8.1 and 8.2
+# against a `^8.3` requirement, installed SQLite extensions for an application that
+# needs MySQL, never ran a migration, and had never once executed.
+
+on:
+  push:
+    branches: [master, claude-improvements]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-analysis:
+    name: Formatting and static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Check formatting
+        run: vendor/bin/pint --test
+
+      - name: Analyse
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+  tests:
+    name: Tests on PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: zue_testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, bcmath, gd
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      # `.env.testing` is not committed: it holds a local database password. CI
+      # writes its own, pointed at the service container above.
+      - name: Write the testing environment
+        run: |
+          cat > .env.testing <<'ENV'
+          APP_NAME=zue
+          APP_ENV=testing
+          APP_DEBUG=true
+          APP_URL=http://localhost
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_DATABASE=zue_testing
+          DB_USERNAME=root
+          DB_PASSWORD=
+          CACHE_DRIVER=array
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          MAIL_MAILER=array
+          BCRYPT_ROUNDS=4
+          ENV
+          cp .env.testing .env
+          php artisan key:generate --env=testing
+          php artisan key:generate
+
+      - name: Migrate
+        run: php artisan migrate --env=testing --force
+
+      # Rolling the whole schema back and forward again. Three `down()` methods were
+      # broken before this, and nothing would have noticed until a release needed
+      # backing out.
+      - name: Rehearse the rollback
+        run: |
+          php artisan migrate:reset --env=testing --force
+          php artisan migrate --env=testing --force
+
+      - name: Run the suite
+        run: php artisan test
+
+  browser:
+    name: Browser tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: zue_dusk
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, bcmath, gd
+          coverage: none
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      # The browser tests read the built assets, so the build comes first.
+      - name: Build the front end
+        run: |
+          npm ci
+          npm run build
+
+      - name: Write the Dusk environment
+        run: |
+          cat > .env <<'ENV'
+          APP_NAME=zue
+          APP_ENV=local
+          APP_DEBUG=true
+          APP_URL=http://127.0.0.1:8000
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_DATABASE=zue_dusk
+          DB_USERNAME=root
+          DB_PASSWORD=
+          CACHE_DRIVER=file
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=file
+          MAIL_MAILER=array
+          BCRYPT_ROUNDS=4
+          ENV
+          cp .env .env.dusk.local
+          php artisan key:generate
+
+      - name: Migrate
+        run: php artisan migrate --force
+
+      - name: Install ChromeDriver
+        run: php artisan dusk:chrome-driver --detect
+
+      - name: Serve the application
+        run: php artisan serve --host=127.0.0.1 --port=8000 --no-reload &
+
+      - name: Wait for the server
+        run: |
+          for _ in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1 && exit 0
+            sleep 1
+          done
+          echo "The application never came up." >&2
+          exit 1
+
+      - name: Run the browser tests
+        run: php artisan dusk
+
+      - name: Keep the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-failures
+          path: |
+            tests/Browser/screenshots
+            tests/Browser/console

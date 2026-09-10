@@ -9,6 +9,9 @@ class AppraisalForm extends Model
 {
     protected $fillable = ['code', 'name_ar', 'is_active'];
 
+    /**
+     * @return HasMany<AppraisalFormVersion, $this>
+     */
     public function versions(): HasMany
     {
         return $this->hasMany(AppraisalFormVersion::class);

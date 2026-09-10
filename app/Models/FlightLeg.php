@@ -38,16 +38,25 @@ class FlightLeg extends Model
         'seat_capacity' => 'integer',
     ];
 
+    /**
+     * @return BelongsTo<Flight, $this>
+     */
     public function flight(): BelongsTo
     {
         return $this->belongsTo(Flight::class);
     }
 
+    /**
+     * @return BelongsTo<FlightStation, $this>
+     */
     public function fromStation(): BelongsTo
     {
         return $this->belongsTo(FlightStation::class, 'from_station_id');
     }
 
+    /**
+     * @return BelongsTo<FlightStation, $this>
+     */
     public function toStation(): BelongsTo
     {
         return $this->belongsTo(FlightStation::class, 'to_station_id');

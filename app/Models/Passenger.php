@@ -16,6 +16,9 @@ class Passenger extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return BelongsToMany<Flight, $this>
+     */
     public function flights(): BelongsToMany
     {
         return $this->belongsToMany(Flight::class);

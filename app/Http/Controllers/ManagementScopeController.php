@@ -9,11 +9,13 @@ use App\Models\Employee;
 use App\Models\Location;
 use App\Models\ManagementScope;
 use App\Services\ManagementScopeService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ManagementScopeController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', ManagementScope::class);
 
@@ -59,7 +61,7 @@ class ManagementScopeController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): View
     {
         $this->authorize('create', ManagementScope::class);
 
@@ -93,7 +95,7 @@ class ManagementScopeController extends Controller
         ));
     }
 
-    public function store(ManagementScopeStoreRequest $request, ManagementScopeService $service)
+    public function store(ManagementScopeStoreRequest $request, ManagementScopeService $service): RedirectResponse
     {
         $this->authorize('create', ManagementScope::class);
 
@@ -104,7 +106,7 @@ class ManagementScopeController extends Controller
             ->with('success', 'Management scope(s) created successfully.');
     }
 
-    public function edit(ManagementScope $managementScope)
+    public function edit(ManagementScope $managementScope): View
     {
         $this->authorize('update', $managementScope);
 
@@ -136,7 +138,7 @@ class ManagementScopeController extends Controller
         ));
     }
 
-    public function update(ManagementScopeStoreRequest $request, ManagementScope $managementScope, ManagementScopeService $service)
+    public function update(ManagementScopeStoreRequest $request, ManagementScope $managementScope, ManagementScopeService $service): RedirectResponse
     {
         $this->authorize('update', $managementScope);
 
@@ -147,7 +149,7 @@ class ManagementScopeController extends Controller
             ->with('success', 'Management scope updated successfully.');
     }
 
-    public function destroy(ManagementScope $managementScope, ManagementScopeService $service)
+    public function destroy(ManagementScope $managementScope, ManagementScopeService $service): RedirectResponse
     {
         $this->authorize('delete', $managementScope);
 

@@ -11,9 +11,13 @@ class ScopePolicy extends Model
     use HasFactory;
 
     public const MATCH_GLOBAL = 'global';
+
     public const MATCH_LOCATION = 'location';
+
     public const MATCH_DEPARTMENT = 'department';
+
     public const MATCH_CENTER = 'center';
+
     public const MATCH_EMPLOYEE = 'employee';
 
     protected $fillable = [
@@ -35,6 +39,9 @@ class ScopePolicy extends Model
         'is_active' => 'bool',
     ];
 
+    /**
+     * @return HasMany<ScopePolicyActor, $this>
+     */
     public function actors(): HasMany
     {
         return $this->hasMany(ScopePolicyActor::class, 'policy_id');

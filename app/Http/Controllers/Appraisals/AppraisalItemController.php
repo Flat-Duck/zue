@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Appraisals\AppraisalItemStoreRequest;
 use App\Http\Requests\Appraisals\AppraisalItemUpdateRequest;
 use App\Models\Appraisals\AppraisalItem;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AppraisalItemController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $q = trim((string) $request->get('q', ''));
 
@@ -25,12 +27,12 @@ class AppraisalItemController extends Controller
         return view('app.appraisals.items.index', compact('items', 'q'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('app.appraisals.items.create');
     }
 
-    public function store(AppraisalItemStoreRequest $request)
+    public function store(AppraisalItemStoreRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -39,12 +41,12 @@ class AppraisalItemController extends Controller
         return redirect()->route('appraisals.items.index')->with('success', 'تم إضافة البند.');
     }
 
-    public function edit(AppraisalItem $item)
+    public function edit(AppraisalItem $item): View
     {
         return view('app.appraisals.items.edit', compact('item'));
     }
 
-    public function update(AppraisalItemUpdateRequest $request, AppraisalItem $item)
+    public function update(AppraisalItemUpdateRequest $request, AppraisalItem $item): RedirectResponse
     {
         $data = $request->validated();
 

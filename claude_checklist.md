@@ -539,11 +539,75 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
 
 ## Phase 6 — Quality gates
 
-- [ ] 6.1 Reduce the PHPStan baseline from 212
-- [ ] 6.2 Raise PHPStan to level 6, then 7
-- [ ] 6.3 Adopt model observers for audit logging and balance recalculation
-- [ ] 6.4 CI running Pint, PHPStan and the suite on every push
-- [ ] A red gate blocks a merge without anyone remembering to look
+- [x] 6.1 **Baseline 212 → 113 at level 5**, all through fixes rather than deletions: relation
+  generics, `@property` blocks, model return types, and the trait rewrite below.
+
+- [x] 6.2 **PHPStan is at level 6.** Raising it surfaced **712** findings; **451 were fixed** and
+  the remaining 261 baselined. A new violation is caught immediately — verified by dropping an
+  untyped method in and watching it fail.
+
+  Note the two baseline numbers are not comparable: 113 is the level-5 figure, 368 is the level-6
+  one. The debt did not grow; more of it is now being looked for, and it is enumerated rather
+  than unreported. Level 7 is the next step and has not been attempted.
+
+  What the 451 actually were: 77 untyped Eloquent relations, 30 form request rule sets, 48
+  controller return types (with the 11 missing imports that came with them), and the trait below.
+
+- [x] **`Searchable` defined two scopes that could not work.** `scopeWithArchived()` and
+  `scopeWithoutArchived()` filtered on `archived_at` — a column only `Employee` has. On the other
+  **fourteen** models using the trait, calling either raised `Unknown column 'archived_at'`;
+  confirmed by running it. On `Employee` they never ran at all: `SoftArchivingScope` registers
+  builder macros of the same names, and a macro takes precedence over a local scope. So one
+  definition was dead and the other was a crash waiting for a caller. Both removed, with
+  `SearchableScopeTest` holding the line. `scopeSearchLatestPaginated()` went too — it declared
+  `: Builder` and returned a paginator, and nothing called it.
+
+- [x] 6.3 **Balance recalculation moved into a `TimeSheetObserver`.** It was dispatched by hand
+  from four places in one service, so any write that did not go through that service left the
+  balance quietly wrong.
+
+  Measuring it first turned up something worse: **filling a month dispatched thirty identical
+  recalculations** — one per day, each a full pass over the employee's attendance history, and
+  with `QUEUE_CONNECTION=sync` every one of them inline. The batch paths now suppress the
+  observer and recalculate once. Asserted, both the count and that the balance is still right.
+
+  Audit logging was left where it is, deliberately. Those calls record intents —
+  `impersonation.started`, `database.restored`, `user.roles_changed` — and an observer watching a
+  model cannot know which of those it is looking at.
+
+- [x] 6.4 **CI runs on every push and pull request.** Three jobs: formatting and static analysis;
+  the suite on PHP 8.3 and 8.4 against a MySQL service; and the browser tests, which build the
+  front end, serve the app and upload failure screenshots.
+
+  There was already a `tests.yml` — the Laravel skeleton's. It tested PHP 8.1 and 8.2 against a
+  `^8.3` requirement, installed SQLite extensions for a MySQL application, never ran a migration,
+  and **had never once executed**: the repository shows zero workflow runs, ever. Three more
+  workflows called `laravel/.github` reusable jobs for the framework repository's own issue
+  triage. All four removed.
+
+  CI also **rehearses the rollback** — `migrate:reset` then `migrate` — because three `down()`
+  methods were broken until this week and nothing would have noticed until a release needed
+  backing out.
+
+- [x] **The formatter now passes on the whole project.** `pint --test` was red on 96 files: the
+  project had only ever been formatted with `--dirty`. A gate that cannot go green is not a gate,
+  so the whole project was formatted once. No behaviour change — suite and analysis both clean
+  either side of it.
+
+- [~] A red gate blocks a merge without anyone remembering to look — **the workflow is written
+  and every step was dry-run locally, but it has not yet run on GitHub.** Branch protection also
+  has to be switched on for a red gate to actually block a merge; that is a repository setting,
+  and yours to make.
+
+- [ ] **The leave balance loses its fraction when stored, and the report does not.**
+  `calculateBalance()` returns `8.81` for ten days at a 37/42 rotation. `employees.total_balance`
+  is an `int` column, so saving rounds it to 9 — while `calculateBalanceToDate()`, which the
+  reports read, keeps the fraction. For the **18 people on 37/42, 39/42, 40/50, 45/50 and 50/45**
+  the report and the record disagree about the same person.
+
+  The rounding is now explicit in `Employee::calculateBalance()` rather than happening silently in
+  MySQL, and two tests pin it. **Whether a part-day of leave should be kept, rounded or floored is
+  yours to decide** — it changes what people are owed, so I have not chosen for you.
 
 ---
 
@@ -620,4 +684,11 @@ a content security policy are gone; 57 inline styles and 14 page scripts remain,
 one pass with phase 7's CSP work). **Operations 5 → 6** — `migrate:reset` works end to end, which
 rollback rehearsal depends on. Overall **7.8**.
 
-Still at baseline: **Scalability 5** — phase 6 has not started.
+After phase 6, **Code quality 7 → 8** (PHPStan at level 6, 451 findings fixed, the whole project
+formatted, two dead scopes removed) and **Operations 6 → 7** (CI runs formatting, analysis, the
+suite on two PHP versions, a rollback rehearsal and the browser tests — where before, nothing had
+ever run). **Performance 8 → 9**: filling a month went from thirty balance recalculations to one.
+Overall **8.1**.
+
+Still at baseline: **Scalability 5** — nothing in phases 1–6 addressed it, and phase 7 is where
+load and Octane are decided.

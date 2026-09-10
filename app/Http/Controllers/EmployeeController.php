@@ -75,7 +75,7 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function importArchivedEmployees(ArchivedEmployeeImportRequest $request)
+    public function importArchivedEmployees(ArchivedEmployeeImportRequest $request): RedirectResponse
     {
         Excel::import(new ArchivedEmployeesImport, $request->file('file'));
 

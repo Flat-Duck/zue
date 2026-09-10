@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Employee;
 use App\Models\TimeSheet;
 use Carbon\Carbon;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class DashboardChart extends Component
@@ -72,7 +73,7 @@ class DashboardChart extends Component
         ];
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.dashboard-chart', [
             'initialData' => $this->getChartData(),

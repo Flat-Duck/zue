@@ -9,11 +9,17 @@ class AppraisalReviewScore extends Model
 {
     protected $fillable = ['appraisal_review_id', 'form_version_item_id', 'score', 'text_value'];
 
+    /**
+     * @return BelongsTo<AppraisalReview, $this>
+     */
     public function review(): BelongsTo
     {
         return $this->belongsTo(AppraisalReview::class, 'appraisal_review_id');
     }
 
+    /**
+     * @return BelongsTo<AppraisalFormVersionItem, $this>
+     */
     public function formVersionItem(): BelongsTo
     {
         return $this->belongsTo(AppraisalFormVersionItem::class, 'form_version_item_id');

@@ -12,6 +12,9 @@ class Signature extends Model
 
     protected $fillable = ['user_id', 'image_path'];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

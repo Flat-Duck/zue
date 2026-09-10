@@ -22,11 +22,17 @@ class AppraisalFormVersion extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<AppraisalForm, $this>
+     */
     public function form(): BelongsTo
     {
         return $this->belongsTo(AppraisalForm::class, 'appraisal_form_id');
     }
 
+    /**
+     * @return HasMany<AppraisalFormVersionItem, $this>
+     */
     public function versionItems(): HasMany
     {
         return $this->hasMany(AppraisalFormVersionItem::class)->orderBy('sort_order');

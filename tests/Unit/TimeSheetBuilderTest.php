@@ -176,4 +176,64 @@ class TimeSheetBuilderTest extends TestCase
             ]);
         }
     }
+
+    /**
+     * Most staff work 14/14, where a day worked earns exactly a day of leave and the
+     * arithmetic lands on whole numbers. Eighteen people do not: 37/42, 39/42, 40/50,
+     * 45/50 and 50/45 all produce fractions.
+     *
+     * `calculateBalance()` returns that fraction, and `calculateBalanceToDate()` —
+     * which the reports use — returns it too. But `employees.total_balance` is an
+     * `int` column, so saving discards it. The report and the record then disagree
+     * about the same person.
+     *
+     * This pins what happens today rather than choosing a fix: whether a part-day of
+     * leave should be kept, rounded or floored is a question about how the company
+     * tracks leave.
+     */
+    public function test_a_fractional_balance_is_lost_when_it_is_stored(): void
+    {
+        $employee = Employee::factory()->create([
+            'schedule' => '37/42',
+            'transfered_balance' => 0,
+            'total_balance' => 0,
+        ]);
+
+        $this->giveDays($employee, 'A', 10);
+
+        // 10 worked at 37/42 earns 8.809... days.
+        $calculated = TimeSheetBuilder::calculateBalance($employee->id, '37/42');
+        $this->assertEqualsWithDelta(8.8095, $calculated, 0.0001);
+
+        $employee->calculateBalance();
+
+        $stored = $employee->fresh()->total_balance;
+
+        $this->assertSame(9, $stored, 'The stored balance is the rounded whole number.');
+        $this->assertNotEquals($calculated, $stored, 'The fraction is discarded by the int column.');
+    }
+
+    /**
+     * The reports read the same arithmetic through a different door, and keep the
+     * fraction the employee record threw away.
+     */
+    public function test_the_report_and_the_record_disagree_for_a_fractional_rotation(): void
+    {
+        $employee = Employee::factory()->create([
+            'schedule' => '37/42',
+            'transfered_balance' => 0,
+            'total_balance' => 0,
+        ]);
+
+        $this->giveDays($employee, 'A', 10);
+        $employee->calculateBalance();
+
+        $reported = TimeSheetBuilder::calculateBalanceToDate($employee->id, '37/42', '2026-12-31');
+
+        $this->assertNotEquals(
+            $reported,
+            $employee->fresh()->total_balance,
+            'These agreeing would mean the rounding question had been settled.'
+        );
+    }
 }

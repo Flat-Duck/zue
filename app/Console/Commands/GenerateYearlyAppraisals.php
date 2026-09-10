@@ -32,7 +32,7 @@ class GenerateYearlyAppraisals extends Command
 
         $service->aggregateYearly((int) $year);
 
-        $this->info("Yearly appraisals generated successfully.");
+        $this->info('Yearly appraisals generated successfully.');
 
         return self::SUCCESS;
     }

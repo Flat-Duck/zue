@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Appraisals\AppraisalOfficial;
 use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Employee;
+use App\Services\Appraisals\AppraisalAttendanceService;
 use App\Services\Appraisals\AppraisalFinalizeService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AppraisalOfficialController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $this->authorizeOfficialManagement();
 
@@ -45,7 +48,7 @@ class AppraisalOfficialController extends Controller
         return (int) $employeeId;
     }
 
-    public function show(AppraisalPeriod $period, Employee $employee, \App\Services\Appraisals\AppraisalAttendanceService $attendanceService)
+    public function show(AppraisalPeriod $period, Employee $employee, AppraisalAttendanceService $attendanceService)
     {
         $this->authorizeOfficialView($employee);
 
@@ -86,7 +89,7 @@ class AppraisalOfficialController extends Controller
         return view('app.appraisals.official.show', compact('period', 'employee', 'official', 'attendanceStats', 'groupedScores', 'sectionLabels'));
     }
 
-    public function finalize(AppraisalFinalizeService $service, AppraisalPeriod $period, Employee $employee)
+    public function finalize(AppraisalFinalizeService $service, AppraisalPeriod $period, Employee $employee): RedirectResponse
     {
         $this->authorizeOfficialManagement();
 
@@ -96,7 +99,7 @@ class AppraisalOfficialController extends Controller
             ->with('success', 'تم اعتماد النتيجة الرسمية.');
     }
 
-    public function approve(Request $request, AppraisalPeriod $period, Employee $employee)
+    public function approve(Request $request, AppraisalPeriod $period, Employee $employee): RedirectResponse
     {
         $official = AppraisalOfficial::where('appraisal_period_id', $period->id)
             ->where('employee_id', $employee->id)

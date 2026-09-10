@@ -20,6 +20,9 @@ class Administration extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return HasMany<Department, $this>
+     */
     public function departments(): HasMany
     {
         return $this->hasMany(Department::class);

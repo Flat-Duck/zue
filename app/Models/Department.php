@@ -23,11 +23,17 @@ class Department extends Model
 
     protected $searchableFields = ['*'];
 
+    /**
+     * @return HasMany<Employee, $this>
+     */
     public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);
     }
 
+    /**
+     * @return BelongsTo<Administration, $this>
+     */
     public function administration(): BelongsTo
     {
         return $this->belongsTo(Administration::class);

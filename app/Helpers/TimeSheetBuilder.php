@@ -76,7 +76,14 @@ class TimeSheetBuilder
         return $times->sortKeys();
     }
 
-    public static function calculateBalance(int $employee_id, string $schedule, int $transfered_balance = 0)
+    /**
+     * Days worked, scaled by the rotation's on/off ratio, less days taken, plus
+     * anything carried over.
+     *
+     * A rotation such as 37/42 yields a fraction. `employees.total_balance` is an
+     * integer column, so storing it drops that — see TimeSheetBuilderTest.
+     */
+    public static function calculateBalance(int $employee_id, string $schedule, int $transfered_balance = 0): float
     {
         $sch = explode('/', $schedule);
         $w = 0;
@@ -97,7 +104,7 @@ class TimeSheetBuilder
         return $total + $transfered_balance;
     }
 
-    public static function calculateBalanceToDate(int $employee_id, string $schedule, string $date, int $transfered_balance = 0)
+    public static function calculateBalanceToDate(int $employee_id, string $schedule, string $date, int $transfered_balance = 0): float
     {
         $sch = explode('/', $schedule);
         $w = 0;

@@ -14,6 +14,7 @@ class ArchivedEmployees implements Scope
     {
         $this->with = $with;
     }
+
     /**
      * Apply the scope to a given Eloquent query builder.
      */
@@ -54,15 +55,13 @@ class ArchivedEmployees implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  Model  $model
      * @return void
      */
 
     /**
      * Extend the query builder with the needed functions.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     public function extend(Builder $builder)
@@ -83,7 +82,6 @@ class ArchivedEmployees implements Scope
     /**
      * Get the "deleted at" column for the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return string
      */
     protected function getDeletedAtColumn(Builder $builder)
@@ -98,7 +96,6 @@ class ArchivedEmployees implements Scope
     /**
      * Add the restore extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addRestore(Builder $builder)
@@ -113,13 +110,12 @@ class ArchivedEmployees implements Scope
     /**
      * Add the with-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addWithArchived(Builder $builder)
     {
         $builder->macro('withArchived', function (Builder $builder, $withArchived = true) {
-            if (!$withArchived) {
+            if (! $withArchived) {
                 return $builder->withoutArchived();
             }
 
@@ -130,7 +126,6 @@ class ArchivedEmployees implements Scope
     /**
      * Add the without-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addWithoutArchived(Builder $builder)
@@ -149,7 +144,6 @@ class ArchivedEmployees implements Scope
     /**
      * Add the only-trashed extension to the builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
     protected function addOnlyArchived(Builder $builder)

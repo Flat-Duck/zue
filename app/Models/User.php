@@ -42,12 +42,17 @@ class User extends Authenticatable
      *
      * Every user is an employee — the database enforces it — but most
      * employees have no login, which is why the link lives on this side.
+     *
+     * @return BelongsTo<Employee, $this>
      */
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
+    /**
+     * @return HasMany<TimeSheet, $this>
+     */
     public function timeSheets(): HasMany
     {
         return $this->hasMany(TimeSheet::class);
@@ -99,6 +104,9 @@ class User extends Authenticatable
         return $this->employee?->number;
     }
 
+    /**
+     * @return HasOne<Signature, $this>
+     */
     public function signature(): HasOne
     {
         return $this->hasOne(Signature::class);

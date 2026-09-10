@@ -61,8 +61,6 @@ class TimeSheetMutationService
                 'user_id' => $actor?->id,
             ]);
 
-            $this->dispatchBalanceCalculation($employee);
-
             return $timeSheet;
         });
     }
@@ -92,8 +90,6 @@ class TimeSheetMutationService
                 'old_value' => $oldValue,
             ]);
 
-            $this->dispatchBalanceCalculation($lockedTimeSheet->employee);
-
             return $lockedTimeSheet;
         });
     }
@@ -107,23 +103,33 @@ class TimeSheetMutationService
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $employee = $lockedTimeSheet->employee;
             $lockedTimeSheet->delete();
-
-            if ($employee) {
-                $this->dispatchBalanceCalculation($employee);
-            }
         });
     }
 
+    /**
+     * Filling a month used to recalculate the employee's balance once per day —
+     * thirty times, each a full pass over their attendance history, and on a `sync`
+     * queue every one of them inline. The observer is suppressed for the batch and
+     * the balance is worked out once at the end.
+     */
     public function fillDateOrRange(Employee $employee, string $dateOrRange, string $value, int $overTime, ?User $actor = null): int
     {
         $days = $this->daysFromDateOrRange($dateOrRange);
-        $count = 0;
 
-        foreach ($days as $day) {
-            $this->createForEmployee($employee, $day, $value, $overTime, $actor);
-            $count++;
+        $count = TimeSheet::withoutEvents(function () use ($employee, $days, $value, $overTime, $actor): int {
+            $written = 0;
+
+            foreach ($days as $day) {
+                $this->createForEmployee($employee, $day, $value, $overTime, $actor);
+                $written++;
+            }
+
+            return $written;
+        });
+
+        if ($count > 0) {
+            $this->dispatchBalanceCalculation($employee);
         }
 
         return $count;

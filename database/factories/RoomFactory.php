@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Residence;
 use App\Models\Room;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RoomFactory extends Factory
@@ -25,7 +25,7 @@ class RoomFactory extends Factory
         return [
             'number' => $this->faker->name(),
             'beds' => $this->faker->randomNumber(0),
-            'residence_id' => \App\Models\Residence::factory(),
+            'residence_id' => Residence::factory(),
         ];
     }
 }

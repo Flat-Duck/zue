@@ -2,12 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Appraisals\AppraisalPeriod;
+use Illuminate\Console\Command;
 
 class SyncAppraisalPeriodStatus extends Command
 {
     protected $signature = 'appraisal:sync-period-status';
+
     protected $description = 'Sync appraisal period status based on window dates';
 
     public function handle(): int
@@ -15,8 +16,9 @@ class SyncAppraisalPeriodStatus extends Command
         $today = now()->toDateString();
 
         AppraisalPeriod::query()->each(function (AppraisalPeriod $p) use ($today) {
-            if ($p->status === 'locked')
+            if ($p->status === 'locked') {
                 return;
+            }
 
             if ($today >= $p->window_open_from->toDateString() && $today <= $p->window_open_to->toDateString()) {
                 $p->status = 'open';
@@ -30,6 +32,7 @@ class SyncAppraisalPeriodStatus extends Command
         });
 
         $this->info('Appraisal periods synced.');
+
         return self::SUCCESS;
     }
 }
