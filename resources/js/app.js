@@ -1,4 +1,17 @@
 import './bootstrap';
+
+/*
+ * Tabler keeps its theme switcher in a module of its own, and it was never
+ * imported — which is the whole reason the dark mode links did nothing. It reads
+ * `?theme=`, remembers the choice in localStorage, follows the system setting
+ * when no choice has been made, and writes `data-bs-theme` on <html>.
+ *
+ * The server renders that attribute too, from the same choice, so the page is
+ * already the right colour before this module runs and there is no flash.
+ */
+import '@tabler/core/js/tabler-theme';
+
+import './echo';
 import './tabler-init';
 
 import flatpickr from 'flatpickr';

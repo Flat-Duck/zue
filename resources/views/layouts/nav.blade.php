@@ -39,44 +39,23 @@
                 </div>
             </div>
         <div class="d-none d-md-flex">
-            <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
+            {{-- `fullUrlWithQuery` keeps whatever the page was already showing: switching
+                 theme from a filtered list should not throw the filter away. --}}
+            <a href="{{ request()->fullUrlWithQuery(['theme' => 'dark']) }}"
+               class="nav-link px-0 hide-theme-dark"
+               title="@lang('crud.common.dark_mode')"
+               aria-label="@lang('crud.common.dark_mode')"
+               data-bs-toggle="tooltip" data-bs-placement="bottom">
                 <i class="ti ti-moon"></i>
             </a>
-            <a href="?theme=light" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <a href="{{ request()->fullUrlWithQuery(['theme' => 'light']) }}"
+               class="nav-link px-0 hide-theme-light"
+               title="@lang('crud.common.light_mode')"
+               aria-label="@lang('crud.common.light_mode')"
+               data-bs-toggle="tooltip" data-bs-placement="bottom">
                 <i class="ti ti-sun"></i>
             </a>
-            <div class="nav-item dropdown d-none d-md-flex me-3">
-                <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
-                    <i class="ti ti-bell"></i>
-                    <span class="badge bg-red"></span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Last updates</h3>
-                        </div>
-                        <div class="list-group list-group-flush list-group-hoverable">
-                            <div class="list-group-item">
-                                <div class="row align-items-center">
-                                    <div class="col-auto"><span class="status-dot status-dot-animated bg-red d-block"></span></div>
-                                        <div class="col text-truncate">
-                                            <a href="#" class="text-body d-block">Example 1</a>
-                                            <div class="d-block text-secondary text-truncate mt-n1">
-                                                Change deprecated html tags to text decoration classes (#29604)
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <a href="#" class="list-group-item-actions">
-                                                <i class="ti ti-star"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <livewire:notification-bell />
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
                     {{-- <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)"></span> --}}

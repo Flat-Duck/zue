@@ -154,12 +154,6 @@ jobs:
           node-version: '20'
           cache: npm
 
-      # The browser tests read the built assets, so the build comes first.
-      - name: Build the front end
-        run: |
-          npm ci
-          npm run build
-
       - name: Write the Dusk environment
         run: |
           cat > .env <<'ENV'
@@ -178,15 +172,39 @@ jobs:
           SESSION_DRIVER=file
           MAIL_MAILER=array
           BCRYPT_ROUNDS=4
+          BROADCAST_DRIVER=reverb
+          REVERB_APP_ID=ci
+          REVERB_APP_KEY=ci-key
+          REVERB_APP_SECRET=ci-secret
+          REVERB_HOST=127.0.0.1
+          REVERB_PORT=8080
+          REVERB_SCHEME=http
+          VITE_REVERB_APP_KEY=ci-key
+          VITE_REVERB_HOST=127.0.0.1
+          VITE_REVERB_PORT=8080
+          VITE_REVERB_SCHEME=http
           ENV
           cp .env .env.dusk.local
           php artisan key:generate
+
+      # After the environment is written: Vite bakes the VITE_REVERB_* values into
+      # the bundle, so building first would ship a client that cannot connect.
+      - name: Build the front end
+        run: |
+          npm ci
+          npm run build
 
       - name: Migrate
         run: php artisan migrate --force
 
       - name: Install ChromeDriver
         run: php artisan dusk:chrome-driver --detect
+
+      # The live notification test needs a real socket server, or it skips. The
+      # point of that test is the whole chain — notification, broadcast, Reverb,
+      # WebSocket, channel authorization, Livewire — so it is worth having one.
+      - name: Start the WebSocket server
+        run: php artisan reverb:start --host=127.0.0.1 --port=8080 &
 
       - name: Serve the application
         run: php artisan serve --host=127.0.0.1 --port=8000 --no-reload &

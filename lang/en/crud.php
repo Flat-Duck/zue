@@ -3,6 +3,11 @@
 return [
     'common' => [
         'language' => 'Language',
+        'dark_mode' => 'Enable dark mode',
+        'light_mode' => 'Enable light mode',
+        'notifications' => 'Notifications',
+        'no_notifications' => 'Nothing new',
+        'mark_all_read' => 'Mark all as read',
         'actions' => ' Actions',
         'create' => ' Create',
         'edit' => ' Edit',

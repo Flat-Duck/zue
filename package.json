@@ -20,6 +20,8 @@
         "apexcharts": "^7.1.0",
         "flatpickr": "^4.6.13",
         "hugerte": "^1.0.9",
+        "laravel-echo": "^2.5.0",
+        "pusher-js": "^8.6.0",
         "signature_pad": "^5.1.4",
         "tom-select": "^2.3.1"
     }

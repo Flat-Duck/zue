@@ -1,13 +1,17 @@
 @php
+    use App\Http\Middleware\RememberTablerPreferences;
+
     $locale = app()->getLocale();
     $direction = config("locales.supported.{$locale}.dir", 'ltr');
+    $appearance = RememberTablerPreferences::attributes();
 @endphp
 <!doctype html>
-<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $direction }}">
+<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $direction }}"
+    @foreach ($appearance as $attribute => $value) {{ $attribute }}="{{ $value }}" @endforeach>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -39,9 +43,11 @@
     </div>
 
 
+    {{-- Before @livewireScripts: Livewire looks for `window.Echo` as it boots, and
+         warns "Laravel Echo cannot be found" if the bundle has not run yet. --}}
+    @vite('resources/js/app.js')
     @livewireScripts
 
-    @vite('resources/js/app.js')
 
     @if (session()->has('success'))
         <script>

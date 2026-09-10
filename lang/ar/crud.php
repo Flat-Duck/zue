@@ -11,6 +11,11 @@
 return [
     'common' => [
         'language' => 'اللغة',
+        'dark_mode' => 'تفعيل الوضع الداكن',
+        'light_mode' => 'تفعيل الوضع الفاتح',
+        'notifications' => 'الإشعارات',
+        'no_notifications' => 'لا يوجد جديد',
+        'mark_all_read' => 'تعليم الكل كمقروء',
         'actions' => 'الإجراءات',
         'create' => 'إنشاء',
         'edit' => 'تعديل',

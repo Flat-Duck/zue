@@ -195,14 +195,15 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   and why so much of the baseline was `Relation 'x' is not found`. Adding the return types (and
   `@property-read` on `User` and `TimeSheet`) took the **PHPStan baseline from 194 to 158**.
 
-- [ ] **An unexplained intermittent test failure, seen twice and never captured.** Two separate
-  full-suite runs reported one failure (`1 failed, 404 passed`, later `1 failed, 416 passed`);
-  both times only the summary line was kept, so the failing test is unknown. Roughly thirty
-  runs since — including seventeen consecutive runs whose full output was saved specifically to
-  catch it — have all been clean. It is not the performance benchmarks: those are excluded from
-  the default run. Best guess is a test with an order or timing dependency that only bites on a
-  particular interleaving. Recorded rather than dismissed; the next sighting needs the full
-  output kept, not the summary.
+- [ ] **The intermittent failure now has a name: `TimeSheetMutationServiceTest ::
+  revise preserves employee id and records audit fields`.** Seen three times across roughly
+  sixty full-suite runs, always alone, always passing on the next run and always passing in
+  isolation. Ruled out so far: the permission cache (`array` store in tests), test ordering
+  (twelve runs with `--order-by=random`, all clean), and the performance benchmarks (a separate
+  suite). Knowing which test it is narrows it considerably — that test revises a time sheet onto
+  a different day, and `time_sheets` carries a unique constraint on `(employee_id, day)` — but
+  the failure output was not captured the one time it named itself, so the cause is still
+  unproven. The next occurrence needs the full output kept.
 
 **Phase 2 result (2026-09-10).**
 
@@ -535,6 +536,64 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
 
 - [x] No view references an external host — asserted by `FrontendAssetTest`, not assumed
 
+## Interface work — requested outside the roadmap
+
+- [x] **Dark mode works.** Tabler keeps its theme switcher in a module of its own and the
+  application never imported it, so the two toggle links set a `?theme=` parameter that nothing
+  read. Importing it is the fix. On top of that the choice is now remembered in the session and
+  the attribute is rendered by the **server**, so a fresh page is already the right colour rather
+  than flashing light while a deferred script catches up — and it needs no inline script, which
+  matters for phase 7's content security policy. The links also keep the current query string, so
+  switching theme on a filtered list no longer throws the filter away.
+
+  `DarkModeTest` proves it in a browser by reading the computed background colour, not by
+  trusting the attribute. It sets an explicit starting theme first: Tabler's default is `auto`,
+  and the headless browser asks for dark, so a test that assumed light would pass or fail
+  depending on the machine.
+
+- [x] **A malformed `viewport` meta tag** in both layouts —
+  `content="width=device-width, initial-scale=1" viewport-fit=cover"` — a stray quote that made
+  the browser read the attribute as `viewport-fit="cover""`. Fixed.
+
+- [x] **Broadcasting: Laravel Reverb, Echo, and a notification bell that is actually live.**
+
+  Reverb rather than Pusher or Ably: it is Laravel's own server, runs beside the application, and
+  nothing leaves the network. Employee data on an internal HR system has no business travelling
+  to a third party to be echoed back.
+
+  - `config/broadcasting.php` gains a `reverb` connection; `BroadcastServiceProvider` was
+    commented out in `config/app.php` and is enabled.
+  - `resources/js/echo.js` configures Echo, and **degrades rather than throwing** when no key is
+    configured — a single office with no queue worker needs none of this and should not get a
+    broken page for it.
+  - The transport follows the *page* protocol rather than the configured scheme: a browser will
+    not open an insecure socket from a secure page. `REVERB_SCHEME` describes how the server
+    listens, and behind a TLS proxy the two differ.
+  - `TimeSheetApproved` is written to the database *and* broadcast, with both channels built from
+    one payload — a notification that reads differently depending on how it arrived is a bug that
+    gets reported as a mystery. The message follows the interface language.
+  - The bell was Tabler's demo markup with "Example 1" hardcoded. It is a Livewire component now,
+    on Tabler's `dropdown-menu-card` with a flush hoverable list group and animated status dots,
+    subscribed to the signed-in user's private channel.
+
+- [x] **`@livewireScripts` loaded before the bundle, so Echo was never found.** Livewire looks for
+  `window.Echo` as it boots and warns "Laravel Echo cannot be found" if it is missing — a
+  `console.warn`, not an error, so the browser-error assertions never saw it. The component
+  subscribed to nothing. The bundle loads first now.
+
+- [x] **Channel authorization was proving nothing.** `/broadcasting/auth` answers **200 with an
+  empty body for anybody** under the `null` broadcaster, which is what `.env.testing` fell back
+  to — so a test asserting who may subscribe would have passed no matter what. `phpunit.xml` now
+  configures a real broadcaster, and the tests assert 403 for another user's channel and for a
+  guest.
+
+- [x] **The whole chain is proven end to end in a browser.** `LiveNotificationTest` sits on an
+  unrelated page, has the *server* send a notification, and waits for the badge to appear:
+  notification → broadcast → Reverb → WebSocket → channel authorization → Livewire → DOM, with
+  nothing polling. It skips with a clear message when no socket server is running, and CI starts
+  one so it actually runs there.
+
+
 ## Phase 6 — Quality gates
 
 - [x] 6.1 **Baseline 212 → 113 at level 5**, all through fixes rather than deletions: relation
@@ -695,5 +754,8 @@ After the owner's decisions landed, **Frontend 8 → 9** (the interface is bilin
 right-to-left layout, the editor bundle is 294 KB lighter and its content stylesheet finally
 loads, and the last external font request is gone). Overall **8.2**.
 
-Still at baseline: **Scalability 5** — nothing in phases 1–6 addressed it, and phase 7 is where
-load and Octane are decided.
+With dark mode working, a bilingual right-to-left interface and a real broadcasting foundation,
+**Frontend 9 → 9** holds and **Scalability 5 → 6**: the application can now push to a browser
+instead of being polled, which is what a queue worker and a field site need. Overall **8.3**.
+
+Still short of target: **Scalability** — phase 7 is where load and Octane are decided.
