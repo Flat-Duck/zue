@@ -1,0 +1,12 @@
+// The Arabic interface.
+//
+// Tabler ships a mirrored build of its stylesheet rather than relying on logical
+// properties, so right-to-left is a different file, not a `dir` attribute alone.
+// Everything after the Tabler imports is the application's own and is shared with
+// the left-to-right build.
+
+@import "@tabler/core/dist/css/tabler.rtl.min.css";
+@import "@tabler/core/dist/css/tabler-vendors.rtl.min.css";
+@import "@tabler/icons-webfont/tabler-icons.min.css";
+
+@import "app-shared";

@@ -1,5 +1,9 @@
+@php
+    $locale = app()->getLocale();
+    $direction = config("locales.supported.{$locale}.dir", 'ltr');
+@endphp
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $direction }}">
 
 <head>
     <meta charset="utf-8">
@@ -11,7 +15,7 @@
 
     <title>zue</title>
 
-    @vite('resources/sass/app.scss')
+    @vite($direction === 'rtl' ? 'resources/sass/app-rtl.scss' : 'resources/sass/app.scss')
 
     @livewireStyles
     @yield('styles')

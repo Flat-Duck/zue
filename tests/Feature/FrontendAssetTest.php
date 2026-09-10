@@ -77,4 +77,44 @@ class FrontendAssetTest extends TestCase
 
         return $files;
     }
+
+    /**
+     * Scanning Blade was not enough. `app.scss` pulled Nunito from
+     * fonts.googleapis.com with an `@import url(...)`, so every page fetched a font
+     * it never used — invisible to a test that only reads views. The built output is
+     * what the browser loads, so that is what gets checked.
+     *
+     * Only fetch-shaped references count. Bundled libraries carry licence and
+     * homepage URLs in their comments, and those are text, not requests.
+     */
+    #[Test]
+    public function no_built_asset_fetches_from_another_host(): void
+    {
+        $built = glob(public_path('build/assets/*.{css,js}'), GLOB_BRACE) ?: [];
+
+        $this->assertNotEmpty($built, 'Nothing is built. Run `npm run build` before this test.');
+
+        $fetches = [
+            'a stylesheet @import' => '#@import\s*(?:url\()?\s*["\']?(https?:)?//([a-z0-9.-]+)#i',
+            'a url() reference' => '#\burl\(\s*["\']?(https?:)?//([a-z0-9.-]+)#i',
+            'a dynamic import' => '#\bimport\(\s*["\'](https?:)?//([a-z0-9.-]+)#i',
+            'a fetch' => '#\bfetch\(\s*["\'](https?:)?//([a-z0-9.-]+)#i',
+        ];
+
+        $offenders = [];
+
+        foreach ($built as $path) {
+            $contents = (string) file_get_contents($path);
+
+            foreach ($fetches as $what => $pattern) {
+                preg_match_all($pattern, $contents, $matches, PREG_SET_ORDER);
+
+                foreach ($matches as $match) {
+                    $offenders[] = basename($path).' has '.$what.' from '.$match[2];
+                }
+            }
+        }
+
+        $this->assertSame([], array_values(array_unique($offenders)), implode(PHP_EOL, $offenders));
+    }
 }

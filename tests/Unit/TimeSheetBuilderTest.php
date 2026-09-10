@@ -6,6 +6,7 @@ use App\Helpers\TimeSheetBuilder;
 use App\Models\Employee;
 use App\Models\TimeSheet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class TimeSheetBuilderTest extends TestCase
@@ -31,7 +32,7 @@ class TimeSheetBuilderTest extends TestCase
             'value' => 'A',
         ]);
 
-        $this->assertSame(1, (int) TimeSheetBuilder::calculateBalanceToDate($employee->id, '1/1', '2026-01-02'));
+        $this->assertSame(1, TimeSheetBuilder::calculateBalanceToDate($employee->id, '1/1', '2026-01-02'));
     }
 
     public function test_unapproved_timesheet_level_is_scoped_to_requested_employee(): void
@@ -70,7 +71,7 @@ class TimeSheetBuilderTest extends TestCase
         $this->giveDays($employee, 'F', 6, startDay: 21);
 
         // 20 worked at 14/14 earns 20 days, less 6 taken.
-        $this->assertSame(14.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '14/14'));
+        $this->assertSame(14, TimeSheetBuilder::calculateBalance($employee->id, '14/14'));
     }
 
     public function test_a_longer_rotation_earns_proportionally_less_leave(): void
@@ -80,7 +81,7 @@ class TimeSheetBuilderTest extends TestCase
         $this->giveDays($employee, 'A', 20);
 
         // 40 on, 80 off: each day worked earns half a day.
-        $this->assertSame(10.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '40/80'));
+        $this->assertSame(10, TimeSheetBuilder::calculateBalance($employee->id, '40/80'));
     }
 
     public function test_every_kind_of_worked_day_counts_and_every_kind_of_day_off_deducts(): void
@@ -95,7 +96,7 @@ class TimeSheetBuilderTest extends TestCase
             $this->giveDays($employee, $off, 1, startDay: $day++);
         }
 
-        $this->assertSame(2.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
+        $this->assertSame(2, TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
     }
 
     /**
@@ -108,7 +109,7 @@ class TimeSheetBuilderTest extends TestCase
 
         $this->giveDays($employee, 'P', 5);
 
-        $this->assertSame(0.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
+        $this->assertSame(0, TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
     }
 
     public function test_the_carried_over_balance_is_added_on(): void
@@ -117,8 +118,8 @@ class TimeSheetBuilderTest extends TestCase
 
         $this->giveDays($employee, 'A', 3);
 
-        $this->assertSame(3.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
-        $this->assertSame(-97.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '1/1', -100));
+        $this->assertSame(3, TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
+        $this->assertSame(-97, TimeSheetBuilder::calculateBalance($employee->id, '1/1', -100));
     }
 
     public function test_one_employees_days_never_count_towards_anothers_balance(): void
@@ -129,7 +130,7 @@ class TimeSheetBuilderTest extends TestCase
         $this->giveDays($employee, 'A', 4);
         $this->giveDays($colleague, 'A', 9);
 
-        $this->assertSame(4.0, (float) TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
+        $this->assertSame(4, TimeSheetBuilder::calculateBalance($employee->id, '1/1'));
     }
 
     /**
@@ -145,8 +146,8 @@ class TimeSheetBuilderTest extends TestCase
         $this->giveDays($employee, 'F', 3, startDay: 11);
 
         $this->assertSame(
-            (float) TimeSheetBuilder::calculateBalance($employee->id, '14/14', 5),
-            (float) TimeSheetBuilder::calculateBalanceToDate($employee->id, '14/14', '2026-02-01', 5),
+            TimeSheetBuilder::calculateBalance($employee->id, '14/14', 5),
+            TimeSheetBuilder::calculateBalanceToDate($employee->id, '14/14', '2026-02-01', 5),
         );
     }
 
@@ -178,46 +179,58 @@ class TimeSheetBuilderTest extends TestCase
     }
 
     /**
-     * Most staff work 14/14, where a day worked earns exactly a day of leave and the
-     * arithmetic lands on whole numbers. Eighteen people do not: 37/42, 39/42, 40/50,
-     * 45/50 and 50/45 all produce fractions.
+     * A part-day of leave settles to the nearest whole day, half going away from
+     * zero: 3.4 is 3, 3.5 is 4, 3.9 is 4. Decided by the company, and this is where
+     * that decision is written down.
      *
-     * `calculateBalance()` returns that fraction, and `calculateBalanceToDate()` —
-     * which the reports use — returns it too. But `employees.total_balance` is an
-     * `int` column, so saving discards it. The report and the record then disagree
-     * about the same person.
-     *
-     * This pins what happens today rather than choosing a fix: whether a part-day of
-     * leave should be kept, rounded or floored is a question about how the company
-     * tracks leave.
+     * @return array<string, array{0: float, 1: int}>
      */
-    public function test_a_fractional_balance_is_lost_when_it_is_stored(): void
+    public static function partDays(): array
     {
-        $employee = Employee::factory()->create([
-            'schedule' => '37/42',
-            'transfered_balance' => 0,
-            'total_balance' => 0,
-        ]);
+        return [
+            'just under a half rounds down' => [3.4, 3],
+            'exactly a half rounds up' => [3.5, 4],
+            'just under the next day rounds up' => [3.9, 4],
+            'a whole number is left alone' => [4.0, 4],
+            'zero is zero' => [0.0, 0],
+            'a debt of half a day is a whole day owed' => [-3.5, -4],
+            'a small debt rounds toward nothing' => [-3.4, -3],
+        ];
+    }
 
-        $this->giveDays($employee, 'A', 10);
-
-        // 10 worked at 37/42 earns 8.809... days.
-        $calculated = TimeSheetBuilder::calculateBalance($employee->id, '37/42');
-        $this->assertEqualsWithDelta(8.8095, $calculated, 0.0001);
-
-        $employee->calculateBalance();
-
-        $stored = $employee->fresh()->total_balance;
-
-        $this->assertSame(9, $stored, 'The stored balance is the rounded whole number.');
-        $this->assertNotEquals($calculated, $stored, 'The fraction is discarded by the int column.');
+    #[DataProvider('partDays')]
+    public function test_a_part_day_settles_to_the_nearest_whole_day(float $raw, int $expected): void
+    {
+        $this->assertSame($expected, TimeSheetBuilder::roundToWholeDays($raw));
     }
 
     /**
-     * The reports read the same arithmetic through a different door, and keep the
-     * fraction the employee record threw away.
+     * Eighteen people are on rotations that do not divide evenly — 37/42, 39/42,
+     * 40/50, 45/50, 50/45. Ten days worked on 37/42 earns 8.81, which is 9 days.
      */
-    public function test_the_report_and_the_record_disagree_for_a_fractional_rotation(): void
+    public function test_a_fractional_rotation_is_settled_before_it_is_stored(): void
+    {
+        $employee = Employee::factory()->create([
+            'schedule' => '37/42',
+            'transfered_balance' => 0,
+            'total_balance' => 0,
+        ]);
+
+        $this->giveDays($employee, 'A', 10);
+
+        $this->assertSame(9, TimeSheetBuilder::calculateBalance($employee->id, '37/42'));
+
+        $employee->calculateBalance();
+
+        $this->assertSame(9, $employee->fresh()->total_balance);
+    }
+
+    /**
+     * Every route to a balance has to give the same number, or the figure on a
+     * report and the figure on the record would describe the same person
+     * differently.
+     */
+    public function test_every_way_of_asking_gives_the_same_whole_number(): void
     {
         $employee = Employee::factory()->create([
             'schedule' => '37/42',
@@ -228,12 +241,17 @@ class TimeSheetBuilderTest extends TestCase
         $this->giveDays($employee, 'A', 10);
         $employee->calculateBalance();
 
-        $reported = TimeSheetBuilder::calculateBalanceToDate($employee->id, '37/42', '2026-12-31');
+        $stored = $employee->fresh()->total_balance;
+        $running = TimeSheetBuilder::calculateBalance($employee->id, '37/42');
+        $toDate = TimeSheetBuilder::calculateBalanceToDate($employee->id, '37/42', '2026-12-31');
+        $bulk = TimeSheetBuilder::calculateBulckBalanceToDate(
+            Employee::query()->whereKey($employee->id)->get(),
+            [$employee->id],
+            '2026-12-31'
+        )->first()->total_balance;
 
-        $this->assertNotEquals(
-            $reported,
-            $employee->fresh()->total_balance,
-            'These agreeing would mean the rounding question had been settled.'
-        );
+        $this->assertSame($stored, $running);
+        $this->assertSame($stored, $toDate);
+        $this->assertSame($stored, $bulk);
     }
 }

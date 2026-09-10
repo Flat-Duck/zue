@@ -2,6 +2,7 @@
 
 return [
     'common' => [
+        'language' => 'Language',
         'actions' => ' Actions',
         'create' => ' Create',
         'edit' => ' Edit',

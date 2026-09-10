@@ -9,6 +9,7 @@ use App\Http\Controllers\FlightController;
 use App\Http\Controllers\FlightRouteController;
 use App\Http\Controllers\FlightStationController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ManagementScopeController;
@@ -85,6 +86,10 @@ Route::post('/rr', function () {
 // })->name('time-sheets.approve');
 
 Auth::routes(['register' => false]);
+
+// Switching the interface language. Outside the auth group: the login page is
+// offered in both languages too.
+Route::get('locale/{locale}', LocaleController::class)->name('locale.switch');
 
 Route::prefix('/')
     ->middleware('auth')

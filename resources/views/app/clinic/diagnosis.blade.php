@@ -40,6 +40,10 @@
                     selector: "#diagnosis",
                     height: 300,
                     menubar: false,
+                    // The skin and content stylesheet are in the build; without this the editor
+                    // asks the current URL for them and gets a 404.
+                    skin_url: 'default',
+                    content_css: 'default',
                     statusbar: false,
                     plugins: plugins,
                     toolbar: tools,
@@ -55,6 +59,10 @@
                     selector: "#prescription",
                     height: 300,
                     menubar: false,
+                    // The skin and content stylesheet are in the build; without this the editor
+                    // asks the current URL for them and gets a 404.
+                    skin_url: 'default',
+                    content_css: 'default',
                     statusbar: false,
                     plugins: plugins,
                     toolbar: tools,

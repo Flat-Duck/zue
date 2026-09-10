@@ -23,14 +23,21 @@
                     </form>
                 </div>
             @endif
-            <div class="nav-item d-none d-md-flex me-3">
-                <div class="btn-list">
-                <a href="https://github.com/sponsors/codecalm" class="btn" target="_blank" rel="noreferrer">
-                    <i class="ti ti-heart text-pink"></i>
-                    Sponsor
+            <div class="nav-item dropdown d-none d-md-flex me-3">
+                <a href="#" class="nav-link px-2" data-bs-toggle="dropdown" aria-label="@lang('crud.common.language')" title="@lang('crud.common.language')">
+                    <i class="ti ti-language"></i>
+                    <span class="ms-1">{{ config('locales.supported.'.app()->getLocale().'.native') }}</span>
                 </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    @foreach (config('locales.supported') as $code => $language)
+                        <a class="dropdown-item {{ app()->getLocale() === $code ? 'active' : '' }}"
+                           href="{{ route('locale.switch', $code) }}"
+                           lang="{{ $code }}">
+                            {{ $language['native'] }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
-        </div>
         <div class="d-none d-md-flex">
             <a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
                 <i class="ti ti-moon"></i>

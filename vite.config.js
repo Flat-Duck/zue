@@ -5,6 +5,7 @@ export default defineConfig({
     plugins: [
         laravel([
             'resources/sass/app.scss',
+            'resources/sass/app-rtl.scss',
             'resources/js/app.js',
             'resources/js/editor.js',
             'resources/js/appraisal-period-form.js',

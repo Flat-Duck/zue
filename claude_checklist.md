@@ -247,27 +247,15 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   methods averaging seven lines: relations, accessors and small predicates. Moving those into
   traits would move lines without making anything clearer.
 
-- [ ] 3.4 **`centers` does not duplicate `departments.code` — it is worse than that, and this
-  needs your decision.** Measured against the real data:
+- [x] 3.4 **Decided: keep both tables and keep `departments.code`.** The measurement stands —
+  132 centres against 126 departments across 153 distinct pairings, so a centre does not
+  determine a department and the two are not interchangeable. Owner's answer: the department code
+  is a data necessity and stays. No schema change; the cost centre remains the budget line a
+  department reports against.
 
-  - 132 centres and 126 departments are in use, across **153 distinct pairings** — so the two
-    are not 1:1, and a centre does not determine a department.
-  - `centers.name` is almost always identical to `centers.code` (`5W20` / `5W20`). Centres have
-    no names; the import created them from the cost centre code.
-  - The codes usually match across the pair but not always: centre `5J09` sits under department
-    `8J09`, centre `5G30` under `8G30`, centre `5S40` under `5M16`.
-  - Centres are duplicated across the `5`/`8` prefix: `5G30` and `8G30` are separate centres
-    pointing at the same department.
-  - **Two generations of records coexist.** Departments from the legacy dump are English and
-    have no code (`MAINT`, `PROD`, `Gas Plant`); departments from the personnel export are
-    Arabic and do. 1,115 staff are still filed under the codeless legacy ones.
-
-  What that means is a question about the business, not the schema: is a cost centre a budget
-  line that a department reports against — in which case the tables are right and the data
-  needs reconciling — or is it another name for the department, in which case one of them goes?
-  **My recommendation:** keep both tables, treat the cost centre as the budget line, and
-  reconcile the two generations during the fresh import rather than by migration. Tell me which
-  it is and I will do it.
+  What is left is a data question rather than a modelling one: 1,115 staff sit under the
+  codeless legacy departments imported from the dump, and the export departments carry codes.
+  Reconciling those two generations belongs to the fresh import, not to a migration.
 
 - [x] Employee list queries no longer carry salaries or national IDs — asserted, not assumed
 
@@ -303,13 +291,12 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   install — previously the access model existed only in `PermissionsSeeder` and in whatever the
   live database had drifted to.
 
-- [ ] **Four roles the time sheet workflow depends on hold no permissions at all.**
-  `PermissionsSeeder` creates `supervisor`, `fieldcoordinator`, `superintendent` and `campboss`
-  with nothing granted, yet those are the names the approval flow puts in `required_role`. On a
-  fresh install someone given one of those roles alone reaches no page whatsoever — it works
-  today only because the same people also hold `user`. Asserted as it stands so the situation is
-  visible rather than surprising. **Deciding what each of those four should actually be able to
-  reach is yours to make**, and I would rather ask than invent an access matrix for your staff.
+- [x] **Deferred by the owner: the four permissionless roles are test scaffolding.**
+  `supervisor`, `fieldcoordinator`, `superintendent` and `campboss` hold no permissions because
+  they were created to exercise the management scope model, not to be granted to anyone yet.
+  `RoleAccessTest` asserts that as it stands, so the day someone is given one of them on its own
+  and reaches nothing, the test says why. What each should reach gets settled when they are set
+  up for real.
 
 - [x] 4.3 **Coverage is a number now: 57.96% of lines** (3,664 of 6,322), 57.31% of methods,
   36.32% of classes, across 430 tests and 2,520 assertions. No class sits at zero.
@@ -479,62 +466,73 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   subtotal, a popover initialiser. Moving them buys nothing on its own; it buys something only as
   part of the content security policy pass, alongside the last inline styles.
 
-- [ ] **Found doing it: the date picker had a ceiling that was about to expire.** The inline
-  script restricted the fill screen's picker to `from: "2024-01-01", to: '2026-10-10'` — a date
-  literal. Past it, the picker refuses every day and attendance cannot be entered at all. Today
-  is 2026-09-10, so it had **one month left**. The bound is computed from the current date now.
+- [x] **The date picker's ceiling was about to expire; the horizon is now one month, by decision.**
+  The inline script restricted the fill screen to `from: "2024-01-01", to: '2026-10-10'` — a date
+  literal. Past it the picker refuses every day and attendance cannot be entered at all, and on
+  2026-09-10 it had **one month left**.
 
-  Worth your attention: I kept the shape of the old rule — a month ahead of today — because that
-  is what it did, not because anyone decided it. **How far ahead should staff be able to fill a
-  timesheet?** If the answer is "not at all beyond today", or "to the end of the current month",
-  say so and I will change it.
+  Owner's answer: one month ahead is right. That is what the derived bound gives, computed from
+  the current date so it cannot expire again, and a test travels the clock forward to prove the
+  bound moves with it.
 
-- [x] **`migrate:reset` was broken three migrations from the top, and now runs end to end.**
-  Dusk's `DatabaseMigrations` rolls the schema back after each test, which is how this surfaced —
-  nothing else in the project had ever attempted a full rollback. Three `down()` methods failed:
+- [x] 5.4 **Editor kept, and fixed.** Owner's answer was to keep it or find something smaller.
+  Investigating turned up something better than a swap: `hugerte-init.js` imported **all 28
+  plugins** the package ships, while the clinic screens configure 17 between them. Eleven were
+  bundled that nothing asked for — emoticons and its emoji data, codesample and its syntax
+  highlighter, template, accordion, autoresize, autosave, directionality, nonbreaking, pagebreak,
+  quickbars, save, visualchars. Bundle **1,688 KB → 1,394 KB**, with no feature lost.
 
-  1. `add_indexes_to_flight_pivot_tables` dropped a composite index that was the only one serving
-     a foreign key, which MySQL refuses.
-  2. `make_users_id_manual_and_sync_with_number` dropped `employees_user_id_foreign` by name —
-     but the identity redesign's own `down()` restored the column *without* its foreign key, so
-     the migration behind it had nothing to drop.
-  3. `add_location_column_to_residences_table` dropped a column while its foreign key still
-     referenced it.
+  Not swapped, deliberately. Trix cannot do alignment, background colour or headings, all of
+  which the clinic toolbar uses. Quill can, but stores alignment as its own `ql-*` classes, so
+  existing content would need migrating — and these fields hold diagnoses and prescriptions.
+  Migrating clinical text to save a megabyte on four pages is a bad trade.
 
-  All **81 migrations now roll back and re-apply cleanly**, verified as a full round trip. This
-  is a phase 7 prerequisite — "document and rehearse the rollback" is not something you want to
-  discover on the night.
+- [x] **The clinic editor's content stylesheet was 404ing, and only the browser found it.**
+  HugeRTE fetches its skin and content CSS from a base URL unless told they are bundled. Nothing
+  told it, so every clinic screen requested
+  `/clinic/diagnosis//skins/ui/oxide/content.min.css` — a relative path resolved against the
+  current URL, doubled slash and all — and got a 404. The editor worked; the text inside it was
+  styled by browser defaults rather than by the editor, so what a doctor saw while typing was not
+  what the record would look like. `skin_url` and `content_css` are `default` at all seven init
+  sites now, and `ClinicEditorTest` fails on any failed request on that page.
 
-- [ ] 5.4 Code-split or replace the 1,656 KB editor bundle. It is already a separate Vite entry
-  loaded only by the four clinic views, so it costs nothing elsewhere; the 1,688 KB is HugeRTE
-  itself. Splitting it further is not really available — replacing it is a product decision.
+- [~] 5.5 **Decided: two languages, Arabic and English. The foundation is in; the documents are
+  not.** Owner's answer overrode my recommendation to leave it, so the interface is genuinely
+  bilingual rather than English-with-Arabic-documents.
 
-- [ ] 5.5 **The i18n story needs your decision.** Measured rather than guessed:
+  Done:
 
-  - 96 of 184 views already go through `@lang`/`__()`, against a single `lang/en/crud.php` of
-    627 lines. That is the scaffolded chrome — buttons, table headings, "are you sure".
-  - 38 views (20%) contain hard-coded Arabic — **286 lines of it**. It is concentrated in the
-    documents: the appraisal sheet (68 lines), the appraisal review form (36), the injury report
-    (28), the flight manifest (25), the time sheet approval sheet (16).
-  - `config/app.php` sets locale and fallback to `en`, and no `ar` directory exists.
+  - `config/locales.php` names both languages, each with its direction.
+  - `SetLocale` middleware picks one: a choice the person made wins, then the browser's
+    `Accept-Language`, then the default — so an Arabic browser gets Arabic without hunting for a
+    switch.
+  - A language picker in the navigation, each language in its own script: someone looking for
+    Arabic is looking for العربية. It replaced Tabler's sponsor link, which had no business in a
+    private HR system.
+  - **`lang/ar/crud.php`: all 217 keys translated**, none left in English, asserted by a test
+    comparing the two files key for key. Field names follow the wording of the company's own
+    personnel export, so a clerk reads the same word on screen as on the form they type from.
+  - Right-to-left is a real layout, not an attribute: Tabler ships a mirrored stylesheet, so
+    `app-rtl.scss` is a second entry and the layout serves whichever matches. Shared application
+    styles live in one partial both import.
+  - Nine tests, one a browser test that switches to Arabic and checks the page actually lays out
+    right to left, on the mirrored stylesheet, with no console errors.
 
-  So the application is not half-translated; it is two things at once. The **chrome is English and
-  translatable**, and the **printed documents are Arabic and fixed** — because they reproduce
-  forms the company already uses, where the wording is the form. Nobody would want
-  `الجنسية` on the airport manifest to follow a locale switch.
+  **Not done, and the larger half:** the **286 lines of hard-coded Arabic** across 38 views — the
+  appraisal sheet, the manifest, the injury report, the approval sheet. Those are the printed
+  documents, and making them bilingual means deciding *per document* whether it shows both
+  scripts side by side or follows the interface language. The manifest is carried to the airport
+  and the appraisal form is signed. That is a question about the paper. **Say which and I will do
+  the documents.**
 
-  Three ways forward, and it is a question about who uses this system, not about code:
+- [x] **The stylesheet was still fetching a Google font, and my earlier claim was too broad.**
+  I said no view loads from another host. True of Blade, not of the build: `app.scss` opened with
+  `@import url('https://fonts.googleapis.com/css?family=Nunito')`, so every page fetched Nunito —
+  a font **nothing uses**, since Tabler resolves its own `--tblr-body-font-family` and the Sass
+  variable naming Nunito sits in a file nothing imports. Removed. `FrontendAssetTest` now scans
+  the built CSS and JS for fetch-shaped references — `@import`, `url()`, dynamic `import()`,
+  `fetch()` — not just views, and is mutation-checked by putting the font import back.
 
-  1. **Leave it.** Declare the documents Arabic by definition and stop counting them as
-     untranslated. Cheapest, and honest about what those pages are.
-  2. **Translate the chrome to Arabic** — add `lang/ar`, set the locale, and give staff an Arabic
-     interface end to end. Real work: 627 keys, plus RTL for every screen, not just the printed
-     ones.
-  3. **Make it switchable**, so an English-speaking contractor and an Arabic-speaking clerk each
-     get their own. The most work by far, and only worth it if you actually have both.
-
-  **My recommendation is (1) unless staff are asking for an Arabic interface**, in which case (2).
-  I would not build (3) without someone actually needing it. Which is it?
 - [x] No view references an external host — asserted by `FrontendAssetTest`, not assumed
 
 ## Phase 6 — Quality gates
@@ -599,15 +597,18 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   has to be switched on for a red gate to actually block a merge; that is a repository setting,
   and yours to make.
 
-- [ ] **The leave balance loses its fraction when stored, and the report does not.**
-  `calculateBalance()` returns `8.81` for ten days at a 37/42 rotation. `employees.total_balance`
-  is an `int` column, so saving rounds it to 9 — while `calculateBalanceToDate()`, which the
-  reports read, keeps the fraction. For the **18 people on 37/42, 39/42, 40/50, 45/50 and 50/45**
-  the report and the record disagree about the same person.
+- [x] **Decided: a part-day of leave settles to the nearest whole day, half away from zero.**
+  Owner's rule: 3.4 is 3, 3.5 is 4, 3.9 is 4. Implemented in one place —
+  `TimeSheetBuilder::roundToWholeDays()` — and applied by all three ways of asking for a balance,
+  so the running figure, the to-a-date figure and the bulk report figure can no longer disagree
+  about the same person. Seven cases pinned by a data provider, including the negative side:
+  a debt of half a day is a whole day owed.
 
-  The rounding is now explicit in `Employee::calculateBalance()` rather than happening silently in
-  MySQL, and two tests pin it. **Whether a part-day of leave should be kept, rounded or floored is
-  yours to decide** — it changes what people are owed, so I have not chosen for you.
+  A correction to what I said earlier: I described the report and the record as disagreeing. In
+  live code they do not — the balance report reads `employees.total_balance`, the stored integer.
+  The disagreement was between `calculateBalance()` and what got stored, and between the helper
+  functions themselves, neither of which had a production caller. The rule now applies to all of
+  them either way.
 
 ---
 
@@ -689,6 +690,10 @@ formatted, two dead scopes removed) and **Operations 6 → 7** (CI runs formatti
 suite on two PHP versions, a rollback rehearsal and the browser tests — where before, nothing had
 ever run). **Performance 8 → 9**: filling a month went from thirty balance recalculations to one.
 Overall **8.1**.
+
+After the owner's decisions landed, **Frontend 8 → 9** (the interface is bilingual with a real
+right-to-left layout, the editor bundle is 294 KB lighter and its content stylesheet finally
+loads, and the last external font request is gone). Overall **8.2**.
 
 Still at baseline: **Scalability 5** — nothing in phases 1–6 addressed it, and phase 7 is where
 load and Octane are decided.

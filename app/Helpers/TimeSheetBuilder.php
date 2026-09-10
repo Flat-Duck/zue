@@ -77,13 +77,15 @@ class TimeSheetBuilder
     }
 
     /**
-     * Days worked, scaled by the rotation's on/off ratio, less days taken, plus
-     * anything carried over.
+     * A leave balance in whole days: days worked, scaled by the rotation's on/off
+     * ratio, less days taken, plus anything carried over.
      *
-     * A rotation such as 37/42 yields a fraction. `employees.total_balance` is an
-     * integer column, so storing it drops that — see TimeSheetBuilderTest.
+     * A rotation such as 37/42 yields a fraction, and the company settles those to
+     * the nearest whole day — 3.4 is 3, 3.5 and 3.9 are both 4. That decision lives
+     * in {@see roundToWholeDays()} so every way of asking for a balance gives the
+     * same answer.
      */
-    public static function calculateBalance(int $employee_id, string $schedule, int $transfered_balance = 0): float
+    public static function calculateBalance(int $employee_id, string $schedule, int $transfered_balance = 0): int
     {
         $sch = explode('/', $schedule);
         $w = 0;
@@ -101,10 +103,13 @@ class TimeSheetBuilder
 
         $total = $w * $sch[0] / $sch[1] - $f;
 
-        return $total + $transfered_balance;
+        return self::roundToWholeDays($total + $transfered_balance);
     }
 
-    public static function calculateBalanceToDate(int $employee_id, string $schedule, string $date, int $transfered_balance = 0): float
+    /**
+     * The same figure as {@see calculateBalance()}, counted only up to a cutoff day.
+     */
+    public static function calculateBalanceToDate(int $employee_id, string $schedule, string $date, int $transfered_balance = 0): int
     {
         $sch = explode('/', $schedule);
         $w = 0;
@@ -125,7 +130,17 @@ class TimeSheetBuilder
 
         $total = $w * $sch[0] / $sch[1] - $f;
 
-        return $total + $transfered_balance;
+        return self::roundToWholeDays($total + $transfered_balance);
+    }
+
+    /**
+     * Rounds a balance to whole days, half away from zero: 3.4 gives 3, 3.5 and 3.9
+     * both give 4. Negative balances round the same way, so -3.5 gives -4 — a day
+     * owed is treated the same size whichever direction it runs.
+     */
+    public static function roundToWholeDays(float $balance): int
+    {
+        return (int) round($balance);
     }
 
     public static function calculateBulckBalanceToDate($empls, $employeeIds, string $date)
@@ -154,7 +169,7 @@ class TimeSheetBuilder
             }
 
             $total = (($w * (int) $schedule[0]) / (int) $schedule[1]) - $f;
-            $employee['total_balance'] = $total + $employee->transfered_balance;
+            $employee['total_balance'] = self::roundToWholeDays($total + $employee->transfered_balance);
 
             return $employee;
         });

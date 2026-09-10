@@ -1,5 +1,9 @@
+@php
+    $locale = app()->getLocale();
+    $direction = config("locales.supported.{$locale}.dir", 'ltr');
+@endphp
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', $locale) }}" dir="{{ $direction }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" viewport-fit=cover">
@@ -12,7 +16,7 @@
 
     {{-- Styles first: the guest layout previously loaded only the script, so
          every page using it rendered as unstyled HTML. --}}
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite([$direction === 'rtl' ? 'resources/sass/app-rtl.scss' : 'resources/sass/app.scss', 'resources/js/app.js'])
     @yield('styles')
 
     {{-- @livewireStyles --}}

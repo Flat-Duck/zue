@@ -337,19 +337,17 @@ class Employee extends Model
     }
 
     /**
-     * Recalculates the leave balance and stores it.
-     *
-     * The rounding is explicit because the column is an integer and the arithmetic
-     * is not: a 37/42 rotation earns 8.81 days for ten worked, and eighteen people
-     * are on rotations like it. This is what the database was already doing
-     * silently. Whether a part-day of leave should be kept, rounded or floored is a
-     * question for the company, not something to settle by choosing a cast.
+     * Recalculates the leave balance and stores it. Already whole days by the time
+     * it arrives — see TimeSheetBuilder::roundToWholeDays().
      */
     public function calculateBalance(): void
     {
-        $balance = TimeSheetBuilder::calculateBalance($this->id, $this->schedule, $this->transfered_balance);
+        $this->total_balance = TimeSheetBuilder::calculateBalance(
+            $this->id,
+            $this->schedule,
+            $this->transfered_balance
+        );
 
-        $this->total_balance = (int) round($balance);
         $this->save();
     }
 
