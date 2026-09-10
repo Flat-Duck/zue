@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Employee;
 use App\Models\TimeSheet;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TimeSheetFactory extends Factory
@@ -27,8 +27,8 @@ class TimeSheetFactory extends Factory
             'day' => $this->faker->date(),
             'revised_at' => $this->faker->dateTime(),
             'old_value' => $this->faker->text(255),
-            'user_id' => \App\Models\User::factory(),
-            'employee_id' => \App\Models\Employee::factory(),
+            'user_id' => null,
+            'employee_id' => Employee::factory(),
         ];
     }
 }

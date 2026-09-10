@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AuditLoggerContract;
+use App\Contracts\BackupServiceContract;
 use App\Jobs\PerformBackupJob;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
-use App\Services\AuditLogger;
-use App\Services\BackupService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +15,11 @@ use Illuminate\Support\Str;
 
 class MaintenanceController extends Controller
 {
-    protected $backupService;
-
-    public function __construct(BackupService $backupService)
-    {
+    public function __construct(
+        private readonly BackupServiceContract $backupService,
+        private readonly AuditLoggerContract $auditLogger,
+    ) {
         $this->middleware('auth');
-        $this->backupService = $backupService;
     }
 
     public function index()
@@ -177,7 +176,7 @@ class MaintenanceController extends Controller
         try {
             DB::unprepared($sql);
 
-            app(AuditLogger::class)->record('database.restored', [
+            $this->auditLogger->record('database.restored', [
                 'filename' => $filename,
             ]);
 
@@ -185,7 +184,7 @@ class MaintenanceController extends Controller
         } catch (\Exception $e) {
             report($e);
 
-            app(AuditLogger::class)->recordFailure('database.restore_failed', $e->getMessage(), [
+            $this->auditLogger->recordFailure('database.restore_failed', $e->getMessage(), [
                 'filename' => $filename,
             ]);
 
@@ -203,7 +202,7 @@ class MaintenanceController extends Controller
             abort(404);
         }
 
-        app(AuditLogger::class)->record('backup.downloaded', [
+        $this->auditLogger->record('backup.downloaded', [
             'filename' => $filename,
         ]);
 
@@ -219,7 +218,7 @@ class MaintenanceController extends Controller
         if (Storage::disk('local')->exists('backups/'.$filename)) {
             Storage::disk('local')->delete('backups/'.$filename);
 
-            app(AuditLogger::class)->record('backup.deleted', [
+            $this->auditLogger->record('backup.deleted', [
                 'filename' => $filename,
             ]);
 

@@ -215,7 +215,6 @@ class EmployeeProfileFormTest extends TestCase
         $employee = Employee::factory()->create();
 
         $payload = [
-            'user_id' => $employee->user_id,
             'location_id' => $employee->location_id,
             'department_id' => $employee->department_id,
             'center_id' => $employee->center_id,
@@ -251,7 +250,6 @@ class EmployeeProfileFormTest extends TestCase
 
         $this->from(route('employees.edit', $employee))
             ->put(route('employees.update', $employee), [
-                'user_id' => $employee->user_id,
                 'location_id' => $employee->location_id,
                 'department_id' => $employee->department_id,
                 'center_id' => $employee->center_id,
@@ -267,7 +265,6 @@ class EmployeeProfileFormTest extends TestCase
         $response = $this->post(route('employees.store'), [
             'number' => 991234,
             'english_name' => 'Minimal Person',
-            'user_id' => User::factory()->create()->id,
             'location_id' => Location::factory()->create()->id,
             'department_id' => Department::factory()->create()->id,
             'center_id' => Center::factory()->create()->id,

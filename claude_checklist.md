@@ -9,7 +9,7 @@ Tracking for [`claude_roadmap.md`](claude_roadmap.md). Evidence in
 
 Legend: `[x]` done · `[~]` partial / follow-up needed · `[ ]` not started
 
-**Status:** Phase 1 complete; Phase 2 next
+**Status:** Phase 1 complete; Phase 2 in progress (2.1, 2.2, 2.3 done + identity redesign)
 **Baseline:** 311 tests passing · PHPStan level 5 clean (212-item baseline) · Laravel 13.31.0
 **Last updated:** 2026-09-10
 
@@ -42,13 +42,111 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
 
 ## Phase 2 — Structure
 
-- [ ] 2.1 Extract interfaces for the six core services; bind them in a service provider
-- [ ] 2.2 Replace the 32 `app(Concrete::class)` calls with constructor injection
-- [ ] 2.3 Break up `TimeSheetService::getApprovalData` (225 lines)
+- [~] 2.1 Contracts extracted and bound for the three genuine seams — `AuditLoggerContract`, `BackupServiceContract`, `FlightDispatchContract`. The timesheet services are deliberately **not** interfaced yet: an interface mirroring 11 public methods of a 614-line class is ceremony, not a seam. Deferred until 2.4 splits them.
+- [x] 2.2 Service location reduced 32 → 9. Controllers use constructor injection; Livewire uses method injection. The 9 that remain are in an Eloquent model and a static helper, where there is nothing to inject into — documented in place.
+- [x] 2.3 `getApprovalData` 225 → **30 lines**, orchestrating `paginateForPrinting` (25), `collectStageSignatures` (45), `resolveApprovalAvailability` (34) and `stageIsWaiting` (23). Behaviour pinned first by 13 characterization tests.
 - [ ] 2.4 Break up `TimeSheetAuthorizationService` (614 lines; `approve` 115, `approvalStages` 103)
 - [ ] 2.5 Collapse the 18 duplicated CRUD controllers onto a shared base
 - [ ] 2.6 Replace inline `$request->validate()` in 30 files with Form Requests
 - [ ] No method over ~60 lines; core services resolved through interfaces
+
+**Findings raised during Phase 2**
+
+- [x] **Identity redesigned at the root (2026-09-10).** The legacy Windows system linked
+  everything by employee number: `users.num` held it, and `time_sheet.revised_by` held it too.
+  To import `revised_by` directly, this application forced `users.id = users.number =
+  employees.id` — three id spaces pretending to be one, enforced only by a `User::booted()`
+  hook and a migration that made `users.id` manual. It had already drifted: employee id 6718
+  carries number 6716.
+
+  The consequence was severe and silent: `ActorResolver` looked up `employees.user_id`,
+  which was **NULL for every row**, so `managedEmployeesQuery()` returned **0 employees
+  despite 58 configured management scopes**. Timesheet authorization was non-functional.
+
+  Fixed by separating the three identities and declaring one link:
+
+  | | Before | After |
+  | --- | --- | --- |
+  | `users.id` | manual, = employee number | auto-increment surrogate |
+  | `users.number` | duplicated the employee's | **dropped** (accessor reads the employee) |
+  | `employees.user_id` | nullable, unpopulated | **dropped** |
+  | link | id coincidence | **`users.employee_id` NOT NULL UNIQUE FK** |
+  | approvers | FK to employees, resolved as users | employees, end to end |
+
+  `managedEmployeesQuery()` went from **0 to 11** employees for the admin account.
+
+  Two further instances of the same assumption surfaced and were fixed: the supervisor
+  lookup in `getManagedApprovalBuckets` matched **employee ids against user ids**, and
+  `WorkflowResolver` selected the dropped column. Dead re-login logic in `UserController`
+  — which existed only because user ids used to change — was removed.
+
+- [x] **Legacy importer built (2026-09-10).** `php artisan legacy:import` streams the 25
+  converted dump files (60 MB, 1.25M time sheet rows) and reshapes them into the current
+  schema on the way in. Full run: **22 seconds**.
+
+  Employee ids are carried across untouched — every other foreign key in the dump points at
+  one, so translating them would rewrite 1.2M rows for nothing. Only two things change shape:
+  users get a database-assigned id plus a real `employee_id`, and `time_sheets.admin_id`
+  (an employee *number* in the old schema) becomes an employee id.
+
+  The dump does not record which employee a user is — `employees.user_id` is NULL on all
+  1,115 rows — so the link is derived, by strongest available match:
+
+  | | Rule | Users |
+  | --- | --- | :---: |
+  | 1 | `users.number` matches `employees.number` | 32 |
+  | 2 | `users.id` matches `employees.number` | 23 |
+  | 3 | `users.id` matches `employees.id` | 1 |
+
+  Rule 3 exists for exactly one row and would otherwise be lost: user 6718 was keyed on the
+  employee's *id*, and that employee's number is 6716. **All 57 legacy users now resolve.**
+  Rank order also settles the one genuine collision — users 9676 and 10841 are the same
+  person entered twice, and the row carrying an explicit number keeps the account. The
+  displaced row is named in the report rather than dropped in silence.
+
+  Every reviser resolves: **61,354 time sheet rows across 9 named employees**, which was the
+  whole point of the exercise.
+
+  Not imported, deliberately: roles and permissions (owned by `PermissionsSeeder`, so
+  `model_has_roles` is re-pointed **by role name** instead), `backup_logs`, and passwords
+  unless `--with-passwords` is passed. Note the plaintext passwords are in the old C# table,
+  which is commented out; the Laravel table's are `$2y$12$` bcrypt and safe to carry over.
+  A password on an account that already exists is never overwritten.
+
+  `--dry-run` resolves every identity and validates every reference without writing.
+
+- [x] **The dump references 12 employees it does not contain** (3,556 time sheet rows). The
+  legacy database never enforced that foreign key, so staff were deleted out from under their
+  own attendance history. These rows are skipped and reported by employee id and row count —
+  re-exporting the employee table including deleted staff recovers them. `--strict` turns any
+  such finding into a failed run.
+
+- [x] **`employees.number` is now `UNIQUE`.** It is the key the whole actor model rests on, and
+  it was unenforced. The migration folds any duplicate pair back into the referenced row first.
+
+- [x] **The CSV profile importer was creating duplicate employees.** `EmployeeProfilesImport`
+  looked up by number through the global archived-employee scope, so anyone who had left the
+  company read as a new hire — **10 duplicate rows** in the development database. Fixed with
+  `withArchived()`, covered by a regression test, and now structurally impossible thanks to
+  the unique index above.
+
+- [x] **`php artisan db:seed` was broken.** `DatabaseSeeder` called the dump loader in
+  `sql_dump/converted/all.php`, which reads `$seeder->command` — a *protected* property — from
+  outside the class, a guaranteed fatal. `DatabaseSeeder` now calls `SuperAdminSeeder`, and
+  historical data loads through `legacy:import` instead.
+
+- [x] **`SuperAdminSeeder` added.** Creates the one account the system can be signed into,
+  keyed by employee number rather than email, because every actor is an employee. Safe to run
+  before or after the import: run first it creates a placeholder under the id the dump uses,
+  so the import fills in the real record instead of duplicating the person.
+
+  ```
+  php artisan migrate
+  php artisan db:seed
+  php artisan legacy:import --with-passwords
+  ```
+- [x] `TimeSheetService::getApprovalData` had **zero test coverage** before this phase —
+  225 lines feeding three routes. Now covered by `TimeSheetApprovalDataTest` (13 tests).
 
 ## Phase 3 — Data model
 

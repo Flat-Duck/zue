@@ -122,7 +122,6 @@ class EmployeeControllerTest extends TestCase
             'last_date' => $this->faker->date(),
             'total_balance' => $this->faker->randomNumber(0),
             'archived_at' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
-            'user_id' => $user->id,
             'department_id' => $department->id,
             'location_id' => $location->id,
             'center_id' => $center->id,

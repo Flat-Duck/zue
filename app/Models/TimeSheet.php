@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class TimeSheet extends Model
 {
@@ -18,7 +18,7 @@ class TimeSheet extends Model
         'revised_at',
         'old_value',
         'user_id',
-        'over_time'
+        'over_time',
     ];
 
     protected $searchableFields = ['*'];
@@ -37,17 +37,28 @@ class TimeSheet extends Model
 
     public function time_keeper()
     {
-        return $this->belongsTo(User::class, 'timekeeper_id');
+        return $this->belongsTo(Employee::class, 'timekeeper_id');
     }
 
     public function super_intendent()
     {
-        return $this->belongsTo(User::class, 'superintendent_id');
+        return $this->belongsTo(Employee::class, 'superintendent_id');
+    }
+
+    /**
+     * The employee who revised this sheet.
+     *
+     * Carried over from the legacy system's `revised_by`, which held an
+     * employee number.
+     */
+    public function revised_by()
+    {
+        return $this->belongsTo(Employee::class, 'admin_id');
     }
 
     public function super_visor()
     {
-        return $this->belongsTo(User::class, 'supervisor_id');
+        return $this->belongsTo(Employee::class, 'supervisor_id');
     }
 
     public function employee()
@@ -62,6 +73,7 @@ class TimeSheet extends Model
         } elseif ($this->value === 'A') {
             return 2;
         }
+
         return 0;
     }
 
@@ -72,6 +84,7 @@ class TimeSheet extends Model
         } elseif (in_array($this->value, ['F', 'X'])) {
             return 'grassgreen';
         }
+
         return '';
     }
 }

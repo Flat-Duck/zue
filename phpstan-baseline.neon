@@ -31,18 +31,6 @@ parameters:
 			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$versionItems\.$#'
 			identifier: property.notFound
 			count: 1
@@ -109,12 +97,6 @@ parameters:
 			path: app/Http/Controllers/EmployeeController.php
 
 		-
-			message: '#^Relation ''user'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/EmployeeController.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -167,6 +149,12 @@ parameters:
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Http/Controllers/RoomController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$last_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TimeSheetController.php
 
 		-
 			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Model\|null is not subtype of native type App\\Models\\User\.$#'
@@ -349,37 +337,7 @@ parameters:
 			path: app/Models/Scopes/UnderSupervisionEmployees.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$center_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$department_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$employee_level\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$management_level\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Models/User.php
@@ -473,12 +431,6 @@ parameters:
 			identifier: property.notFound
 			count: 2
 			path: app/Services/SignatureService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$user\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TimeSheetAuth/ActorResolver.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_employee_id\.$#'
@@ -637,24 +589,6 @@ parameters:
 			path: app/Services/TimeSheetService.php
 
 		-
-			message: '#^Relation ''super_intendent'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Relation ''super_visor'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Relation ''time_keeper'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 3
@@ -734,6 +668,12 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Faker\\Generator\:\:\$unique\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
 			path: database/factories/UserFactory.php

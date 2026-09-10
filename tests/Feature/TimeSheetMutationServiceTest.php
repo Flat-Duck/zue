@@ -92,12 +92,11 @@ class TimeSheetMutationServiceTest extends TestCase
         $service = app(TimeSheetMutationService::class);
         Role::create(['name' => 'timekeeper']);
 
-        $actorUser = User::factory()->create(['number' => 912345]);
+        $actorUser = User::factory()->forEmployeeNumber(912345)->create();
         $actorUser->assignRole('timekeeper');
-        $actorEmployee = Employee::factory()->create([
-            'user_id' => $actorUser->id,
-            'schedule' => '5/5',
-        ]);
+
+        // The actor's employee is the one their account is linked to.
+        $actorEmployee = $actorUser->employee;
         $targetEmployee = Employee::factory()->create(['schedule' => '5/5']);
 
         TimeSheet::factory()->create([

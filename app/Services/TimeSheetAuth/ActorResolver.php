@@ -14,7 +14,7 @@ class ActorResolver
             return null;
         }
 
-        return Employee::query()->where('user_id', $user->id)->first();
+        return $user->employee;
     }
 
     public function resolveEmployeeByUserId(int $userId): ?Employee
@@ -36,6 +36,6 @@ class ActorResolver
             return null;
         }
 
-        return $employee->user;
+        return User::query()->where('employee_id', $employee->id)->first();
     }
 }

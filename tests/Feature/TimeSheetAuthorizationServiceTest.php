@@ -29,17 +29,17 @@ class TimeSheetAuthorizationServiceTest extends TestCase
         $department = Department::factory()->create();
         $center = Center::factory()->create();
 
-        $actorUser = User::factory()->create(['number' => 9101]);
         $actorEmployee = Employee::factory()->create([
-            'user_id' => $actorUser->id,
+
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
             'archived_at' => null,
         ]);
 
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+
         $targetEmployee = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
@@ -91,7 +91,6 @@ class TimeSheetAuthorizationServiceTest extends TestCase
             'employee_id' => $targetEmployee->id,
             'revised_at' => null,
             'old_value' => null,
-            'user_id' => null,
             'over_time' => 0,
         ]);
 

@@ -167,20 +167,20 @@ class TimeSheetMutationService
             if ($level === 'timekeeper') {
                 return (int) $query
                     ->whereNull('timekeeper_id')
-                    ->update(['timekeeper_id' => $actor->id]);
+                    ->update(['timekeeper_id' => $this->actorEmployeeId($actor)]);
             }
 
             if ($level === 'supervisor') {
                 return (int) $query
                     ->whereNotNull('timekeeper_id')
                     ->whereNull('supervisor_id')
-                    ->update(['supervisor_id' => $actor->id]);
+                    ->update(['supervisor_id' => $this->actorEmployeeId($actor)]);
             }
 
             return (int) $query
                 ->whereNotNull('supervisor_id')
                 ->whereNull('superintendent_id')
-                ->update(['superintendent_id' => $actor->id]);
+                ->update(['superintendent_id' => $this->actorEmployeeId($actor)]);
         });
     }
 
@@ -216,7 +216,7 @@ class TimeSheetMutationService
             if ($level === 'timekeeper') {
                 return (int) (clone $query)
                     ->whereNull('timekeeper_id')
-                    ->update(['timekeeper_id' => $actor->id]);
+                    ->update(['timekeeper_id' => $this->actorEmployeeId($actor)]);
             }
 
             if ($level === 'supervisor') {
@@ -228,7 +228,7 @@ class TimeSheetMutationService
                     ->whereIn('employee_id', $workflow['needs_supervisor_ids'])
                     ->whereNotNull('timekeeper_id')
                     ->whereNull('supervisor_id')
-                    ->update(['supervisor_id' => $actor->id]);
+                    ->update(['supervisor_id' => $this->actorEmployeeId($actor)]);
             }
 
             if ($level === 'fieldcoordinator') {
@@ -254,7 +254,7 @@ class TimeSheetMutationService
                             });
                         }
                     })
-                    ->update(['superintendent_id' => $actor->id]);
+                    ->update(['superintendent_id' => $this->actorEmployeeId($actor)]);
             }
 
             if (empty($workflow['needs_superintendent_ids'])) {
@@ -279,8 +279,22 @@ class TimeSheetMutationService
                         });
                     }
                 })
-                ->update(['superintendent_id' => $actor->id]);
+                ->update(['superintendent_id' => $this->actorEmployeeId($actor)]);
         });
+    }
+
+    /**
+     * The employee behind a signed-in user.
+     *
+     * Approver columns record the person, not the login: they are foreign keys
+     * to `employees`, and the legacy system stored an employee number in the
+     * equivalent column.
+     */
+    private function actorEmployeeId(User|Employee $actor): int
+    {
+        // Callers reach this having already resolved the employee in some
+        // paths and holding the signed-in user in others.
+        return $actor instanceof Employee ? $actor->id : $actor->employee_id;
     }
 
     public function normalizeAttendanceValue(string $value): string

@@ -14,9 +14,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @property-read User|null $user
+ * @property-read Signature|null $signature
+ */
 class Employee extends Model
 {
     use HasFactory;
@@ -37,7 +43,6 @@ class Employee extends Model
         'address',
         'phone',
         'email',
-        'user_id',
         'location_id',
         'department_id',
         'center_id',
@@ -179,7 +184,6 @@ class Employee extends Model
                 'fields' => [
                     'job' => ['label' => 'Job', 'arabic' => 'الوظيفة', 'type' => 'text'],
                     'job_title_en' => ['label' => 'Job title (English)', 'arabic' => 'الوظيفة بالإنجليزية', 'type' => 'text'],
-                    'user_id' => ['label' => 'Login account', 'arabic' => 'حساب الدخول', 'type' => 'select:users'],
                     'employee_level' => ['label' => 'Employment level', 'arabic' => 'مستوى الموظف', 'type' => 'choice:employee_level'],
                     'management_level' => ['label' => 'Management level', 'arabic' => 'المستوى الإداري', 'type' => 'choice:management_level'],
                     'start_date' => ['label' => 'Start date', 'arabic' => 'تاريخ البدء', 'type' => 'date'],
@@ -348,7 +352,6 @@ class Employee extends Model
     private static function relationRule(string $name): array
     {
         $table = match ($name) {
-            'user_id' => 'users',
             'location_id' => 'locations',
             'department_id' => 'departments',
             'center_id' => 'centers',
@@ -361,9 +364,41 @@ class Employee extends Model
             : ['required', 'exists:'.$table.',id'];
     }
 
-    public function user()
+    /**
+     * A display name for the employee.
+     *
+     * Arabic first, because that is what the printed manifests and signature
+     * lines show; the English name is the fallback.
+     */
+    public function getNameAttribute(): ?string
     {
-        return $this->belongsTo(User::class);
+        return $this->arabic_name ?: $this->english_name;
+    }
+
+    /**
+     * The login account for this employee, if they have one.
+     *
+     * The link is owned by `users.employee_id`: every user is an employee, but
+     * most employees have no login.
+     */
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class);
+    }
+
+    /**
+     * The signature belongs to the login account, so it is reached through it.
+     */
+    public function signature(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Signature::class,
+            User::class,
+            'employee_id',
+            'user_id',
+            'id',
+            'id'
+        );
     }
 
     public function timeSheets()

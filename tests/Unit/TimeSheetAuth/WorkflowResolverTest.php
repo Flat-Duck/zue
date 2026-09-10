@@ -52,7 +52,6 @@ class WorkflowResolverTest extends TestCase
         $department = Department::factory()->create();
         $center = Center::factory()->create();
         $employee = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,

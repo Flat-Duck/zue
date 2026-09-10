@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AuditLoggerContract;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Imports\UsersImport;
 use App\Models\User;
-use App\Services\AuditLogger;
 use App\Services\SignatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +20,11 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private readonly AuditLoggerContract $auditLogger,
+        private readonly SignatureService $signatureService,
+    ) {}
+
     private const IMPERSONATOR_ID_SESSION_KEY = 'impersonator_id';
 
     private const IMPERSONATOR_NAME_SESSION_KEY = 'impersonator_name';
@@ -61,19 +66,18 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $validated = $request->validated();
-        $validated['number'] = (int) $validated['number'];
 
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
 
         if ($request->hasFile('signature_file')) {
-            app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+            $this->signatureService->saveSignature($user, $request->file('signature_file'));
         }
 
         $user->syncRoles($request->roles);
 
-        app(AuditLogger::class)->record('user.created', [
+        $this->auditLogger->record('user.created', [
             'user_id' => $user->id,
             'roles' => $user->getRoleNames()->all(),
         ]);
@@ -114,12 +118,7 @@ class UserController extends Controller
     ): RedirectResponse {
         $this->authorize('update', $user);
 
-        $oldUserId = (int) $user->id;
         $validated = $request->validated();
-
-        if (array_key_exists('number', $validated)) {
-            $validated['number'] = (int) $validated['number'];
-        }
 
         if (empty($validated['password'])) {
             unset($validated['password']);
@@ -129,13 +128,8 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        if (auth()->check() && (int) auth()->id() === $oldUserId && (int) $user->id !== $oldUserId) {
-            Auth::login($user);
-            $request->session()->migrate(true);
-        }
-
         if ($request->hasFile('signature_file')) {
-            app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+            $this->signatureService->saveSignature($user, $request->file('signature_file'));
         }
 
         $rolesBefore = $user->getRoleNames()->all();
@@ -145,7 +139,7 @@ class UserController extends Controller
         $rolesAfter = $user->fresh()->getRoleNames()->all();
 
         if ($rolesBefore !== $rolesAfter) {
-            app(AuditLogger::class)->record('user.roles_changed', [
+            $this->auditLogger->record('user.roles_changed', [
                 'user_id' => $user->id,
                 'from' => $rolesBefore,
                 'to' => $rolesAfter,
@@ -179,7 +173,7 @@ class UserController extends Controller
             'signature_file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        app(SignatureService::class)->saveSignature($user, $request->file('signature_file'));
+        $this->signatureService->saveSignature($user, $request->file('signature_file'));
 
         return redirect()
             ->back()
@@ -221,7 +215,7 @@ class UserController extends Controller
             'Content-Disposition' => 'attachment; filename="users_import_template.csv"',
         ];
 
-        $columns = ['name', 'email', 'number', 'phone'];
+        $columns = ['name', 'email'];
 
         $callback = function () use ($columns) {
             $file = fopen('php://output', 'w');
@@ -239,7 +233,7 @@ class UserController extends Controller
 
         if (! $actor || ! $actor->hasRole('super-admin')) {
             // A refused attempt to become someone else is worth recording.
-            app(AuditLogger::class)->recordFailure(
+            $this->auditLogger->recordFailure(
                 'impersonation.denied',
                 'Only a super-admin may impersonate.',
                 ['target_user_id' => $user->id]
@@ -254,7 +248,7 @@ class UserController extends Controller
 
         // Logged before the session switches, so the entry names the real actor
         // rather than the person being impersonated.
-        app(AuditLogger::class)->record('impersonation.started', [
+        $this->auditLogger->record('impersonation.started', [
             'impersonator_id' => $actor->id,
             'impersonator_name' => $actor->name,
             'target_user_id' => $user->id,
@@ -278,7 +272,7 @@ class UserController extends Controller
         $request->session()->forget(self::IMPERSONATOR_NAME_SESSION_KEY);
 
         if (! $impersonatorId) {
-            app(AuditLogger::class)->recordFailure(
+            $this->auditLogger->recordFailure(
                 'impersonation.stop_failed',
                 'No active impersonation session found.'
             );
@@ -289,7 +283,7 @@ class UserController extends Controller
         $impersonator = User::find($impersonatorId);
 
         if (! $impersonator || ! $impersonator->hasRole('super-admin')) {
-            app(AuditLogger::class)->recordFailure(
+            $this->auditLogger->recordFailure(
                 'impersonation.stop_failed',
                 'The recorded impersonator is missing or is no longer a super-admin.',
                 ['impersonator_id' => $impersonatorId]
@@ -306,7 +300,7 @@ class UserController extends Controller
 
         $impersonatedUser = Auth::user();
 
-        app(AuditLogger::class)->record('impersonation.stopped', [
+        $this->auditLogger->record('impersonation.stopped', [
             'impersonator_id' => $impersonator->id,
             'impersonator_name' => $impersonator->name,
             'target_user_id' => $impersonatedUser?->getAuthIdentifier(),

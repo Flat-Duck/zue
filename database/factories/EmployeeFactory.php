@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Center;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EmployeeFactory extends Factory
@@ -38,10 +41,9 @@ class EmployeeFactory extends Factory
             'last_date' => null,
             'total_balance' => $this->faker->randomNumber(0),
             'archived_at' => null,
-            'user_id' => \App\Models\User::factory(),
-            'department_id' => \App\Models\Department::factory(),
-            'location_id' => \App\Models\Location::factory(),
-            'center_id' => \App\Models\Center::factory(),
+            'department_id' => Department::factory(),
+            'location_id' => Location::factory(),
+            'center_id' => Center::factory(),
         ];
     }
 }

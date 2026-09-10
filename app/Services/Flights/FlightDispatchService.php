@@ -2,6 +2,7 @@
 
 namespace App\Services\Flights;
 
+use App\Contracts\FlightDispatchContract;
 use App\Models\Employee;
 use App\Models\Flight;
 use App\Models\FlightBooking;
@@ -22,7 +23,7 @@ use RuntimeException;
  * two dispatchers booking the last seat at the same moment will both be told
  * they got it.
  */
-class FlightDispatchService
+class FlightDispatchService implements FlightDispatchContract
 {
     /**
      * Copy a route onto a flight as its legs.

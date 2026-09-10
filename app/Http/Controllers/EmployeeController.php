@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AuditLoggerContract;
 use App\Http\Requests\EmployeeQuickStoreRequest;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
@@ -13,7 +14,6 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
 use App\Models\User;
-use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -22,6 +22,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
+    public function __construct(private readonly AuditLoggerContract $auditLogger) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -106,7 +108,7 @@ class EmployeeController extends Controller
 
         Excel::import($import, $request->file('file'));
 
-        app(AuditLogger::class)->record('employees.profiles_imported', [
+        $this->auditLogger->record('employees.profiles_imported', [
             'created' => $import->created,
             'updated' => $import->updated,
             'skipped' => $import->skipped,
@@ -208,7 +210,6 @@ class EmployeeController extends Controller
             'location_id' => $validated['location_id'],
             'center_id' => $validated['center_id'],
             'department_id' => $departmentId,
-            'user_id' => null,
             'transfered_balance' => 0,
         ]);
 

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\AuditLoggerContract;
 use App\Http\Requests\TimeSheetApprovalRequest;
 use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
 use App\Models\Employee;
 use App\Models\TimeSheet;
-use App\Services\AuditLogger;
 use App\Services\TimeSheetAuthorizationService;
 use App\Services\TimeSheetMutationService;
 use App\Services\TimeSheetService;
@@ -18,18 +18,12 @@ use Illuminate\View\View;
 
 class TimeSheetController extends Controller
 {
-    protected $timeSheetService;
-
-    protected $timeSheetAuthorizationService;
-
     public function __construct(
-        TimeSheetService $timeSheetService,
-        TimeSheetAuthorizationService $timeSheetAuthorizationService,
-        private readonly TimeSheetMutationService $timeSheetMutationService
-    ) {
-        $this->timeSheetService = $timeSheetService;
-        $this->timeSheetAuthorizationService = $timeSheetAuthorizationService;
-    }
+        private readonly TimeSheetService $timeSheetService,
+        private readonly TimeSheetAuthorizationService $timeSheetAuthorizationService,
+        private readonly TimeSheetMutationService $timeSheetMutationService,
+        private readonly AuditLoggerContract $auditLogger,
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -214,7 +208,7 @@ class TimeSheetController extends Controller
                 $selectedScopePolicyId
             );
 
-            app(AuditLogger::class)->record('timesheets.approved', [
+            $this->auditLogger->record('timesheets.approved', [
                 'month' => $month,
                 'year' => $year,
                 'level' => $level,
@@ -235,7 +229,7 @@ class TimeSheetController extends Controller
             $managedEmployeeIds
         );
 
-        app(AuditLogger::class)->record('timesheets.approved', [
+        $this->auditLogger->record('timesheets.approved', [
             'month' => $month,
             'year' => $year,
             'level' => $level,

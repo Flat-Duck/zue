@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class TimeSheetBuilder
 {
+    /*
+     * A static helper, so there is nothing to inject into. The container is
+     * reached explicitly; callers still depend on the service's behaviour, not
+     * on how it is constructed.
+     */
+
     public static function create($day, int $employee_id, string $value, int $over_time): TimeSheet
     {
         return app(TimeSheetMutationService::class)->createForEmployee(

@@ -16,16 +16,28 @@ class AuthorizationIdentityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_employee_identity_uses_employee_user_id(): void
+    /**
+     * Identity runs through `users.employee_id`, not through matching ids.
+     *
+     * The legacy design forced `users.id` to equal the employee number, so a
+     * changed number rewrote the primary key. The number now lives only on the
+     * employee, and the user's id is an ordinary surrogate that never moves.
+     */
+    public function test_user_identity_runs_through_the_employee_link(): void
     {
-        $user = User::factory()->create(['number' => 70001]);
-        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $user = User::factory()->forEmployeeNumber(70001)->create();
+        $employee = $user->employee;
 
-        $this->assertSame($employee->id, $user->employee?->id);
+        $this->assertSame($employee->id, $user->employee_id);
+        $this->assertSame(70001, $user->number, 'The number is read from the employee.');
 
-        $user->update(['number' => 70002]);
+        $originalUserId = $user->id;
 
-        $this->assertSame(70001, $user->fresh()->id);
+        // Changing the number is an employee-level edit and leaves the account alone.
+        $employee->update(['number' => 70002]);
+
+        $this->assertSame($originalUserId, $user->fresh()->id);
+        $this->assertSame(70002, $user->fresh()->number);
     }
 
     public function test_management_scope_writes_authoritative_policy_and_deactivates_it_on_delete(): void
@@ -63,8 +75,8 @@ class AuthorizationIdentityTest extends TestCase
 
     public function test_v2_scope_resolution_matches_legacy_scope_for_a_representative_manager(): void
     {
-        $user = User::factory()->create(['number' => 70003]);
-        $manager = Employee::factory()->create(['user_id' => $user->id]);
+        $user = User::factory()->forEmployeeNumber(70003)->create();
+        $manager = $user->employee;
         $target = Employee::factory()->create();
         $service = app(ManagementScopeService::class);
 

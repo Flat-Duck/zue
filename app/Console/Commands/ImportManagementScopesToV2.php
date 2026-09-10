@@ -40,7 +40,7 @@ class ImportManagementScopesToV2 extends Command
         'transp',
     ];
 
-    public function handle(): int
+    public function handle(WorkflowResolver $resolver): int
     {
         $dryRun = (bool) $this->option('dry-run');
         $seedFlows = (bool) $this->option('seed-flows');
@@ -49,7 +49,7 @@ class ImportManagementScopesToV2 extends Command
             ->with('managers:id')
             ->get();
 
-        $this->info('Legacy scopes found: ' . $legacyScopes->count());
+        $this->info('Legacy scopes found: '.$legacyScopes->count());
 
         $importedPolicies = 0;
         $importedActors = 0;
@@ -58,17 +58,17 @@ class ImportManagementScopesToV2 extends Command
             foreach ($legacyScopes as $scope) {
                 $settings = is_array($scope->settings) ? $scope->settings : [];
                 $targetIds = collect($settings['target_employee_ids'] ?? [])
-                    ->map(fn($id) => (int) $id)
-                    ->filter(fn($id) => $id > 0);
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => $id > 0);
 
-                if (!is_null($scope->subordinate_employee_id)) {
+                if (! is_null($scope->subordinate_employee_id)) {
                     $targetIds->push((int) $scope->subordinate_employee_id);
                 }
 
                 $targetIds = $targetIds->unique()->values()->all();
 
                 $policyData = [
-                    'name' => $scope->name ?: ('Legacy Scope #' . $scope->id),
+                    'name' => $scope->name ?: ('Legacy Scope #'.$scope->id),
                     'context' => $scope->context ?: 'general',
                     'match_type' => (string) $scope->scope_type,
                     'location_id' => $scope->location_id,
@@ -96,8 +96,8 @@ class ImportManagementScopesToV2 extends Command
                     }
                     $importedPolicies++;
 
-                    $managerIds = $scope->managers->pluck('id')->map(fn($id) => (int) $id)->all();
-                    if (empty($managerIds) && !is_null($scope->manager_id)) {
+                    $managerIds = $scope->managers->pluck('id')->map(fn ($id) => (int) $id)->all();
+                    if (empty($managerIds) && ! is_null($scope->manager_id)) {
                         $managerIds = [(int) $scope->manager_id];
                     }
 
@@ -126,15 +126,15 @@ class ImportManagementScopesToV2 extends Command
             DB::transaction($importScopes);
         }
 
-        $this->line('Imported/updated scope policies: ' . $importedPolicies);
-        $this->line('Imported/updated scope actors: ' . $importedActors);
+        $this->line('Imported/updated scope policies: '.$importedPolicies);
+        $this->line('Imported/updated scope actors: '.$importedActors);
 
         if ($seedFlows) {
             $seeded = $this->seedDefaultFlows($dryRun);
-            $this->line('Seeded/updated flow definitions: ' . $seeded);
+            $this->line('Seeded/updated flow definitions: '.$seeded);
         }
 
-        $this->runAudit();
+        $this->runAudit($resolver);
 
         return self::SUCCESS;
     }
@@ -209,6 +209,7 @@ class ImportManagementScopesToV2 extends Command
             foreach ($definitions as $flowDef) {
                 if ($dryRun) {
                     $seeded++;
+
                     continue;
                 }
 
@@ -249,7 +250,7 @@ class ImportManagementScopesToV2 extends Command
         return $seeded;
     }
 
-    private function runAudit(): void
+    private function runAudit(WorkflowResolver $resolver): void
     {
         $this->line('');
         $this->info('Audit Report');
@@ -260,27 +261,26 @@ class ImportManagementScopesToV2 extends Command
         $overlapCounter = [];
         foreach ($policies as $policy) {
             foreach ($employees as $employee) {
-                if (!$this->policyMatchesEmployee($policy, $employee)) {
+                if (! $this->policyMatchesEmployee($policy, $employee)) {
                     continue;
                 }
 
-                $key = $policy->context . ':' . $employee->id;
+                $key = $policy->context.':'.$employee->id;
                 $overlapCounter[$key] = ($overlapCounter[$key] ?? 0) + 1;
             }
         }
 
-        $overlaps = collect($overlapCounter)->filter(fn($count) => $count > 1);
-        $this->line('Overlap map entries (>1 policy for same employee/context): ' . $overlaps->count());
+        $overlaps = collect($overlapCounter)->filter(fn ($count) => $count > 1);
+        $this->line('Overlap map entries (>1 policy for same employee/context): '.$overlaps->count());
 
-        $resolver = app(WorkflowResolver::class);
         $coverageGaps = 0;
         foreach ($employees as $employee) {
             $flow = $resolver->resolveFlowForEmployee($employee, 'time_sheet');
-            if (!$flow) {
+            if (! $flow) {
                 $coverageGaps++;
             }
         }
-        $this->line('Flow coverage gaps (no matching active flow): ' . $coverageGaps);
+        $this->line('Flow coverage gaps (no matching active flow): '.$coverageGaps);
     }
 
     private function policyMatchesEmployee(ScopePolicy $policy, Employee $employee): bool
@@ -289,12 +289,12 @@ class ImportManagementScopesToV2 extends Command
             ScopePolicy::MATCH_GLOBAL => true,
             ScopePolicy::MATCH_LOCATION => (int) $policy->location_id === (int) $employee->location_id,
             ScopePolicy::MATCH_DEPARTMENT => (
-                (!$policy->location_id || (int) $policy->location_id === (int) $employee->location_id)
+                (! $policy->location_id || (int) $policy->location_id === (int) $employee->location_id)
                 && (int) $policy->department_id === (int) $employee->department_id
             ),
             ScopePolicy::MATCH_CENTER => (int) $policy->center_id === (int) $employee->center_id,
             ScopePolicy::MATCH_EMPLOYEE => collect($policy->target_employee_ids ?? [])
-                ->map(fn($id) => (int) $id)
+                ->map(fn ($id) => (int) $id)
                 ->contains((int) $employee->id),
             default => false,
         };

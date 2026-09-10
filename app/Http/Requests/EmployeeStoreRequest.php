@@ -31,7 +31,6 @@ class EmployeeStoreRequest extends FormRequest
             'address' => ['nullable', 'max:255', 'string'],
             'phone' => ['nullable', 'max:255', 'string'],
             'email' => ['nullable', 'email'],
-            'user_id' => ['required', 'exists:users,id'],
             'location_id' => ['required', 'exists:locations,id'],
             'department_id' => ['required', 'exists:departments,id'],
             'center_id' => ['required', 'exists:centers,id'],

@@ -44,7 +44,7 @@ class TimeSheetControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $managerEmployee = Employee::factory()->create(['user_id' => $user->id]);
+        $managerEmployee = $user->employee;
 
         $scope = ManagementScope::create([
             'manager_id' => $managerEmployee->id,

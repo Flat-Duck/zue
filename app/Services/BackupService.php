@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\BackupServiceContract;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
 use Illuminate\Support\Facades\Cache;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
-class BackupService
+class BackupService implements BackupServiceContract
 {
     public function performBackup(string $type = 'both', array $selectedTables = [], bool $saveToBackups = true, ?int $logId = null): string
     {

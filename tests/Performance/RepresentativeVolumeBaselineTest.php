@@ -62,7 +62,7 @@ class RepresentativeVolumeBaselineTest extends TestCase
             'list rooms', 'view rooms',
         ]);
 
-        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $employee = $user->employee;
 
         $scope = ManagementScope::create([
             'manager_id' => $employee->id,

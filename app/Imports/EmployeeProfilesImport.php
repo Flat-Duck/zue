@@ -206,7 +206,9 @@ class EmployeeProfilesImport extends StringValueBinder implements ToCollection, 
 
         $attributes += $this->resolveOrganisation($values);
 
-        $employee = Employee::query()->where('number', $number)->first();
+        // Archived employees are hidden by a global scope. Looking through it would
+        // make the import create a second row for anyone who has left the company.
+        $employee = Employee::query()->withArchived()->where('number', $number)->first();
 
         if ($employee) {
             $employee->fill($attributes)->save();

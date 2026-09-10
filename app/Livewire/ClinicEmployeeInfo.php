@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Contracts\AuditLoggerContract;
 use App\Models\ClinicApointment;
 use App\Models\Employee;
-use App\Services\AuditLogger;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\On;
@@ -97,7 +97,7 @@ class ClinicEmployeeInfo extends Component
         $this->dispatch('setPrescription', ['content' => $this->prescription]);
     }
 
-    public function save_apointment(): void
+    public function save_apointment(AuditLoggerContract $auditLogger): void
     {
         $this->authorizeClinicAccess($this->employee);
 
@@ -121,7 +121,7 @@ class ClinicEmployeeInfo extends Component
 
         // Medical content itself is never logged - only that a record was
         // written, by whom, and for which employee.
-        app(AuditLogger::class)->record('clinic.appointment_saved', [
+        $auditLogger->record('clinic.appointment_saved', [
             'employee_id' => $this->employee->id,
             'appointment_id' => $this->aponitment->id,
         ]);

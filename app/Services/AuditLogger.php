@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\AuditLoggerContract;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Session;
  * the sensitive content itself. Medical findings and credentials must not be
  * duplicated into a log file that has a longer retention than the data.
  */
-class AuditLogger
+class AuditLogger implements AuditLoggerContract
 {
     /**
      * Keys whose values are never written to the audit log, at any depth.

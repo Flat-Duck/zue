@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -25,14 +25,7 @@ class UserUpdateRequest extends FormRequest
         $userId = $targetUser instanceof User ? $targetUser->id : $targetUser;
 
         return [
-            'number' => [
-                'sometimes',
-                'required',
-                'integer',
-                'min:1',
-                Rule::unique('users', 'number')->ignore($userId),
-                Rule::unique('users', 'id')->ignore($userId),
-            ],
+            'employee_id' => ['sometimes', 'integer', 'exists:employees,id', Rule::unique('users', 'employee_id')->ignore($userId)],
             'name' => ['required', 'max:255', 'string'],
             'email' => [
                 'required',

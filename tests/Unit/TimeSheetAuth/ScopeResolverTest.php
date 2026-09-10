@@ -25,17 +25,16 @@ class ScopeResolverTest extends TestCase
         $department = Department::factory()->create();
         $center = Center::factory()->create();
 
-        $actorUser = User::factory()->create(['number' => 8101]);
         $actorEmployee = Employee::factory()->create([
-            'user_id' => $actorUser->id,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
             'archived_at' => null,
         ]);
 
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+
         $otherManager = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
@@ -43,14 +42,12 @@ class ScopeResolverTest extends TestCase
         ]);
 
         $targetA = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
             'archived_at' => null,
         ]);
         $targetB = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
@@ -115,24 +112,22 @@ class ScopeResolverTest extends TestCase
         $department = Department::factory()->create();
         $center = Center::factory()->create();
 
-        $actorUser = User::factory()->create(['number' => 8201]);
         $actorEmployee = Employee::factory()->create([
-            'user_id' => $actorUser->id,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
             'archived_at' => null,
         ]);
 
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+
         $targetA = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,
             'archived_at' => null,
         ]);
         $targetB = Employee::factory()->create([
-            'user_id' => null,
             'location_id' => $location->id,
             'department_id' => $department->id,
             'center_id' => $center->id,

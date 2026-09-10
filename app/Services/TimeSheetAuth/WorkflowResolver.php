@@ -29,7 +29,7 @@ class WorkflowResolver
                 ->with('department:id,name')
                 ->whereIn('id', $ids)
                 ->lockForUpdate()
-                ->get(['id', 'department_id', 'location_id', 'center_id', 'user_id']);
+                ->get(['id', 'department_id', 'location_id', 'center_id']);
 
             if ($employees->isEmpty()) {
                 return;

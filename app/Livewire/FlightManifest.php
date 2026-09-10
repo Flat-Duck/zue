@@ -2,12 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Contracts\FlightDispatchContract;
 use App\Models\Employee;
 use App\Models\Flight;
 use App\Models\FlightBooking;
 use App\Models\FlightLeg;
 use App\Models\Passenger;
-use App\Services\Flights\FlightDispatchService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -92,7 +92,7 @@ class FlightManifest extends Component
         $this->reset(['travellerId', 'note']);
     }
 
-    public function addTraveller(): void
+    public function addTraveller(FlightDispatchContract $dispatch): void
     {
         $this->authorizeDispatch();
 
@@ -110,7 +110,7 @@ class FlightManifest extends Component
             : Passenger::query()->findOrFail($validated['travellerId']);
 
         try {
-            $booking = app(FlightDispatchService::class)->book(
+            $booking = $dispatch->book(
                 $leg,
                 $traveller,
                 auth()->user(),
@@ -130,29 +130,29 @@ class FlightManifest extends Component
             : 'No seats left on '.$leg->label().' - added to the waiting list.');
     }
 
-    public function promote(int $bookingId): void
+    public function promote(FlightDispatchContract $dispatch, int $bookingId): void
     {
         $this->authorizeDispatch();
 
         try {
-            app(FlightDispatchService::class)->promote($this->bookingOrFail($bookingId));
+            $dispatch->promote($this->bookingOrFail($bookingId));
         } catch (RuntimeException $exception) {
             $this->addError('manifest', $exception->getMessage());
         }
     }
 
-    public function demote(int $bookingId): void
+    public function demote(FlightDispatchContract $dispatch, int $bookingId): void
     {
         $this->authorizeDispatch();
 
-        app(FlightDispatchService::class)->demote($this->bookingOrFail($bookingId));
+        $dispatch->demote($this->bookingOrFail($bookingId));
     }
 
-    public function remove(int $bookingId): void
+    public function remove(FlightDispatchContract $dispatch, int $bookingId): void
     {
         $this->authorizeDispatch();
 
-        app(FlightDispatchService::class)->cancel($this->bookingOrFail($bookingId));
+        $dispatch->cancel($this->bookingOrFail($bookingId));
     }
 
     public function openPassengerModal(): void

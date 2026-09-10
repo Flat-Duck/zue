@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -23,13 +24,36 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => $this->faker->unique()->numberBetween(100000, 999999),
+            // Every user is an employee, so the factory makes one by default.
+            // Pass `employee_id` explicitly to attach an existing employee.
+            'employee_id' => Employee::factory(),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique->email(),
             'email_verified_at' => now(),
             'password' => \Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Attach the account to an employee carrying a specific number.
+     *
+     * The number lives on the employee, so a test that cares about it says so
+     * here rather than setting a column the user no longer has.
+     */
+    public function forEmployeeNumber(int $number): static
+    {
+        return $this->state(fn (): array => [
+            'employee_id' => Employee::factory()->create(['number' => $number])->id,
+        ]);
+    }
+
+    /**
+     * Attach the account to an employee that already exists.
+     */
+    public function forEmployee(Employee $employee): static
+    {
+        return $this->state(fn (): array => ['employee_id' => $employee->id]);
     }
 
     /**

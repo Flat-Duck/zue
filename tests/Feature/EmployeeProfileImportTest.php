@@ -49,6 +49,29 @@ class EmployeeProfileImportTest extends TestCase
         $this->assertSame(3, Employee::query()->count());
     }
 
+    /**
+     * Archived employees are hidden by a global scope. Reading through it would make
+     * the import treat everyone who has left the company as a new hire and create a
+     * second row for them under the same employee number.
+     */
+    #[Test]
+    public function it_updates_an_archived_employee_instead_of_creating_a_duplicate(): void
+    {
+        $archived = Employee::factory()->create([
+            'number' => 3438,
+            'english_name' => 'SALEH KHALIFA',
+            'archived_at' => now()->subYear(),
+        ]);
+
+        $import = $this->import();
+
+        $this->assertSame(2, $import->created);
+        $this->assertSame(1, $import->updated);
+        $this->assertSame(1, Employee::withArchived()->where('number', 3438)->count());
+        $this->assertSame('صالح خليفة مشري سعيد', $archived->fresh()->arabic_name);
+        $this->assertNotNull($archived->fresh()->archived_at, 'Updating a record must not silently un-archive the person.');
+    }
+
     #[Test]
     public function it_maps_the_arabic_name_and_nationality(): void
     {
@@ -330,6 +353,7 @@ class EmployeeProfileImportTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertSame(3, Employee::query()->count());
+        // The acting user brings its own employee, so count the imported ones.
+        $this->assertSame(3, Employee::query()->whereNotNull('arabic_name')->count());
     }
 }

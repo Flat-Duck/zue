@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserStoreRequest extends FormRequest
 {
@@ -21,13 +21,7 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => [
-                'required',
-                'integer',
-                'min:1',
-                Rule::unique('users', 'number'),
-                Rule::unique('users', 'id'),
-            ],
+            'employee_id' => ['required', 'integer', 'exists:employees,id', Rule::unique('users', 'employee_id')],
             'name' => ['required', 'max:255', 'string'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required'],
