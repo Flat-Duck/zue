@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\AppraisalFormVersionItemBulkUpdateRequest;
+use App\Http\Requests\Appraisals\AppraisalFormVersionItemStoreRequest;
 use App\Models\Appraisals\AppraisalFormVersion;
 use App\Models\Appraisals\AppraisalFormVersionItem;
 use App\Models\Appraisals\AppraisalItem;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -26,19 +27,11 @@ class AppraisalFormVersionItemsController extends Controller
         return view('app.appraisals.version_items.edit', compact('version', 'versionItems', 'items'));
     }
 
-    public function addItem(Request $request, AppraisalFormVersion $version)
+    public function addItem(AppraisalFormVersionItemStoreRequest $request, AppraisalFormVersion $version)
     {
         $this->ensureVersionIsMutable($version);
 
-        $data = $request->validate([
-            'item_id' => 'required|exists:appraisal_items,id',
-            'max_score_override' => 'required|integer|min:0',
-            'sort_order' => 'required|integer|min:1',
-            'is_required' => 'nullable|boolean',
-            'is_active' => 'nullable|boolean',
-            'label_override' => 'nullable|string|max:255',
-            'section_override' => 'nullable|in:job_performance,personal_traits,initiative',
-        ]);
+        $data = $request->validated();
 
         AppraisalFormVersionItem::updateOrCreate(
             [
@@ -58,20 +51,11 @@ class AppraisalFormVersionItemsController extends Controller
         return back()->with('success', 'تمت إضافة البند للـ Version.');
     }
 
-    public function bulkUpdate(Request $request, AppraisalFormVersion $version)
+    public function bulkUpdate(AppraisalFormVersionItemBulkUpdateRequest $request, AppraisalFormVersion $version)
     {
         $this->ensureVersionIsMutable($version);
 
-        $data = $request->validate([
-            'rows' => 'required|array',
-            'rows.*.id' => 'required|exists:appraisal_form_version_items,id',
-            'rows.*.max_score_override' => 'required|integer|min:0',
-            'rows.*.sort_order' => 'required|integer|min:1',
-            'rows.*.is_required' => 'nullable|boolean',
-            'rows.*.is_active' => 'nullable|boolean',
-            'rows.*.label_override' => 'nullable|string|max:255',
-            'rows.*.section_override' => 'nullable|in:job_performance,personal_traits,initiative',
-        ]);
+        $data = $request->validated();
 
         $versionItems = AppraisalFormVersionItem::query()
             ->where('appraisal_form_version_id', $version->id)

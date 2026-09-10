@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuditLoggerContract;
+use App\Http\Requests\UserImportRequest;
+use App\Http\Requests\UserSignatureUploadRequest;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Imports\UsersImport;
@@ -165,14 +167,8 @@ class UserController extends Controller
             ->withSuccess(__('crud.common.removed'));
     }
 
-    public function uploadSignature(Request $request, User $user): RedirectResponse
+    public function uploadSignature(UserSignatureUploadRequest $request, User $user): RedirectResponse
     {
-        $this->authorize('update', $user);
-
-        $request->validate([
-            'signature_file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ]);
-
         $this->signatureService->saveSignature($user, $request->file('signature_file'));
 
         return redirect()
@@ -180,14 +176,8 @@ class UserController extends Controller
             ->withSuccess('Signature uploaded successfully');
     }
 
-    public function import(Request $request): RedirectResponse
+    public function import(UserImportRequest $request): RedirectResponse
     {
-        $this->authorize('create', User::class);
-
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:xlsx,csv,txt', 'max:51200'],
-        ]);
-
         try {
             Excel::import(new UsersImport, $request->file('file'));
         } catch (ValidationException $e) {

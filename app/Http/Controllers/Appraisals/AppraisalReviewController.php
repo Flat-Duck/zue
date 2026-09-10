@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\AppraisalReviewStoreRequest;
 use App\Http\Requests\Appraisals\UpdateAppraisalReviewRequest;
 use App\Models\Appraisals\AppraisalFormVersion;
 use App\Models\Appraisals\AppraisalFormVersionItem;
@@ -13,7 +14,6 @@ use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAttendanceService;
 use App\Services\Appraisals\AppraisalScoreService;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 
 class AppraisalReviewController extends Controller
 {
@@ -50,12 +50,9 @@ class AppraisalReviewController extends Controller
         return view('app.appraisals.reviews.create', compact('periods', 'employees'));
     }
 
-    public function store(Request $request)
+    public function store(AppraisalReviewStoreRequest $request)
     {
-        $data = $request->validate([
-            'appraisal_period_id' => 'required|exists:appraisal_periods,id',
-            'employee_id' => 'required|exists:employees,id',
-        ]);
+        $data = $request->validated();
 
         $period = AppraisalPeriod::findOrFail($data['appraisal_period_id']);
         if (! $period->isOpen()) {

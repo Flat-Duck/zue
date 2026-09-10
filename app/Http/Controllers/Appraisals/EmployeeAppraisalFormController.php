@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\EmployeeAppraisalFormUpdateRequest;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Employee;
-use Illuminate\Http\Request;
 
 class EmployeeAppraisalFormController extends Controller
 {
@@ -23,13 +23,9 @@ class EmployeeAppraisalFormController extends Controller
         return view('app.appraisals.employees.appraisal_form.edit', compact('employee', 'forms'));
     }
 
-    public function update(Request $request, Employee $employee)
+    public function update(EmployeeAppraisalFormUpdateRequest $request, Employee $employee)
     {
-        $this->authorize('update', $employee);
-
-        $data = $request->validate([
-            'appraisal_form_id' => 'nullable|exists:appraisal_forms,id',
-        ]);
+        $data = $request->validated();
 
         $employee->appraisal_form_id = $data['appraisal_form_id'] ?? null;
         $employee->save();

@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Scopes\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Room extends Model
 {
@@ -17,12 +19,12 @@ class Room extends Model
 
     protected $searchableFields = ['*'];
 
-    public function residence()
+    public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
     }
 
-    public function employees()
+    public function employees(): BelongsToMany
     {
         return $this->belongsToMany(Employee::class)->withPivot(['is_owner', 'is_here']);
     }

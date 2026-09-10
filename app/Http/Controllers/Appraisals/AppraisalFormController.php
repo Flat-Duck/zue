@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Appraisals\AppraisalFormStoreRequest;
+use App\Http\Requests\Appraisals\AppraisalFormUpdateRequest;
 use App\Models\Appraisals\AppraisalForm;
 
 class AppraisalFormController extends Controller
@@ -11,6 +12,7 @@ class AppraisalFormController extends Controller
     public function index()
     {
         $forms = AppraisalForm::query()->orderBy('code')->get();
+
         return view('app.appraisals.forms.index', compact('forms'));
     }
 
@@ -19,13 +21,9 @@ class AppraisalFormController extends Controller
         return view('app.appraisals.forms.create');
     }
 
-    public function store(Request $request)
+    public function store(AppraisalFormStoreRequest $request)
     {
-        $data = $request->validate([
-            'code' => 'required|string|max:255|unique:appraisal_forms,code',
-            'name_ar' => 'required|string|max:255',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $data = $request->validated();
 
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
 
@@ -40,13 +38,9 @@ class AppraisalFormController extends Controller
         return view('app.appraisals.forms.edit', compact('form'));
     }
 
-    public function update(Request $request, AppraisalForm $form)
+    public function update(AppraisalFormUpdateRequest $request, AppraisalForm $form)
     {
-        $data = $request->validate([
-            'code' => 'required|string|max:255|unique:appraisal_forms,code,' . $form->id,
-            'name_ar' => 'required|string|max:255',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $data = $request->validated();
 
         $data['is_active'] = (bool) ($data['is_active'] ?? false);
         $form->update($data);

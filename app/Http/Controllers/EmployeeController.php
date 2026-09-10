@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\AuditLoggerContract;
+use App\Http\Requests\ArchivedEmployeeImportRequest;
+use App\Http\Requests\EmployeeProfileImportRequest;
 use App\Http\Requests\EmployeeQuickStoreRequest;
 use App\Http\Requests\EmployeeStoreRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
@@ -62,25 +64,19 @@ class EmployeeController extends Controller
      */
     public function imports(Request $request): View
     {
-        // The page exists to run an import, which creates and updates records,
-        // so it is gated the same way the import itself is.
         $this->authorize('create', Employee::class);
         $this->authorize('update', new Employee);
 
+        // The page exists to run an import, which creates and updates records,
+        // so it is gated the same way the import itself is.
         return view('app.employees.imports');
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function importArchivedEmployees(Request $request)
+    public function importArchivedEmployees(ArchivedEmployeeImportRequest $request)
     {
-        $this->authorize('view-any', Employee::class);
-
-        $request->validate([
-            'file' => 'required|mimes:xlsx',
-        ]);
-
         Excel::import(new ArchivedEmployeesImport, $request->file('file'));
 
         return back()->with('success', 'Employees archived successfully.');
@@ -94,16 +90,9 @@ class EmployeeController extends Controller
      * Existing employees are updated and new ones created, so the same export
      * can be re-imported whenever HR refresh it.
      */
-    public function importProfiles(Request $request): RedirectResponse
+    public function importProfiles(EmployeeProfileImportRequest $request): RedirectResponse
     {
         // Creating and updating personnel records, so both are required.
-        $this->authorize('create', Employee::class);
-        $this->authorize('update', new Employee);
-
-        $request->validate([
-            'file' => ['required', 'file', 'mimes:xlsx,xls,csv,txt'],
-        ]);
-
         $import = new EmployeeProfilesImport;
 
         Excel::import($import, $request->file('file'));

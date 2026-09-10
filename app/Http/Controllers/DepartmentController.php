@@ -2,119 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use App\Models\Department;
-use Illuminate\Http\Request;
-use App\Models\Administration;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\DepartmentStoreRequest;
 use App\Http\Requests\DepartmentUpdateRequest;
+use App\Models\Administration;
+use App\Models\Department;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
-class DepartmentController extends Controller
+/**
+ * @extends CrudController<Department>
+ */
+class DepartmentController extends CrudController
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): View
-    {
-        $this->authorize('view-any', Department::class);
+    protected string $model = Department::class;
 
-        $search = $request->get('search', '');
+    protected int $perPage = 50;
 
-        $departments = Department::search($search)
-            ->latest()
-            ->paginate(50)
-            ->withQueryString();
-
-        return view('app.departments.index', compact('departments', 'search'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request): View
-    {
-        $this->authorize('create', Department::class);
-
-        $administrations = Administration::pluck('name', 'id');
-
-        return view('app.departments.create', compact('administrations'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(DepartmentStoreRequest $request): RedirectResponse
     {
-        $this->authorize('create', Department::class);
-
-        $validated = $request->validated();
-
-        $department = Department::create($validated);
-
-        return redirect()
-            ->route('departments.edit', $department)
-            ->withSuccess(__('crud.common.created'));
+        return $this->storeModel($request);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, Department $department): View
     {
-        $this->authorize('view', $department);
-
-        return view('app.departments.show', compact('department'));
+        return $this->showModel($department);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Request $request, Department $department): View
     {
-        $this->authorize('update', $department);
+        return $this->editModel($department);
+    }
 
-        $administrations = Administration::pluck('name', 'id');
+    public function update(DepartmentUpdateRequest $request, Department $department): RedirectResponse
+    {
+        return $this->updateModel($request, $department);
+    }
 
-        return view(
-            'app.departments.edit',
-            compact('department', 'administrations')
-        );
+    public function destroy(Request $request, Department $department): RedirectResponse
+    {
+        return $this->destroyModel($department);
     }
 
     /**
-     * Update the specified resource in storage.
+     * @return array<string, mixed>
      */
-    public function update(
-        DepartmentUpdateRequest $request,
-        Department $department
-    ): RedirectResponse
+    protected function formOptions(?Model $record = null): array
     {
-        $this->authorize('update', $department);
-
-        $validated = $request->validated();
-
-        $department->update($validated);
-
-        return redirect()
-            ->route('departments.edit', $department)
-            ->withSuccess(__('crud.common.saved'));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(
-        Request $request,
-        Department $department
-    ): RedirectResponse
-    {
-        $this->authorize('delete', $department);
-
-        $department->delete();
-
-        return redirect()
-            ->route('departments.index')
-            ->withSuccess(__('crud.common.removed'));
+        return ['administrations' => Administration::pluck('name', 'id')];
     }
 }

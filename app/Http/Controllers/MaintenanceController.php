@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Contracts\AuditLoggerContract;
 use App\Contracts\BackupServiceContract;
+use App\Http\Requests\DatabaseExportRequest;
+use App\Http\Requests\DatabaseImportRequest;
+use App\Http\Requests\MaintenanceSettingsRequest;
 use App\Jobs\PerformBackupJob;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -70,16 +72,8 @@ class MaintenanceController extends Controller
         ]);
     }
 
-    public function export(Request $request)
+    public function export(DatabaseExportRequest $request)
     {
-        $this->authorize('maintenance');
-
-        $request->validate([
-            'type' => ['nullable', 'in:structure,data,both'],
-            'tables' => ['nullable', 'array'],
-            'tables.*' => ['string', 'regex:/^[A-Za-z0-9_]+$/'],
-        ]);
-
         $type = $request->input('type', 'both');
         $selectedTables = $request->input('tables', []);
 
@@ -104,16 +98,8 @@ class MaintenanceController extends Controller
         ]);
     }
 
-    public function updateSettings(Request $request)
+    public function updateSettings(MaintenanceSettingsRequest $request)
     {
-        $this->authorize('maintenance');
-
-        $request->validate([
-            'backup_interval' => 'required|in:daily,weekly,monthly',
-            'backup_time' => 'required',
-            'keep_backups_count' => 'required|integer|min:1',
-        ]);
-
         MaintenanceSetting::set('auto_backup_enabled', $request->has('auto_backup_enabled') ? '1' : '0');
         MaintenanceSetting::set('backup_interval', $request->backup_interval);
         MaintenanceSetting::set('backup_time', $request->backup_time);
@@ -139,14 +125,8 @@ class MaintenanceController extends Controller
 
     // runInBackground method removed in favor of Laravel Queues
 
-    public function import(Request $request)
+    public function import(DatabaseImportRequest $request)
     {
-        $request->validate([
-            'sql_file' => ['required', 'file', 'max:512000', 'mimetypes:text/plain,application/sql,application/octet-stream'],
-        ]);
-
-        $this->authorize('maintenance');
-
         $path = $request->file('sql_file')->getRealPath();
         $sql = file_get_contents($path);
 

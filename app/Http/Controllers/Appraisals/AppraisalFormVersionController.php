@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\AppraisalFormVersionStoreRequest;
 use App\Models\Appraisals\AppraisalForm;
 use App\Models\Appraisals\AppraisalFormVersion;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AppraisalFormVersionController extends Controller
@@ -22,14 +22,9 @@ class AppraisalFormVersionController extends Controller
         return view('app.appraisals.versions.index', compact('form', 'versions', 'nextVersion'));
     }
 
-    public function store(Request $request, AppraisalForm $form)
+    public function store(AppraisalFormVersionStoreRequest $request, AppraisalForm $form)
     {
-        $data = $request->validate([
-            'version' => 'required|integer|min:1',
-            'effective_from' => 'nullable|date',
-            'effective_to' => 'nullable|date|after_or_equal:effective_from',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $data = $request->validated();
 
         $data['appraisal_form_id'] = $form->id;
         $data['is_active'] = (bool) ($data['is_active'] ?? false);

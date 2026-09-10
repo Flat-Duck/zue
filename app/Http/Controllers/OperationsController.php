@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ArchiveByTimesheetRequest;
+use App\Http\Requests\EmployeeNumbersRequest;
 use App\Models\Employee;
 use App\Models\TimeSheet;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OperationsController extends Controller
@@ -29,13 +30,9 @@ class OperationsController extends Controller
         ]);
     }
 
-    public function archiveByTimesheet(Request $request): RedirectResponse
+    public function archiveByTimesheet(ArchiveByTimesheetRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'date' => ['required', 'date'],
-        ]);
-
-        $date = Carbon::parse($validated['date'])->startOfDay();
+        $date = Carbon::parse($request->validated('date'))->startOfDay();
 
         $employeeIds = TimeSheet::query()
             ->select('employee_id')
@@ -52,7 +49,7 @@ class OperationsController extends Controller
         return redirect()->back()->with('success', "Archived $count employees whose last timesheet was on or before ".$date->format('Y-m-d'));
     }
 
-    public function archiveByNumber(Request $request): RedirectResponse
+    public function archiveByNumber(EmployeeNumbersRequest $request): RedirectResponse
     {
         $numbers = $this->employeeNumbersFromRequest($request);
 
@@ -64,7 +61,7 @@ class OperationsController extends Controller
         return redirect()->back()->with('success', "Successfully archived $count employees.");
     }
 
-    public function unarchiveByNumber(Request $request): RedirectResponse
+    public function unarchiveByNumber(EmployeeNumbersRequest $request): RedirectResponse
     {
         $numbers = $this->employeeNumbersFromRequest($request);
 
@@ -88,11 +85,9 @@ class OperationsController extends Controller
     /**
      * @return array<int, int>
      */
-    private function employeeNumbersFromRequest(Request $request): array
+    private function employeeNumbersFromRequest(EmployeeNumbersRequest $request): array
     {
-        $validated = $request->validate([
-            'employee_numbers' => ['required', 'string', 'max:10000'],
-        ]);
+        $validated = $request->validated();
 
         $numbers = collect(preg_split('/[\s,]+/', $validated['employee_numbers'], -1, PREG_SPLIT_NO_EMPTY))
             ->filter(fn (string $number): bool => ctype_digit($number))

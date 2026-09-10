@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\AppraisalItemStoreRequest;
+use App\Http\Requests\Appraisals\AppraisalItemUpdateRequest;
 use App\Models\Appraisals\AppraisalItem;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,7 @@ class AppraisalItemController extends Controller
         $q = trim((string) $request->get('q', ''));
 
         $items = AppraisalItem::query()
-            ->when($q !== '', fn($qq) => $qq->where('key', 'like', "%{$q}%")
+            ->when($q !== '', fn ($qq) => $qq->where('key', 'like', "%{$q}%")
                 ->orWhere('default_label', 'like', "%{$q}%"))
             ->orderBy('default_section')
             ->orderBy('key')
@@ -28,14 +30,9 @@ class AppraisalItemController extends Controller
         return view('app.appraisals.items.create');
     }
 
-    public function store(Request $request)
+    public function store(AppraisalItemStoreRequest $request)
     {
-        $data = $request->validate([
-            'key' => 'required|string|max:255|unique:appraisal_items,key',
-            'default_section' => 'required|in:job_performance,personal_traits,initiative',
-            'type' => 'required|in:score,text',
-            'default_label' => 'required|string|max:255',
-        ]);
+        $data = $request->validated();
 
         AppraisalItem::create($data);
 
@@ -47,14 +44,9 @@ class AppraisalItemController extends Controller
         return view('app.appraisals.items.edit', compact('item'));
     }
 
-    public function update(Request $request, AppraisalItem $item)
+    public function update(AppraisalItemUpdateRequest $request, AppraisalItem $item)
     {
-        $data = $request->validate([
-            'key' => 'required|string|max:255|unique:appraisal_items,key,' . $item->id,
-            'default_section' => 'required|in:job_performance,personal_traits,initiative',
-            'type' => 'required|in:score,text',
-            'default_label' => 'required|string|max:255',
-        ]);
+        $data = $request->validated();
 
         $item->update($data);
 

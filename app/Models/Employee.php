@@ -12,6 +12,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -401,12 +402,12 @@ class Employee extends Model
         );
     }
 
-    public function timeSheets()
+    public function timeSheets(): HasMany
     {
         return $this->hasMany(TimeSheet::class);
     }
 
-    public function clinicApointments()
+    public function clinicApointments(): HasMany
     {
         return $this->hasMany(ClinicApointment::class);
     }
@@ -434,22 +435,22 @@ class Employee extends Model
         });
     }
 
-    public function department()
+    public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function location()
+    public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
 
-    public function center()
+    public function center(): BelongsTo
     {
         return $this->belongsTo(Center::class);
     }
 
-    public function rooms()
+    public function rooms(): BelongsToMany
     {
         return $this->belongsToMany(Room::class)->withPivot(['is_owner', 'is_here']);
     }
@@ -459,7 +460,7 @@ class Employee extends Model
         return 10;
     }
 
-    public function flights()
+    public function flights(): BelongsToMany
     {
         return $this->belongsToMany(Flight::class);
     }

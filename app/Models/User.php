@@ -18,6 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @property int $employee_id
  * @property-read Employee|null $employee
+ * @property-read Signature|null $signature
  */
 class User extends Authenticatable
 {

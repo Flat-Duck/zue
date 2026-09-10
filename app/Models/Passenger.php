@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Passenger extends Model
 {
@@ -15,7 +16,7 @@ class Passenger extends Model
 
     protected $searchableFields = ['*'];
 
-    public function flights()
+    public function flights(): BelongsToMany
     {
         return $this->belongsToMany(Flight::class);
     }

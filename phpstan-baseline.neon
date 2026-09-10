@@ -61,49 +61,13 @@ parameters:
 			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
 
 		-
-			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ClinicApointmentController.php
-
-		-
-			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ClinicApointmentController.php
-
-		-
-			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ClinicApointmentController.php
-
-		-
-			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/EmployeeController.php
-
-		-
-			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/EmployeeController.php
-
-		-
-			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/EmployeeController.php
-
-		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
 			path: app/Http/Controllers/EmployeeController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Http/Controllers/FlightController.php
@@ -115,68 +79,44 @@ parameters:
 			path: app/Http/Controllers/OperationsController.php
 
 		-
-			message: '#^Relation ''center'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ReportController.php
-
-		-
-			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ReportController.php
-
-		-
-			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 4
-			path: app/Http/Controllers/ReportController.php
-
-		-
-			message: '#^Relation ''location'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 2
-			path: app/Http/Controllers/ReportController.php
-
-		-
-			message: '#^Relation ''employees'' is not found in App\\Models\\Room model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/RoomController.php
-
-		-
-			message: '#^Relation ''residence'' is not found in App\\Models\\Room model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Http/Controllers/RoomController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$last_date\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/TimeSheetController.php
-
-		-
 			message: '#^PHPDoc tag @return with type Illuminate\\Database\\Eloquent\\Model\|null is not subtype of native type App\\Models\\User\.$#'
 			identifier: return.phpDocType
 			count: 1
 			path: app/Imports/UsersImport.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Jobs/ClearRoomVacant.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Flight\:\:\$employees\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$ownRoom\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Jobs/FillRoomVacant.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$center\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$rooms\.$#'
 			identifier: property.notFound
+			count: 1
+			path: app/Jobs/FillRoomVacant.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/ClinicEmployeeInfo.php
+
+		-
+			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$aponitment \(App\\Models\\ClinicApointment\|null\) does not accept Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: app/Livewire/ClinicEmployeeInfo.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:employees\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: app/Livewire/TimeTable.php
 
@@ -199,25 +139,7 @@ parameters:
 			path: app/Models/Appraisals/AppraisalFormVersionItem.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$center\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$clinicApointments\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Models/Employee.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$location\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Models/Employee.php
@@ -226,6 +148,12 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$center_id\.$#'
 			identifier: property.notFound
 			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date\.$#'
+			identifier: property.notFound
+			count: 2
 			path: app/Models/Employee.php
 
 		-
@@ -238,6 +166,18 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_id\.$#'
 			identifier: property.notFound
 			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$month\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
 			path: app/Models/Employee.php
 
 		-
@@ -256,6 +196,12 @@ parameters:
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$subordinate_employee_id\.$#'
 			identifier: property.notFound
 			count: 2
+			path: app/Models/Employee.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$year\.$#'
+			identifier: property.notFound
+			count: 1
 			path: app/Models/Employee.php
 
 		-
@@ -335,12 +281,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: app/Models/Scopes/UnderSupervisionEmployees.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Models/User.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Appraisals\\AppraisalOfficialScore\:\:\$final_avg\.$#'
@@ -427,10 +367,22 @@ parameters:
 			path: app/Services/ImageProcessingService.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 2
-			path: app/Services/SignatureService.php
+			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 6
+			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$actor_employee_id\.$#'
@@ -457,7 +409,7 @@ parameters:
 			path: app/Services/TimeSheetAuth/ScopeResolver.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/TimeSheetAuth/WorkflowResolver.php
@@ -475,117 +427,27 @@ parameters:
 			path: app/Services/TimeSheetAuth/WorkflowResolver.php
 
 		-
-			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetAuth/WorkflowResolver.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 3
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$image_path\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Method App\\Services\\TimeSheetAuthorizationService\:\:groupedManagedEmployees\(\) should return array\{supervisors\: Illuminate\\Support\\Collection\<int, App\\Models\\Employee\>, normal_employees_by_department\: Illuminate\\Support\\Collection\<string, Illuminate\\Support\\Collection\<int, App\\Models\\Employee\>\>\} but returns array\{supervisors\: Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>, normal_employees_by_department\: Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\}\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\Employee\)\: bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:reject\(\) expects bool\|\(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|Illuminate\\Database\\Eloquent\\Model, Closure\(App\\Models\\Employee\)\: bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Parameter \#1 \$groupBy of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:groupBy\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: string\)\|list\<Closure\|string\>\|string, Closure\(App\\Models\\Employee\)\: string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Relation ''administration'' is not found in App\\Models\\Department model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetAuthorizationService.php
-
-		-
-			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
 			count: 1
 			path: app/Services/TimeSheetAuthorizationService.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
-			count: 5
+			count: 1
 			path: app/Services/TimeSheetAuthorizationService.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$administration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/TimeSheetService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 3
-			path: app/Services/TimeSheetMutationService.php
-
-		-
-			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetMutationService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\Employee\:\:\$department\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$employee\.$#'
-			identifier: property.notFound
-			count: 3
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$super_intendent\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$super_visor\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\TimeSheet\:\:\$time_keeper\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Relation ''department'' is not found in App\\Models\\Employee model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Relation ''employee'' is not found in App\\Models\\TimeSheet model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
 			path: app/Services/TimeSheetService.php
 
 		-

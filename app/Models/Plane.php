@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plane extends Model
 {
@@ -15,7 +16,7 @@ class Plane extends Model
 
     protected $searchableFields = ['*'];
 
-    public function flights()
+    public function flights(): HasMany
     {
         return $this->hasMany(Flight::class);
     }

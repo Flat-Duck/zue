@@ -5,7 +5,15 @@ namespace App\Models;
 use App\Models\Scopes\Searchable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property-read Employee|null $employee
+ * @property-read Employee|null $revised_by
+ * @property-read Employee|null $time_keeper
+ * @property-read Employee|null $super_visor
+ * @property-read Employee|null $super_intendent
+ */
 class TimeSheet extends Model
 {
     use HasFactory;
@@ -30,17 +38,17 @@ class TimeSheet extends Model
         'revised_at' => 'datetime',
     ];
 
-    public function revisedBy()
+    public function revisedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function time_keeper()
+    public function time_keeper(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'timekeeper_id');
     }
 
-    public function super_intendent()
+    public function super_intendent(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'superintendent_id');
     }
@@ -51,17 +59,17 @@ class TimeSheet extends Model
      * Carried over from the legacy system's `revised_by`, which held an
      * employee number.
      */
-    public function revised_by()
+    public function revised_by(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'admin_id');
     }
 
-    public function super_visor()
+    public function super_visor(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'supervisor_id');
     }
 
-    public function employee()
+    public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }

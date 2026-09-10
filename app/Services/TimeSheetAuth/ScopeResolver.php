@@ -177,6 +177,9 @@ class ScopeResolver
             ->values();
     }
 
+    /**
+     * @return Builder<Employee>
+     */
     public function managedEmployeesQuery(
         User $user,
         string $context = 'time_sheet',
@@ -227,6 +230,27 @@ class ScopeResolver
         return $policyIds
             ->map(fn (int $policyId) => $policiesById->get($policyId))
             ->filter()
+            ->values();
+    }
+
+    /**
+     * The same policies as {@see selectablePolicies}, reduced to what a picker needs.
+     * A policy saved without a name still has to be choosable, so it falls back to
+     * its id rather than rendering as a blank option.
+     *
+     * @return Collection<int, array{id: int, name: string}>
+     */
+    public function selectablePolicyOptions(User $user, string $context = 'time_sheet'): Collection
+    {
+        return $this->selectablePolicies($user, $context)
+            ->map(function (ScopePolicy $policy): array {
+                $name = trim((string) ($policy->name ?? ''));
+
+                return [
+                    'id' => (int) $policy->id,
+                    'name' => $name === '' ? 'Scope #'.$policy->id : $name,
+                ];
+            })
             ->values();
     }
 

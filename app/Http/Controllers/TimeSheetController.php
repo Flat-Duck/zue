@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Contracts\AuditLoggerContract;
 use App\Http\Requests\TimeSheetApprovalRequest;
+use App\Http\Requests\TimeSheetApproveViewRequest;
+use App\Http\Requests\TimeSheetPrintRequest;
 use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
 use App\Models\Employee;
@@ -144,15 +146,9 @@ class TimeSheetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function approve(Request $request): View
+    public function approve(TimeSheetApproveViewRequest $request): View
     {
-        $this->authorize('view-any', TimeSheet::class);
-
-        $validated = $request->validate([
-            'selected_month' => ['required', 'integer', 'min:1', 'max:12'],
-            'selected_year' => ['required', 'integer', 'min:2000', 'max:2100'],
-            'scope_policy_id' => ['nullable', 'integer', 'exists:scope_policies,id'],
-        ]);
+        $validated = $request->validated();
 
         $month = (int) $validated['selected_month'];
         $year = (int) $validated['selected_year'];
@@ -165,15 +161,9 @@ class TimeSheetController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function print(Request $request): View
+    public function print(TimeSheetPrintRequest $request): View
     {
-        $this->authorize('view-any', TimeSheet::class);
-
-        $validated = $request->validate([
-            'selected_month' => ['required', 'integer', 'min:1', 'max:12'],
-            'selected_year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
-            'scope_policy_id' => ['nullable', 'integer', 'exists:scope_policies,id'],
-        ]);
+        $validated = $request->validated();
 
         $month = (int) $validated['selected_month'];
         $year = (int) ($validated['selected_year'] ?? now()->year);

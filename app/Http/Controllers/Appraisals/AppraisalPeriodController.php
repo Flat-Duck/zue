@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Appraisals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Appraisals\AppraisalPeriodRequest;
+use App\Http\Requests\Appraisals\GenerateYearlyAppraisalsRequest;
 use App\Jobs\GenerateYearlyAppraisalsJob;
 use App\Models\Appraisals\AppraisalPeriod;
 use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAggregationService;
-use Illuminate\Http\Request;
 
 class AppraisalPeriodController extends Controller
 {
@@ -26,16 +27,9 @@ class AppraisalPeriodController extends Controller
         return view('app.appraisals.periods.create');
     }
 
-    public function store(Request $request)
+    public function store(AppraisalPeriodRequest $request)
     {
-        $validated = $request->validate([
-            'year' => 'required|integer|min:2020|max:2099',
-            'type' => 'required|in:quarter,yearly',
-            'quarter' => 'nullable|integer|min:1|max:4|required_if:type,quarter',
-            'window_open_from' => 'required|date',
-            'window_open_to' => 'required|date|after_or_equal:window_open_from',
-            'status' => 'required|in:planned,open,closed,locked',
-        ]);
+        $validated = $request->validated();
 
         $exists = AppraisalPeriod::where('year', $validated['year'])
             ->where('type', $validated['type'])
@@ -56,16 +50,9 @@ class AppraisalPeriodController extends Controller
         return view('app.appraisals.periods.edit', compact('period'));
     }
 
-    public function update(Request $request, AppraisalPeriod $period)
+    public function update(AppraisalPeriodRequest $request, AppraisalPeriod $period)
     {
-        $validated = $request->validate([
-            'year' => 'required|integer|min:2020|max:2099',
-            'type' => 'required|in:quarter,yearly',
-            'quarter' => 'nullable|integer|min:1|max:4|required_if:type,quarter',
-            'window_open_from' => 'required|date',
-            'window_open_to' => 'required|date|after_or_equal:window_open_from',
-            'status' => 'required|in:planned,open,closed,locked',
-        ]);
+        $validated = $request->validated();
 
         $exists = AppraisalPeriod::where('year', $validated['year'])
             ->where('type', $validated['type'])
@@ -89,11 +76,9 @@ class AppraisalPeriodController extends Controller
         return redirect()->route('appraisals.periods.index')->with('success', 'Period deleted successfully.');
     }
 
-    public function generateYearly(Request $request, AppraisalAggregationService $service)
+    public function generateYearly(GenerateYearlyAppraisalsRequest $request, AppraisalAggregationService $service)
     {
-        $validated = $request->validate([
-            'year' => ['nullable', 'integer', 'min:2020', 'max:2099'],
-        ]);
+        $validated = $request->validated();
 
         $year = (int) ($validated['year'] ?? now()->year);
 
