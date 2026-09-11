@@ -3,17 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Employee;
-use App\Models\ManagementScope;
-use App\Models\ScopePolicy;
-use App\Models\ScopePolicyActor;
+use App\Models\Location;
+use App\Models\ScopeContext;
+use App\Models\ScopePolicyCriterion;
 use App\Models\User;
-use App\Services\ManagementScopeService;
-use App\Services\TimeSheetAuth\ScopeResolver;
+use App\Services\ManagementScopes\ScopeWriter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 class AuthorizationIdentityTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     /**
@@ -40,60 +41,86 @@ class AuthorizationIdentityTest extends TestCase
         $this->assertSame(70002, $user->fresh()->number);
     }
 
-    public function test_management_scope_writes_authoritative_policy_and_deactivates_it_on_delete(): void
+    /**
+     * Saving a scope replaces what it covers, rather than adding to it. Dropping
+     * a field from the form has to drop it from the scope, or people keep seeing
+     * employees the screen no longer says they can see.
+     */
+    public function test_saving_a_scope_replaces_what_it_covers(): void
     {
+        $writer = app(ScopeWriter::class);
+
         $manager = Employee::factory()->create();
-        $service = app(ManagementScopeService::class);
+        $fieldA = Location::factory()->create();
+        $fieldD = Location::factory()->create();
 
-        $service->createScopes([
+        $scope = $writer->create([
+            'name' => 'Dispatcher',
+            'context_id' => $this->scopeContext(ScopeContext::DISPATCHER)->id,
             'manager_ids' => [$manager->id],
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
-            'name' => 'All staff',
+            'field_ids' => [$fieldA->id, $fieldD->id],
         ]);
 
-        $scope = ManagementScope::query()->latest('id')->firstOrFail();
-        $policy = ScopePolicy::query()
-            ->where('settings->legacy_scope_id', $scope->id)
-            ->firstOrFail();
+        $this->assertEqualsCanonicalizing(
+            [$fieldA->id, $fieldD->id],
+            $scope->valuesFor(ScopePolicyCriterion::FIELD)
+        );
 
-        $this->assertTrue($policy->is_active);
-        $this->assertDatabaseHas('scope_policy_actors', [
-            'policy_id' => $policy->id,
-            'actor_employee_id' => $manager->id,
-            'can_fill' => 1,
-            'can_approve' => 1,
-            'can_revise' => 1,
+        $writer->update($scope, [
+            'name' => 'Dispatcher',
+            'context_id' => $scope->context_id,
+            'manager_ids' => [$manager->id],
+            'field_ids' => [$fieldD->id],
         ]);
 
-        $service->deleteScope($scope);
-
-        $this->assertDatabaseMissing('management_scopes', ['id' => $scope->id]);
-        $this->assertFalse($policy->fresh()->is_active);
-        $this->assertSame(1, ScopePolicyActor::query()->where('policy_id', $policy->id)->count());
+        $this->assertSame([$fieldD->id], $scope->fresh()->load('criteria')->valuesFor(ScopePolicyCriterion::FIELD));
     }
 
-    public function test_v2_scope_resolution_matches_legacy_scope_for_a_representative_manager(): void
+    public function test_removing_a_manager_takes_their_access_away(): void
     {
-        $user = User::factory()->forEmployeeNumber(70003)->create();
-        $manager = $user->employee;
-        $target = Employee::factory()->create();
-        $service = app(ManagementScopeService::class);
+        $writer = app(ScopeWriter::class);
 
-        $service->createScopes([
-            'manager_ids' => [$manager->id],
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
+        $kept = Employee::factory()->create();
+        $removed = Employee::factory()->create();
+        $target = Employee::factory()->create();
+
+        $scope = $writer->create([
+            'name' => 'Shared',
+            'context_id' => $this->scopeContext()->id,
+            'manager_ids' => [$kept->id, $removed->id],
+            'employee_ids' => [$target->id],
         ]);
 
-        $legacyIds = $manager->managedEmployeesQuery('time_sheet')->pluck('id')->sort()->values()->all();
-        $v2Ids = app(ScopeResolver::class)
-            ->resolveVisibleEmployeeIds($user, 'time_sheet')
-            ->sort()
-            ->values()
-            ->all();
+        $this->assertCount(2, $scope->actors);
 
-        $this->assertContains($target->id, $legacyIds);
-        $this->assertSame($legacyIds, $v2Ids);
+        $writer->update($scope, [
+            'name' => 'Shared',
+            'context_id' => $scope->context_id,
+            'manager_ids' => [$kept->id],
+            'employee_ids' => [$target->id],
+        ]);
+
+        $this->assertSame(
+            [$kept->id],
+            $scope->fresh()->actors->pluck('actor_employee_id')->map(fn ($id) => (int) $id)->all()
+        );
+    }
+
+    public function test_deleting_a_scope_takes_its_criteria_and_actors_with_it(): void
+    {
+        $writer = app(ScopeWriter::class);
+
+        $scope = $writer->create([
+            'name' => 'Temporary',
+            'context_id' => $this->scopeContext()->id,
+            'manager_ids' => [Employee::factory()->create()->id],
+            'employee_ids' => [Employee::factory()->create()->id],
+        ]);
+
+        $writer->delete($scope);
+
+        $this->assertDatabaseMissing('scope_policies', ['id' => $scope->id]);
+        $this->assertDatabaseMissing('scope_policy_criteria', ['policy_id' => $scope->id]);
+        $this->assertDatabaseMissing('scope_policy_actors', ['policy_id' => $scope->id]);
     }
 }

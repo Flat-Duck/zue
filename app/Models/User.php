@@ -117,18 +117,7 @@ class User extends Authenticatable
      */
     public function managedEmployees(): Collection
     {
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            return app(TimeSheetAuthorizationService::class)
-                ->managedEmployeesQuery($this, 'general')
-                ->get();
-        }
-
-        $employee = app(ActorResolver::class)->resolveEmployee($this);
-        if (! $employee) {
-            return collect();
-        }
-
-        return $employee->managedEmployees();
+        return $this->managedEmployeesQuery(ScopeContext::GENERAL)->get();
     }
 
     /**
@@ -139,23 +128,11 @@ class User extends Authenticatable
      * Eloquent hydrates models directly, so there is no constructor to inject
      * into: the container is reached explicitly here rather than threading
      * services through every call site.
-     *
-     * The deeper fix is that this authorization logic does not belong on the
-     * model at all — see roadmap 2.4.
      */
 
-    public function managedEmployeesQuery(string $context = 'general'): Builder
+    public function managedEmployeesQuery(string $context = ScopeContext::GENERAL): Builder
     {
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            return app(TimeSheetAuthorizationService::class)->managedEmployeesQuery($this, $context);
-        }
-
-        $employee = app(ActorResolver::class)->resolveEmployee($this);
-        if (! $employee) {
-            return Employee::query()->whereRaw('0 = 1');
-        }
-
-        return $employee->managedEmployeesQuery($context);
+        return app(TimeSheetAuthorizationService::class)->managedEmployeesQuery($this, $context);
     }
 
     /**

@@ -35,7 +35,8 @@ class UserUpdateRequest extends FormRequest
                 'email',
             ],
             'password' => ['nullable'],
-            'roles' => 'array',
+            'roles' => ['array'],
+            'roles.*' => ['integer', 'exists:roles,id'],
             'signature_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }

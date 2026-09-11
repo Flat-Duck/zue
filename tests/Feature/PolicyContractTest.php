@@ -10,11 +10,11 @@ use App\Models\Flight;
 use App\Models\FlightRoute;
 use App\Models\FlightStation;
 use App\Models\Location;
-use App\Models\ManagementScope;
 use App\Models\Passenger;
 use App\Models\Plane;
 use App\Models\Residence;
 use App\Models\Room;
+use App\Models\ScopePolicy;
 use App\Models\Stock;
 use App\Models\TimeSheet;
 use App\Models\User;
@@ -169,11 +169,11 @@ class PolicyContractTest extends TestCase
             'fill or create a timesheet' => [TimeSheet::class, 'create', ['fill timesheets', 'create timesheets']],
             'revise or update a timesheet' => [TimeSheet::class, 'update', ['revise timesheets', 'update timesheets']],
             'approve or update a timesheet' => [TimeSheet::class, 'approve', ['approve timesheets', 'update timesheets']],
-            'see scopes through users or employees' => [ManagementScope::class, 'viewAny', ['list users', 'list employees']],
-            'view scopes through users or employees' => [ManagementScope::class, 'view', ['list users', 'list employees']],
-            'create scopes through users or employees' => [ManagementScope::class, 'create', ['update users', 'update employees']],
-            'update scopes through users or employees' => [ManagementScope::class, 'update', ['update users', 'update employees']],
-            'delete scopes through users or employees' => [ManagementScope::class, 'delete', ['delete users', 'delete employees']],
+            'see scopes through users or employees' => [ScopePolicy::class, 'viewAny', ['list users', 'list employees']],
+            'view scopes through users or employees' => [ScopePolicy::class, 'view', ['list users', 'list employees']],
+            'create scopes through users or employees' => [ScopePolicy::class, 'create', ['update users', 'update employees']],
+            'update scopes through users or employees' => [ScopePolicy::class, 'update', ['update users', 'update employees']],
+            'delete scopes through users or employees' => [ScopePolicy::class, 'delete', ['delete users', 'delete employees']],
         ];
     }
 

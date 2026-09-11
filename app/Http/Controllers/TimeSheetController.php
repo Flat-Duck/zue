@@ -9,6 +9,7 @@ use App\Http\Requests\TimeSheetPrintRequest;
 use App\Http\Requests\TimeSheetStoreRequest;
 use App\Http\Requests\TimeSheetUpdateRequest;
 use App\Models\Employee;
+use App\Models\ScopeContext;
 use App\Models\TimeSheet;
 use App\Services\TimeSheetAuthorizationService;
 use App\Services\TimeSheetMutationService;
@@ -40,21 +41,15 @@ class TimeSheetController extends Controller
         $selectedScopePolicyId = null;
         $groupedEmployees = null;
 
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
-            $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user(), 'time_sheet');
-            $groupedEmployees = $this->timeSheetAuthorizationService
-                ->groupedManagedEmployees(auth()->user(), 'time_sheet', $selectedScopePolicyId);
+        $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+        $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user());
+        $groupedEmployees = $this->timeSheetAuthorizationService
+            ->groupedManagedEmployees(auth()->user(), ScopeContext::TIME_SHEET, $selectedScopePolicyId);
 
-            $employees = $this->timeSheetAuthorizationService
-                ->managedEmployeesQueryForScope(auth()->user(), 'time_sheet', $selectedScopePolicyId)
-                ->with('details')
-                ->paginate(20);
-        } else {
-            $employees = auth()->user()->managedEmployeesQuery('time_sheet')
-                ->with('details')
-                ->paginate(20);
-        }
+        $employees = $this->timeSheetAuthorizationService
+            ->managedEmployeesQueryForScope(auth()->user(), ScopeContext::TIME_SHEET, $selectedScopePolicyId)
+            ->with('details')
+            ->paginate(20);
 
         $employees = $employees
             ->through(function ($employee) {
@@ -134,13 +129,8 @@ class TimeSheetController extends Controller
      */
     public function approve_preview(Request $request): View
     {
-        $scopeOptions = collect();
-        $selectedScopePolicyId = null;
-
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user(), 'time_sheet');
-            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
-        }
+        $scopeOptions = $this->timeSheetAuthorizationService->selectableScopes(auth()->user());
+        $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
 
         return view('app.time_sheets.approve_preview', compact('scopeOptions', 'selectedScopePolicyId'));
     }
@@ -190,35 +180,13 @@ class TimeSheetController extends Controller
         $month = (int) $validated['month'];
         $level = $this->timeSheetMutationService->normalizeApprovalLevel($validated['level']);
 
-        if (config('timesheet_auth.v2_write_enabled', false)) {
-            $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
-            $updated = $this->timeSheetAuthorizationService->approve(
-                auth()->user(),
-                $month,
-                $year,
-                $level,
-                $selectedScopePolicyId
-            );
-
-            $this->auditLogger->record('timesheets.approved', [
-                'month' => $month,
-                'year' => $year,
-                'level' => $level,
-                'rows_updated' => $updated,
-                'scope_policy_id' => $selectedScopePolicyId,
-                'path' => 'v2',
-            ]);
-
-            return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
-        }
-
-        $managedEmployeeIds = auth()->user()->managedEmployeesQuery('time_sheet')->pluck('id');
-        $updated = $this->timeSheetMutationService->approveLegacy(
+        $selectedScopePolicyId = $this->selectedScopePolicyIdFromRequest($request);
+        $updated = $this->timeSheetAuthorizationService->approve(
             auth()->user(),
             $month,
             $year,
             $level,
-            $managedEmployeeIds
+            $selectedScopePolicyId
         );
 
         $this->auditLogger->record('timesheets.approved', [
@@ -226,7 +194,8 @@ class TimeSheetController extends Controller
             'year' => $year,
             'level' => $level,
             'rows_updated' => $updated,
-            'path' => 'legacy',
+            'scope_policy_id' => $selectedScopePolicyId,
+            'path' => 'v2',
         ]);
 
         return back()->with('success', "Time sheets approved. Updated rows: {$updated}");
@@ -284,36 +253,22 @@ class TimeSheetController extends Controller
 
     private function ensureManageableForTimeSheet(int $employeeId, ?int $selectedScopePolicyId = null): void
     {
-        if (config('timesheet_auth.v2_read_enabled', false)) {
-            $isManageable = $this->timeSheetAuthorizationService
-                ->managedEmployeesQueryForScope(auth()->user(), 'time_sheet', $selectedScopePolicyId)
-                ->where('id', $employeeId)
-                ->exists();
-        } else {
-            $isManageable = auth()->user()
-                ->managedEmployeesQuery('time_sheet')
-                ->where('id', $employeeId)
-                ->exists();
-        }
+        $isManageable = $this->timeSheetAuthorizationService
+            ->managedEmployeesQueryForScope(auth()->user(), ScopeContext::TIME_SHEET, $selectedScopePolicyId)
+            ->where('id', $employeeId)
+            ->exists();
 
         abort_unless($isManageable, 403);
     }
 
     private function selectedScopePolicyIdFromRequest(Request $request): ?int
     {
-        if (
-            ! config('timesheet_auth.v2_read_enabled', false)
-            && ! config('timesheet_auth.v2_write_enabled', false)
-        ) {
-            return null;
-        }
-
         $requested = $request->query('scope_policy_id', $request->input('scope_policy_id'));
         $requested = is_null($requested) || $requested === '' ? null : (int) $requested;
 
         return $this->timeSheetAuthorizationService->resolveSelectedScopePolicyId(
             auth()->user(),
-            'time_sheet',
+            ScopeContext::TIME_SHEET,
             $requested
         );
     }

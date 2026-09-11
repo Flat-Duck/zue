@@ -7,8 +7,10 @@ use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
-use App\Models\ManagementScope;
-use App\Services\ManagementScopeService;
+use App\Models\ScopeContext;
+use App\Models\ScopePolicy;
+use App\Services\ManagementScopes\ScopeWriter;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,146 +19,114 @@ class ManagementScopeController extends Controller
 {
     public function index(Request $request): View
     {
-        $this->authorize('viewAny', ManagementScope::class);
+        $this->authorize('viewAny', ScopePolicy::class);
 
-        $managerId = $request->get('manager_id');
-        $search = $request->get('search');
+        $managerId = $request->integer('manager_id') ?: null;
+        $contextId = $request->integer('context_id') ?: null;
+        $search = trim((string) $request->get('search'));
 
-        $query = ManagementScope::query()
-            ->with(['manager', 'subordinate', 'location', 'department', 'center'])
-            ->orderBy('manager_id')
-            ->orderBy('scope_type');
-
-        // Filter by manager (check if manager is in the shared list)
-        if (! empty($managerId)) {
-            $query->whereHas('managers', function ($q) use ($managerId) {
-                $q->where('employees.id', $managerId);
-            });
-        }
-
-        // Text search (manager name, subordinate name, scope_type)
-        if (! empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('manager', function ($q2) use ($search) {
-                    $q2->where('english_name', 'like', '%'.$search.'%');
-                })
-                    ->orWhereHas('subordinate', function ($q2) use ($search) {
-                        $q2->where('english_name', 'like', '%'.$search.'%');
-                    })
-                    ->orWhere('scope_type', 'like', '%'.$search.'%');
-            });
-        }
-
-        $managementScopes = $query->paginate(20)->appends($request->query());
-
-        $managers = Employee::query()
-            ->select(['id', 'number', 'english_name'])
-            ->orderBy('english_name')
-            ->get();
+        $scopes = ScopePolicy::query()
+            ->with(['context', 'criteria', 'actors.actorEmployee:id,number,english_name'])
+            ->when($managerId, fn ($query) => $query->whereHas(
+                'actors',
+                fn ($actors) => $actors->where('actor_employee_id', $managerId)
+            ))
+            ->when($contextId, fn ($query) => $query->where('context_id', $contextId))
+            ->when($search !== '', fn ($query) => $query->where(function ($where) use ($search): void {
+                $where->where('name', 'like', '%'.$search.'%')
+                    ->orWhereHas(
+                        'actors.actorEmployee',
+                        fn ($employees) => $employees->where('english_name', 'like', '%'.$search.'%')
+                    );
+            }))
+            ->orderByDesc('is_active')
+            ->orderBy('context_id')
+            ->orderBy('name')
+            ->paginate(20)
+            ->appends($request->query());
 
         return view('app.management_scopes.index', [
-            'managementScopes' => $managementScopes,
-            'managers' => $managers,
+            'managementScopes' => $scopes,
+            'managers' => $this->managers(),
+            'contexts' => ScopeContext::query()->orderBy('sort_order')->get(),
             'managerId' => $managerId,
+            'contextId' => $contextId,
         ]);
     }
 
     public function create(Request $request): View
     {
-        $this->authorize('create', ManagementScope::class);
+        $this->authorize('create', ScopePolicy::class);
 
-        $managerId = $request->get('manager_id');
-
-        $managers = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
-        $employees = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
-        $locations = Location::query()->select(['id', 'name'])->orderBy('name')->get();
-        $departments = Department::query()->select(['id', 'name'])->orderBy('name')->get();
-        $centers = Center::query()->select(['id', 'name'])->orderBy('name')->get();
-
-        $scopeTypes = [
-            ManagementScope::TYPE_GLOBAL,
-            ManagementScope::TYPE_LOCATION,
-            ManagementScope::TYPE_DEPARTMENT,
-            ManagementScope::TYPE_CENTER,
-            ManagementScope::TYPE_EMPLOYEE,
-        ];
-
-        $contexts = ['general', 'time_sheet', 'flight'];
-
-        return view('app.management_scopes.create', compact(
-            'managers',
-            'employees',
-            'locations',
-            'departments',
-            'centers',
-            'scopeTypes',
-            'contexts',
-            'managerId'
-        ));
+        return view('app.management_scopes.create', $this->formData() + [
+            'managerId' => $request->integer('manager_id') ?: null,
+        ]);
     }
 
-    public function store(ManagementScopeStoreRequest $request, ManagementScopeService $service): RedirectResponse
+    public function store(ManagementScopeStoreRequest $request, ScopeWriter $writer): RedirectResponse
     {
-        $this->authorize('create', ManagementScope::class);
-
-        $service->createScopes($request->validated());
+        $writer->create($request->validated());
 
         return redirect()
             ->route('management-scopes.index')
-            ->with('success', 'Management scope(s) created successfully.');
+            ->with('success', __('crud.common.created'));
     }
 
-    public function edit(ManagementScope $managementScope): View
+    public function edit(ScopePolicy $managementScope): View
     {
         $this->authorize('update', $managementScope);
 
-        $managers = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
-        $employees = Employee::query()->select(['id', 'number', 'english_name'])->orderBy('english_name')->get();
-        $locations = Location::query()->select(['id', 'name'])->orderBy('name')->get();
-        $departments = Department::query()->select(['id', 'name'])->orderBy('name')->get();
-        $centers = Center::query()->select(['id', 'name'])->orderBy('name')->get();
-
-        $scopeTypes = [
-            ManagementScope::TYPE_GLOBAL,
-            ManagementScope::TYPE_LOCATION,
-            ManagementScope::TYPE_DEPARTMENT,
-            ManagementScope::TYPE_CENTER,
-            ManagementScope::TYPE_EMPLOYEE,
-        ];
-
-        $contexts = ['general', 'time_sheet', 'flight'];
-
-        return view('app.management_scopes.edit', compact(
-            'managementScope',
-            'managers',
-            'employees',
-            'locations',
-            'departments',
-            'centers',
-            'scopeTypes',
-            'contexts'
-        ));
+        return view('app.management_scopes.edit', $this->formData() + [
+            'managementScope' => $managementScope->load(['criteria', 'actors']),
+        ]);
     }
 
-    public function update(ManagementScopeStoreRequest $request, ManagementScope $managementScope, ManagementScopeService $service): RedirectResponse
-    {
-        $this->authorize('update', $managementScope);
-
-        $service->updateScope($managementScope, $request->validated());
+    public function update(
+        ManagementScopeStoreRequest $request,
+        ScopePolicy $managementScope,
+        ScopeWriter $writer
+    ): RedirectResponse {
+        $writer->update($managementScope, $request->validated());
 
         return redirect()
             ->route('management-scopes.index')
-            ->with('success', 'Management scope updated successfully.');
+            ->with('success', __('crud.common.saved'));
     }
 
-    public function destroy(ManagementScope $managementScope, ManagementScopeService $service): RedirectResponse
+    public function destroy(ScopePolicy $managementScope, ScopeWriter $writer): RedirectResponse
     {
         $this->authorize('delete', $managementScope);
 
-        $service->deleteScope($managementScope);
+        $writer->delete($managementScope);
 
         return redirect()
             ->route('management-scopes.index')
-            ->with('success', 'Management scope deleted successfully.');
+            ->with('success', __('crud.common.deleted'));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function formData(): array
+    {
+        return [
+            'contexts' => ScopeContext::query()->where('is_active', true)->orderBy('sort_order')->get(),
+            'managers' => $this->managers(),
+            'employees' => $this->managers(),
+            'fields' => Location::query()->orderBy('name')->get(['id', 'name']),
+            'departments' => Department::query()->orderBy('name')->get(['id', 'name']),
+            'centers' => Center::query()->orderBy('name')->get(['id', 'name']),
+        ];
+    }
+
+    /**
+     * @return Collection<int, Employee>
+     */
+    private function managers()
+    {
+        return Employee::query()
+            ->whereNull('archived_at')
+            ->orderBy('english_name')
+            ->get(['id', 'number', 'english_name']);
     }
 }

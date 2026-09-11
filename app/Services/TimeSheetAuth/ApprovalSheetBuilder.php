@@ -192,7 +192,10 @@ class ApprovalSheetBuilder
             return ['', '', ''];
         }
 
-        $policy = ScopePolicy::query()->find($selectedScopePolicyId, ['id', 'department_id', 'center_id', 'settings']);
+        $policy = ScopePolicy::query()->find(
+            $selectedScopePolicyId,
+            ['id', 'print_department_id', 'print_center_id', 'settings']
+        );
 
         if (! $policy) {
             return ['', '', ''];
@@ -203,7 +206,7 @@ class ApprovalSheetBuilder
         $administration = '';
         $center = '';
 
-        $departmentId = (int) ($settings['print_department_id'] ?? ($policy->department_id ?? 0));
+        $departmentId = (int) ($policy->print_department_id ?? ($settings['print_department_id'] ?? 0));
 
         if ($departmentId > 0) {
             $model = Department::query()
@@ -214,7 +217,7 @@ class ApprovalSheetBuilder
             $administration = (string) ($model?->administration?->name ?? '');
         }
 
-        $centerId = (int) ($settings['print_center_id'] ?? ($policy->center_id ?? 0));
+        $centerId = (int) ($policy->print_center_id ?? ($settings['print_center_id'] ?? 0));
 
         if ($centerId > 0) {
             $center = (string) (Center::query()->find($centerId, ['id', 'name'])?->name ?? '');

@@ -33,6 +33,7 @@ return [
         'no_items_found' => 'لا توجد عناصر',
         'created' => 'تم الإنشاء بنجاح',
         'saved' => 'تم الحفظ بنجاح',
+        'deleted' => 'تم الحذف بنجاح',
         'removed' => 'تم الحذف بنجاح',
         'print_preview' => 'طباعة',
         'time_sheet_approve' => 'اعتماد بطاقات ضبط الوقت',

@@ -5,8 +5,8 @@ namespace App\Models;
 use App\Helpers\TimeSheetBuilder;
 use App\Models\Scopes\Searchable;
 use App\Models\Scopes\SoftArchives;
-use App\Services\Employees\ManagedEmployeeQuery;
 use App\Services\Employees\ProfileDefinition;
+use App\Services\TimeSheetAuth\ScopeResolver;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -405,22 +405,13 @@ class Employee extends Model
     }
 
     /**
-     * @return BelongsToMany<ManagementScope, $this>
+     * The management scopes this employee acts under.
+     *
+     * @return HasMany<ScopePolicyActor, $this>
      */
-    public function managementScopes(): BelongsToMany
+    public function scopeAssignments(): HasMany
     {
-        return $this->belongsToMany(ManagementScope::class, 'management_scope_manager', 'manager_id', 'management_scope_id');
-    }
-
-    /**
-     * Legacy owned scopes.
-     */
-    /**
-     * @return HasMany<ManagementScope, $this>
-     */
-    public function ownedManagementScopes(): HasMany
-    {
-        return $this->hasMany(ManagementScope::class, 'manager_id');
+        return $this->hasMany(ScopePolicyActor::class, 'actor_employee_id');
     }
 
     public function getFullNameAttribute(): string
@@ -436,20 +427,20 @@ class Employee extends Model
     /**
      * Get all managed employees as a collection.
      */
-    public function managedEmployees(?string $context = 'general')
+    public function managedEmployees(?string $context = ScopeContext::GENERAL)
     {
         return $this->managedEmployeesQuery($context)->get();
     }
 
     /**
-     * Who this employee manages, under the original scope model. The rules live in
-     * {@see ManagedEmployeeQuery}; this is how the rest of the application asks.
+     * Who this employee manages, in one context. The rules live in
+     * {@see ScopeResolver}; this is how the rest of the application asks.
      *
      * @return Builder<Employee>
      */
-    public function managedEmployeesQuery(?string $context = 'general'): Builder
+    public function managedEmployeesQuery(?string $context = ScopeContext::GENERAL): Builder
     {
-        return app(ManagedEmployeeQuery::class)->forEmployee($this, $context);
+        return app(ScopeResolver::class)->employeesManagedBy($this, $context ?? ScopeContext::GENERAL);
     }
 
     /**

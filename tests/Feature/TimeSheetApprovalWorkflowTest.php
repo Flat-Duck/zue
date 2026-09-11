@@ -9,7 +9,6 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
 use App\Models\ScopePolicy;
-use App\Models\ScopePolicyActor;
 use App\Models\Signature;
 use App\Models\TimeSheet;
 use App\Models\TimeSheetApprovalStep;
@@ -19,6 +18,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 /**
@@ -31,6 +31,7 @@ use Tests\TestCase;
  */
 class TimeSheetApprovalWorkflowTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     private TimeSheetAuthorizationService $service;
@@ -62,21 +63,7 @@ class TimeSheetApprovalWorkflowTest extends TestCase
         $this->actorEmployee = $this->makeEmployee();
         $this->actor = User::factory()->forEmployee($this->actorEmployee)->create();
 
-        $this->policy = ScopePolicy::query()->create([
-            'name' => 'Global',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_GLOBAL,
-            'priority' => 0,
-            'is_active' => true,
-        ]);
-
-        ScopePolicyActor::query()->create([
-            'policy_id' => $this->policy->id,
-            'actor_employee_id' => $this->actorEmployee->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => true,
-        ]);
+        $this->policy = $this->buildGlobalScope([$this->actorEmployee]);
 
         $this->flow = ApprovalFlow::query()->create([
             'context' => 'time_sheet',

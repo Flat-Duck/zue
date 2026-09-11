@@ -10,6 +10,7 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Imports\UsersImport;
 use App\Models\User;
 use App\Services\SignatureService;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +62,25 @@ class UserController extends Controller
     }
 
     /**
+     * The roles the form asked for.
+     *
+     * The checkboxes carry role ids, and an id arrives over HTTP as a string.
+     * Spatie reads a string as a role *name*, so "4" was looked up as a role
+     * called "4" and every save threw `RoleDoesNotExist`. Resolving the ids here
+     * says which of the two was meant, and matches how permissions already do it.
+     *
+     * @return EloquentCollection<int, Role>
+     */
+    private function rolesFromRequest(Request $request): EloquentCollection
+    {
+        $ids = array_map('intval', (array) $request->input('roles', []));
+
+        return $ids === []
+            ? Role::query()->whereRaw('0 = 1')->get()
+            : Role::query()->whereIn('id', $ids)->get();
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(UserStoreRequest $request): RedirectResponse
@@ -77,7 +97,7 @@ class UserController extends Controller
             $this->signatureService->saveSignature($user, $request->file('signature_file'));
         }
 
-        $user->syncRoles($request->roles);
+        $user->syncRoles($this->rolesFromRequest($request));
 
         $this->auditLogger->record('user.created', [
             'user_id' => $user->id,
@@ -136,7 +156,7 @@ class UserController extends Controller
 
         $rolesBefore = $user->getRoleNames()->all();
 
-        $user->syncRoles($request->roles);
+        $user->syncRoles($this->rolesFromRequest($request));
 
         $rolesAfter = $user->fresh()->getRoleNames()->all();
 

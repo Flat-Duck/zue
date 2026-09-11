@@ -1,250 +1,248 @@
 @php
-    use App\Models\ManagementScope as ScopeModel;
+    use App\Models\ScopePolicyCriterion;
 
-    /** @var \App\Models\ManagementScope|null $managementScope */
-    $editing = isset($managementScope);
+    /** @var \App\Models\ScopePolicy|null $scope */
+    // `use` on a closure requires the variable to exist, and on the create screen
+    // there is no scope yet.
+    $scope = $managementScope ?? null;
+    $editing = $scope !== null;
 
-    // 1. Managers Selection
+    $chosen = function (string $input, string $dimension) use ($editing, $scope) {
+        $old = old($input);
+
+        if (is_array($old)) {
+            return array_map('intval', $old);
+        }
+
+        return $editing ? $scope->valuesFor($dimension) : [];
+    };
+
     $selectedManagers = old('manager_ids');
-    if ($editing && empty($selectedManagers)) {
-        $selectedManagers = $managementScope->managers->pluck('id')->toArray();
-        // Fallback to legacy owner if pivot is empty but owner exists
-        if (empty($selectedManagers) && $managementScope->manager_id) {
-            $selectedManagers = [$managementScope->manager_id];
-        }
+    if (! is_array($selectedManagers)) {
+        $selectedManagers = $editing
+            ? $scope->actors->pluck('actor_employee_id')->map(fn ($id) => (int) $id)->all()
+            : array_filter([$managerId ?? null]);
     }
-    // If we're creating and a managerId was passed in query string
-    if (!$editing && empty($selectedManagers) && !empty($managerId)) {
-        $selectedManagers = [$managerId];
-    }
-    $selectedManagers = (array) $selectedManagers;
+    $selectedManagers = array_map('intval', $selectedManagers);
 
-    // 2. Subordinates Selection (multi-select)
-    $selectedSubordinates = old('subordinate_employee_ids');
+    $selectedFields = $chosen('field_ids', ScopePolicyCriterion::FIELD);
+    $selectedDepartments = $chosen('department_ids', ScopePolicyCriterion::DEPARTMENT);
+    $selectedCenters = $chosen('center_ids', ScopePolicyCriterion::CENTER);
+    $selectedEmployees = $chosen('employee_ids', ScopePolicyCriterion::EMPLOYEE);
 
-    if ($editing && empty($selectedSubordinates)) {
-        if ($managementScope->subordinate_employee_id) {
-            $selectedSubordinates = [$managementScope->subordinate_employee_id];
-        } elseif (!empty($managementScope->settings['target_employee_ids'])) {
-            $selectedSubordinates = $managementScope->settings['target_employee_ids'];
-        }
-    }
+    $coversEveryone = (bool) old('covers_everyone', $editing ? $scope->covers_everyone : false);
+    $selectedContext = (int) old('context_id', $editing ? $scope->context_id : ($contexts->first()->id ?? 0));
 
-    $selectedSubordinates = (array) $selectedSubordinates;
+    // A new scope starts with whatever the context it opens on would suggest, so
+    // the switch agrees with the dropdown above it before anything is touched.
+    $carvesOut = (bool) old(
+        'carves_out_managers',
+        $editing
+            ? $scope->carves_out_managers
+            : ($contexts->firstWhere('id', $selectedContext)?->carves_out_managers ?? false)
+    );
+
+    $carveDefaults = $contexts->mapWithKeys(fn ($context) => [$context->id => (bool) $context->carves_out_managers]);
 @endphp
 
-<div class="row">
-    {{-- Managers --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="manager_ids" class="form-label"> @lang('ui.managers_one_or_more') </label>
-        <select
-            name="manager_ids[]"
-            id="manager_ids"
-            class="form-control"
-            required
-            multiple
-            data-tomselect="tags"
-        >
-            @foreach($managers as $manager)
-                <option
-                    value="{{ $manager->id }}"
-                    @selected(in_array($manager->id, $selectedManagers))
-                >
-                    {{ $manager->number }} - {{ $manager->english_name ?? ('#'.$manager->id) }}
-                </option>
-            @endforeach
-        </select>
-        <small class="form-hint"> @lang('ui.you_can_assign_multiple_managers_to_the_same') </small>
-    </x-inputs.group>
+<div
+    x-data="{
+        coversEveryone: @js($coversEveryone),
+        carvesOut: @js($carvesOut),
+        contextId: @js($selectedContext),
+        carveDefaults: @js($carveDefaults),
 
+        /* Choosing a context sets the sensible default for the carve-out, since
+           it is the context that decides whether a hierarchy applies. It stays a
+           per-scope choice, so changing it afterwards sticks. */
+        contextChanged() {
+            const suggested = this.carveDefaults[this.contextId];
+            if (typeof suggested === 'boolean') {
+                this.carvesOut = suggested;
+            }
+        },
+    }"
+    class="row"
+>
     {{-- Name --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="name" class="form-label"> @lang('ui.scope_name_optional') </label>
-        <x-inputs.text
-            name="name"
-            id="name"
-            :value="old('name', ($editing ? $managementScope->name : ''))"
-            
-            placeholder="@lang('ui.e_g_my_custom_scope')"
-        ></x-inputs.text>
-    </x-inputs.group>
-
-    {{-- Template --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="template" class="form-label"> @lang('ui.template_identifier') </label>
-        <select
-            name="template"
-            id="template"
-            class="form-control"
-            required
-        >
-            @php
-                $templates = ['general', 'test1', 'test2', 'test3', 'test4'];
-            @endphp
-            @foreach($templates as $tpl)
-                <option
-                    value="{{ $tpl }}"
-                    @selected(old('template', $editing ? $managementScope->template : 'general') == $tpl)
-                >
-                    {{ ucfirst($tpl) }}
-                </option>
-            @endforeach
-        </select>
+    <x-inputs.group class="col-sm-6">
+        <label for="name" class="form-label">@lang('scopes.name')</label>
+        <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror"
+            value="{{ old('name', $editing ? $scope->name : '') }}"
+            placeholder="@lang('scopes.name_placeholder')">
+        @error('name') <span class="invalid-feedback">{{ $message }}</span> @enderror
     </x-inputs.group>
 
     {{-- Context --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="context" class="form-label"> @lang('ui.context') </label>
-        <select
-            name="context"
-            id="context"
-            class="form-control"
-            required
-        >
-            @foreach($contexts as $ctx)
-                <option
-                    value="{{ $ctx }}"
-                    @selected(old('context', $editing ? $managementScope->context : 'general') == $ctx)
-                >
-                    {{ ucfirst(str_replace('_', ' ', $ctx)) }}
+    <x-inputs.group class="col-sm-6">
+        <label for="context_id" class="form-label required">@lang('scopes.context')</label>
+        <select name="context_id" id="context_id" class="form-select @error('context_id') is-invalid @enderror"
+            x-model.number="contextId" @change="contextChanged()" required>
+            @foreach ($contexts as $context)
+                <option value="{{ $context->id }}" @selected($selectedContext === $context->id)>
+                    {{ $context->label() }}
                 </option>
             @endforeach
         </select>
+        <small class="form-hint">@lang('scopes.context_hint')</small>
+        @error('context_id') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
     </x-inputs.group>
 
-    {{-- Scope Type --}}
+    {{-- Managers --}}
     <x-inputs.group class="col-sm-12">
-        <label for="scope_type" class="form-label">
-            @lang('crud.management_scopes.inputs.scope_type', [], 'en')
-        </label>
-        <select
-            name="scope_type"
-            id="scope_type"
-            class="form-control"
-            required
-        >
-            <option value="">
-                @lang('crud.common.please_select', [], 'en')
-            </option>
-            @foreach($scopeTypes as $type)
-                <option
-                    value="{{ $type }}"
-                    @selected(old('scope_type', $editing ? $managementScope->scope_type : '') == $type)
-                >
-                    {{ ucfirst($type) }}
+        <label for="manager_ids" class="form-label required">@lang('scopes.managers')</label>
+        <select name="manager_ids[]" id="manager_ids"
+            class="form-select @error('manager_ids') is-invalid @enderror"
+            multiple required data-tomselect="tags">
+            @foreach ($managers as $manager)
+                <option value="{{ $manager->id }}" @selected(in_array($manager->id, $selectedManagers, true))>
+                    {{ $manager->number }} - {{ $manager->english_name ?? '#'.$manager->id }}
                 </option>
             @endforeach
         </select>
+        <small class="form-hint">@lang('scopes.managers_hint')</small>
+        @error('manager_ids') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
     </x-inputs.group>
 
-    {{-- Location --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="location_id" class="form-label">
-            @lang('crud.management_scopes.inputs.location_id', [], 'en')
-        </label>
-        <select
-            name="location_id"
-            id="location_id"
-            class="form-control"
-        >
-            <option value="">
-                @lang('crud.common.none', [], 'en')
-            </option>
-            @foreach($locations as $location)
-                <option
-                    value="{{ $location->id }}"
-                    @selected(old('location_id', $editing ? $managementScope->location_id : '') == $location->id)
-                >
-                    {{ $location->name }}
-                </option>
-            @endforeach
-        </select>
-    </x-inputs.group>
+    {{-- Coverage --}}
+    <div class="col-12">
+        <hr class="my-3">
+        <h3 class="h4">@lang('scopes.coverage')</h3>
 
-    {{-- Department --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="department_id" class="form-label">
-            @lang('crud.management_scopes.inputs.department_id', [], 'en')
+        <label class="form-check form-switch mb-2">
+            <input type="hidden" name="covers_everyone" value="0">
+            <input class="form-check-input" type="checkbox" name="covers_everyone" value="1"
+                x-model="coversEveryone">
+            <span class="form-check-label">@lang('scopes.covers_everyone')</span>
         </label>
-        <select
-            name="department_id"
-            id="department_id"
-            class="form-control"
-        >
-            <option value="">
-                @lang('crud.common.none', [], 'en')
-            </option>
-            @foreach($departments as $department)
-                <option
-                    value="{{ $department->id }}"
-                    @selected(old('department_id', $editing ? $managementScope->department_id : '') == $department->id)
-                >
-                    {{ $department->name }}
-                </option>
-            @endforeach
-        </select>
-        <small class="form-hint"> @lang('ui.for') <strong>@lang('ui.employee_2')</strong> @lang('ui.scope_type_this_is_used_as_print_header') </small>
-    </x-inputs.group>
+        <small class="form-hint d-block mb-3">@lang('scopes.covers_everyone_hint')</small>
 
-    {{-- Center --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="center_id" class="form-label">
-            @lang('crud.management_scopes.inputs.center_id', [], 'en')
-        </label>
-        <select
-            name="center_id"
-            id="center_id"
-            class="form-control"
-        >
-            <option value="">
-                @lang('crud.common.none', [], 'en')
-            </option>
-            @foreach($centers as $center)
-                <option
-                    value="{{ $center->id }}"
-                    @selected(old('center_id', $editing ? $managementScope->center_id : '') == $center->id)
-                >
-                    {{ $center->name }}
-                </option>
-            @endforeach
-        </select>
-        <small class="form-hint"> @lang('ui.for') <strong>@lang('ui.employee_2')</strong> @lang('ui.scope_type_this_is_used_as_print_header') </small>
-    </x-inputs.group>
+        {{-- The three dimensions go quiet when the scope already covers the
+             company, because they would have nothing left to narrow. --}}
+        <div class="row" :class="coversEveryone ? 'opacity-50' : ''">
+            <x-inputs.group class="col-sm-4">
+                <label for="field_ids" class="form-label">@lang('scopes.fields')</label>
+                <select name="field_ids[]" id="field_ids"
+                    class="form-select @error('field_ids') is-invalid @enderror"
+                    multiple data-tomselect="tags" :disabled="coversEveryone">
+                    @foreach ($fields as $field)
+                        <option value="{{ $field->id }}" @selected(in_array($field->id, $selectedFields, true))>
+                            {{ $field->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </x-inputs.group>
 
-    {{-- Specific employees (multi-select) --}}
-    <div class="mb-3">
-        <label for="subordinate_employee_ids" class="form-label">
-            @lang('crud.management_scopes.inputs.subordinate_employee_id', [], 'en')
-        </label>
-        <select
-            name="subordinate_employee_ids[]"
-            id="subordinate_employee_ids"
-            class="form-select"
-            multiple
-            data-tomselect="tags"
-        >
-            @foreach($employees as $employee)
-                <option value="{{ $employee->id }}" 
-                    @selected(in_array($employee->id, $selectedSubordinates)) >
-                    {{ $employee->number }} - {{ $employee->english_name ?? ('#'.$employee->id) }}
-                </option>
-            @endforeach
-        </select>
-        <small class="form-hint"> @lang('ui.select_one_or_more_employees_when_scope_type') <strong>@lang('ui.employee_2')</strong>.
-        </small>
+            <x-inputs.group class="col-sm-4">
+                <label for="department_ids" class="form-label">@lang('scopes.departments')</label>
+                <select name="department_ids[]" id="department_ids" class="form-select"
+                    multiple data-tomselect="tags" :disabled="coversEveryone">
+                    @foreach ($departments as $department)
+                        <option value="{{ $department->id }}" @selected(in_array($department->id, $selectedDepartments, true))>
+                            {{ $department->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </x-inputs.group>
+
+            <x-inputs.group class="col-sm-4">
+                <label for="center_ids" class="form-label">@lang('scopes.centers')</label>
+                <select name="center_ids[]" id="center_ids" class="form-select"
+                    multiple data-tomselect="tags" :disabled="coversEveryone">
+                    @foreach ($centers as $center)
+                        <option value="{{ $center->id }}" @selected(in_array($center->id, $selectedCenters, true))>
+                            {{ $center->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </x-inputs.group>
+
+            <div class="col-12">
+                <small class="form-hint">@lang('scopes.coverage_hint')</small>
+                @error('field_ids') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+            </div>
+        </div>
+
+        <x-inputs.group class="col-sm-12 mt-3">
+            <label for="employee_ids" class="form-label">@lang('scopes.named_employees')</label>
+            <select name="employee_ids[]" id="employee_ids"
+                class="form-select @error('employee_ids') is-invalid @enderror"
+                multiple data-tomselect="tags">
+                @foreach ($employees as $employee)
+                    <option value="{{ $employee->id }}" @selected(in_array($employee->id, $selectedEmployees, true))>
+                        {{ $employee->number }} - {{ $employee->english_name ?? '#'.$employee->id }}
+                    </option>
+                @endforeach
+            </select>
+            <small class="form-hint">@lang('scopes.named_employees_hint')</small>
+            @error('employee_ids') <span class="invalid-feedback d-block">{{ $message }}</span> @enderror
+        </x-inputs.group>
+
+        <x-inputs.group class="col-sm-6 mt-3">
+            <label for="job_title" class="form-label">@lang('scopes.job_title')</label>
+            <input type="text" name="job_title" id="job_title" class="form-control"
+                value="{{ old('job_title', $editing ? ($scope->jobTitle() ?? '') : '') }}"
+                placeholder="@lang('scopes.job_title_placeholder')">
+            <small class="form-hint">@lang('scopes.job_title_hint')</small>
+        </x-inputs.group>
     </div>
 
-    {{-- Settings: Job Title Filter --}}
-    <x-inputs.group class="col-sm-12">
-        <label for="settings_job_title" class="form-label"> @lang('ui.job_title_filter_optional') </label>
-        <input
-            type="text"
-            name="settings[job_title]"
-            id="settings_job_title"
-            class="form-control"
-            value="{{ old('settings.job_title', $editing ? ($managementScope->settings['job_title'] ?? '') : '') }}"
-            placeholder="@lang('ui.e_g_nurse')"
-        >
-        <small class="form-hint"> @lang('ui.apply_this_scope_only_to_employees_with_this') </small>
-    </x-inputs.group>
+    {{-- Behaviour --}}
+    <div class="col-12">
+        <hr class="my-3">
+        <label class="form-check form-switch">
+            <input type="hidden" name="carves_out_managers" value="0">
+            <input class="form-check-input" type="checkbox" name="carves_out_managers" value="1"
+                x-model="carvesOut">
+            <span class="form-check-label">@lang('scopes.carves_out_managers')</span>
+        </label>
+        <small class="form-hint d-block">@lang('scopes.carves_out_managers_hint')</small>
+    </div>
+
+    {{-- Print header --}}
+    <div class="col-12">
+        <hr class="my-3">
+        <h3 class="h4">@lang('scopes.print_header')</h3>
+        <small class="form-hint d-block mb-2">@lang('scopes.print_header_hint')</small>
+        <div class="row">
+            @foreach ([
+                ['print_location_id', 'scopes.print_field', $fields],
+                ['print_department_id', 'scopes.print_department', $departments],
+                ['print_center_id', 'scopes.print_center', $centers],
+            ] as [$input, $label, $options])
+                <x-inputs.group class="col-sm-4">
+                    <label for="{{ $input }}" class="form-label">@lang($label)</label>
+                    <select name="{{ $input }}" id="{{ $input }}" class="form-select" data-tomselect="select">
+                        <option value="">@lang('scopes.none_selected')</option>
+                        @foreach ($options as $option)
+                            <option value="{{ $option->id }}"
+                                @selected((int) old($input, $editing ? $scope->{$input} : null) === $option->id)>
+                                {{ $option->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </x-inputs.group>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Status --}}
+    <div class="col-12">
+        <hr class="my-3">
+        <div class="row">
+            <x-inputs.group class="col-sm-3">
+                <label for="priority" class="form-label">@lang('scopes.priority')</label>
+                <input type="number" name="priority" id="priority" class="form-control" min="0" max="1000"
+                    value="{{ old('priority', $editing ? $scope->priority : 0) }}">
+            </x-inputs.group>
+            <div class="col-sm-9 d-flex align-items-center">
+                <label class="form-check form-switch mt-3">
+                    <input type="hidden" name="is_active" value="0">
+                    <input class="form-check-input" type="checkbox" name="is_active" value="1"
+                        @checked(old('is_active', $editing ? $scope->is_active : true))>
+                    <span class="form-check-label">@lang('scopes.is_active')</span>
+                </label>
+            </div>
+        </div>
+    </div>
 </div>

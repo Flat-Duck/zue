@@ -25,6 +25,7 @@ return [
         'no_items_found' => ' No items found',
         'created' => ' Successfully created',
         'saved' => ' Saved successfully',
+        'deleted' => 'Deleted successfully',
         'removed' => ' Successfully removed',
         'print_preview' => ' Print',
         'time_sheet_approve' => 'Approve Time Sheets',

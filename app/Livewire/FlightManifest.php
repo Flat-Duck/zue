@@ -8,6 +8,8 @@ use App\Models\Flight;
 use App\Models\FlightBooking;
 use App\Models\FlightLeg;
 use App\Models\Passenger;
+use App\Models\ScopeContext;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -92,6 +94,27 @@ class FlightManifest extends Component
         $this->reset(['travellerId', 'note']);
     }
 
+    /**
+     * The employees this dispatcher may book.
+     *
+     * A dispatcher works across fields rather than down a department, so who they
+     * may seat is a question of its own — the `dispatcher` context — and not the
+     * same answer as who they fill time sheets for. Until a scope says otherwise
+     * they may book nobody, which is the safe direction for a screen that was
+     * previously showing the entire company.
+     *
+     * The list was also capped at 500 with no indication, so with 1,115 employees
+     * on the books several hundred simply could not be found.
+     *
+     * @return Builder<Employee>
+     */
+    private function bookableEmployees(): Builder
+    {
+        return auth()->user()
+            ->managedEmployeesQuery(ScopeContext::DISPATCHER)
+            ->whereNull('archived_at');
+    }
+
     public function addTraveller(FlightDispatchContract $dispatch): void
     {
         $this->authorizeDispatch();
@@ -106,7 +129,7 @@ class FlightManifest extends Component
         $leg = $this->legOrFail((int) $validated['selectedLegId']);
 
         $traveller = $validated['travellerType'] === 'employee'
-            ? Employee::query()->findOrFail($validated['travellerId'])
+            ? $this->bookableEmployees()->findOrFail($validated['travellerId'])
             : Passenger::query()->findOrFail($validated['travellerId']);
 
         try {
@@ -234,10 +257,8 @@ class FlightManifest extends Component
             'waitlisted' => $selectedLeg instanceof FlightLeg
                 ? $selectedLeg->bookings->where('status', FlightBooking::STATUS_WAITLISTED)->values()
                 : collect(),
-            'employeeOptions' => Employee::query()
-                ->whereNull('archived_at')
+            'employeeOptions' => $this->bookableEmployees()
                 ->orderBy('english_name')
-                ->limit(500)
                 ->get(['id', 'number', 'english_name']),
             'passengerOptions' => Passenger::query()
                 ->orderBy('name')

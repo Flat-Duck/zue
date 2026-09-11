@@ -2,15 +2,20 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ManagementScope;
+use App\Models\ScopePolicy;
+use App\Services\ManagementScopes\ScopeWriter;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class ManagementScopeStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $scope = $this->route('management_scope');
+
+        return $scope instanceof ScopePolicy
+            ? $this->user()?->can('update', $scope) ?? false
+            : $this->user()?->can('create', ScopePolicy::class) ?? false;
     }
 
     /**
@@ -18,42 +23,73 @@ class ManagementScopeStoreRequest extends FormRequest
      */
     public function rules(): array
     {
-        $types = [
-            ManagementScope::TYPE_GLOBAL,
-            ManagementScope::TYPE_LOCATION,
-            ManagementScope::TYPE_DEPARTMENT,
-            ManagementScope::TYPE_CENTER,
-            ManagementScope::TYPE_EMPLOYEE,
-        ];
-
         return [
-            'manager_ids' => ['required', 'array', 'min:1'],
-            'manager_ids.*' => ['exists:employees,id'],
             'name' => ['nullable', 'string', 'max:255'],
-            'template' => ['required', 'string', Rule::in(['general', 'test1', 'test2', 'test3', 'test4'])],
-            'scope_type' => ['required', Rule::in($types)],
-            'location_id' => ['nullable', 'exists:locations,id', 'required_if:scope_type,'.ManagementScope::TYPE_LOCATION, 'required_if:scope_type,'.ManagementScope::TYPE_DEPARTMENT],
-            'department_id' => ['nullable', 'exists:departments,id', 'required_if:scope_type,'.ManagementScope::TYPE_DEPARTMENT],
-            'center_id' => ['nullable', 'exists:centers,id', 'required_if:scope_type,'.ManagementScope::TYPE_CENTER],
-            'subordinate_employee_ids' => ['nullable', 'array', 'required_if:scope_type,'.ManagementScope::TYPE_EMPLOYEE],
-            'subordinate_employee_ids.*' => ['exists:employees,id'],
-            'context' => ['required', 'string', 'max:255'],
-            'settings' => ['nullable', 'array'],
+            'context_id' => ['required', 'integer', 'exists:scope_contexts,id'],
+
+            'manager_ids' => ['required', 'array', 'min:1'],
+            'manager_ids.*' => ['integer', 'exists:employees,id'],
+
+            'covers_everyone' => ['nullable', 'boolean'],
+            'carves_out_managers' => ['nullable', 'boolean'],
+
+            'field_ids' => ['nullable', 'array'],
+            'field_ids.*' => ['integer', 'exists:locations,id'],
+            'department_ids' => ['nullable', 'array'],
+            'department_ids.*' => ['integer', 'exists:departments,id'],
+            'center_ids' => ['nullable', 'array'],
+            'center_ids.*' => ['integer', 'exists:centers,id'],
+            'employee_ids' => ['nullable', 'array'],
+            'employee_ids.*' => ['integer', 'exists:employees,id'],
+
+            'job_title' => ['nullable', 'string', 'max:255'],
+
+            'print_location_id' => ['nullable', 'integer', 'exists:locations,id'],
+            'print_department_id' => ['nullable', 'integer', 'exists:departments,id'],
+            'print_center_id' => ['nullable', 'integer', 'exists:centers,id'],
+
+            'priority' => ['nullable', 'integer', 'min:0', 'max:1000'],
+            'is_active' => ['nullable', 'boolean'],
         ];
     }
 
-    public function withValidator($validator)
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
-            if ($this->scope_type === ManagementScope::TYPE_EMPLOYEE) {
-                $subIds = (array) ($this->subordinate_employee_ids ?? []);
-                $managerIds = (array) ($this->manager_ids ?? []);
-
-                $intersection = array_intersect($managerIds, $subIds);
-                if (! empty($intersection)) {
-                    $validator->errors()->add('subordinate_employee_ids', 'A manager cannot also be a subordinate in the same scope.');
-                }
-            }
+        $validator->after(function (Validator $validator): void {
+            $this->rejectAnEmptyScope($validator);
+            $this->rejectManagersManagingThemselves($validator);
         });
+    }
+
+    /**
+     * A scope with nothing in it covers nobody, which is safe but useless — and
+     * far more likely to be a half-finished form than a deliberate choice. The
+     * one way to mean "everybody" is to say so.
+     */
+    private function rejectAnEmptyScope(Validator $validator): void
+    {
+        if ($this->boolean('covers_everyone')) {
+            return;
+        }
+
+        foreach (array_values(ScopeWriter::dimensionInputs()) as $input) {
+            if (filled($this->input($input))) {
+                return;
+            }
+        }
+
+        $validator->errors()->add('field_ids', __('scopes.errors_empty'));
+    }
+
+    private function rejectManagersManagingThemselves(Validator $validator): void
+    {
+        $overlap = array_intersect(
+            array_map('intval', (array) $this->input('manager_ids', [])),
+            array_map('intval', (array) $this->input('employee_ids', [])),
+        );
+
+        if ($overlap !== []) {
+            $validator->errors()->add('employee_ids', __('scopes.errors_self_managed'));
+        }
     }
 }

@@ -229,7 +229,7 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('view-any', App\Models\ManagementScope::class)
+                        @can('viewAny', App\Models\ScopePolicy::class)
                             <li class="nav-item {{ $page == 'management_scopes' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('management-scopes.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block">

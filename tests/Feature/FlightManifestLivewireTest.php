@@ -7,8 +7,10 @@ use App\Models\Employee;
 use App\Models\Flight;
 use App\Models\FlightBooking;
 use App\Models\FlightRoute;
+use App\Models\Location;
 use App\Models\Passenger;
 use App\Models\Plane;
+use App\Models\ScopeContext;
 use App\Models\User;
 use App\Services\Flights\FlightDispatchService;
 use Database\Seeders\FlightRoutesSeeder;
@@ -18,10 +20,12 @@ use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 class FlightManifestLivewireTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     private Flight $flight;
@@ -55,10 +59,34 @@ class FlightManifestLivewireTest extends TestCase
         return $user;
     }
 
+    /**
+     * A dispatcher books across fields, so who they may seat comes from a scope in
+     * the dispatcher context rather than from the time sheet hierarchy.
+     */
     private function dispatcher(): User
     {
         $user = $this->viewer();
         $user->givePermissionTo(['dispatch flights', 'create passengers']);
+
+        $this->buildGlobalScope([$user->employee], ScopeContext::DISPATCHER);
+
+        return $user;
+    }
+
+    /**
+     * A dispatcher whose scope covers one field only.
+     */
+    private function dispatcherFor(Location $field): User
+    {
+        $user = $this->viewer();
+        $user->givePermissionTo(['dispatch flights', 'create passengers']);
+
+        $this->buildScope(
+            name: 'One field',
+            criteria: ['field' => [$field->id]],
+            actors: [$user->employee],
+            context: ScopeContext::DISPATCHER,
+        );
 
         return $user;
     }
@@ -350,5 +378,49 @@ class FlightManifestLivewireTest extends TestCase
             ->assertHasErrors('manifest');
 
         $this->assertTrue($waiting->fresh()->isWaitlisted());
+    }
+
+    /**
+     * The picker used to list every employee in the company, capped at 500 with
+     * nothing to say so. Booking is now limited to the dispatcher's own scope, and
+     * the limit is enforced on the booking itself — a crafted request cannot seat
+     * somebody the screen would not offer.
+     */
+    #[Test]
+    public function a_dispatcher_may_only_book_employees_in_their_scope(): void
+    {
+        $mine = Location::factory()->create();
+        $theirs = Location::factory()->create();
+
+        $bookable = Employee::factory()->create(['location_id' => $mine->id, 'archived_at' => null]);
+        $outOfScope = Employee::factory()->create(['location_id' => $theirs->id, 'archived_at' => null]);
+
+        $dispatcher = $this->dispatcherFor($mine);
+        $leg = $this->flight->legs->first();
+
+        Livewire::actingAs($dispatcher)
+            ->test(FlightManifest::class, ['flight' => $this->flight])
+            ->assertSee($bookable->english_name)
+            ->assertDontSee($outOfScope->english_name);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        Livewire::actingAs($dispatcher)
+            ->test(FlightManifest::class, ['flight' => $this->flight])
+            ->set('selectedLegId', $leg->id)
+            ->set('travellerType', 'employee')
+            ->set('travellerId', $outOfScope->id)
+            ->call('addTraveller');
+    }
+
+    #[Test]
+    public function a_dispatcher_with_no_scope_is_told_why_the_list_is_empty(): void
+    {
+        $user = $this->viewer();
+        $user->givePermissionTo(['dispatch flights']);
+
+        Livewire::actingAs($user)
+            ->test(FlightManifest::class, ['flight' => $this->flight])
+            ->assertSee(__('ui.no_dispatcher_scope'));
     }
 }

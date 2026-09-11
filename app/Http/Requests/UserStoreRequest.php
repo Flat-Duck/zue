@@ -27,7 +27,8 @@ class UserStoreRequest extends FormRequest
             'name' => ['required', 'max:255', 'string'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required'],
-            'roles' => 'array',
+            'roles' => ['array'],
+            'roles.*' => ['integer', 'exists:roles,id'],
             'signature_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }

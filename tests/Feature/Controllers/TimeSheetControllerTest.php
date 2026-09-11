@@ -3,17 +3,18 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Employee;
-use App\Models\ManagementScope;
 use App\Models\TimeSheet;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 class TimeSheetControllerTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase, WithFaker;
 
     private User $user;
@@ -46,14 +47,7 @@ class TimeSheetControllerTest extends TestCase
 
         $managerEmployee = $user->employee;
 
-        $scope = ManagementScope::create([
-            'manager_id' => $managerEmployee->id,
-            'name' => 'Company wide timesheets',
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
-        ]);
-
-        $managerEmployee->managementScopes()->attach($scope->id);
+        $this->buildGlobalScope([$managerEmployee]);
 
         $user->givePermissionTo([
             'list timesheets',

@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Livewire\TimeTable;
 use App\Models\Administration;
 use App\Models\Employee;
-use App\Models\ManagementScope;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 /**
@@ -23,6 +23,7 @@ use Tests\TestCase;
  */
 class DeploymentSmokeTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     private const PASSWORD = 'smoke-test-password';
@@ -30,11 +31,6 @@ class DeploymentSmokeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        config([
-            'timesheet_auth.v2_read_enabled' => false,
-            'timesheet_auth.v2_write_enabled' => false,
-        ]);
 
         $this->seed(PermissionsSeeder::class);
     }
@@ -65,16 +61,7 @@ class DeploymentSmokeTest extends TestCase
             'view employees',
         ]);
 
-        $employee = $user->employee;
-
-        $scope = ManagementScope::create([
-            'manager_id' => $employee->id,
-            'name' => 'Company wide timesheets',
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
-        ]);
-
-        $employee->managementScopes()->attach($scope->id);
+        $this->buildGlobalScope([$user->employee]);
 
         return $user;
     }

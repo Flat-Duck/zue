@@ -6,179 +6,163 @@ use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
-use App\Models\ScopePolicy;
-use App\Models\ScopePolicyActor;
+use App\Models\ScopeContext;
 use App\Models\User;
 use App\Services\TimeSheetAuth\ScopeResolver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\BuildsScopes;
+use Tests\Feature\ScopeVisibilityTest;
 use Tests\TestCase;
 
+/**
+ * Choosing between the scopes one person holds.
+ *
+ * Someone with two scopes in the same context sees the union of both by default,
+ * and one of them at a time when they pick one — which is how a time sheet gets
+ * printed under the right heading. What each scope covers is settled in
+ * {@see ScopeVisibilityTest}; this is about picking.
+ */
 class ScopeResolverTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
-    public function test_priority_winner_hides_employee_owned_by_another_policy(): void
+    private Location $location;
+
+    private Department $department;
+
+    private Center $center;
+
+    protected function setUp(): void
     {
-        $resolver = app(ScopeResolver::class);
+        parent::setUp();
 
-        $location = Location::factory()->create();
-        $department = Department::factory()->create();
-        $center = Center::factory()->create();
-
-        $actorEmployee = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-
-        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
-
-        $otherManager = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-
-        $targetA = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-        $targetB = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-
-        $locationPolicy = ScopePolicy::query()->create([
-            'name' => 'Location',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_LOCATION,
-            'location_id' => $location->id,
-            'department_id' => null,
-            'center_id' => null,
-            'target_employee_ids' => null,
-            'priority' => 0,
-            'is_active' => true,
-            'settings' => null,
-        ]);
-
-        $employeePolicy = ScopePolicy::query()->create([
-            'name' => 'Specific Employee',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_EMPLOYEE,
-            'location_id' => null,
-            'department_id' => null,
-            'center_id' => null,
-            'target_employee_ids' => [$targetB->id],
-            'priority' => 0,
-            'is_active' => true,
-            'settings' => null,
-        ]);
-
-        ScopePolicyActor::query()->create([
-            'policy_id' => $locationPolicy->id,
-            'actor_employee_id' => $actorEmployee->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => false,
-            'role_hint' => null,
-        ]);
-
-        ScopePolicyActor::query()->create([
-            'policy_id' => $employeePolicy->id,
-            'actor_employee_id' => $otherManager->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => false,
-            'role_hint' => null,
-        ]);
-
-        $visibleIds = $resolver->resolveVisibleEmployeeIds($actorUser, 'time_sheet')->all();
-
-        $this->assertContains($targetA->id, $visibleIds);
-        $this->assertNotContains($targetB->id, $visibleIds);
+        $this->location = Location::factory()->create();
+        $this->department = Department::factory()->create();
+        $this->center = Center::factory()->create();
     }
 
-    public function test_it_defaults_to_first_assigned_scope_and_filters_by_selected_scope(): void
+    private function employee(): Employee
+    {
+        return Employee::factory()->create([
+            'location_id' => $this->location->id,
+            'department_id' => $this->department->id,
+            'center_id' => $this->center->id,
+            'archived_at' => null,
+        ]);
+    }
+
+    public function test_it_defaults_to_every_scope_and_filters_by_the_selected_one(): void
     {
         $resolver = app(ScopeResolver::class);
 
-        $location = Location::factory()->create();
-        $department = Department::factory()->create();
-        $center = Center::factory()->create();
-
-        $actorEmployee = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-
+        $actorEmployee = $this->employee();
         $actorUser = User::factory()->forEmployee($actorEmployee)->create();
 
-        $targetA = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
-        $targetB = Employee::factory()->create([
-            'location_id' => $location->id,
-            'department_id' => $department->id,
-            'center_id' => $center->id,
-            'archived_at' => null,
-        ]);
+        $targetA = $this->employee();
+        $targetB = $this->employee();
 
-        $scope1 = ScopePolicy::query()->create([
-            'name' => 'Scope One',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_EMPLOYEE,
-            'target_employee_ids' => [$targetA->id],
-            'priority' => 0,
-            'is_active' => true,
-            'settings' => null,
-        ]);
+        $scopeOne = $this->buildScope('Scope One', ['employee' => [$targetA->id]], [$actorEmployee]);
+        $scopeTwo = $this->buildScope('Scope Two', ['employee' => [$targetB->id]], [$actorEmployee]);
 
-        $scope2 = ScopePolicy::query()->create([
-            'name' => 'Scope Two',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_EMPLOYEE,
-            'target_employee_ids' => [$targetB->id],
-            'priority' => 0,
-            'is_active' => true,
-            'settings' => null,
-        ]);
+        $this->assertSame(
+            $scopeOne->id,
+            $resolver->resolveSelectedPolicyId($actorUser, ScopeContext::TIME_SHEET, null)
+        );
 
-        ScopePolicyActor::query()->create([
-            'policy_id' => $scope1->id,
-            'actor_employee_id' => $actorEmployee->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => false,
-            'role_hint' => null,
-        ]);
+        $this->assertEqualsCanonicalizing(
+            [$targetA->id, $targetB->id],
+            $resolver->resolveVisibleEmployeeIds($actorUser, ScopeContext::TIME_SHEET)->all(),
+            'With no scope chosen, both of mine count.'
+        );
 
-        ScopePolicyActor::query()->create([
-            'policy_id' => $scope2->id,
-            'actor_employee_id' => $actorEmployee->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => false,
-            'role_hint' => null,
-        ]);
+        $this->assertSame(
+            [$targetA->id],
+            $resolver->resolveVisibleEmployeeIds($actorUser, ScopeContext::TIME_SHEET, $scopeOne->id)->all()
+        );
 
-        $defaultSelected = $resolver->resolveSelectedPolicyId($actorUser, 'time_sheet', null);
-        $this->assertSame($scope1->id, $defaultSelected);
+        $this->assertSame(
+            [$targetB->id],
+            $resolver->resolveVisibleEmployeeIds($actorUser, ScopeContext::TIME_SHEET, $scopeTwo->id)->all()
+        );
+    }
 
-        $scope1Visible = $resolver->resolveVisibleEmployeeIds($actorUser, 'time_sheet', $scope1->id)->all();
-        $scope2Visible = $resolver->resolveVisibleEmployeeIds($actorUser, 'time_sheet', $scope2->id)->all();
+    public function test_a_scope_that_is_not_mine_cannot_be_selected(): void
+    {
+        $resolver = app(ScopeResolver::class);
 
-        $this->assertSame([$targetA->id], $scope1Visible);
-        $this->assertSame([$targetB->id], $scope2Visible);
+        $actorEmployee = $this->employee();
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+        $target = $this->employee();
+
+        $mine = $this->buildScope('Mine', ['employee' => [$target->id]], [$actorEmployee]);
+        $theirs = $this->buildScope('Theirs', ['employee' => [$target->id]], [$this->employee()]);
+
+        $this->assertSame(
+            $mine->id,
+            $resolver->resolveSelectedPolicyId($actorUser, ScopeContext::TIME_SHEET, $theirs->id),
+            'Asking for someone else\'s scope falls back to one of my own.'
+        );
+
+        $this->assertSame(
+            [],
+            $resolver->resolveVisibleEmployeeIds($actorUser, ScopeContext::TIME_SHEET, $theirs->id)->all()
+        );
+    }
+
+    public function test_an_inactive_scope_is_not_offered_and_shows_nobody(): void
+    {
+        $resolver = app(ScopeResolver::class);
+
+        $actorEmployee = $this->employee();
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+        $target = $this->employee();
+
+        $scope = $this->buildScope('Retired', ['employee' => [$target->id]], [$actorEmployee]);
+        $scope->update(['is_active' => false]);
+
+        $this->assertSame([], $resolver->selectablePolicyOptions($actorUser)->all());
+        $this->assertSame([], $resolver->resolveVisibleEmployeeIds($actorUser)->all());
+    }
+
+    public function test_a_scope_whose_context_is_switched_off_shows_nobody(): void
+    {
+        $resolver = app(ScopeResolver::class);
+
+        $actorEmployee = $this->employee();
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+        $target = $this->employee();
+
+        $this->buildScope('Dispatcher', ['employee' => [$target->id]], [$actorEmployee], ScopeContext::DISPATCHER);
+        $this->scopeContext(ScopeContext::DISPATCHER)->update(['is_active' => false]);
+
+        $this->assertSame(
+            [],
+            $resolver->resolveVisibleEmployeeIds($actorUser, ScopeContext::DISPATCHER)->all()
+        );
+    }
+
+    public function test_an_actor_with_no_capabilities_is_not_a_manager(): void
+    {
+        $resolver = app(ScopeResolver::class);
+
+        $actorEmployee = $this->employee();
+        $actorUser = User::factory()->forEmployee($actorEmployee)->create();
+        $target = $this->employee();
+
+        $scope = $this->buildScope('Read nothing', ['employee' => [$target->id]]);
+        $this->giveScopeTo($scope, $actorEmployee, canFill: false, canApprove: false, canRevise: false);
+
+        $this->assertSame([], $resolver->resolveVisibleEmployeeIds($actorUser)->all());
+        $this->assertSame([], $resolver->selectablePolicyOptions($actorUser)->all());
+    }
+
+    public function test_a_user_with_no_employee_record_manages_nobody(): void
+    {
+        $resolver = app(ScopeResolver::class);
+
+        $this->buildGlobalScope([$this->employee()]);
+
+        $this->assertSame([], $resolver->resolveVisibleEmployeeIds(User::factory()->create())->all());
     }
 }

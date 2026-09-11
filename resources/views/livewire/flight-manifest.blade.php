@@ -106,6 +106,12 @@
                                         </select>
                                     </div>
 
+                                    @if ($travellerType === 'employee' && $employeeOptions->isEmpty())
+                                        <div class="text-secondary small mt-1">
+                                            @lang('ui.no_dispatcher_scope')
+                                        </div>
+                                    @endif
+
                                     @error('travellerId')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror

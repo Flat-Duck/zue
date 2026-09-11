@@ -3,13 +3,12 @@
 namespace Tests\Browser;
 
 use App\Models\Employee;
-use App\Models\ScopePolicy;
-use App\Models\ScopePolicyActor;
 use App\Models\TimeSheet;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
+use Tests\BuildsScopes;
 use Tests\DuskTestCase;
 
 /**
@@ -22,6 +21,7 @@ use Tests\DuskTestCase;
  */
 class ApprovalScreenTest extends DuskTestCase
 {
+    use BuildsScopes;
     use DatabaseMigrations;
 
     private function admin(): User
@@ -41,21 +41,7 @@ class ApprovalScreenTest extends DuskTestCase
      */
     private function giveGlobalScope(User $actor): void
     {
-        $policy = ScopePolicy::query()->create([
-            'name' => 'Global',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_GLOBAL,
-            'priority' => 0,
-            'is_active' => true,
-        ]);
-
-        ScopePolicyActor::query()->create([
-            'policy_id' => $policy->id,
-            'actor_employee_id' => $actor->employee_id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => true,
-        ]);
+        $this->buildGlobalScope([$actor->employee]);
     }
 
     public function test_the_fill_screen_opens_a_working_date_picker(): void

@@ -3,8 +3,10 @@
 namespace App\Services\Legacy;
 
 use App\Models\User;
+use App\Services\Employees\ProfileDefinition;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -113,14 +115,73 @@ class LegacyImporter
      * Employee ids are preserved verbatim. `user_id` is dropped: the column no
      * longer exists, and it was NULL on every row in the dump anyway, which is
      * precisely why the actor link had to be rebuilt from numbers.
+     *
+     * The employee row was split in two after this importer was written: the HR
+     * profile moved to `employee_details`. Seven of the dump's columns belong on
+     * that side now, so each row is divided as it is read and the profile halves
+     * are written once the employees they hang off exist.
      */
     private function importEmployees(): void
     {
-        $this->copy('employees', 'employees', drop: ['user_id'], transform: function (array $row): array {
-            $this->identity->registerEmployee((int) $row['id'], $this->intOrNull($row['number'] ?? null));
+        $detailColumns = array_values(array_intersect(
+            Schema::getColumnListing('employee_details'),
+            ProfileDefinition::detailFields(),
+        ));
+
+        $profiles = [];
+
+        $this->copy('employees', 'employees', drop: ['user_id'], transform: function (array $row) use ($detailColumns, &$profiles): array {
+            $employeeId = (int) $row['id'];
+
+            $this->identity->registerEmployee($employeeId, $this->intOrNull($row['number'] ?? null));
+
+            $profile = [];
+
+            foreach ($detailColumns as $column) {
+                if (array_key_exists($column, $row)) {
+                    $profile[$column] = $row[$column];
+                    unset($row[$column]);
+                }
+            }
+
+            if ($profile !== []) {
+                $profiles[] = $profile + [
+                    'employee_id' => $employeeId,
+                    'created_at' => $row['created_at'] ?? null,
+                    'updated_at' => $row['updated_at'] ?? null,
+                ];
+            }
 
             return $row;
         });
+
+        $this->importEmployeeDetails($profiles);
+    }
+
+    /**
+     * @param  list<array<string, string|int|null>>  $profiles
+     */
+    private function importEmployeeDetails(array $profiles): void
+    {
+        $imported = 0;
+        $batch = [];
+
+        foreach ($profiles as $profile) {
+            $batch[] = $profile;
+            $imported++;
+
+            if (count($batch) >= $this->chunkSize) {
+                $this->flush('employee_details', $batch, ['employee_id'], null);
+                $batch = [];
+                $this->reportProgress('employee_details', $imported);
+            }
+        }
+
+        if ($batch !== []) {
+            $this->flush('employee_details', $batch, ['employee_id'], null);
+        }
+
+        $this->record('employee_details', $imported);
     }
 
     private function importUsers(): void

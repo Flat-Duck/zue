@@ -4,12 +4,16 @@ namespace Tests\Feature;
 
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\ManagementScope;
+use App\Models\Signature;
 use App\Models\TimeSheet;
 use App\Models\User;
+use App\Services\TimeSheetAuthorizationService;
 use App\Services\TimeSheetService;
+use Database\Seeders\ApprovalFlowSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
+use Spatie\Permission\Models\Role;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 /**
@@ -22,6 +26,7 @@ use Tests\TestCase;
  */
 class TimeSheetApprovalDataTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     private const MONTH = 3;
@@ -32,10 +37,9 @@ class TimeSheetApprovalDataTest extends TestCase
     {
         parent::setUp();
 
-        config([
-            'timesheet_auth.v2_read_enabled' => false,
-            'timesheet_auth.v2_write_enabled' => false,
-        ]);
+        // Which stages a sheet needs is decided by the approval flows, so a test
+        // about stages needs them defined.
+        $this->seed(ApprovalFlowSeeder::class);
     }
 
     private ?Employee $managerEmployee = null;
@@ -52,13 +56,15 @@ class TimeSheetApprovalDataTest extends TestCase
 
         $this->managerEmployee = $managerEmployee;
 
-        $scope = ManagementScope::create([
-            'manager_id' => $managerEmployee->id,
-            'name' => 'Company wide',
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
-        ]);
-        $managerEmployee->managementScopes()->attach($scope->id);
+        $this->buildGlobalScope([$managerEmployee]);
+
+        // Under the flow model a stage is gated on the actor's role, not only on
+        // their scope. These tests are about the order stages fall in, so the
+        // manager holds every signing role.
+        foreach (['timekeeper', 'supervisor', 'fieldcoordinator', 'superintendent'] as $role) {
+            Role::findOrCreate($role);
+            $user->assignRole($role);
+        }
 
         $this->actingAs($user);
 
@@ -84,6 +90,18 @@ class TimeSheetApprovalDataTest extends TestCase
         }
 
         return $employee;
+    }
+
+    /**
+     * Signs one stage for the month, the way the application signs it.
+     */
+    private function sign(User $manager, string $stepKey): void
+    {
+        // The sheet has to have been looked at before it can be signed: that is
+        // what creates the steps.
+        $this->data();
+
+        app(TimeSheetAuthorizationService::class)->approve($manager, self::MONTH, self::YEAR, $stepKey);
     }
 
     private function data(): array
@@ -204,7 +222,9 @@ class TimeSheetApprovalDataTest extends TestCase
     public function the_timekeeper_may_not_approve_once_every_sheet_is_signed(): void
     {
         $manager = $this->actAsManager();
-        $this->employeeWithMonth('PROD', 3, 'A', ['timekeeper_id' => $manager->employee_id]);
+        $this->employeeWithMonth('PROD', 3);
+
+        $this->sign($manager, 'timekeeper');
 
         $this->assertFalse($this->data()['canTimekeeperApprove']);
     }
@@ -220,7 +240,7 @@ class TimeSheetApprovalDataTest extends TestCase
 
         $this->assertFalse($this->data()['canSupervisorApprove'], 'Nothing is timekeeper-signed yet.');
 
-        TimeSheet::query()->update(['timekeeper_id' => $manager->employee_id]);
+        $this->sign($manager, 'timekeeper');
 
         $this->assertTrue($this->data()['canSupervisorApprove']);
     }
@@ -238,9 +258,15 @@ class TimeSheetApprovalDataTest extends TestCase
             $this->assertNull($signatures[$stage]['name'], "[{$stage}] should start unsigned.");
         }
 
-        TimeSheet::query()->update(['timekeeper_id' => $manager->employee_id]);
+        // The block fills in from the signature on file, so the approver needs one.
+        Signature::query()->create(['user_id' => $manager->id, 'image_path' => 'signatures/manager.png']);
 
-        $this->assertSame($manager->employee->name, $this->data()['signatures']['time_keeper']['name']);
+        $this->sign($manager, 'timekeeper');
+
+        $signed = $this->data()['signatures']['time_keeper'];
+
+        $this->assertSame('signatures/manager.png', $signed['sign']);
+        $this->assertNotNull($signed['name'], 'A signed stage names who signed it.');
     }
 
     #[Test]

@@ -13,24 +13,6 @@ parameters:
 			path: app/Console/Commands/DatabaseBackupCommand.php
 
 		-
-			message: '#^Match arm comparison between ''employee'' and ''employee'' is always true\.$#'
-			identifier: match.alwaysTrue
-			count: 1
-			path: app/Console/Commands/ImportManagementScopesToV2.php
-
-		-
-			message: '#^Unable to resolve the template type TKey in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Console/Commands/ImportManagementScopesToV2.php
-
-		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Console/Commands/ImportManagementScopesToV2.php
-
-		-
 			message: '#^Method App\\Exports\\EmployeeBalanceExport\:\:__construct\(\) has parameter \$employees with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -341,18 +323,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/Http/Requests/FlightRouteRequest.php
-
-		-
-			message: '#^Method App\\Http\\Requests\\ManagementScopeStoreRequest\:\:withValidator\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/Http/Requests/ManagementScopeStoreRequest.php
-
-		-
-			message: '#^Method App\\Http\\Requests\\ManagementScopeStoreRequest\:\:withValidator\(\) has parameter \$validator with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Http/Requests/ManagementScopeStoreRequest.php
 
 		-
 			message: '#^Method App\\Http\\Requests\\OccupationalInjuryReportStoreRequest\:\:booleanFields\(\) return type has no value type specified in iterable type array\.$#'
@@ -997,12 +967,6 @@ parameters:
 			path: app/Models/MaintenanceSetting.php
 
 		-
-			message: '#^Method App\\Models\\ManagementScope\:\:manager\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Models/ManagementScope.php
-
-		-
 			message: '#^Class App\\Models\\OccupationalInjuryReport uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -1405,12 +1369,6 @@ parameters:
 			path: app/Services/BackupService.php
 
 		-
-			message: '#^Method App\\Services\\Employees\\ManagedEmployeeQuery\:\:forEmployee\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/Employees/ManagedEmployeeQuery.php
-
-		-
 			message: '#^Call to an undefined method Imagick\:\:setImageColorFuzz\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1447,48 +1405,6 @@ parameters:
 			path: app/Services/ImageProcessingService.php
 
 		-
-			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$managerIds with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Method App\\Services\\ManagementScopeService\:\:createScope\(\) has parameter \$scopeType with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Method App\\Services\\ManagementScopeService\:\:createScopes\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Method App\\Services\\ManagementScopeService\:\:updateScope\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Unable to resolve the template type TKey in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Services/ManagementScopeService.php
-
-		-
 			message: '#^Property App\\Services\\SignatureService\:\:\$imageProcessingService has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1501,19 +1417,7 @@ parameters:
 			path: app/Services/TimeSheetAuth/ApprovalSheetBuilder.php
 
 		-
-			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:matchedEmployeeIdsForPolicy\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Services/TimeSheetAuth/ScopeResolver.php
-
-		-
 			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:resolveVisibleEmployeeIds\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/TimeSheetAuth/ScopeResolver.php
-
-		-
-			message: '#^Method App\\Services\\TimeSheetAuth\\ScopeResolver\:\:selectablePolicies\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
 			path: app/Services/TimeSheetAuth/ScopeResolver.php
@@ -1573,12 +1477,6 @@ parameters:
 			path: app/Services/TimeSheetMutationService.php
 
 		-
-			message: '#^Method App\\Services\\TimeSheetService\:\:collectStageSignatures\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
 			message: '#^Method App\\Services\\TimeSheetService\:\:getApprovalData\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1594,24 +1492,6 @@ parameters:
 			message: '#^Method App\\Services\\TimeSheetService\:\:getManagedApprovalBuckets\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Method App\\Services\\TimeSheetService\:\:resolveApprovalAvailability\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Method App\\Services\\TimeSheetService\:\:stageIsWaiting\(\) has parameter \$baseQuery with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Services/TimeSheetService.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 3
 			path: app/Services/TimeSheetService.php
 
 		-

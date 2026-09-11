@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\ScopePolicy;
+use App\Policies\ManagementScopePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,7 +15,9 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        // The model is `ScopePolicy`, which auto-discovery would look for as
+        // `ScopePolicyPolicy`. The thing itself is a management scope.
+        ScopePolicy::class => ManagementScopePolicy::class,
     ];
 
     /**

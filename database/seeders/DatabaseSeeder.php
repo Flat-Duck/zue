@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(SuperAdminSeeder::class);
+
+        // Without these a time sheet has no chain to be signed through, so every
+        // sheet stalls at the first step with nothing to explain why.
+        $this->call(ApprovalFlowSeeder::class);
     }
 }

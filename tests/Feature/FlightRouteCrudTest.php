@@ -46,7 +46,7 @@ class FlightRouteCrudTest extends TestCase
 
         $this->actingAs($user)->get('/home')
             ->assertOk()
-            ->assertSee('Dispatcher Management')
+            ->assertSee(__('nav.dispatcher_management'))
             ->assertSee(route('planes.index'), false)
             ->assertSee(route('flight-routes.index'), false)
             ->assertSee(route('flight-stations.index'), false);

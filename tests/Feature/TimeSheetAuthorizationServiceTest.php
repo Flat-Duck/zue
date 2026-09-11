@@ -8,17 +8,17 @@ use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
-use App\Models\ScopePolicy;
-use App\Models\ScopePolicyActor;
 use App\Models\TimeSheet;
 use App\Models\TimeSheetApprovalStep;
 use App\Models\User;
 use App\Services\TimeSheetAuthorizationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\BuildsScopes;
 use Tests\TestCase;
 
 class TimeSheetAuthorizationServiceTest extends TestCase
 {
+    use BuildsScopes;
     use RefreshDatabase;
 
     public function test_approve_updates_v2_step_and_legacy_timesheet_column(): void
@@ -46,27 +46,7 @@ class TimeSheetAuthorizationServiceTest extends TestCase
             'archived_at' => null,
         ]);
 
-        $policy = ScopePolicy::query()->create([
-            'name' => 'Global',
-            'context' => 'time_sheet',
-            'match_type' => ScopePolicy::MATCH_GLOBAL,
-            'location_id' => null,
-            'department_id' => null,
-            'center_id' => null,
-            'target_employee_ids' => null,
-            'priority' => 0,
-            'is_active' => true,
-            'settings' => null,
-        ]);
-
-        ScopePolicyActor::query()->create([
-            'policy_id' => $policy->id,
-            'actor_employee_id' => $actorEmployee->id,
-            'can_fill' => true,
-            'can_approve' => true,
-            'can_revise' => true,
-            'role_hint' => null,
-        ]);
+        $policy = $this->buildGlobalScope([$actorEmployee]);
 
         $flow = ApprovalFlow::query()->create([
             'context' => 'time_sheet',

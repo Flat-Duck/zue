@@ -497,6 +497,68 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   what the record would look like. `skin_url` and `content_css` are `default` at all seven init
   sites now, and `ClinicEditorTest` fails on any failed request on that page.
 
+## Management scopes
+
+- [x] **Every manager but seven saw nobody at all, and the cause was a rule that
+  cancelled itself.** `ScopeResolver` applied the ownership carve-out across *all*
+  policies including the actor's own, so any scope with a co-manager disallowed the
+  employees it had just matched. All fourteen of the company's scopes have between
+  two and eight managers, so all of them did this. Measured against the real data:
+
+      before   V2 total visible: 93     legacy: 1808   (34 of 40 managers disagreed)
+      after    V2 total visible: 1879   legacy: 1879   (0 of 41 disagreed)
+
+  A second defect sat behind it: the winning policy was chosen across every policy
+  rather than the actor's own, so when somebody else's scope won a tie the employee
+  vanished from the sheet entirely. Nothing caught either, because every test gave a
+  policy exactly one actor — the one shape the real data never has.
+
+- [x] **Fields, departments and cost centres are three independent things, and a
+  scope can now name several of each.** The owner's explanation was the missing
+  piece: a department such as Gas Plant has staff at both 103A and 103D, cost
+  centres cut across both, and a dispatcher books travellers out of two fields at
+  once — which the old single `match_type` plus one id could not express at all.
+
+  A scope is now a context, a set of criteria, optional named individuals, print
+  header fields and a carve-out switch. An employee is covered when the scope covers
+  everyone, or they are named on it, or they match every dimension it filters on.
+  Values inside a dimension are alternatives; dimensions narrow each other. **A scope
+  with nothing in it covers nobody** — a half-filled form cannot expose the company.
+
+- [x] **Context is a record, not a string.** The same person holds a different scope
+  for each business purpose, and nothing may assume one stands for the other.
+  `scope_contexts` ships with Timesheet, Dispatcher, General, Leave and Attendance,
+  each carrying the carve-out default the form suggests.
+
+- [x] **The supervisor carve-out became a property of the scope.** It is what makes
+  the time sheet hierarchy work — a supervisor drops out of the pool they manage and
+  is signed for by whoever names them — and exactly wrong for a dispatcher, because
+  supervisors fly like everybody else.
+
+- [x] **One store instead of two.** `management_scopes` and
+  `management_scope_manager` are gone, along with `ManagementScopeService`,
+  `ManagedEmployeeQuery`, the `ManagementScope` model, the one-off import command and
+  the `timesheet_auth.v2_*` flags that chose between the two. `scope_policies` is the
+  answer. `template` (never read) and `subordinate_employee_id` (never written) went
+  with them.
+
+- [x] **The dispatcher's traveller picker listed the whole company, capped at 500.**
+  With 1,115 employees on the books, several hundred could not be found, and nothing
+  said so. It now reads the dispatcher context and enforces the same limit on the
+  booking itself, so a crafted request cannot seat somebody the screen would not
+  offer. **Until you create dispatcher-context scopes the picker is empty** — it says
+  why rather than showing a blank list.
+
+- [x] **The approval flows had no seeder.** A1/A2/A3/A4/LEGACY existed only inside the
+  import command, so a freshly migrated database came up with no approval chain and
+  every sheet stalled at the first step with nothing to explain it. They live in
+  `ApprovalFlowSeeder` now and `DatabaseSeeder` calls it.
+
+- [x] **Twenty-eight tests cover it**, including the shapes that were missing: a
+  scope covering two fields, dimensions narrowing one another, a cost centre cutting
+  across both, named people added on top, an empty scope covering nobody, one person
+  seeing different people in two contexts, and three browser tests for the form.
+
 - [x] 5.5 **Decided: two languages, Arabic and English. Both are complete.** Owner's answer
   overrode my recommendation to leave it, so the interface is genuinely bilingual rather than
   English-with-Arabic-documents.

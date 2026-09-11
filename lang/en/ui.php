@@ -155,4 +155,5 @@ return [
     'seated_count' => 'Seated (:count)',
     'waiting_list_count' => 'Waiting list (:count)',
     'seats_free' => ':free of :total seats free',
+    'no_dispatcher_scope' => 'No employees are in your dispatcher scope, so there is nobody to book. Ask an administrator to give you a scope in the Dispatcher context.',
 ];
