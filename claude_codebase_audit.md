@@ -1,3 +1,5 @@
+> Historical audit snapshot. See FIX_PLAN_CHECKLIST.md for current status; findings require revalidation against current code.
+
 # Full codebase audit — zue
 
 **Date:** 2026-09-10 · **Laravel** 13.31.0 · **PHP** 8.4.24

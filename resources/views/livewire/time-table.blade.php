@@ -36,63 +36,63 @@
             <div class="row row-cards">
                 <div class="col-2 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.zoc_no')</label>
-                        <input value="{{ $employee->number}}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-employee-number">@lang('timesheets.zoc_no')</label>
+                        <input id="timesheet-employee-number" value="{{ $employee->number}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-6 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.full_name')</label>
-                        <input value="{{ $employee->english_name}}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-employee-name">@lang('timesheets.full_name')</label>
+                        <input id="timesheet-employee-name" value="{{ $employee->english_name}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.start_date')</label>
-                        <input value="{{ $employee->start_date}}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-start-date">@lang('timesheets.start_date')</label>
+                        <input id="timesheet-start-date" value="{{ $employee->start_date}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.administration')</label>
-                        <input value="{{ $employee->administration_name }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-administration">@lang('timesheets.administration')</label>
+                        <input id="timesheet-administration" value="{{ $employee->administration_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.department')</label>
-                        <input value="{{ $employee->department_name }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-department">@lang('timesheets.department')</label>
+                        <input id="timesheet-department" value="{{ $employee->department_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.cost_center')</label>
-                        <input value="{{ $employee->center_name }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-cost-center">@lang('timesheets.cost_center')</label>
+                        <input id="timesheet-cost-center" value="{{ $employee->center_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.location')</label>
-                        <input value="{{ $employee->location_name }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-location">@lang('timesheets.location')</label>
+                        <input id="timesheet-location" value="{{ $employee->location_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.schedule')</label>
-                        <input value="{{ $employee->schedule }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-schedule">@lang('timesheets.schedule')</label>
+                        <input id="timesheet-schedule" value="{{ $employee->schedule }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.total_balance') </label>
+                        <label class="form-label" for="timesheet-total-balance">@lang('timesheets.total_balance') </label>
                         <input value="{{ $employee->balance }}" type="text"
-                            class="form-control {{ ($employee->balance < 0) ? 'bg-red-lt' : 'bg-green-lt' }} " disabled>
+                            id="timesheet-total-balance" class="form-control {{ ($employee->balance < 0) ? 'bg-red-lt' : 'bg-green-lt' }} " disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">@lang('timesheets.to_date')</label>
-                        <input value="{{ $employee->last_date }}" type="text" class="form-control" disabled>
+                        <label class="form-label" for="timesheet-last-date">@lang('timesheets.to_date')</label>
+                        <input id="timesheet-last-date" value="{{ $employee->last_date }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
             </div>

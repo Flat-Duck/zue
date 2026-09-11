@@ -149,6 +149,32 @@ class LargeDatasetBoundsTest extends TestCase
     }
 
     #[Test]
+    public function the_balance_export_stays_within_a_memory_budget(): void
+    {
+        $this->seedEmployees(5200);
+
+        gc_collect_cycles();
+        $before = memory_get_usage(true);
+
+        $response = $this->actingAs($this->reporter())
+            ->post(route('reports.balances'), [
+                'report_type' => 'all',
+                'print_type' => 'excel',
+            ]);
+
+        $response->assertOk();
+        $response->assertHeader('content-disposition');
+
+        $usedMb = (memory_get_usage(true) - $before) / 1024 / 1024;
+
+        $this->assertLessThan(
+            256,
+            $usedMb,
+            sprintf('Balance export used %.1f MB; the row cap or export shape may have regressed.', $usedMb)
+        );
+    }
+
+    #[Test]
     public function the_balance_report_eager_loads_its_relations(): void
     {
         $this->seedEmployees(400);

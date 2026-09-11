@@ -24,8 +24,8 @@ class AppraisalAggregationTest extends TestCase
         $quarterOne = $this->period(1, 'quarter');
         $quarterTwo = $this->period(2, 'quarter');
 
-        $officialOne = $this->official($quarterOne, $employee, $versionOne, 80);
         $officialTwo = $this->official($quarterTwo, $employee, $versionTwo, 90);
+        $officialOne = $this->official($quarterOne, $employee, $versionOne, 80);
 
         $service = app(AppraisalAggregationService::class);
         $service->aggregateYearly(2026);

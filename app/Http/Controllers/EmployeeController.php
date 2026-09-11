@@ -80,8 +80,6 @@ class EmployeeController extends Controller
         Excel::import(new ArchivedEmployeesImport, $request->file('file'));
 
         return back()->with('success', 'Employees archived successfully.');
-
-        return back();
     }
 
     /**

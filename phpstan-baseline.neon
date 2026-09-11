@@ -223,12 +223,6 @@ parameters:
 			path: app/Http/Controllers/Appraisals/AppraisalFormVersionItemsController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalOfficialController\:\:manageableEmployeeQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
-			identifier: missingType.generics
-			count: 1
-			path: app/Http/Controllers/Appraisals/AppraisalOfficialController.php
-
-		-
 			message: '#^Method App\\Http\\Controllers\\Appraisals\\AppraisalOfficialController\:\:show\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -245,12 +239,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/Appraisals/AppraisalReviewController.php
-
-		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: app/Http/Controllers/EmployeeController.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\Room\:\:\$pivot\.$#'
@@ -401,42 +389,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/Jobs/FillRoomVacant.php
-
-		-
-			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$logId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
-
-		-
-			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$selectedTables with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
-
-		-
-			message: '#^Method App\\Jobs\\PerformBackupJob\:\:__construct\(\) has parameter \$type with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
-
-		-
-			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$logId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
-
-		-
-			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$selectedTables has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
-
-		-
-			message: '#^Property App\\Jobs\\PerformBackupJob\:\:\$type has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/Jobs/PerformBackupJob.php
 
 		-
 			message: '#^Property App\\Livewire\\ClinicEmployeeInfo\:\:\$listeners has no type specified\.$#'

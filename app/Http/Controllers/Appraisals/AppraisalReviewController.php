@@ -30,6 +30,8 @@ class AppraisalReviewController extends Controller
 
     public function index(): View
     {
+        $this->authorize('viewAny', AppraisalReview::class);
+
         $myEmployeeId = $this->currentEmployeeId();
 
         $reviews = AppraisalReview::with(['period', 'employee', 'appraiser'])
@@ -42,6 +44,8 @@ class AppraisalReviewController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', AppraisalReview::class);
+
         $periods = AppraisalPeriod::query()->where('status', 'open')->orderByDesc('year')->get();
 
         $employees = $this->reviewableEmployeesQuery()
@@ -62,10 +66,7 @@ class AppraisalReviewController extends Controller
         }
 
         $employee = Employee::findOrFail($data['employee_id']);
-        abort_unless(
-            $this->reviewableEmployeesQuery()->whereKey($employee->id)->exists(),
-            403
-        );
+        $this->authorize('reviewEmployee', [AppraisalReview::class, $employee]);
 
         // Determine employee form + active latest version
         $formId = $employee->appraisal_form_id;
@@ -114,11 +115,7 @@ class AppraisalReviewController extends Controller
 
     public function edit(AppraisalReview $review, AppraisalAttendanceService $attendanceService): View
     {
-        $myEmployeeId = $this->currentEmployeeId();
-
-        if ($review->appraiser_id !== $myEmployeeId) {
-            abort(403);
-        }
+        $this->authorize('view', $review);
 
         $review->load([
             'period',
@@ -151,10 +148,8 @@ class AppraisalReviewController extends Controller
 
     public function update(UpdateAppraisalReviewRequest $request, AppraisalReview $review, AppraisalScoreService $service)
     {
-        $myEmployeeId = $this->currentEmployeeId();
-        if ($review->appraiser_id !== $myEmployeeId) {
-            abort(403);
-        }
+        $this->authorize('update', $review);
+
         if ($review->status !== 'draft') {
             return back()->with('error', 'التقييم مقفول.');
         }
@@ -179,10 +174,8 @@ class AppraisalReviewController extends Controller
 
     public function submit(AppraisalReview $review): RedirectResponse
     {
-        $myEmployeeId = $this->currentEmployeeId();
-        if ($review->appraiser_id !== $myEmployeeId) {
-            abort(403);
-        }
+        $this->authorize('submit', $review);
+
         if ($review->status !== 'draft') {
             return back();
         }

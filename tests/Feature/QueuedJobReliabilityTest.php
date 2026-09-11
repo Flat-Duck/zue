@@ -116,6 +116,14 @@ class QueuedJobReliabilityTest extends TestCase
         } catch (RuntimeException $e) {
             $this->assertSame('storage unavailable', $e->getMessage());
         }
+
+        (new PerformBackupJob('both', [], $log->id))->failed(new RuntimeException('storage unavailable'));
+
+        $log->refresh();
+
+        $this->assertSame('failed', $log->status);
+        $this->assertSame('failed', $log->verification_status);
+        $this->assertSame('Queued backup job failed.', $log->verification_error);
     }
 
     #[Test]

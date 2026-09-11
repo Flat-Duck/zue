@@ -1,66 +1,40 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Zue
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Internal employee management application: personnel, attendance and approvals,
+appraisals, clinic records, flights, and maintenance. The active application uses
+Laravel 13, Livewire 3, Blade, MySQL, and PHP 8.3 or newer. Use the locked Composer
+packages and their platform requirements when provisioning PHP.
 
-## About Laravel
+## Local setup
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Install dependencies with `composer install` and `npm ci`. Copy `.env.example`
+to `.env`, configure a dedicated development MySQL database, then generate an
+application key and run migrations. Never point local setup or tests at production.
+Run `npm run dev` during frontend development or `npm run build` for bundled assets.
+See [deployment instructions](deploy/README.md) for workers, Reverb, storage and scheduling.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Verification
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Create `.env.testing` with a separate MySQL database named `zue_testing` and its
+connection credentials. Clear cached configuration before testing. Browser tests
+use `.env.dusk.local` and a separate `zue_dusk` database. Neither contains production data.
 
-## Learning Laravel
+- `vendor/bin/phpunit` runs the default Application suite (unit and feature tests).
+- `vendor/bin/phpunit --testsuite=Performance` explicitly runs volume benchmarks.
+- `php artisan dusk` runs browser tests with the Dusk environment and application server.
+- `composer analyse` runs Larastan; suppressions remain debt, not proof of correctness.
+- `vendor/bin/pint --dirty` formats changed PHP; `npm run build` verifies assets.
+- `composer audit` and `npm audit` check dependencies.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Identity and access
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+`users.id` identifies an account; `employees.id` identifies an HR record.
+`users.employee_id` links an account to its employee. Employee numbers are business
+identifiers, not interchangeable with account IDs. Global employee permissions
+remain global; timesheet management scopes are enforced by the scope services.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Current remediation
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[FIX_PLAN_CHECKLIST.md](FIX_PLAN_CHECKLIST.md) is the current implementation ledger.
+Older audit documents describe historical snapshots and must not be treated as
+current completion evidence. Generated legacy APIs are outside the active MVC scope.

@@ -40,14 +40,13 @@ trait CreatesApplication
         $connection = $app['config']->get('database.default');
         $live = (string) $app['config']->get("database.connections.{$connection}.database");
 
-        // An in-memory or file SQLite database is self-evidently not production data.
-        if ($live === '' || $live === ':memory:' || str_ends_with($live, '.sqlite')) {
+        if ($connection === 'sqlite' && $live === ':memory:') {
             return;
         }
 
         $permitted = $this->databasesDeclaredForTesting();
 
-        if ($permitted === [] || in_array($live, $permitted, true)) {
+        if ($live !== '' && $permitted !== [] && in_array($live, $permitted, true)) {
             return;
         }
 
@@ -70,7 +69,7 @@ trait CreatesApplication
      *
      * @return list<string>
      */
-    private function databasesDeclaredForTesting(): array
+    protected function databasesDeclaredForTesting(): array
     {
         static $declared = null;
 

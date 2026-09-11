@@ -95,6 +95,39 @@ class BackupRetentionTest extends TestCase
     }
 
     #[Test]
+    public function retention_keeps_previous_restore_verified_backup_when_newer_backup_is_not_restore_verified(): void
+    {
+        MaintenanceSetting::set('keep_backups_count', 1);
+
+        $restoreVerified = $this->writeBackup('backup_20260101_000000_restore_verified.sql', 300);
+        $newerPending = $this->writeBackup('backup_20260102_000000_pending.sql', 100);
+
+        BackupLog::create([
+            'type' => 'both',
+            'status' => 'completed',
+            'filename' => 'backup_20260101_000000_restore_verified.sql',
+            'verification_status' => 'passed',
+            'verified_at' => now()->subMinutes(300),
+            'restore_verification_status' => 'passed',
+            'restore_verified_at' => now()->subMinutes(300),
+        ]);
+
+        BackupLog::create([
+            'type' => 'both',
+            'status' => 'completed',
+            'filename' => 'backup_20260102_000000_pending.sql',
+            'verification_status' => 'passed',
+            'verified_at' => now()->subMinutes(100),
+            'restore_verification_status' => 'pending',
+        ]);
+
+        $this->runCleanup();
+
+        Storage::disk('backups')->assertExists($restoreVerified);
+        Storage::disk('backups')->assertMissing($newerPending);
+    }
+
+    #[Test]
     public function retention_still_reduces_the_backup_count_around_the_protected_file(): void
     {
         MaintenanceSetting::set('keep_backups_count', 2);
@@ -250,6 +283,36 @@ class BackupRetentionTest extends TestCase
         $fresh = $log->fresh();
         $this->assertSame('failed', $fresh->status);
         $this->assertNotNull($fresh->error);
+    }
+
+    #[Test]
+    public function storage_write_failure_marks_the_log_failed_and_leaves_no_backup_file(): void
+    {
+        $log = BackupLog::create(['type' => 'both', 'status' => 'pending']);
+
+        Storage::shouldReceive('disk')->with('backups')->andReturn(new class
+        {
+            public function put(string $path, mixed $contents): bool
+            {
+                return false;
+            }
+
+            public function files(): array
+            {
+                return [];
+            }
+        });
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to write backup file to storage.');
+
+        try {
+            app(BackupService::class)->performBackup('both', ['migrations'], true, $log->id);
+        } finally {
+            $fresh = $log->fresh();
+            $this->assertSame('failed', $fresh->status);
+            $this->assertSame('Unable to write backup file to storage.', $fresh->error);
+        }
     }
 
     #[Test]

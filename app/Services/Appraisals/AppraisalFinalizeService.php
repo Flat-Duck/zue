@@ -96,7 +96,7 @@ class AppraisalFinalizeService
                 'total_score' => (int) round($total),
                 'max_score' => $max,
                 'percentage' => $percentage,
-                'grade' => $this->gradeFromPercentage($percentage),
+                'grade' => AppraisalGrade::fromPercentage($percentage),
             ]);
 
             // Lock those submissions
@@ -104,27 +104,6 @@ class AppraisalFinalizeService
 
             return $official;
         });
-    }
-
-    private function gradeFromPercentage(?float $p): ?string
-    {
-        if ($p === null) {
-            return null;
-        }
-        if ($p >= 90) {
-            return 'ممتاز';
-        }
-        if ($p >= 80) {
-            return 'جيد جداً';
-        }
-        if ($p >= 70) {
-            return 'جيد';
-        }
-        if ($p >= 60) {
-            return 'مقبول';
-        }
-
-        return 'ضعيف';
     }
 
     private function guessFormVersionId(): ?int

@@ -37,6 +37,8 @@ class AppraisalAggregationService
             // The DB enum might be 'quarter' or 'quarterly'. Seeder seems to use 'quarter'.
             // Let's match what's in DB. based on debug it is 'quarter'
             ->whereIn('type', ['quarter', 'quarterly'])
+            ->orderBy('quarter')
+            ->orderBy('id')
             ->get();
 
         if ($quarterlyPeriods->isEmpty()) {
@@ -84,7 +86,7 @@ class AppraisalAggregationService
 
             $avgPercentage = $quarterlyResults->avg('percentage');
 
-            $grade = $this->gradeFromPercentage($avgPercentage);
+            $grade = AppraisalGrade::fromPercentage($avgPercentage);
 
             $officialYearly = AppraisalOfficial::updateOrCreate(
                 [
@@ -92,7 +94,7 @@ class AppraisalAggregationService
                     'employee_id' => $employee->id,
                 ],
                 [
-                    'appraisal_form_version_id' => $quarterlyResults->last()->appraisal_form_version_id,
+                    'appraisal_form_version_id' => $quarterlyResults->sortBy(fn (AppraisalOfficial $official): int => (int) $quarterlyIds->search($official->appraisal_period_id))->last()->appraisal_form_version_id,
                     'reviews_count' => $quarterlyResults->count(),
                     'percentage' => round($avgPercentage, 2),
                     'grade' => $grade,
@@ -120,26 +122,5 @@ class AppraisalAggregationService
                 ]);
             }
         });
-    }
-
-    private function gradeFromPercentage(?float $p): ?string
-    {
-        if ($p === null) {
-            return null;
-        }
-        if ($p >= 90) {
-            return 'ممتاز';
-        }
-        if ($p >= 80) {
-            return 'جيد جداً';
-        }
-        if ($p >= 70) {
-            return 'جيد';
-        }
-        if ($p >= 60) {
-            return 'مقبول';
-        }
-
-        return 'ضعيف';
     }
 }

@@ -9,7 +9,6 @@ use App\Models\Employee;
 use App\Services\Appraisals\AppraisalAttendanceService;
 use App\Services\Appraisals\AppraisalFinalizeService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,7 +17,7 @@ class AppraisalOfficialController extends Controller
 {
     public function index(Request $request): View
     {
-        $this->authorizeOfficialManagement();
+        $this->authorize('viewAny', AppraisalOfficial::class);
 
         $q = trim((string) $request->get('q'));
         $year = $request->get('year', now()->year);
@@ -50,7 +49,7 @@ class AppraisalOfficialController extends Controller
 
     public function show(AppraisalPeriod $period, Employee $employee, AppraisalAttendanceService $attendanceService)
     {
-        $this->authorizeOfficialView($employee);
+        $this->authorize('viewForEmployee', [AppraisalOfficial::class, $employee]);
 
         $official = AppraisalOfficial::with([
             'scores.formVersionItem.item',
@@ -91,7 +90,7 @@ class AppraisalOfficialController extends Controller
 
     public function finalize(AppraisalFinalizeService $service, AppraisalPeriod $period, Employee $employee): RedirectResponse
     {
-        $this->authorizeOfficialManagement();
+        $this->authorize('manage', AppraisalOfficial::class);
 
         $official = $service->finalizeForEmployee($period, $employee->id, $this->currentEmployeeId());
 
@@ -106,34 +105,21 @@ class AppraisalOfficialController extends Controller
             ->firstOrFail();
 
         $type = $request->get('type'); // employee, manager, hr
-        $user = auth()->user();
 
         if ($type === 'employee') {
-            if ((int) optional($user->employee)->id !== (int) $official->employee_id) {
-                abort(403, 'Unauthorized');
-            }
+            $this->authorize('approveEmployee', $official);
             $official->update(['employee_signed_at' => now()]);
         } elseif ($type === 'manager') {
-            if (! $user->hasAnyRole(['manager', 'supervisor', 'superintendent', 'fieldcoordinator'])) {
-                abort(403, 'Only an authorized manager may approve.');
-            }
-
-            abort_unless(
-                $this->manageableEmployeeQuery()->whereKey($official->employee_id)->exists(),
-                403,
-                'Only the assigned manager may approve.'
-            );
+            $this->authorize('approveManager', $official);
 
             $official->update([
-                'manager_user_id' => $user->id,
+                'manager_user_id' => auth()->id(),
                 'manager_signed_at' => now(),
             ]);
         } elseif ($type === 'hr') {
-            if (! $user->hasAnyRole(['hr', 'admin', 'super-admin'])) {
-                abort(403, 'Only HR or Admin');
-            }
+            $this->authorize('approveHr', $official);
             $official->update([
-                'hr_user_id' => $user->id,
+                'hr_user_id' => auth()->id(),
                 'hr_signed_at' => now(),
             ]);
         } else {
@@ -141,37 +127,5 @@ class AppraisalOfficialController extends Controller
         }
 
         return back()->with('success', 'Approved successfully.');
-    }
-
-    private function authorizeOfficialManagement(): void
-    {
-        abort_unless(
-            auth()->user()->hasAnyRole(['hr', 'admin', 'super-admin']),
-            403,
-            'Only HR or Admin may manage official appraisals.'
-        );
-    }
-
-    private function authorizeOfficialView(Employee $employee): void
-    {
-        $user = auth()->user();
-
-        if ($user->hasAnyRole(['hr', 'admin', 'super-admin'])) {
-            return;
-        }
-
-        if ((int) optional($user->employee)->id === (int) $employee->id) {
-            return;
-        }
-
-        abort_unless(
-            $this->manageableEmployeeQuery()->whereKey($employee->id)->exists(),
-            403
-        );
-    }
-
-    private function manageableEmployeeQuery(): Builder
-    {
-        return auth()->user()->managedEmployeesQuery('general');
     }
 }

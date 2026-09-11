@@ -1,3 +1,5 @@
+> Historical audit snapshot. See FIX_PLAN_CHECKLIST.md for current status; findings require revalidation against current code.
+
 # Laravel application audit — 8 September 2026
 
 ## 1. Executive summary

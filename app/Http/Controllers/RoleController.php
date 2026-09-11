@@ -32,7 +32,10 @@ class RoleController extends Controller
     {
         $this->authorize('create', Role::class);
 
-        $permissions = Permission::all();
+        $permissions = Permission::query()
+            ->select(['id', 'name', 'guard_name'])
+            ->orderBy('name')
+            ->get();
 
         return view('app.roles.create')->with('permissions', $permissions);
     }
@@ -77,7 +80,10 @@ class RoleController extends Controller
     {
         $this->authorize('update', $role);
 
-        $permissions = Permission::all();
+        $permissions = Permission::query()
+            ->select(['id', 'name', 'guard_name'])
+            ->orderBy('name')
+            ->get();
 
         return view('app.roles.edit')
             ->with('role', $role)

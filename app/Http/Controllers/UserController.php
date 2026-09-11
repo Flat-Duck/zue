@@ -10,11 +10,11 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Imports\UsersImport;
 use App\Models\User;
 use App\Services\SignatureService;
+use App\Services\UserAccountService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -26,6 +26,7 @@ class UserController extends Controller
     public function __construct(
         private readonly AuditLoggerContract $auditLogger,
         private readonly SignatureService $signatureService,
+        private readonly UserAccountService $accountService,
     ) {}
 
     private const IMPERSONATOR_ID_SESSION_KEY = 'impersonator_id';
@@ -87,22 +88,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $validated = $request->validated();
-
-        $validated['password'] = Hash::make($validated['password']);
-
-        $user = User::create($validated);
-
-        if ($request->hasFile('signature_file')) {
-            $this->signatureService->saveSignature($user, $request->file('signature_file'));
-        }
-
-        $user->syncRoles($this->rolesFromRequest($request));
-
-        $this->auditLogger->record('user.created', [
-            'user_id' => $user->id,
-            'roles' => $user->getRoleNames()->all(),
-        ]);
+        $user = $this->accountService->create($request->validated(), $this->rolesFromRequest($request), $request->file('signature_file'));
 
         return redirect()
             ->route('users.edit', $user)
@@ -140,33 +126,7 @@ class UserController extends Controller
     ): RedirectResponse {
         $this->authorize('update', $user);
 
-        $validated = $request->validated();
-
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        } else {
-            $validated['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($validated);
-
-        if ($request->hasFile('signature_file')) {
-            $this->signatureService->saveSignature($user, $request->file('signature_file'));
-        }
-
-        $rolesBefore = $user->getRoleNames()->all();
-
-        $user->syncRoles($this->rolesFromRequest($request));
-
-        $rolesAfter = $user->fresh()->getRoleNames()->all();
-
-        if ($rolesBefore !== $rolesAfter) {
-            $this->auditLogger->record('user.roles_changed', [
-                'user_id' => $user->id,
-                'from' => $rolesBefore,
-                'to' => $rolesAfter,
-            ]);
-        }
+        $this->accountService->update($user, $request->validated(), $this->rolesFromRequest($request), $request->file('signature_file'));
 
         return redirect()
             ->route('users.edit', $user)

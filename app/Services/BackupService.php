@@ -17,7 +17,7 @@ class BackupService implements BackupServiceContract
 {
     public function performBackup(string $type = 'both', array $selectedTables = [], bool $saveToBackups = true, ?int $logId = null): string
     {
-        $lock = Cache::lock('database-backup', 1800);
+        $lock = Cache::lock('database-backup', 1900);
 
         if (! $lock->get()) {
             throw new RuntimeException('Another database backup is already running.');
@@ -284,12 +284,23 @@ class BackupService implements BackupServiceContract
     }
 
     /**
-     * The most recent backup this application has actually verified as
-     * restorable. Retention must never discard it, because it is the only file
-     * known to be good if a later backup turns out to be corrupt.
+     * Prefer the last restore-proven backup. Until a restore has been verified,
+     * preserve the legacy file-validated backup without treating it as proof
+     * that a full restore succeeded.
      */
     private function newestVerifiedBackupPath(): ?string
     {
+        $restored = BackupLog::query()
+            ->where('restore_verification_status', 'passed')
+            ->whereNotNull('restore_verified_at')
+            ->whereNotNull('filename')
+            ->latest('restore_verified_at')
+            ->value('filename');
+
+        if ($restored !== null) {
+            return $restored;
+        }
+
         $filename = BackupLog::query()
             ->where('verification_status', 'passed')
             ->whereNotNull('filename')

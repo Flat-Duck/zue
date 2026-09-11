@@ -6,7 +6,9 @@ use App\Models\Center;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Location;
-use App\Models\ManagementScope;
+use App\Models\ScopeContext;
+use App\Models\ScopePolicy;
+use App\Models\ScopePolicyActor;
 use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,13 +66,17 @@ class RepresentativeVolumeBaselineTest extends TestCase
 
         $employee = $user->employee;
 
-        $scope = ManagementScope::create([
-            'manager_id' => $employee->id,
+        $context = ScopeContext::query()->firstOrCreate(
+            ['key' => ScopeContext::GENERAL],
+            ['name' => 'General', 'name_ar' => 'عام', 'is_active' => true]
+        );
+        $scope = ScopePolicy::create([
             'name' => 'Company wide',
-            'scope_type' => ManagementScope::TYPE_GLOBAL,
-            'context' => 'time_sheet',
+            'context_id' => $context->id,
+            'covers_everyone' => true,
+            'is_active' => true,
         ]);
-        $employee->managementScopes()->attach($scope->id);
+        ScopePolicyActor::create(['policy_id' => $scope->id, 'actor_employee_id' => $employee->id]);
 
         return $user;
     }

@@ -20,16 +20,17 @@ class PerformBackupJob implements ShouldQueue
 
     public int $backoff = 300;
 
-    protected $type;
+    protected string $type;
 
-    protected $logId;
+    protected ?int $logId;
 
-    protected $selectedTables;
+    /** @var list<string> */
+    protected array $selectedTables;
 
     /**
-     * Create a new job instance.
+     * @param  list<string>  $selectedTables
      */
-    public function __construct($type = 'both', $selectedTables = [], $logId = null)
+    public function __construct(string $type = 'both', array $selectedTables = [], ?int $logId = null)
     {
         $this->type = $type;
         $this->selectedTables = $selectedTables;
@@ -56,6 +57,8 @@ class PerformBackupJob implements ShouldQueue
                     'status' => 'failed',
                     'error' => 'Queued job failed: '.$exception->getMessage(),
                     'completed_at' => now(),
+                    'verification_status' => 'failed',
+                    'verification_error' => 'Queued backup job failed.',
                 ]);
             }
         }

@@ -155,9 +155,21 @@ class MaintenanceController extends Controller
         }
 
         $sql = Storage::disk('backups')->get($filename);
+        $backupLog = BackupLog::query()->where('filename', $filename)->latest('created_at')->first();
+
+        $backupLog?->update([
+            'restore_verification_status' => 'running',
+            'restore_verification_error' => null,
+        ]);
 
         try {
             DB::unprepared($sql);
+
+            $backupLog?->update([
+                'restore_verification_status' => 'passed',
+                'restore_verified_at' => now(),
+                'restore_verification_error' => null,
+            ]);
 
             $this->auditLogger->record('database.restored', [
                 'filename' => $filename,
@@ -166,6 +178,11 @@ class MaintenanceController extends Controller
             return redirect()->back()->with('success', 'Database restored successfully from '.$filename);
         } catch (\Exception $e) {
             report($e);
+
+            $backupLog?->update([
+                'restore_verification_status' => 'failed',
+                'restore_verification_error' => 'Restore execution failed.',
+            ]);
 
             $this->auditLogger->recordFailure('database.restore_failed', $e->getMessage(), [
                 'filename' => $filename,

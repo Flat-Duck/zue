@@ -1,3 +1,5 @@
+> Historical audit snapshot. See FIX_PLAN_CHECKLIST.md for current status; findings require revalidation against current code.
+
 # Claude Audit — Laravel Application (`zue`)
 
 **Date:** 2026-09-09  
