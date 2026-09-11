@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="col-sm-auto" style="min-width: 200px;">
-                        <select name="context_id" class="form-select" onchange="this.form.submit()"
+                        <select name="context_id" class="form-select" data-submit-on-change
                             data-tomselect="select" aria-label="@lang('scopes.context')">
                             <option value="">@lang('scopes.all_contexts')</option>
                             @foreach ($contexts as $context)
@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="col-sm-auto" style="min-width: 240px;">
-                        <select name="manager_id" class="form-select" onchange="this.form.submit()"
+                        <select name="manager_id" class="form-select" data-submit-on-change
                             data-tomselect="select" aria-label="@lang('scopes.managers')">
                             <option value="">@lang('scopes.all_managers')</option>
                             @foreach ($managers as $manager)
@@ -105,7 +105,7 @@
                                 </a>
                                 <form action="{{ route('management-scopes.destroy', $scope) }}" method="POST"
                                     class="inline pointer ms-1"
-                                    onsubmit="return confirm({{ Js::from(__('scopes.confirm_delete')) }})">
+                                    data-confirm="{{ __('scopes.confirm_delete') }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-icon btn-outline-danger"

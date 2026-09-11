@@ -243,7 +243,7 @@
                             <strong>@lang('maintenance.warning')</strong> @lang('maintenance.importing_will_execute_all_sql_commands_in') </div>
                     </div>
                     <div class="card-footer text-end">
-                        <button type="submit" class="btn btn-warning" onclick="return confirm({{ Js::from(__('maintenance.confirm_import_sql')) }})">
+                        <button type="submit" class="btn btn-warning" data-confirm="{{ __('maintenance.confirm_import_sql') }}">
                             <i class="ti ti-upload me-2"></i> @lang('maintenance.import') </button>
                     </div>
                 </form>
@@ -277,13 +277,13 @@
                                                     <i class="ti ti-download"></i> @lang('maintenance.download') </a>
                                                 <form action="{{ route('maintenance.restore', $backup['name']) }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm({{ Js::from(__('maintenance.confirm_restore')) }})">
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" data-confirm="{{ __('maintenance.confirm_restore') }}">
                                                         <i class="ti ti-rotate-2"></i> @lang('maintenance.restore') </button>
                                                 </form>
                                                 <form action="{{ route('maintenance.delete', $backup['name']) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm({{ Js::from(__('maintenance.confirm_generic')) }})">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="{{ __('maintenance.confirm_generic') }}">
                                                         <i class="ti ti-trash"></i> @lang('maintenance.delete') </button>
                                                 </form>
                                             </div>

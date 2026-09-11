@@ -92,7 +92,7 @@
                                 action="{{ route('flights.destroy', $flight) }}"
                                 method="POST"
                                 class="inline pointer ms-1"
-                                onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')"
+                                data-confirm="{{ __('crud.common.are_you_sure') }}"
                             >
                                 @csrf @method('DELETE')
                                 <button
@@ -108,7 +108,7 @@
                                 action="{{ route('flights.approve', $flight) }}"
                                 method="POST"
                                 class="inline pointer ms-1"
-                                onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')"
+                                data-confirm="{{ __('crud.common.are_you_sure') }}"
                             >
                                 @csrf @method('DELETE')
                                 <button

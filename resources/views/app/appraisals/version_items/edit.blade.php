@@ -165,7 +165,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm({{ Js::from(__('appraisals.confirm_delete_version_item')) }})">@lang('appraisals.delete')</button>
+                                                data-confirm="{{ __('appraisals.confirm_delete_version_item') }}">@lang('appraisals.delete')</button>
                                         </form>
                                     </td>
                                 </tr>

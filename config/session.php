@@ -168,7 +168,10 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Production is served over TLS, so the cookie is marked for TLS only unless
+    // the environment says otherwise. A cookie without this flag travels over
+    // plain HTTP if anything ever links to it that way.
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
 
     /*
     |--------------------------------------------------------------------------

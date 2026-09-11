@@ -144,8 +144,8 @@ class AuditLoggingTest extends TestCase
     #[Test]
     public function deleting_a_backup_is_audited_through_the_real_request(): void
     {
-        Storage::fake('local');
-        Storage::disk('local')->put('backups/backup_20260101_000000_a.sql', 'SET FOREIGN_KEY_CHECKS=0;');
+        Storage::fake('backups');
+        Storage::disk('backups')->put('backup_20260101_000000_a.sql', 'SET FOREIGN_KEY_CHECKS=0;');
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Permission::findOrCreate('maintenance', 'web');

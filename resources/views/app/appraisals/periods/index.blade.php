@@ -55,7 +55,7 @@
                                                 class="btn btn-sm btn-outline-primary">@lang('appraisals.edit')</a>
                                             @if($period->status !== 'open')
                                                 <form action="{{ route('appraisals.periods.destroy', $period) }}" method="POST" class="d-inline"
-                                                    onsubmit="return confirm({{ Js::from(__('appraisals.confirm_generic')) }});">
+                                                    data-confirm="{{ __('appraisals.confirm_generic') }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">@lang('appraisals.delete')</button>

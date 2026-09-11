@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Closure;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -24,6 +25,27 @@ abstract class DuskTestCase extends BaseTestCase
         if (! static::runningInSail()) {
             static::startChromeDriver(['--port=9515']);
         }
+    }
+
+    /**
+     * Every browser test ends by checking the console.
+     *
+     * A refused script, a failed request or a JavaScript exception all land in
+     * the browser log and nowhere else — the page looks fine and the assertion
+     * that was made still passes. Checking after every test rather than in the
+     * few that remembered to is what makes the suite a real canary for the
+     * content security policy: a script that loses its nonce fails whichever
+     * test next visits that page.
+     */
+    public function browse(Closure $callback)
+    {
+        return parent::browse(function (Browser ...$browsers) use ($callback): void {
+            $callback(...$browsers);
+
+            foreach ($browsers as $browser) {
+                $this->assertNoBrowserErrors($browser, 'The page');
+            }
+        });
     }
 
     /**

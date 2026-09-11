@@ -32,7 +32,7 @@
     
     @push('scripts')
         @vite('resources/js/editor.js')
-            <script>
+            <script @cspNonce>
       document.addEventListener("DOMContentLoaded", function () {
         let options = {
           selector: "#hugerte-mytextarea",

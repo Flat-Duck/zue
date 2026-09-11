@@ -20,7 +20,7 @@
     </div>
     <div class="col-auto ms-auto d-print-none">
       <a href="{{ route('injury-reports.edit', $r) }}" class="btn btn-warning">@lang('clinic.edit')</a>
-      <button onclick="window.print()" class="btn btn-primary">
+      <button data-action="print" class="btn btn-primary">
         @svg('tabler-printer', 'icon') @lang('clinic.print')
       </button>
       <a href="{{ route('injury-reports.index') }}" class="btn btn-light">@lang('clinic.back')</a>
@@ -311,7 +311,7 @@
     <div class="d-flex gap-2">
       <a href="{{ route('injury-reports.index') }}" class="btn btn-light">@lang('clinic.back')</a>
       <a href="{{ route('injury-reports.edit',$r) }}" class="btn btn-warning">@lang('clinic.edit')</a>
-      <button onclick="window.print()" class="btn btn-primary">
+      <button data-action="print" class="btn btn-primary">
         @svg('tabler-printer', 'icon') @lang('clinic.print')
       </button>
     </div>

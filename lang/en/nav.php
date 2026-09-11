@@ -57,4 +57,6 @@ return [
     'builder' => 'Builder',
     'process' => 'Process',
     'employee' => 'Employee',
+    'scope_contexts' => 'Scope contexts',
+    'system_status' => 'System status',
 ];

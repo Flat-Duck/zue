@@ -82,7 +82,7 @@
     </div>
 </div>
 
-<script>
+<script @cspNonce>
     document.addEventListener("DOMContentLoaded", function () {
         const canvas = document.getElementById("signature-advanced");
         const signaturePad = new SignaturePad(canvas, {

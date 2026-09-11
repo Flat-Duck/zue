@@ -26,6 +26,7 @@ return [
         'created' => ' Successfully created',
         'saved' => ' Saved successfully',
         'deleted' => 'Deleted successfully',
+        'refresh' => 'Refresh',
         'removed' => ' Successfully removed',
         'print_preview' => ' Print',
         'time_sheet_approve' => 'Approve Time Sheets',

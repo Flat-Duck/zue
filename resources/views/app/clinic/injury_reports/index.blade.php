@@ -24,7 +24,7 @@
         <a class="btn btn-sm btn-warning" href="{{ route('injury-reports.edit',$r) }}">@lang('clinic.edit')</a>
         <form action="{{ route('injury-reports.destroy',$r) }}" method="POST" class="d-inline">
           @csrf @method('DELETE')
-          <button class="btn btn-sm btn-danger" onclick="return confirm({{ Js::from(__('clinic.confirm_delete')) }})">@lang('clinic.delete')</button>
+          <button class="btn btn-sm btn-danger" data-confirm="{{ __('clinic.confirm_delete') }}">@lang('clinic.delete')</button>
         </form>
       </td>
     </tr>

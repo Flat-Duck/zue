@@ -36,6 +36,17 @@ return [
             'throw' => false,
         ],
 
+        /*
+         * Where backups are written. On the box itself by default, which means a
+         * disk failure takes the data and the backups together; point BACKUP_PATH
+         * at a mounted network share to change that with no other edit.
+         */
+        'backups' => [
+            'driver' => 'local',
+            'root' => env('BACKUP_PATH', storage_path('app/backups')),
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

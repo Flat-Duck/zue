@@ -25,7 +25,7 @@
                         <div class="card-body">
                             <p class="text-muted"> @lang('operations.this_operation_will_archive_all_employees') <strong>@lang('operations.latest')</strong> @lang('operations.timesheet_record_is_older_than_or_equal_to') </p>
                             <form action="{{ route('operations.archive-by-timesheet') }}" method="POST"
-                                onsubmit="return confirm({{ Js::from(__('operations.confirm_archive_by_date')) }});">
+                                data-confirm="{{ __('operations.confirm_archive_by_date') }}">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">@lang('operations.threshold_date')</label>
@@ -43,7 +43,7 @@
 
                             <p class="text-muted mb-2"> @lang('operations.or_archive_by_entering_one_or_more_employee') </p>
                             <form id="archiveByNumberForm" action="{{ route('operations.archive-by-number') }}" method="POST"
-                                onsubmit="return confirm({{ Js::from(__('operations.confirm_archive_by_number')) }});">
+                                data-confirm="{{ __('operations.confirm_archive_by_number') }}">
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">@lang('operations.employee_numbers')</label>
@@ -82,7 +82,7 @@
                                 <button type="submit" form="unarchiveByNumberForm" class="btn btn-primary w-100">
                                     <i class="ti ti-rotate-2 me-2"></i> @lang('operations.un_archive_employees') </button>
                                 <form action="{{ route('operations.unarchive-all') }}" method="POST" class="w-100"
-                                    onsubmit="return confirm({{ Js::from(__('operations.confirm_unarchive_all')) }});">
+                                    data-confirm="{{ __('operations.confirm_unarchive_all') }}">
                                     @csrf
                                     <button type="submit" class="btn btn-outline-danger w-100">
                                         <i class="ti ti-rotate-clockwise-2 me-2"></i> @lang('operations.un_archive_all') </button>

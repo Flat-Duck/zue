@@ -311,7 +311,7 @@
 
             </div>
 
-            <script>
+            <script @cspNonce>
                 function sumSection(sec, cls) {
                     let total = 0;
                     document.querySelectorAll(`.${cls}[data-sec="${sec}"]`).forEach(inp => {

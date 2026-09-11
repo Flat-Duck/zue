@@ -241,6 +241,18 @@
                                 </a>
                             </li>
                         @endcan
+                        @can('viewAny', App\Models\ScopeContext::class)
+                            <li class="nav-item {{ $page == 'scope_contexts' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('scope-contexts.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-category"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        @lang('nav.scope_contexts')
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
                         @can('view-any', App\Models\Employee::class)
                             <li class="nav-item {{ $page == 'operations' ? 'active' : ''  }}">
                                 <a class="nav-link" href="{{ route('operations.index') }}">
@@ -261,6 +273,18 @@
                                     </span>
                                     <span class="nav-link-title">
                                         @lang('nav.maintenance')
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('maintenance')
+                            <li class="nav-item {{ $page == 'status' ? 'active' : ''  }}">
+                                <a class="nav-link" href="{{ route('maintenance.status') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <i class="ti ti-heartbeat"></i>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        @lang('nav.system_status')
                                     </span>
                                 </a>
                             </li>

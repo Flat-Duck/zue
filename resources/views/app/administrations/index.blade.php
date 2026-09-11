@@ -88,7 +88,7 @@
                                 action="{{ route('administrations.destroy', $administration) }}"
                                 method="POST"
                                 class="inline pointer ms-1"
-                                onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')"
+                                data-confirm="{{ __('crud.common.are_you_sure') }}"
                             >
                                 @csrf @method('DELETE')
                                 <button

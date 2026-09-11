@@ -1,0 +1,26 @@
+# The queue worker. Approvals, notifications, backups and the heartbeat the
+# status page reads all run here; if this is not running they silently stop.
+#
+#   sudo cp deploy/systemd/zue-queue.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now zue-queue
+#
+# After every deploy:  sudo systemctl restart zue-queue
+# (a worker keeps the old code in memory until restarted)
+
+[Unit]
+Description=zue queue worker
+After=network.target mysql.service redis.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/zue
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --timeout=900
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/www/zue/storage/logs/queue.log
+StandardError=append:/var/www/zue/storage/logs/queue.log
+
+[Install]
+WantedBy=multi-user.target

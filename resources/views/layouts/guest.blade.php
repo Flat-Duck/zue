@@ -42,7 +42,7 @@
     @stack('scripts')
 
     @if (session()->has('success'))
-        <script>
+        <script @cspNonce>
             document.addEventListener('DOMContentLoaded', () => {
                 new window.Notyf({ dismissible: true })
                     .success(@json(session('success')));

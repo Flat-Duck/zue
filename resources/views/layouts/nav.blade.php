@@ -99,7 +99,7 @@
                                 @lang('nav.my_signature')
                             </span>
                         </a>
-                        <a class="dropdown-item" href="{{ route('logout') }}" rel="noopener" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <a class="dropdown-item" href="{{ route('logout') }}" rel="noopener" data-submit="#logout-form">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <i class="ti ti-logout-2"></i>
                             </span>

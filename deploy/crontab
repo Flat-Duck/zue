@@ -1,0 +1,5 @@
+# The scheduler: nightly backups, the period status sync, and the heartbeat
+# the status page uses to tell that cron itself is running.
+#
+#   sudo crontab -u www-data deploy/crontab
+* * * * * cd /var/www/zue && /usr/bin/php artisan schedule:run >> /dev/null 2>&1

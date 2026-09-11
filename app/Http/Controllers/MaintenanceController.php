@@ -10,6 +10,7 @@ use App\Http\Requests\MaintenanceSettingsRequest;
 use App\Jobs\PerformBackupJob;
 use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
+use App\Services\BackupService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -29,13 +30,13 @@ class MaintenanceController extends Controller
     {
         $this->authorize('maintenance');
 
-        $backups = Storage::disk('local')->files('backups');
+        $backups = Storage::disk('backups')->files();
         $backups = array_map(function ($file) {
             return [
                 'name' => basename($file),
                 'path' => $file,
-                'size' => round(Storage::disk('local')->size($file) / 1024, 2).' KB',
-                'created_at' => Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file))->toDateTimeString(),
+                'size' => round(Storage::disk('backups')->size($file) / 1024, 2).' KB',
+                'created_at' => Carbon::createFromTimestamp(Storage::disk('backups')->lastModified($file))->toDateTimeString(),
             ];
         }, $backups);
 
@@ -146,13 +147,14 @@ class MaintenanceController extends Controller
     {
         $this->authorize('maintenance');
 
-        abort_unless($this->isSafeBackupFilename($filename), 404);
+        // Only a dump is SQL; the archive of uploaded files beside it is not.
+        abort_unless($this->isSafeBackupFilename($filename) && str_ends_with($filename, '.sql'), 404);
 
-        if (! Storage::disk('local')->exists('backups/'.$filename)) {
+        if (! Storage::disk('backups')->exists($filename)) {
             return redirect()->back()->with('error', 'Backup file not found.');
         }
 
-        $sql = Storage::disk('local')->get('backups/'.$filename);
+        $sql = Storage::disk('backups')->get($filename);
 
         try {
             DB::unprepared($sql);
@@ -179,7 +181,7 @@ class MaintenanceController extends Controller
 
         abort_unless($this->isSafeBackupFilename($filename), 404);
 
-        if (! Storage::disk('local')->exists('backups/'.$filename)) {
+        if (! Storage::disk('backups')->exists($filename)) {
             abort(404);
         }
 
@@ -187,7 +189,7 @@ class MaintenanceController extends Controller
             'filename' => $filename,
         ]);
 
-        return response()->download(storage_path('app/backups/'.$filename));
+        return response()->download(Storage::disk('backups')->path($filename));
     }
 
     public function delete($filename): RedirectResponse
@@ -196,8 +198,12 @@ class MaintenanceController extends Controller
 
         abort_unless($this->isSafeBackupFilename($filename), 404);
 
-        if (Storage::disk('local')->exists('backups/'.$filename)) {
-            Storage::disk('local')->delete('backups/'.$filename);
+        if (Storage::disk('backups')->exists($filename)) {
+            Storage::disk('backups')->delete($filename);
+
+            if (str_ends_with($filename, '.sql')) {
+                Storage::disk('backups')->delete(BackupService::uploadsArchiveFor($filename));
+            }
 
             $this->auditLogger->record('backup.deleted', [
                 'filename' => $filename,
@@ -211,7 +217,7 @@ class MaintenanceController extends Controller
 
     private function isSafeBackupFilename(string $filename): bool
     {
-        return Str::is(['backup_*.sql', 'export_*.sql'], $filename)
+        return Str::is(['backup_*.sql', 'export_*.sql', 'backup_*.files.tar.gz'], $filename)
             && basename($filename) === $filename;
     }
 }

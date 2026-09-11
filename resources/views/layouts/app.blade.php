@@ -50,7 +50,7 @@
 
 
     @if (session()->has('success'))
-        <script>
+        <script @cspNonce>
             // app.js is a module and therefore deferred, so Notyf does not
             // exist while this inline script is parsed. Wait for the document.
             document.addEventListener('DOMContentLoaded', () => {
@@ -60,7 +60,7 @@
         </script>
     @endif
 
-    <script>
+    <script @cspNonce>
         /* Simple Alpine Image Viewer */
         document.addEventListener('alpine:init', () => {
             Alpine.data('imageViewer', (src = '') => {

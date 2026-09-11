@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\FlightRouteController;
 use App\Http\Controllers\FlightStationController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ResidenceController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\ScopeContextController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\TimeSheetController;
 use App\Http\Controllers\UserController;
@@ -62,7 +64,7 @@ Route::post('/rr', function () {
     Excel::import(new RoomsImport, request()->file('rooms'));
 
     return back()->with('success', 'Rooms imported successfully.');
-})->middleware(['auth', 'can:maintenance'])->name('rr');
+})->middleware(['auth', 'can:maintenance', 'throttle:imports'])->name('rr');
 // Route::get('/ss', function () {
 
 //     $month_name = "April";
@@ -86,6 +88,9 @@ Route::post('/rr', function () {
 // })->name('time-sheets.approve');
 
 Auth::routes(['register' => false]);
+
+// For a monitoring tool: 200 or 503, and no detail unless signed in.
+Route::get('health', HealthController::class)->name('health')->middleware('throttle:60,1');
 
 // Switching the interface language. Outside the auth group: the login page is
 // offered in both languages too.
@@ -114,6 +119,7 @@ Route::prefix('/')
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
         Route::resource('management-scopes', ManagementScopeController::class);
+        Route::resource('scope-contexts', ScopeContextController::class)->except(['show']);
 
         Route::resource('injury-reports', OccupationalInjuryReportController::class);
 
@@ -143,7 +149,7 @@ Route::prefix('/')
         Route::resource('rooms', RoomController::class);
         Route::resource('stocks', StockController::class);
         Route::get('users/template', [UserController::class, 'downloadTemplate'])->name('users.template');
-        Route::post('users/import', [UserController::class, 'import'])->name('users.import');
+        Route::post('users/import', [UserController::class, 'import'])->name('users.import')->middleware('throttle:imports');
         Route::post('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
         Route::delete('users/impersonate', [UserController::class, 'stopImpersonation'])->name('users.impersonate.stop');
         Route::resource('users', UserController::class);
@@ -152,9 +158,9 @@ Route::prefix('/')
         Route::get('employees/imports', [EmployeeController::class, 'imports'])->name('employees.imports');
         Route::get('employees/quick-create', [EmployeeController::class, 'quickCreate'])->name('employees.quick-create');
         Route::post('employees/quick-create', [EmployeeController::class, 'quickStore'])->name('employees.quick-store');
-        Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees');
+        Route::post('import-archived-employees', [EmployeeController::class, 'importArchivedEmployees'])->name('employees.import-archived-employees')->middleware('throttle:imports');
         // Full personnel export: creates or updates by employee number.
-        Route::post('employees/import-profiles', [EmployeeController::class, 'importProfiles'])->name('employees.import-profiles');
+        Route::post('employees/import-profiles', [EmployeeController::class, 'importProfiles'])->name('employees.import-profiles')->middleware('throttle:imports');
         Route::resource('employees', EmployeeController::class);
 
         Route::get('signature', [ProfileController::class, 'signature'])->name('signature.show');
@@ -173,9 +179,10 @@ Route::prefix('/')
         Route::post('operations/unarchive-all', [OperationsController::class, 'unarchiveAll'])->name('operations.unarchive-all');
 
         Route::get('maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
+        Route::get('maintenance/status', [HealthController::class, 'status'])->name('maintenance.status')->middleware('can:maintenance');
         Route::post('maintenance/export', [MaintenanceController::class, 'export'])->name('maintenance.export');
-        Route::post('maintenance/import', [MaintenanceController::class, 'import'])->name('maintenance.import');
-        Route::post('maintenance/restore/{filename}', [MaintenanceController::class, 'restore'])->name('maintenance.restore');
+        Route::post('maintenance/import', [MaintenanceController::class, 'import'])->name('maintenance.import')->middleware('throttle:imports');
+        Route::post('maintenance/restore/{filename}', [MaintenanceController::class, 'restore'])->name('maintenance.restore')->middleware('throttle:imports');
         Route::get('maintenance/download/{filename}', [MaintenanceController::class, 'download'])->name('maintenance.download');
         Route::delete('maintenance/delete/{filename}', [MaintenanceController::class, 'delete'])->name('maintenance.delete');
         Route::post('maintenance/settings', [MaintenanceController::class, 'updateSettings'])->name('maintenance.settings.update');

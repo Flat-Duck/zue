@@ -42,7 +42,7 @@
 <body>
     <div class="toolbar">
         <a class="secondary" href="{{ route('flights.show', $flight) }}">{{ __('flights.back', [], 'ar') }}</a>
-        <button type="button" onclick="window.print()">{{ __('flights.print_or_save_pdf', [], 'ar') }}</button>
+        <button type="button" data-action="print">{{ __('flights.print_or_save_pdf', [], 'ar') }}</button>
     </div>
 
     <div class="sheet">

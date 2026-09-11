@@ -9,6 +9,7 @@ use App\Models\User;
 use Database\Seeders\PermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\BuildsScopes;
 use Tests\TestCase;
@@ -195,5 +196,34 @@ class DeploymentSmokeTest extends TestCase
             ->assertRedirect();
 
         $this->assertGuest();
+    }
+
+    /**
+     * With debugging off, an error page says nothing about the code. Ignition's
+     * routes — one of which executes code — are a dev dependency and are absent
+     * from a `--no-dev` install, but they must also be inert wherever they exist
+     * and debugging is off.
+     */
+    #[Test]
+    public function with_debugging_off_an_error_reveals_nothing_and_the_debug_routes_are_inert(): void
+    {
+        config(['app.debug' => false]);
+
+        Route::get('/_smoke/explode', function (): never {
+            throw new \RuntimeException('secret-detail-that-must-not-leak');
+        });
+
+        $response = $this->get('/_smoke/explode');
+
+        $response->assertStatus(500);
+        $this->assertStringNotContainsString('secret-detail-that-must-not-leak', $response->getContent());
+        $this->assertStringNotContainsString('RuntimeException', $response->getContent());
+        $this->assertStringNotContainsString(base_path(), $response->getContent());
+
+        foreach (['/_ignition/health-check', '/_ignition/execute-solution', '/_ignition/update-config'] as $uri) {
+            $status = $this->post($uri)->status();
+
+            $this->assertContains($status, [403, 404, 405], "{$uri} answered {$status} with debugging off.");
+        }
     }
 }

@@ -14,7 +14,7 @@
                     <h2 class="page-title">@lang('reports.run_report')</h2>
                 </div>
                 <div class="col-auto ms-auto">
-                    <button onclick="window.print()" class="btn btn-primary">
+                    <button data-action="print" class="btn btn-primary">
                         <i class="ti ti-printer me-2"></i> @lang('reports.print_report') </button>
                 </div>
             </div>

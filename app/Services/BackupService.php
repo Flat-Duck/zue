@@ -7,6 +7,7 @@ use App\Models\BackupLog;
 use App\Models\MaintenanceSetting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -129,12 +130,9 @@ class BackupService implements BackupServiceContract
             file_put_contents($tempPath, "SET FOREIGN_KEY_CHECKS=1;\n", FILE_APPEND);
 
             if ($saveToBackups) {
-                if (! Storage::disk('local')->exists('backups')) {
-                    Storage::disk('local')->makeDirectory('backups');
-                }
 
                 $stream = fopen($tempPath, 'r');
-                $stored = Storage::disk('local')->put('backups/'.$filename, $stream);
+                $stored = Storage::disk('backups')->put($filename, $stream);
                 if (is_resource($stream)) {
                     fclose($stream);
                 }
@@ -150,9 +148,9 @@ class BackupService implements BackupServiceContract
                 }
 
                 try {
-                    $this->verifyStoredBackup('backups/'.$filename);
+                    $this->verifyStoredBackup($filename);
                 } catch (Throwable $exception) {
-                    Storage::disk('local')->delete('backups/'.$filename);
+                    Storage::disk('backups')->delete($filename);
 
                     if ($log) {
                         $log->update([
@@ -163,6 +161,8 @@ class BackupService implements BackupServiceContract
 
                     throw $exception;
                 }
+
+                $this->archiveUploadsAlongside($filename);
 
                 $this->cleanupOldBackups();
 
@@ -203,11 +203,57 @@ class BackupService implements BackupServiceContract
         }
     }
 
+    /**
+     * The name of the archive of uploaded files that travels with a dump.
+     */
+    public static function uploadsArchiveFor(string $dumpFilename): string
+    {
+        return preg_replace('/\.sql$/', '', $dumpFilename).'.files.tar.gz';
+    }
+
+    /**
+     * Uploaded files — signatures, at present — are not in the database, and a
+     * restore without them means collecting every signature again. They are
+     * tarred next to each dump under the same stem, so a backup is always the
+     * pair, and retention removes the pair.
+     *
+     * A failure here is logged rather than thrown: the dump is already stored
+     * and verified, and losing it because the images could not be archived would
+     * be the wrong trade.
+     */
+    private function archiveUploadsAlongside(string $dumpFilename): void
+    {
+        $source = Storage::disk('public')->path('');
+        $archive = self::uploadsArchiveFor($dumpFilename);
+        $tempTar = storage_path('app/temp_'.Str::uuid().'.tar');
+
+        try {
+            if (! is_dir($source) || iterator_count(new \FilesystemIterator($source)) === 0) {
+                return;
+            }
+
+            $tar = new \PharData($tempTar);
+            $tar->buildFromDirectory($source);
+            $tar->compress(\Phar::GZ);
+
+            $stream = fopen($tempTar.'.gz', 'r');
+            if (is_resource($stream)) {
+                Storage::disk('backups')->put($archive, $stream);
+                fclose($stream);
+            }
+        } catch (Throwable $exception) {
+            Log::warning("backup: uploaded files were not archived alongside {$dumpFilename}: ".$exception->getMessage());
+        } finally {
+            @unlink($tempTar);
+            @unlink($tempTar.'.gz');
+        }
+    }
+
     protected function cleanupOldBackups(): void
     {
         $keepCount = (int) MaintenanceSetting::get('keep_backups_count', 10);
-        $backups = collect(Storage::disk('local')->files('backups'))
-            ->filter(fn (string $backup): bool => Str::is('backups/backup_*.sql', $backup))
+        $backups = collect(Storage::disk('backups')->files())
+            ->filter(fn (string $backup): bool => Str::is('backup_*.sql', $backup))
             ->values()
             ->all();
 
@@ -216,7 +262,7 @@ class BackupService implements BackupServiceContract
         }
 
         usort($backups, function (string $a, string $b): int {
-            return Storage::disk('local')->lastModified($a) <=> Storage::disk('local')->lastModified($b);
+            return Storage::disk('backups')->lastModified($a) <=> Storage::disk('backups')->lastModified($b);
         });
 
         $protected = $this->newestVerifiedBackupPath();
@@ -231,7 +277,8 @@ class BackupService implements BackupServiceContract
                 continue;
             }
 
-            Storage::disk('local')->delete($backup);
+            Storage::disk('backups')->delete($backup);
+            Storage::disk('backups')->delete(self::uploadsArchiveFor($backup));
             $toDelete--;
         }
     }
@@ -249,7 +296,7 @@ class BackupService implements BackupServiceContract
             ->latest('verified_at')
             ->value('filename');
 
-        return $filename ? 'backups/'.$filename : null;
+        return $filename ? $filename : null;
     }
 
     /**
@@ -284,7 +331,7 @@ class BackupService implements BackupServiceContract
 
     protected function verifyStoredBackup(string $path): void
     {
-        $disk = Storage::disk('local');
+        $disk = Storage::disk('backups');
         if (! $disk->exists($path) || $disk->size($path) < 1) {
             throw new RuntimeException('Backup verification failed: stored file is missing or empty.');
         }

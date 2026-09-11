@@ -30,7 +30,7 @@
     @push('scripts')
         @livewireScripts
         @vite('resources/js/editor.js')
-        <script>
+        <script @cspNonce>
             document.addEventListener("DOMContentLoaded", function() {
 
                 plugins = ["advlist", "anchor", "lists"];

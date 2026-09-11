@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-auto ms-auto d-print-none">
                     <form method="GET" class="d-flex gap-2">
-                        <select name="year" class="form-select w-auto" onchange="this.form.submit()">
+                        <select name="year" class="form-select w-auto" data-submit-on-change>
                             @foreach(range(now()->year, now()->year - 2) as $y)
                                 <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endforeach

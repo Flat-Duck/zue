@@ -196,7 +196,7 @@
                             <button type="button" class="btn btn-link link-secondary me-auto"
                                 data-bs-dismiss="modal">@lang('appraisals.cancel')</button>
                             <button type="button" class="btn btn-success"
-                                onclick="document.getElementById('submit-form').submit()">@lang('appraisals.yes_submit')</button>
+                                data-submit="#submit-form">@lang('appraisals.yes_submit')</button>
                         </div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
         </div>
     </div>
 
-    <script>
+    <script @cspNonce>
         document.addEventListener('DOMContentLoaded', function() {
             const inputs = document.querySelectorAll('.score-input');
             const progressBar = document.getElementById('progress-bar');

@@ -14,7 +14,7 @@
                     <h2 class="page-title">@lang('reports.monthly_time_control_sheet')</h2>
                 </div>
                 <div class="col-auto ms-auto">
-                    <button onclick="window.print()" class="btn btn-primary">
+                    <button data-action="print" class="btn btn-primary">
                         <i class="ti ti-printer me-2"></i> @lang('reports.print_official_sheet') </button>
                 </div>
             </div>

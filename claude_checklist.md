@@ -554,6 +554,12 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   every sheet stalled at the first step with nothing to explain it. They live in
   `ApprovalFlowSeeder` now and `DatabaseSeeder` calls it.
 
+- [x] **Contexts are managed on their own screen.** Add Leave, Attendance or whatever
+  comes next without a deploy; rename or switch off any of them. The three the code
+  asks for by name — `time_sheet`, `dispatcher`, `general` — keep their key and cannot
+  be deleted, and that holds for a super admin too: `Gate::before` waves them past
+  every policy, so the protection sits in the controller as well.
+
 - [x] **Twenty-eight tests cover it**, including the shapes that were missing: a
   scope covering two fields, dimensions narrowing one another, a cost centre cutting
   across both, named people added on top, an empty scope covering nobody, one person
@@ -800,31 +806,87 @@ go-live**, and 7.1 is the highest-risk item in the whole roadmap.
 
 ### 7a. Security configuration
 
-- [ ] 7.1 `APP_ENV=production`, `APP_DEBUG=false`; confirm Ignition routes disappear
-- [ ] 7.2 Rate-limit login, password reset and import endpoints (1 of 241 routes is throttled today)
-- [ ] 7.3 Security headers and a Content Security Policy
+- [x] 7.1 `APP_DEBUG=false` is pinned by a smoke test: with debugging off an error page
+  reveals neither the message, the exception class nor a path, and the three Ignition
+  routes — one of which executes code — answer 403/404. Ignition is a dev dependency, so
+  a `--no-dev` install has no such routes at all; the test covers the case where it
+  does. Mutation-checked by flipping debug on. The env values themselves are set at
+  deploy time.
+- [x] 7.2 **Rate limits.** Login already locked out after five wrong passwords (that was
+  the one throttled route). Now also: asking for a password reset and submitting one
+  (5/min per address+IP — without it anyone could make the server mail a stranger as
+  fast as they could post), re-entering a password for a sensitive action (a password
+  guess with a stolen session), and all six import/restore endpoints (6/min per user;
+  each parses a spreadsheet or replaces the database). Six tests, one per surface.
+- [x] 7.3 **Security headers and an enforced Content Security Policy.** `nosniff`, `DENY`
+  framing, referrer and permissions policies on every response; HSTS over TLS. The
+  CSP is nonce-based for scripts — a script runs only if the server put it on the page
+  — with `'unsafe-eval'` for Alpine's expression evaluator and `'unsafe-inline'` still
+  on styles (57 `style=` attributes remain). The policy is data in `config/security.php`
+  and flips to report-only with one env value.
+
+  Getting there meant clearing **all 41 inline event handlers** (`onclick`, `onsubmit`,
+  `onchange`), which a nonce policy refuses outright. They became four attributes that
+  carry intent rather than code — `data-confirm`, `data-action="print"`,
+  `data-submit-on-change`, `data-submit` — handled once at the document in
+  `resources/js/actions.js`. The 13 remaining inline `<script>`s carry `@cspNonce`.
+
+  **The proof was the browser suite, and it was weaker than I said.** I claimed every
+  Dusk test asserts zero console errors; a mutation check — stripping the nonce from one
+  script — passed anyway, because only some tests called the assertion. `DuskTestCase`
+  now checks the console after *every* `browse()`, so a lost nonce fails whichever test
+  next visits that page. Re-run under the mutation: three pages refused, test failed.
+  Restored: 15 of 15 pass under the enforced policy.
 - [ ] 7.4 Rotate `APP_KEY` and every credential for production
-- [ ] 7.5 Force HTTPS; secure and `SameSite` cookies
+- [x] 7.5 In production every generated URL is https and a plain-HTTP request is
+  redirected (the web server should do this too; this holds if it does not). The
+  session cookie is `Secure`, `HttpOnly`, `SameSite=Lax`. Both default on when
+  `APP_ENV=production` and are overridable in `.env`; a test reads the config files the
+  way boot does under that environment.
 
 ### 7b. Infrastructure
 
-- [ ] 7.6 `QUEUE_CONNECTION=redis` with a supervised worker (currently `sync`)
-- [ ] 7.7 Sessions and cache to Redis (currently file-based)
-- [ ] 7.8 Uploads to S3-compatible object storage (currently `local`)
-- [ ] 7.9 Verify `config:cache`, `route:cache`, `view:cache` and `npm run build` in the deploy
+- [x] 7.6 **Reframed for the company network.** The server is on the private network
+  behind the VPN — one box, self-signed certificate, no mail relay, no cloud services.
+  Redis can be installed, so the queue, cache and sessions go to it; `deploy/systemd/`
+  holds the units for the worker and Reverb, `deploy/crontab` the scheduler, and
+  `deploy/README.md` the whole runbook including the restore drill. That is the one new
+  top-level folder, added without asking; say so if it should live elsewhere.
+- [x] 7.7 Redis, per the env block in `deploy/README.md`.
+- [x] 7.8 **No S3 — there is no outside.** Uploads stay on local disk, and are now part
+  of every backup: each dump is written with a `.files.tar.gz` of `storage/app/public`
+  beside it (the signatures), kept and deleted as a pair, downloadable, and refused by
+  restore, which only ever executes a `.sql`. The backup destination became a
+  `backups` disk whose root is `BACKUP_PATH`, so a mounted network share is one env
+  value. **Until that value points at another machine, a disk failure loses the data
+  and the backups together** — the owner chose to keep them on the box for now.
+- [x] 7.9 All four caches build cleanly (`config`, `route`, `view`, `event`) and so does
+  the bundle. **One warning for the deploy runbook:** never leave `config:cache` output
+  on a development machine — a cached config ignores `.env.testing`, which is exactly
+  how the test suite emptied the development database. The guard in
+  `tests/CreatesApplication.php` now refuses to run in that state.
 
 ### 7c. Observability
 
-- [ ] 7.10 Error tracking
-- [ ] 7.11 Failed-job and queue-depth alerting
-- [ ] 7.12 Log aggregation; production log level and rotation
-- [ ] 7.13 Slow-query and request-duration monitoring (watch `home1` aggregate cost)
-- [ ] 7.14 Uptime checks
+- [x] 7.10–7.14 **A status page instead of services.** With no mail and no monitoring
+  service, the alert is a page and a log line. Maintenance → System status runs eight
+  checks — database, cache, scheduler heartbeat, queue-worker heartbeat, failed jobs,
+  disk space, last backup age, writable storage — with the thresholds a person would
+  worry at. The two heartbeats are the important ones: cron writes one every minute,
+  and queues a job that writes the other, so a fresh scheduler beat with a stale queue
+  beat says the worker has died while every page still loads. `/health` answers 200 or
+  503 for whatever polls it, and says nothing more to a stranger. Every ten minutes a
+  scheduled report writes each failing check to the log. Eleven tests. (Found while
+  writing them: the development machine is at 99% disk, 1.4 GB free.)
+- [x] 7.11 Above: failed jobs are a failing check, logged and shown.
+- [x] 7.12 `LOG_CHANNEL=daily`, 14 days kept. Nothing to aggregate into.
+- [ ] 7.13 Slow-query monitoring — MySQL's slow log on the box is the tool; not built.
+- [x] 7.14 `/health`, for whatever on the network polls it.
 
 ### 7d. Go-live
 
-- [ ] 7.15 Document and rehearse the rollback
-- [ ] 7.16 Restore drill against production-shaped data
+- [~] 7.15 The deploy steps are in `deploy/README.md`; the rollback (`git checkout <previous>` and `migrate:rollback --step`) is the same steps reversed and needs rehearsing on the box.
+- [~] 7.16 Written into `deploy/README.md` as a four-step drill with 'write down how long it took'. Needs doing on a copy of the server, by you.
 - [ ] 7.17 Seed production permissions and roles; verify each role's access
 - [ ] 7.18 Load test, then decide on Octane
 

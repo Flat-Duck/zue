@@ -37,7 +37,7 @@
 
 </div>
 @push('scripts')
-    <script>
+    <script @cspNonce>
         document.addEventListener("DOMContentLoaded", function () {
             const selectElement = document.querySelector('#employee_id');
             let ts = new TomSelect(selectElement, {

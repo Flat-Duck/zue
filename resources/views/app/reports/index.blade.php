@@ -263,7 +263,7 @@
     </div>
 
     @push('scripts')
-        <script>
+        <script @cspNonce>
             document.getElementById('report_type_selector').addEventListener('change', function () {
                 var thresholdOptions = document.getElementById('threshold_options');
                 if (this.value === 'threshold') {

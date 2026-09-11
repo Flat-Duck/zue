@@ -11,6 +11,8 @@ use App\Services\AuditLogger;
 use App\Services\BackupService;
 use App\Services\Flights\FlightDispatchService;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -43,6 +45,13 @@ class AppServiceProvider extends ServiceProvider
     {
         TimeSheet::observe(TimeSheetObserver::class);
 
-        //
+        if (config('security.force_https')) {
+            URL::forceScheme('https');
+        }
+
+        // The per-request nonce the content security policy expects on any
+        // inline script. Vite and Livewire pick it up themselves; a view that
+        // still carries a <script> of its own writes `<script @cspNonce>`.
+        Blade::directive('cspNonce', fn (): string => '<?php echo \'nonce="\'.\Illuminate\Support\Facades\Vite::cspNonce().\'"\'; ?>');
     }
 }

@@ -34,6 +34,7 @@ return [
         'created' => 'تم الإنشاء بنجاح',
         'saved' => 'تم الحفظ بنجاح',
         'deleted' => 'تم الحذف بنجاح',
+        'refresh' => 'تحديث',
         'removed' => 'تم الحذف بنجاح',
         'print_preview' => 'طباعة',
         'time_sheet_approve' => 'اعتماد بطاقات ضبط الوقت',

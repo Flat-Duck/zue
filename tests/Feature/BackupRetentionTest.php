@@ -28,17 +28,17 @@ class BackupRetentionTest extends TestCase
     {
         parent::setUp();
 
-        Storage::fake('local');
+        Storage::fake('backups');
     }
 
     private function writeBackup(string $filename, int $ageInMinutes = 0): string
     {
-        $path = 'backups/'.$filename;
+        $path = $filename;
 
-        Storage::disk('local')->put($path, "SET FOREIGN_KEY_CHECKS=0;\nSET FOREIGN_KEY_CHECKS=1;\n");
+        Storage::disk('backups')->put($path, "SET FOREIGN_KEY_CHECKS=0;\nSET FOREIGN_KEY_CHECKS=1;\n");
 
         // Older files must sort earlier for the mtime-ordered retention pass.
-        touch(Storage::disk('local')->path($path), now()->subMinutes($ageInMinutes)->timestamp);
+        touch(Storage::disk('backups')->path($path), now()->subMinutes($ageInMinutes)->timestamp);
 
         return $path;
     }
@@ -61,9 +61,9 @@ class BackupRetentionTest extends TestCase
 
         $this->runCleanup();
 
-        Storage::disk('local')->assertMissing($oldest);
-        Storage::disk('local')->assertExists($middle);
-        Storage::disk('local')->assertExists($newest);
+        Storage::disk('backups')->assertMissing($oldest);
+        Storage::disk('backups')->assertExists($middle);
+        Storage::disk('backups')->assertExists($newest);
     }
 
     #[Test]
@@ -88,10 +88,10 @@ class BackupRetentionTest extends TestCase
         // The verified backup is the oldest file, so mtime-only retention would
         // have deleted it first. With keep_backups_count = 1 it must be the one
         // file that survives.
-        Storage::disk('local')->assertExists($verified);
-        Storage::disk('local')->assertMissing($newerA);
-        Storage::disk('local')->assertMissing($newerB);
-        $this->assertCount(1, Storage::disk('local')->files('backups'));
+        Storage::disk('backups')->assertExists($verified);
+        Storage::disk('backups')->assertMissing($newerA);
+        Storage::disk('backups')->assertMissing($newerB);
+        $this->assertCount(1, Storage::disk('backups')->files());
     }
 
     #[Test]
@@ -114,10 +114,10 @@ class BackupRetentionTest extends TestCase
 
         $this->runCleanup();
 
-        $remaining = collect(Storage::disk('local')->files('backups'))->values();
+        $remaining = collect(Storage::disk('backups')->files())->values();
 
         $this->assertCount(2, $remaining);
-        $this->assertContains('backups/backup_20260101_000000_verified.sql', $remaining->all());
+        $this->assertContains('backup_20260101_000000_verified.sql', $remaining->all());
     }
 
     #[Test]
@@ -134,14 +134,14 @@ class BackupRetentionTest extends TestCase
             protected function performBackupWithLock(string $type, array $selectedTables, bool $saveToBackups, ?int $logId): string
             {
                 $filename = 'backup_20260101_000000_corrupt.sql';
-                Storage::disk('local')->put('backups/'.$filename, '-- truncated dump with no guards');
+                Storage::disk('backups')->put($filename, '-- truncated dump with no guards');
 
                 $log = BackupLog::query()->find($logId);
 
                 try {
-                    $this->verifyStoredBackup('backups/'.$filename);
+                    $this->verifyStoredBackup($filename);
                 } catch (\Throwable $exception) {
-                    Storage::disk('local')->delete('backups/'.$filename);
+                    Storage::disk('backups')->delete($filename);
 
                     $log?->update([
                         'verification_status' => 'failed',
@@ -162,7 +162,7 @@ class BackupRetentionTest extends TestCase
             $this->assertStringContainsString('verification failed', strtolower($e->getMessage()));
         }
 
-        Storage::disk('local')->assertMissing('backups/backup_20260101_000000_corrupt.sql');
+        Storage::disk('backups')->assertMissing('backup_20260101_000000_corrupt.sql');
 
         $this->assertSame('failed', $log->fresh()->verification_status);
         $this->assertNotNull($log->fresh()->verification_error);
@@ -171,14 +171,14 @@ class BackupRetentionTest extends TestCase
     #[Test]
     public function an_empty_stored_backup_fails_verification(): void
     {
-        Storage::disk('local')->put('backups/backup_empty.sql', '');
+        Storage::disk('backups')->put('backup_empty.sql', '');
 
         $method = new ReflectionMethod(BackupService::class, 'verifyStoredBackup');
         $method->setAccessible(true);
 
         $this->expectException(RuntimeException::class);
 
-        $method->invoke(app(BackupService::class), 'backups/backup_empty.sql');
+        $method->invoke(app(BackupService::class), 'backup_empty.sql');
     }
 
     #[Test]
@@ -189,7 +189,7 @@ class BackupRetentionTest extends TestCase
 
         $this->expectException(RuntimeException::class);
 
-        $method->invoke(app(BackupService::class), 'backups/does_not_exist.sql');
+        $method->invoke(app(BackupService::class), 'does_not_exist.sql');
     }
 
     #[Test]
@@ -245,7 +245,7 @@ class BackupRetentionTest extends TestCase
         }
 
         // No half-written dump may be left behind pretending to be a backup.
-        $this->assertSame([], Storage::disk('local')->files('backups'));
+        $this->assertSame([], Storage::disk('backups')->files());
 
         $fresh = $log->fresh();
         $this->assertSame('failed', $fresh->status);

@@ -81,7 +81,7 @@
                             @can('delete-any', App\Models\Passenger::class)
                             <button
                                 class="btn btn-danger"
-                                onclick="confirm({{ Js::from(__('ui.confirm_generic')) }}) || event.stopImmediatePropagation()"
+                                data-confirm="{{ __('ui.confirm_generic') }}"
                                 wire:click="detach({{ $passenger->id }})"
                             >
                                 <i class="ti ti-trash"></i>

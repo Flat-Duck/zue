@@ -29,6 +29,15 @@ class ScopeContext extends Model
 
     public const GENERAL = 'general';
 
+    /**
+     * The contexts the code itself asks for by key. Their keys cannot change and
+     * they cannot be deleted, because a feature would be left asking for a
+     * context that no longer exists — though they can be renamed or switched off.
+     *
+     * @var list<string>
+     */
+    public const BUILT_IN = [self::TIME_SHEET, self::DISPATCHER, self::GENERAL];
+
     protected $fillable = [
         'key',
         'name',
@@ -50,6 +59,11 @@ class ScopeContext extends Model
     public function policies(): HasMany
     {
         return $this->hasMany(ScopePolicy::class, 'context_id');
+    }
+
+    public function isBuiltIn(): bool
+    {
+        return in_array($this->key, self::BUILT_IN, true);
     }
 
     public function label(): string

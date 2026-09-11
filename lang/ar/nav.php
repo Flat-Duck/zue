@@ -57,4 +57,6 @@ return [
     'builder' => 'البناء',
     'process' => 'العملية',
     'employee' => 'الموظف',
+    'scope_contexts' => 'سياقات النطاقات',
+    'system_status' => 'حالة النظام',
 ];

@@ -108,7 +108,7 @@
 </div>
 
 @push('scripts')
-<script>
+<script @cspNonce>
     document.addEventListener('alpine:init', () => {
         Alpine.data('routeLegs', (initialLegs) => ({
             legs: initialLegs.length ? initialLegs : [{ from_station_id: '', to_station_id: '', direction: 'coming' }],

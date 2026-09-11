@@ -76,7 +76,8 @@
                                 @else
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                                         data-bs-target="#uploadSignatureModal"
-                                        onclick="setSignatureUploadAction('{{ $user->id }}', '{{ $user->name }}')">
+                                        data-signature-upload="{{ route('users.upload-signature', $user) }}"
+                                        data-signature-user="{{ $user->name }}">
                                         <i class="ti ti-upload"></i> @lang('ui.upload') </button>
                                 @endif
                             </td>
@@ -92,7 +93,7 @@
                                         </a>
                                     @endcan @can('delete', $user)
                                         <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline pointer ms-1"
-                                            onsubmit="return confirm('{{ __('crud.common.are_you_sure') }}')">
+                                            data-confirm="{{ __('crud.common.are_you_sure') }}">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="btn btn-icon btn-outline-danger">
                                                 <i class="ti ti-trash-x"></i>
@@ -101,7 +102,7 @@
                                     @endcan
                                     @if(auth()->user()->hasRole('super-admin') && !session()->has('impersonator_id') && auth()->id() !== $user->id)
                                         <form action="{{ route('users.impersonate', $user) }}" method="POST" class="inline pointer ms-1"
-                                            onsubmit="return confirm({{ Js::from(__('ui.confirm_sign_in_as', ['name' => $user->name])) }})">
+                                            data-confirm="{{ __('ui.confirm_sign_in_as', ['name' => $user->name]) }}">
                                             @csrf
                                             <button type="submit" class="btn btn-icon btn-outline-primary" title="@lang('ui.sign_in_as_user')">
                                                 <i class="ti ti-user-share"></i>
@@ -184,18 +185,19 @@
         </div>
     </div>
 
-    <script>
-        function setSignatureUploadAction(userId, userName) {
+    <script @cspNonce>
+        // The upload modal is shared by every row; the button that opened it
+        // says which user it is for.
+        document.addEventListener('click', function (event) {
+            var button = event.target.closest('[data-signature-upload]');
+            if (!button) return;
+
             var form = document.getElementById('uploadSignatureForm');
             var modalTitle = document.getElementById('modalUserName');
 
-            if (modalTitle) modalTitle.textContent = userName;
-
-            if (form) {
-                var dummyUrl = "{{ route('users.upload-signature', '000') }}";
-                form.action = dummyUrl.replace('000', userId);
-            }
-        }
+            if (modalTitle) modalTitle.textContent = button.dataset.signatureUser;
+            if (form) form.action = button.dataset.signatureUpload;
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             // Initialize Popovers

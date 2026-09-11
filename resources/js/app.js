@@ -13,6 +13,7 @@ import '@tabler/core/js/tabler-theme';
 
 import './echo';
 import './tabler-init';
+import './actions';
 
 import flatpickr from 'flatpickr';
 import TomSelect from 'tom-select';
