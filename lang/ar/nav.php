@@ -8,8 +8,8 @@
  */
 
 return [
-    'dashboard' => 'لوحة المعلومات',
-    'dispatcher_management' => 'إدارة التسيير',
+    'dashboard' => 'الرئيسية',
+    'dispatcher_management' => 'المرحل',
     'flights' => 'الرحلات',
     'passengers' => 'الركاب',
     'planes' => 'الطائرات',
@@ -39,7 +39,7 @@ return [
     'create_review' => 'إنشاء مراجعة',
     'assign_employee_form' => 'إسناد نموذج للموظف (من صفحة الموظف)',
     'official_result' => 'النتيجة الرسمية (من الموظف/الفترة)',
-    'access_management' => 'إدارة الصلاحيات',
+    'access_management' => 'الصلاحيات',
     'users' => 'المستخدمون',
     'roles' => 'الأدوار',
     'permissions' => 'الصلاحيات',

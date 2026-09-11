@@ -9,7 +9,7 @@
 
 return [
     'dashboard' => 'Dashboard',
-    'dispatcher_management' => 'Dispatcher Management',
+    'dispatcher_management' => 'Dispatcher',
     'flights' => 'Flights',
     'passengers' => 'Passengers',
     'planes' => 'Planes',
@@ -39,7 +39,7 @@ return [
     'create_review' => 'Create Review',
     'assign_employee_form' => 'Assign employee form (from employee page)',
     'official_result' => 'Official result (from employee/period)',
-    'access_management' => 'Access Management',
+    'access_management' => 'Access',
     'users' => 'Users',
     'roles' => 'Roles',
     'permissions' => 'Permissions',
