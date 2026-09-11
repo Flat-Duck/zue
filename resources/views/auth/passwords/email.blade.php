@@ -3,7 +3,7 @@
     <div class="card card-md">
         <div class="card-body">
             <h2 class="h2 text-center mb-4">{{ __('Reset Password') }}</h2>
-            <p class="text-secondary mb-4">Enter your email address and your password will be reset and emailed to you.</p>
+            <p class="text-secondary mb-4">@lang('auth.enter_your_email_address_and_your_password')</p>
             <form action="{{ route('password.email') }}" method="POST" autocomplete="off" novalidate>
                 @csrf
                 @if (session('status'))
@@ -13,7 +13,7 @@
                 @endif
                 <div class="mb-3">
                     <label class="form-label required">{{ __('Email Address') }}</label>
-                    <input type="email" placeholder="Enter email" id="email"  class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    <input type="email" placeholder="@lang('auth.enter_email')" id="email"  class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
                     @error('email')
                         <span class="invalid-feedback">
                             <strong>{{ $message }}</strong>
@@ -26,7 +26,6 @@
             </form>
         </div>
     </div>
-    <div class="text-center text-secondary mt-3">
-        Forget it, send me back to the sign in screen. <a href="{{ route('login') }}">Login</a>
+    <div class="text-center text-secondary mt-3"> @lang('auth.forget_it_send_me_back_to_the_sign_in_screen') <a href="{{ route('login') }}">@lang('auth.login')</a>
     </div>
 @endsection         

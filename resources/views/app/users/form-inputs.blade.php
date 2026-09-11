@@ -3,20 +3,20 @@
 <div class="row">
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="number" label="ZOC No" :value="old('number', ($editing ? $user->number : ''))"
-            placeholder="ZOC No" required></x-inputs.text>
+            placeholder="@lang('ui.zoc_no')" required></x-inputs.text>
     </x-inputs.group>
     <x-inputs.group class="col-sm-12">
-        <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $user->name : ''))" placeholder="Name"
+        <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $user->name : ''))" placeholder="@lang('ui.name')"
             required></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.email name="email" label="Email" :value="old('email', ($editing ? $user->email : ''))"
-            placeholder="Email" required></x-inputs.email>
+            placeholder="@lang('ui.email')" required></x-inputs.email>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.password name="password" label="Password" placeholder="Password"
+        <x-inputs.password name="password" label="Password" placeholder="@lang('ui.password')"
             :required="!$editing"></x-inputs.password>
     </x-inputs.group>
 
@@ -25,7 +25,7 @@
         <input type="file" name="signature_file" class="form-control" accept="image/png, image/jpeg, image/webp" />
         @if($editing && $user->signature)
             <div class="mt-2">
-                <img src="{{ asset('storage/' . $user->signature->image_path) }}" alt="Signature"
+                <img src="{{ asset('storage/' . $user->signature->image_path) }}" alt="@lang('ui.signature')"
                     style="max-height: 50px; border: 1px solid #ccc;">
             </div>
         @endif
@@ -33,7 +33,7 @@
     </x-inputs.group>
 
     <div class="form-group col-sm-12 mt-4">
-        <h4>Assign @lang('crud.roles.name')</h4>
+        <h4>@lang('ui.assign', ['thing' => __('crud.roles.name')])</h4>
 
         @foreach ($roles as $role)
             <div>

@@ -3,8 +3,8 @@
 @section('content')
     <div class="container-xl">
         <div class="page-header d-print-none">
-            <h2 class="page-title">إنشاء تقييم</h2>
-            <div class="text-muted">اختر الفترة والموظف</div>
+            <h2 class="page-title">@lang('appraisals.create_appraisal')</h2>
+            <div class="text-muted">@lang('appraisals.choose_period_and_employee')</div>
         </div>
 
         @if(session('error'))
@@ -18,9 +18,9 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">الفترة (Open فقط)</label>
+                            <label class="form-label">@lang('appraisals.period_open_only')</label>
                             <select name="appraisal_period_id" class="form-select" required>
-                                <option value="">-- اختر --</option>
+                                <option value="">@lang('appraisals.choose_placeholder')</option>
                                 @foreach($periods as $p)
                                     <option value="{{ $p->id }}">{{ $p->label }}
                                         ({{ $p->window_open_from->format('m/d') }}→{{ $p->window_open_to->format('m/d') }})
@@ -30,20 +30,20 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">الموظف</label>
+                            <label class="form-label">@lang('appraisals.employee')</label>
                             <select name="employee_id" class="form-select" required>
-                                <option value="">-- اختر --</option>
+                                <option value="">@lang('appraisals.choose_placeholder')</option>
                                 @foreach($employees as $e)
                                     <option value="{{ $e->id }}">{{ $e->name ?? ('#' . $e->id) }}</option>
                                 @endforeach
                             </select>
-                            <div class="form-hint">لازم الموظف يكون مربوط بـ appraisal_form_id</div>
+                            <div class="form-hint">@lang('appraisals.employee_needs_a_form')</div>
                         </div>
                     </div>
 
                     <div class="mt-4">
-                        <button class="btn btn-primary">إنشاء</button>
-                        <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary">رجوع</a>
+                        <button class="btn btn-primary">@lang('appraisals.create')</button>
+                        <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary">@lang('appraisals.back')</a>
                     </div>
                 </form>
             </div>

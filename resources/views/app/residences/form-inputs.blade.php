@@ -3,14 +3,14 @@
 <div class="row">
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="name" label="Name" :value="old('name', ($editing ? $residence->name : ''))"
-            placeholder="Name" required></x-inputs.text>
+            placeholder="@lang('ui.name')" required></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.select name="type" label="Type">
             @php $selected = old('type', ($editing ? $residence->type : 'Villa')) @endphp
-            <option value="Villa" {{ $selected == 'Villa' ? 'selected' : '' }}>Villa</option>
-            <option value="Trailer" {{ $selected == 'Trailer' ? 'selected' : '' }}>Trailer</option>
+            <option value="Villa" {{ $selected == 'Villa' ? 'selected' : '' }}>@lang('ui.villa')</option>
+            <option value="Trailer" {{ $selected == 'Trailer' ? 'selected' : '' }}>@lang('ui.trailer')</option>
         </x-inputs.select>
     </x-inputs.group>
 </div>

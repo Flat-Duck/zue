@@ -18,15 +18,9 @@
                             <img src="/img/zue-logo.png" class="print-logo" class="mx-auto d-block">
                         </div>
                         <div class="col-6">
-                            <h2 class="h2 text-center">
-                                ZUEITINA OIL COMPANY
-                            </h2>
-                            <h3 class="h3 text-center">
-                                ACCOUNTING DEPARTMENT 103
-                            </h3>
-                            <h4 class="h4 text-center">
-                                DETAILED FIELD-BREAK BALANCE
-                            </h4>
+                            <h2 class="h2 text-center"> @lang('reports.zueitina_oil_company') </h2>
+                            <h3 class="h3 text-center"> @lang('reports.accounting_department_103') </h3>
+                            <h4 class="h4 text-center"> @lang('reports.detailed_field_break_balance') </h4>
                         </div>
                         <div class="col-3 d-flex align-items-end ">
                             {{-- <img src="/img/noc-logo.png" class="print-logo" class="mx-auto d-block"> --}}
@@ -44,14 +38,14 @@
                         <thead>
                             <tr>
                                 <th class="p-1">#</th>
-                                <th class="p-0 m-0">Number</th>
-                                <th class="p-0 m-0">Name</th>
-                                <th class="p-0 m-0">Start Date</th>
-                                <th class="p-0 m-0">Department</th>
-                                <th class="p-0 m-0">Cost Center</th>
-                                <th class="p-0 m-0">Location</th>
-                                <th class="p-0 m-0">Last Date</th>
-                                <th class="p-0 m-0">Balance</th>
+                                <th class="p-0 m-0">@lang('reports.number')</th>
+                                <th class="p-0 m-0">@lang('reports.name')</th>
+                                <th class="p-0 m-0">@lang('reports.start_date')</th>
+                                <th class="p-0 m-0">@lang('reports.department')</th>
+                                <th class="p-0 m-0">@lang('reports.cost_center')</th>
+                                <th class="p-0 m-0">@lang('reports.location')</th>
+                                <th class="p-0 m-0">@lang('reports.last_date')</th>
+                                <th class="p-0 m-0">@lang('reports.balance')</th>
                             </tr>
                         </thead>
                         <tbody>

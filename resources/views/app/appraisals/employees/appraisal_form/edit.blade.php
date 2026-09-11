@@ -5,13 +5,11 @@
         <div class="page-header d-print-none">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">تحديد نموذج تقييم للموظف</h2>
+                    <h2 class="page-title">@lang('appraisals.assign_form_to_employee')</h2>
                     <div class="text-muted">{{ $employee->name ?? ('#' . $employee->id) }}</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <a href="{{ route('appraisals.reviews.create') }}" class="btn btn-outline-primary">
-                        إنشاء تقييم له
-                    </a>
+                    <a href="{{ route('appraisals.reviews.create') }}" class="btn btn-outline-primary"> @lang('appraisals.create_appraisal_for') </a>
                 </div>
             </div>
         </div>
@@ -31,19 +29,19 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <div class="form-label">القسم</div>
+                        <div class="form-label">@lang('appraisals.department')</div>
                         <div class="fw-bold">{{ $employee->department->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">الإدارة</div>
+                        <div class="form-label">@lang('appraisals.administration')</div>
                         <div class="fw-bold">{{ $employee->administration->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">الموقع</div>
+                        <div class="form-label">@lang('appraisals.location')</div>
                         <div class="fw-bold">{{ $employee->location->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">مركز التكلفة</div>
+                        <div class="form-label">@lang('appraisals.cost_center')</div>
                         <div class="fw-bold">{{ $employee->costCenter->name ?? '-' }}</div>
                     </div>
                 </div>
@@ -58,38 +56,33 @@
 
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label">نموذج التقييم</label>
+                            <label class="form-label">@lang('appraisals.appraisal_form')</label>
                             <select name="appraisal_form_id" class="form-select">
-                                <option value="">-- بدون (غير محدد) --</option>
+                                <option value="">@lang('appraisals.none_unassigned')</option>
                                 @foreach($forms as $f)
                                     <option value="{{ $f->id }}" {{ (string) $employee->appraisal_form_id === (string) $f->id ? 'selected' : '' }}>
                                         {{ $f->name_ar }} ({{ $f->code }})
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="form-hint">
-                                لو الموظف إداري/مالي اختار FORM_3_ADMIN_FIN، ولو فني اختار النموذج الفني.
-                            </div>
+                            <div class="form-hint"> @lang('appraisals.form_choice_hint') </div>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">الحالة الحالية</label>
+                            <label class="form-label">@lang('appraisals.current_status')</label>
                             @if($employee->appraisal_form_id)
-                                <div class="p-2 rounded bg-green-lt">
-                                    مربوط بنموذج: <span
+                                <div class="p-2 rounded bg-green-lt"> @lang('appraisals.linked_to_form') <span
                                         class="fw-bold">{{ optional($forms->firstWhere('id', $employee->appraisal_form_id))->code }}</span>
                                 </div>
                             @else
-                                <div class="p-2 rounded bg-yellow-lt">
-                                    غير مربوط بأي نموذج
-                                </div>
+                                <div class="p-2 rounded bg-yellow-lt"> @lang('appraisals.not_linked_to_any_form') </div>
                             @endif
                         </div>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button class="btn btn-primary">حفظ</button>
-                        <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary">رجوع</a>
+                        <button class="btn btn-primary">@lang('appraisals.save')</button>
+                        <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary">@lang('appraisals.back')</a>
                     </div>
                 </form>
             </div>

@@ -11,12 +11,11 @@
         <div class="page-header d-print-none text-white">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">Run Report</h2>
+                    <h2 class="page-title">@lang('reports.run_report')</h2>
                 </div>
                 <div class="col-auto ms-auto">
                     <button onclick="window.print()" class="btn btn-primary">
-                        <i class="ti ti-printer me-2"></i> Print Report
-                    </button>
+                        <i class="ti ti-printer me-2"></i> @lang('reports.print_report') </button>
                 </div>
             </div>
         </div>
@@ -31,9 +30,9 @@
                             <img src="{{ asset('/img/zue-logo.png') }}" style="height: 60px;">
                         </div>
                         <div class="col-6 text-center">
-                            <h2 class="mb-0">ZUEITINA OIL COMPANY</h2>
-                            <h3 class="mb-0">General Balance Run Report</h3>
-                            <p class="text-muted small">Generated on {{ now()->format('Y-m-d H:i') }}</p>
+                            <h2 class="mb-0">@lang('reports.zueitina_oil_company')</h2>
+                            <h3 class="mb-0">@lang('reports.general_balance_run_report')</h3>
+                            <p class="text-muted small">@lang('ui.generated_on', ['time' => now()->format('Y-m-d H:i')])</p>
                         </div>
                     </div>
 
@@ -41,14 +40,14 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>ZOC Num</th>
-                                <th class="text-start">Name</th>
-                                <th>Start Date</th>
-                                <th>Department</th>
-                                <th>Location</th>
-                                <th>Schedule</th>
-                                <th>Last Date</th>
-                                <th>Total Balance</th>
+                                <th>@lang('reports.zoc_num')</th>
+                                <th class="text-start">@lang('reports.name')</th>
+                                <th>@lang('reports.start_date')</th>
+                                <th>@lang('reports.department')</th>
+                                <th>@lang('reports.location')</th>
+                                <th>@lang('reports.schedule')</th>
+                                <th>@lang('reports.last_date')</th>
+                                <th>@lang('reports.total_balance')</th>
                             </tr>
                         </thead>
                         <tbody>

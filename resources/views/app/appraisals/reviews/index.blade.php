@@ -5,12 +5,10 @@
         <div class="page-header d-print-none">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">تقييماتي (كمُقيّم)</h2>
+                    <h2 class="page-title">@lang('appraisals.my_appraisals_as_appraiser')</h2>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <a href="{{ route('appraisals.reviews.create') }}" class="btn btn-primary">
-                        إنشاء تقييم جديد
-                    </a>
+                    <a href="{{ route('appraisals.reviews.create') }}" class="btn btn-primary"> @lang('appraisals.create_new_appraisal') </a>
                 </div>
             </div>
         </div>
@@ -27,11 +25,11 @@
                 <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
-                            <th>الموظف</th>
-                            <th>الفترة</th>
-                            <th>الحالة</th>
-                            <th>المجموع</th>
-                            <th>النسبة</th>
+                            <th>@lang('appraisals.employee')</th>
+                            <th>@lang('appraisals.period')</th>
+                            <th>@lang('appraisals.status')</th>
+                            <th>@lang('appraisals.total')</th>
+                            <th>@lang('appraisals.percentage')</th>
                             <th class="w-1"></th>
                         </tr>
                     </thead>
@@ -45,14 +43,12 @@
                                 <td>{{ $r->percentage ?? '-' }}</td>
                                 <td>
                                     <a class="btn btn-sm btn-outline-primary"
-                                        href="{{ route('appraisals.reviews.edit', $r->id) }}">
-                                        فتح
-                                    </a>
+                                        href="{{ route('appraisals.reviews.edit', $r->id) }}"> @lang('appraisals.open') </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted">مافيش تقييمات</td>
+                                <td colspan="6" class="text-center text-muted">@lang('appraisals.no_appraisals')</td>
                             </tr>
                         @endforelse
                     </tbody>

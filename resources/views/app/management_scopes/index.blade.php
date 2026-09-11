@@ -17,7 +17,7 @@
                             value="{{ request('search') }}"
                             class="form-control"
                             placeholder="@lang('crud.common.search')"
-                            aria-label="Search..."
+                            aria-label="@lang('ui.search_2')"
                             autocomplete="off"
                         />
                     </div>
@@ -46,7 +46,7 @@
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
-                            aria-label="Button"
+                            aria-label="@lang('ui.button')"
                         >
                             <i class="ti ti-search"></i>
                         </button>
@@ -73,10 +73,10 @@
         <table class="table card-table table-vcenter text-nowrap datatable">
             <thead>
                 <tr>
-                    <th class="text-left">Scope Name</th>
-                    <th class="text-left">Template</th>
-                    <th class="text-left">Context</th>
-                    <th class="text-left">Managers</th>
+                    <th class="text-left">@lang('ui.scope_name')</th>
+                    <th class="text-left">@lang('ui.template')</th>
+                    <th class="text-left">@lang('ui.context')</th>
+                    <th class="text-left">@lang('ui.managers')</th>
                     <th class="text-left">
                         @lang('crud.management_scopes.columns.scope_type', [], 'en')
                     </th>
@@ -103,7 +103,7 @@
                             @endforeach
                             @if($scope->managers->isEmpty() && $scope->manager_id)
                                 <span class="badge badge-outline-secondary">
-                                    {{ $scope->manager->english_name ?? ('#'.$scope->manager_id) }} (Legacy)
+                                    @lang('ui.legacy_manager', ['name' => $scope->manager->english_name ?? '#'.$scope->manager_id])
                                 </span>
                             @endif
                         </td>
@@ -132,7 +132,7 @@
                                 @case(\App\Models\ManagementScope::TYPE_EMPLOYEE)
                                     {{ $scope->subordinate?->english_name ?? ('#'.$scope->subordinate_employee_id) }}
                                     @if(!empty($scope->settings['target_employee_ids']))
-                                        <br><small>+ {{ count($scope->settings['target_employee_ids']) }} grouped</small>
+                                        <br><small>@lang('ui.plus_grouped', ['count' => count($scope->settings['target_employee_ids'])])</small>
                                     @endif
                                     @break
 
@@ -143,7 +143,7 @@
                         <td class="text-center table-actions">
                             <div
                                 role="group"
-                                aria-label="Row Actions"
+                                aria-label="@lang('ui.row_actions')"
                                 class="btn-group"
                             >
                                 <a

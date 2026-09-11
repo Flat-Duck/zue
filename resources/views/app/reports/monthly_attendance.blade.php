@@ -11,12 +11,11 @@
         <div class="page-header d-print-none text-white">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">Monthly Time Control Sheet</h2>
+                    <h2 class="page-title">@lang('reports.monthly_time_control_sheet')</h2>
                 </div>
                 <div class="col-auto ms-auto">
                     <button onclick="window.print()" class="btn btn-primary">
-                        <i class="ti ti-printer me-2"></i> Print Official Sheet
-                    </button>
+                        <i class="ti ti-printer me-2"></i> @lang('reports.print_official_sheet') </button>
                 </div>
             </div>
         </div>
@@ -34,12 +33,12 @@
                                 <img src="{{ asset('/img/zue-logo.png') }}" style="height: 70px;">
                             </div>
                             <div class="col-6 text-center">
-                                <h2 class="mb-0">حقول الانتصار 103</h2>
-                                <h3 class="mb-0">بطاقة ضبط الوقت</h3>
+                                <h2 class="mb-0">@lang('reports.intisar_fields')</h2>
+                                <h3 class="mb-0">@lang('reports.time_control_card')</h3>
                                 <div class="mt-2">
-                                    <strong>Month:</strong> {{ $month_name }} | <strong>Year:</strong>
+                                    <strong>@lang('reports.month')</strong> {{ $month_name }} | <strong>@lang('reports.year')</strong>
                                     {{ $selected_year ?? now()->year }}
-                                    @if(isset($center_name)) | <strong>Center:</strong> {{ $center_name }} @endif
+                                    @if(isset($center_name)) | <strong>@lang('reports.center_2')</strong> {{ $center_name }} @endif
                                 </div>
                             </div>
                             <div class="col-3 text-end">
@@ -54,15 +53,15 @@
                                     <tr>
                                         <th rowspan="2">#</th>
                                         <th rowspan="2">Z-N</th>
-                                        <th rowspan="2" style="width: 150px;">Employee Name</th>
+                                        <th rowspan="2" style="width: 150px;">@lang('reports.employee_name')</th>
                                         @for ($i = 1; $i <= $month_days; $i++)
                                             <th class="p-0">{{ $i }}</th>
                                         @endfor
-                                        <th rowspan="2">OT</th>
+                                        <th rowspan="2">@lang('reports.ot')</th>
                                     </tr>
                                     <tr>
                                         @for ($i = 1; $i <= $month_days; $i++)
-                                            <th class="p-0"><small>OT</small></th>
+                                            <th class="p-0"><small>@lang('reports.ot')</small></th>
                                         @endfor
                                     </tr>
                                 </thead>
@@ -102,40 +101,40 @@
                         <div class="row mt-4">
                             <div class="col-4">
                                 <div class="signature-box">
-                                    <strong>حافظ الوقت / Timekeeper</strong>
+                                    <strong>@lang('reports.signature_timekeeper')</strong>
                                     <hr class="my-1">
                                     @isset($signatures['time_keeper']['sign'])
                                         <img src="{{ asset('storage/' . $signatures['time_keeper']['sign']) }}"
                                             class="signature-img">
                                         <div class="small mt-4">{{ $signatures['time_keeper']['name'] }}</div>
                                     @else
-                                        <div class="mt-4 text-muted small">Pending Approval</div>
+                                        <div class="mt-4 text-muted small">@lang('reports.pending_approval')</div>
                                     @endisset
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="signature-box">
-                                    <strong>مشرف القسم / Supervisor</strong>
+                                    <strong>@lang('reports.signature_supervisor')</strong>
                                     <hr class="my-1">
                                     @isset($signatures['super_visor']['sign'])
                                         <img src="{{ asset('storage/' . $signatures['super_visor']['sign']) }}"
                                             class="signature-img">
                                         <div class="small mt-4">{{ $signatures['super_visor']['name'] }}</div>
                                     @else
-                                        <div class="mt-4 text-muted small">Pending Approval</div>
+                                        <div class="mt-4 text-muted small">@lang('reports.pending_approval')</div>
                                     @endisset
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="signature-box">
-                                    <strong>منسق الحقل / Superintendent</strong>
+                                    <strong>@lang('reports.signature_superintendent')</strong>
                                     <hr class="my-1">
                                     @isset($signatures['super_intendent']['sign'])
                                         <img src="{{ asset('storage/' . $signatures['super_intendent']['sign']) }}"
                                             class="signature-img">
                                         <div class="small mt-4">{{ $signatures['super_intendent']['name'] }}</div>
                                     @else
-                                        <div class="mt-4 text-muted small">Pending Approval</div>
+                                        <div class="mt-4 text-muted small">@lang('reports.pending_approval')</div>
                                     @endisset
                                 </div>
                             </div>

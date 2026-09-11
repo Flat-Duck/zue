@@ -20,7 +20,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label class="form-label">Year</label>
+                                    <label class="form-label">@lang('appraisals.year')</label>
                                     <input type="number" name="year" class="form-control"
                                         value="{{ old('year', $period->year ?? date('Y')) }}" required>
                                 </div>
@@ -28,19 +28,19 @@
 
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label class="form-label">Type</label>
+                                    <label class="form-label">@lang('appraisals.type')</label>
                                     <select name="type" class="form-select" id="typeSelect" required>
-                                        <option value="quarter" {{ old('type', $period->type ?? '') == 'quarter' ? 'selected' : '' }}>Quarterly</option>
-                                        <option value="yearly" {{ old('type', $period->type ?? '') == 'yearly' ? 'selected' : '' }}>Yearly</option>
+                                        <option value="quarter" {{ old('type', $period->type ?? '') == 'quarter' ? 'selected' : '' }}>@lang('appraisals.quarterly')</option>
+                                        <option value="yearly" {{ old('type', $period->type ?? '') == 'yearly' ? 'selected' : '' }}>@lang('appraisals.yearly')</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="col-md-4" id="quarterField">
                                 <div class="mb-3">
-                                    <label class="form-label">Quarter</label>
+                                    <label class="form-label">@lang('appraisals.quarter')</label>
                                     <select name="quarter" class="form-select">
-                                        <option value="">Select Quarter</option>
+                                        <option value="">@lang('appraisals.select_quarter')</option>
                                         <option value="1" {{ old('quarter', $period->quarter ?? '') == '1' ? 'selected' : '' }}>Q1</option>
                                         <option value="2" {{ old('quarter', $period->quarter ?? '') == '2' ? 'selected' : '' }}>Q2</option>
                                         <option value="3" {{ old('quarter', $period->quarter ?? '') == '3' ? 'selected' : '' }}>Q3</option>
@@ -53,7 +53,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Window Open From</label>
+                                    <label class="form-label">@lang('appraisals.window_open_from')</label>
                                     <input type="date" name="window_open_from" class="form-control"
                                         value="{{ old('window_open_from', isset($period) ? $period->window_open_from->format('Y-m-d') : '') }}"
                                         required>
@@ -61,7 +61,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Window Open To</label>
+                                    <label class="form-label">@lang('appraisals.window_open_to')</label>
                                     <input type="date" name="window_open_to" class="form-control"
                                         value="{{ old('window_open_to', isset($period) ? $period->window_open_to->format('Y-m-d') : '') }}"
                                         required>
@@ -70,20 +70,19 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Status</label>
+                            <label class="form-label">@lang('appraisals.status')</label>
                             <select name="status" class="form-select" required>
-                                <option value="planned" {{ old('status', $period->status ?? '') == 'planned' ? 'selected' : '' }}>Planned</option>
-                                <option value="open" {{ old('status', $period->status ?? '') == 'open' ? 'selected' : '' }}>
-                                    Open</option>
-                                <option value="closed" {{ old('status', $period->status ?? '') == 'closed' ? 'selected' : '' }}>Closed</option>
-                                <option value="locked" {{ old('status', $period->status ?? '') == 'locked' ? 'selected' : '' }}>Locked</option>
+                                <option value="planned" {{ old('status', $period->status ?? '') == 'planned' ? 'selected' : '' }}>@lang('appraisals.planned')</option>
+                                <option value="open" {{ old('status', $period->status ?? '') == 'open' ? 'selected' : '' }}> @lang('appraisals.open')</option>
+                                <option value="closed" {{ old('status', $period->status ?? '') == 'closed' ? 'selected' : '' }}>@lang('appraisals.closed')</option>
+                                <option value="locked" {{ old('status', $period->status ?? '') == 'locked' ? 'selected' : '' }}>@lang('appraisals.locked')</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="card-footer text-end">
-                        <a href="{{ route('appraisals.periods.index') }}" class="btn btn-link">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Save Period</button>
+                        <a href="{{ route('appraisals.periods.index') }}" class="btn btn-link">@lang('appraisals.cancel')</a>
+                        <button type="submit" class="btn btn-primary">@lang('appraisals.save_period')</button>
                     </div>
                 </form>
             </div>

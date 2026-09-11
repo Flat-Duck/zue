@@ -5,8 +5,8 @@
   @csrf @method('PUT')
   @include('app.clinic.injury_reports.form-inputs', ['report'=>$report])
   <div class="mt-3">
-    <button class="btn btn-primary">تحديث</button>
-    <a href="{{ route('injury-reports.show',$report) }}" class="btn btn-light">إلغاء</a>
+    <button class="btn btn-primary">@lang('clinic.update')</button>
+    <a href="{{ route('injury-reports.show',$report) }}" class="btn btn-light">@lang('clinic.cancel')</a>
   </div>
 </form>
 @endsection

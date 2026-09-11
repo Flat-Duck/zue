@@ -3,18 +3,18 @@
 <div class="row">
     <x-inputs.group class="col-sm-12">
         <x-inputs.text name="number" label="Number" :value="old('number', ($editing ? $room->number : ''))"
-            placeholder="Number" required></x-inputs.text>
+            placeholder="@lang('ui.number')" required></x-inputs.text>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.number name="beds" label="Beds" :value="old('beds', ($editing ? $room->beds : ''))" max="255"
-            placeholder="Beds" required></x-inputs.number>
+            placeholder="@lang('ui.beds')" required></x-inputs.number>
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.select name="residence_id" label="Residence" required>
             @php $selected = old('residence_id', ($editing ? $room->residence_id : '')) @endphp
-            <option disabled {{ empty($selected) ? 'selected' : '' }}>Please select the Residence</option>
+            <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_residence')</option>
             @foreach($residences as $k => $residence)
                 <option value="{{ $residence->id }}" {{ $selected == $residence->id ? 'selected' : '' }}>
                     {{ $residence->type . ' - ' . $residence->name }}</option>

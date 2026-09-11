@@ -7,48 +7,48 @@
                         <div class="row row-cards">
                             <div class="col-4 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">ZOC No :</label>
+                                    <label class="form-label">@lang('ui.zoc_no_2')</label>
                                     <input value="{{ $employee->number }}" type="text" class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="col-8 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Full Name :</label>
+                                    <label class="form-label">@lang('ui.full_name')</label>
                                     <input value="{{ $employee->english_name }}" type="text" class="form-control"
                                         disabled>
                                 </div>
                             </div>
                             <div class="col-4 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Start Date :</label>
+                                    <label class="form-label">@lang('ui.start_date')</label>
                                     <input value="{{ $employee->id_card_issue_date }}" type="text"
                                         class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="col-4 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Administration :</label>
+                                    <label class="form-label">@lang('ui.administration')</label>
                                     <input value="{{ $employee->administration_name }}" type="text"
                                         class="form-control" disabled>
                                 </div>
                             </div>
                             <div class="col-4 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Department :</label>
+                                    <label class="form-label">@lang('ui.department')</label>
                                     <input value="{{ $employee->department_name }}" type="text" class="form-control"
                                         disabled>
                                 </div>
                             </div>
                             <div class="col-6 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Cost Center :</label>
+                                    <label class="form-label">@lang('ui.cost_center')</label>
                                     <input value="{{ $employee->center_name }}" type="text" class="form-control"
                                         disabled>
                                 </div>
                             </div>
                             <div class="col-6 mt-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Location :</label>
+                                    <label class="form-label">@lang('ui.location')</label>
                                     <input value="{{ $employee->location_name }}" type="text" class="form-control"
                                         disabled>
                                 </div>
@@ -59,11 +59,10 @@
                     </div>
                     <div class="col-3">
                         <button wire:click="new_apointment" class="btn btn-primary btn-sm w-100 mb-3" >
-                            <i class="ti ti-plus"></i> New Ppointment
-                        </button>
+                            <i class="ti ti-plus"></i> @lang('ui.new_appointment') </button>
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">History</h3>
+                                <h3 class="card-title">@lang('ui.history')</h3>
                             </div>
                             <div class="list-group list-group-flush overflow-auto" style="max-height: 15rem">
                                 @foreach ($employee->apointments() as $group => $groupedApointments)
@@ -86,14 +85,14 @@
                 <!-- Text Editors (Notepad) -->
                 <div class="row mt-3" wire:ignore>
                     <div class="col-md-6">
-                        <label for="diagnosis" class="form-label">Diagnosis</label>
+                        <label for="diagnosis" class="form-label">@lang('ui.diagnosis')</label>
                         <textarea class="form-control" wire:model.defer="diagnosis" wire:model="diagnosis" id="diagnosis" rows="5"
-                            placeholder="Write something..."></textarea>
+                            placeholder="@lang('ui.write_something')"></textarea>
                     </div>
                     <div class="col-md-6">
-                        <label for="prescription" class="form-label">Prescription Rx</label>
+                        <label for="prescription" class="form-label">@lang('ui.prescription_rx')</label>
                         <textarea class="form-control" wire:model.defer="prescription" wire:model="prescription" id="prescription"
-                            rows="5" placeholder="Write something..."></textarea>
+                            rows="5" placeholder="@lang('ui.write_something')"></textarea>
                     </div>
 
                 </div>

@@ -148,7 +148,7 @@ Route::prefix('/')
         Route::delete('users/impersonate', [UserController::class, 'stopImpersonation'])->name('users.impersonate.stop');
         Route::resource('users', UserController::class);
         Route::post('users/{user}/upload-signature', [UserController::class, 'uploadSignature'])->name('users.upload-signature');
-        Route::get('dir', [EmployeeController::class, 'dir']);
+        Route::get('dir', [EmployeeController::class, 'dir'])->name('employees.dir');
         Route::get('employees/imports', [EmployeeController::class, 'imports'])->name('employees.imports');
         Route::get('employees/quick-create', [EmployeeController::class, 'quickCreate'])->name('employees.quick-create');
         Route::post('employees/quick-create', [EmployeeController::class, 'quickStore'])->name('employees.quick-store');

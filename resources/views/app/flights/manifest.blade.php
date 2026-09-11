@@ -41,39 +41,39 @@
 </head>
 <body>
     <div class="toolbar">
-        <a class="secondary" href="{{ route('flights.show', $flight) }}">رجوع</a>
-        <button type="button" onclick="window.print()">طباعة / حفظ PDF</button>
+        <a class="secondary" href="{{ route('flights.show', $flight) }}">{{ __('flights.back', [], 'ar') }}</a>
+        <button type="button" onclick="window.print()">{{ __('flights.print_or_save_pdf', [], 'ar') }}</button>
     </div>
 
     <div class="sheet">
         <div class="head">
-            <img src="{{ asset('img/zue-logo.png') }}" alt="Zueitina">
+            <img src="{{ asset('img/zue-logo.png') }}" alt="{{ __('flights.manifest_company_header', [], 'ar') }}">
             <div class="titles">
-                <div class="company">ZUEITINA OIL COMPANY</div>
+                <div class="company">{{ __('flights.manifest_company_header', [], 'ar') }}</div>
                 <div class="subject">
-                    قائمة الركاب {{ $movement }} من {{ $from }} الى {{ $to }}
+                    {{ __('flights.manifest_title', ['movement' => $movement, 'from' => $from, 'to' => $to], 'ar') }}
                 </div>
             </div>
-            <img src="{{ asset('img/zue-logo.png') }}" alt="Zueitina">
+            <img src="{{ asset('img/zue-logo.png') }}" alt="{{ __('flights.manifest_company_header', [], 'ar') }}">
         </div>
 
         <div class="meta">
-            <span>اليوم : {{ $dayName }}</span>
-            <span>نوع الطائرة : {{ $flight->plane?->name ?? '' }}</span>
+            <span>{{ __('flights.day_label', ['day' => $dayName], 'ar') }}</span>
+            <span>{{ __('flights.plane_type_label', ['plane' => $flight->plane?->name ?? ''], 'ar') }}</span>
             <span>{{ $flightDate?->format('d/m/Y') }}</span>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th class="c-seq">ت</th>
-                    <th class="c-num">الرقم</th>
-                    <th class="c-name">الاســـم</th>
-                    <th class="c-nat">الجنسية</th>
-                    <th class="c-comp">الشركة</th>
-                    <th class="c-site">الموقع</th>
-                    <th class="c-dept">القسم</th>
-                    <th class="c-dest">الجهة</th>
+                    <th class="c-seq">{{ __('flights.manifest_sequence', [], 'ar') }}</th>
+                    <th class="c-num">{{ __('flights.manifest_number', [], 'ar') }}</th>
+                    <th class="c-name">{{ __('flights.manifest_name', [], 'ar') }}</th>
+                    <th class="c-nat">{{ __('flights.manifest_nationality', [], 'ar') }}</th>
+                    <th class="c-comp">{{ __('flights.manifest_company', [], 'ar') }}</th>
+                    <th class="c-site">{{ __('flights.manifest_location', [], 'ar') }}</th>
+                    <th class="c-dept">{{ __('flights.manifest_department', [], 'ar') }}</th>
+                    <th class="c-dest">{{ __('flights.manifest_destination', [], 'ar') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,8 +121,8 @@
         </table>
 
         <div class="signatures">
-            <div><div class="line">مراقب حقول الانتصار 103</div></div>
-            <div><div class="line">وحدة الحجز والترحيل — عمليات الطيران</div></div>
+            <div><div class="line">{{ __('flights.field_superintendent', [], 'ar') }}</div></div>
+            <div><div class="line">{{ __('flights.dispatch_unit', [], 'ar') }}</div></div>
         </div>
     </div>
 </body>

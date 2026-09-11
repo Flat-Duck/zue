@@ -15,8 +15,8 @@
                             type="text"
                             value=""
                             class="form-control"
-                            placeholder="Search…"
-                            aria-label="Search..."
+                            placeholder="@lang('clinic.search_2')"
+                            aria-label="@lang('clinic.search')"
                             spellcheck="false"
                             data-ms-editor="true"
                             autocomplete="off"
@@ -25,7 +25,7 @@
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
-                            aria-label="Button"
+                            aria-label="@lang('clinic.button')"
                         >
                             <i class="ti ti-search"></i>
                         </button>
@@ -35,7 +35,7 @@
             <div class="col-auto ms-auto d-print-none">
                 @can('create', App\Models\Employee::class)
                 <a
-                    data-bs-original-title="إنشاء"
+                    data-bs-original-title="@lang('clinic.create')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-primary"
@@ -122,7 +122,7 @@
                     <td class="text-center table-actions">
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('clinic.row_actions')"
                             class="btn-group"
                         >
                             @can('view', $employee)
@@ -133,7 +133,7 @@
                             </a>
                             @endcan
                             <a href="{{ route('clinic.diagnosis', $employee) }}"
-                                    data-bs-original-title="New Diagnosis"
+                                    data-bs-original-title="@lang('clinic.new_diagnosis')"
                                     data-bs-placement="top"
                                     data-bs-toggle="tooltip"
                                     class="btn btn-icon btn-outline-success ms-1" >

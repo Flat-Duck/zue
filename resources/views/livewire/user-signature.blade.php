@@ -3,13 +3,13 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <h3 class="card-title">Add Your Signature</h3>
-                <p class="card-subtitle">Please Use Touch screen or electronic signature pad</p>
+                <h3 class="card-title">@lang('ui.add_your_signature')</h3>
+                <p class="card-subtitle">@lang('ui.please_use_touch_screen_or_electronic')</p>
                 <div class="mb-3">
                     <label class="form-label">{{ __('Signature') }}</label>
                     <div class="signature position-relative">
                         <div class="position-absolute top-0 end-0 p-2">
-                            <div class="btn btn-icon" id="signature-advanced-clear" title="Clear signature">
+                            <div class="btn btn-icon" id="signature-advanced-clear" title="@lang('ui.clear_signature')">
                                 <i class="ti ti-trash"></i>
                             </div>
                         </div>
@@ -19,10 +19,9 @@
             </div>
             <div class="card-footer">
                 <div class="row align-items-center">
-                    <div class="col"><strong>Signed By</strong> {{ auth()->user()->name }}</div>
+                    <div class="col"><strong>@lang('ui.signed_by')</strong> {{ auth()->user()->name }}</div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-primary w-100" id="signature-submit-png">Save
-                            Signature</button>
+                        <button type="button" class="btn btn-primary w-100" id="signature-submit-png">@lang('ui.save_signature')</button>
                     </div>
                 </div>
             </div>
@@ -41,9 +40,9 @@
                     @endphp
                     @if($currentPath)
                         <img src="{{ asset('storage/' . $currentPath) }}" class="img-fluid rounded border"
-                            alt="Current Signature" />
+                            alt="@lang('ui.current_signature')" />
                     @else
-                        <div class="text-muted">No signature on file.</div>
+                        <div class="text-muted">@lang('ui.no_signature_on_file')</div>
                     @endif
                 </div>
 
@@ -53,24 +52,22 @@
                     @error('signatureFile')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                    <div wire:loading wire:target="signatureFile" class="form-text mt-1">Uploading…</div>
+                    <div wire:loading wire:target="signatureFile" class="form-text mt-1">@lang('ui.uploading')</div>
                 </div>
 
                 @if ($signatureFile)
                     <div class="mb-3">
-                        <div class="form-label">Preview</div>
-                        <img src="{{ $signatureFile->temporaryUrl() }}" class="img-fluid rounded border" alt="Preview">
+                        <div class="form-label">@lang('ui.preview')</div>
+                        <img src="{{ $signatureFile->temporaryUrl() }}" class="img-fluid rounded border" alt="@lang('ui.preview')">
                     </div>
                 @endif
             </div>
             <div class="card-footer">
                 <div class="row align-items-center">
-                    <div class="col"><strong>Upload</strong> New Signature</div>
+                    <div class="col"><strong>@lang('ui.upload')</strong> @lang('ui.new_signature')</div>
                     <div class="col-auto">
                         <button type="button" class="btn btn-primary w-100" wire:click="saveUpload"
-                            wire:loading.attr="disabled">
-                            Save Signature (Upload)
-                        </button>
+                            wire:loading.attr="disabled"> @lang('ui.save_signature_upload') </button>
                     </div>
                 </div>
             </div>

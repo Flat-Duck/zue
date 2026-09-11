@@ -5,9 +5,7 @@
         <div class="container-xl">
             <div class="row g-2 align-items-center">
                 <div class="col">
-                    <h2 class="page-title">
-                        Dashboard
-                    </h2>
+                    <h2 class="page-title"> @lang('ui.dashboard') </h2>
                 </div>
             </div>
         </div>
@@ -21,11 +19,11 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Total Users</div>
+                                <div class="subheader">@lang('ui.total_users')</div>
                             </div>
                             <div class="h1 mb-3">{{ $usersCount }}</div>
                             <div class="d-flex mb-2">
-                                <div>Active system users</div>
+                                <div>@lang('ui.active_system_users')</div>
                             </div>
                         </div>
                     </div>
@@ -35,11 +33,11 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Total Employees</div>
+                                <div class="subheader">@lang('ui.total_employees')</div>
                             </div>
                             <div class="h1 mb-3">{{ $employeesCount }}</div>
                             <div class="d-flex mb-2">
-                                <div>Registered employees</div>
+                                <div>@lang('ui.registered_employees')</div>
                             </div>
                         </div>
                     </div>
@@ -49,7 +47,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Timesheets (This Month)</div>
+                                <div class="subheader">@lang('ui.timesheets_this_month')</div>
                             </div>
                             <div class="d-flex align-items-baseline">
                                 <div class="h1 mb-3 me-2">{{ $employeesWithTimesheets }}</div>
@@ -58,7 +56,7 @@
                                 <span class="text-success me-2 fw-bold">
                                     {{ $employeesCount > 0 ? round(($employeesWithTimesheets / $employeesCount) * 100) : 0 }}%
                                 </span>
-                                <div>completion rate</div>
+                                <div>@lang('ui.completion_rate')</div>
                             </div>
                         </div>
                     </div>
@@ -69,7 +67,7 @@
                         <div class="card-body">
 
                             <div class="d-flex align-items-center">
-                                <div class="subheader">Pending Timesheets</div>
+                                <div class="subheader">@lang('ui.pending_timesheets')</div>
                             </div>
                             <div class="d-flex align-items-baseline">
                                 <div class="h1 mb-3 me-2">{{ $employeesMissingTimesheets }}</div>
@@ -78,7 +76,7 @@
                                 <span class="text-warning me-2 fw-bold">
                                     {{ $employeesCount > 0 ? round(($employeesMissingTimesheets / $employeesCount) * 100) : 0 }}%
                                 </span>
-                                <div>missing records</div>
+                                <div>@lang('ui.missing_records')</div>
                             </div>
                         </div>
                     </div>

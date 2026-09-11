@@ -16,7 +16,7 @@
                     type="button"
                     class="btn-close"
                     data-dismiss="modal"
-                    aria-label="Close"
+                    aria-label="@lang('ui.close')"
                     data-bs-dismiss="modal"
                 >
                     <span aria-hidden="true">&times;</span>
@@ -31,7 +31,7 @@
                             label="Passenger"
                             wire:model.live="passenger_id"
                         >
-                            <option value="null" disabled>Please select the Passenger</option>
+                            <option value="null" disabled>@lang('ui.please_select_the_passenger')</option>
                             @foreach($passengersForSelect as $value => $label)
                             <option value="{{ $value }}"  >{{ $label }}</option>
                             @endforeach
@@ -75,13 +75,13 @@
                     <td>
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('ui.row_actions')"
                             class="relative inline-flex align-middle"
                         >
                             @can('delete-any', App\Models\Passenger::class)
                             <button
                                 class="btn btn-danger"
-                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                onclick="confirm({{ Js::from(__('ui.confirm_generic')) }}) || event.stopImmediatePropagation()"
                                 wire:click="detach({{ $passenger->id }})"
                             >
                                 <i class="ti ti-trash"></i>

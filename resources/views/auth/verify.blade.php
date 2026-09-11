@@ -20,7 +20,6 @@
             </form>
         </div>
     </div>
-    <div class="text-center text-secondary mt-3">
-        Forget it, send me back to the sign in screen. <a href="{{ route('login') }}">Login</a>
+    <div class="text-center text-secondary mt-3"> @lang('auth.forget_it_send_me_back_to_the_sign_in_screen') <a href="{{ route('login') }}">@lang('auth.login')</a>
     </div>
 @endsection         

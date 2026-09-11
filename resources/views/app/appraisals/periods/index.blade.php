@@ -3,7 +3,7 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Appraisal Periods</h3>
+            <h3 class="card-title">@lang('appraisals.appraisal_periods')</h3>
             <div class="card-actions">
                 <a href="{{ route('appraisals.periods.create') }}" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
@@ -11,21 +11,19 @@
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                    New Period
-                </a>
+                    </svg> @lang('appraisals.new_period') </a>
             </div>
         </div>
         <div class="table-responsive">
             <table class="table card-table table-vcenter text-nowrap datatable">
                 <thead>
                     <tr>
-                        <th>Year</th>
-                        <th>Type</th>
-                        <th>Quarter</th>
-                        <th>Window</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>@lang('appraisals.year')</th>
+                        <th>@lang('appraisals.type')</th>
+                        <th>@lang('appraisals.quarter')</th>
+                        <th>@lang('appraisals.window')</th>
+                        <th>@lang('appraisals.status')</th>
+                        <th>@lang('appraisals.actions')</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,13 +52,13 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('appraisals.periods.edit', $period) }}"
-                                                class="btn btn-sm btn-outline-primary">Edit</a>
+                                                class="btn btn-sm btn-outline-primary">@lang('appraisals.edit')</a>
                                             @if($period->status !== 'open')
                                                 <form action="{{ route('appraisals.periods.destroy', $period) }}" method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Are you sure?');">
+                                                    onsubmit="return confirm({{ Js::from(__('appraisals.confirm_generic')) }});">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">@lang('appraisals.delete')</button>
                                                 </form>
                                             @endif
                                         </td>

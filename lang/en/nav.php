@@ -1,0 +1,60 @@
+<?php
+
+/*
+ * The navigation: the sidebar, its dropdowns and the user menu.
+ *
+ * These are the labels a person reads to find their way around, so they are the
+ * first thing that has to speak their language.
+ */
+
+return [
+    'dashboard' => 'Dashboard',
+    'dispatcher_management' => 'Dispatcher Management',
+    'flights' => 'Flights',
+    'passengers' => 'Passengers',
+    'planes' => 'Planes',
+    'routes' => 'Routes',
+    'stations' => 'Stations',
+    'management' => 'Management',
+    'administrations' => 'Administrations',
+    'centers' => 'Centers',
+    'departments' => 'Departments',
+    'locations' => 'Locations',
+    'camp_boss' => 'Camp Boss',
+    'residences' => 'Residences',
+    'rooms' => 'Rooms',
+    'stocks' => 'Stocks',
+    'time_sheets' => 'Time Sheets',
+    'management_scopes' => 'Management Scopes',
+    'operations' => 'Operations',
+    'maintenance' => 'Maintenance',
+    'reports' => 'Reports',
+    'appraisals' => 'Appraisals',
+    'items' => 'Items',
+    'create_item' => 'Create Item',
+    'forms' => 'Forms',
+    'create_form' => 'Create Form',
+    'periods' => 'Periods',
+    'reviews' => 'Reviews',
+    'create_review' => 'Create Review',
+    'assign_employee_form' => 'Assign employee form (from employee page)',
+    'official_result' => 'Official result (from employee/period)',
+    'access_management' => 'Access Management',
+    'users' => 'Users',
+    'roles' => 'Roles',
+    'permissions' => 'Permissions',
+    'clinic' => 'Clinic',
+    'injury_reports' => 'Injury Reports',
+    'profile' => 'Profile',
+    'signature' => 'Signature',
+    'logout' => 'Log out',
+    'login' => 'Log in',
+    'my_signature' => 'My Signature',
+    'return_to' => 'Return to :name',
+    'open_user_menu' => 'Open user menu',
+    'toggle_navigation' => 'Toggle navigation',
+    'all_rights_reserved' => 'All rights reserved.',
+    'builder' => 'Builder',
+    'process' => 'Process',
+    'employee' => 'Employee',
+];

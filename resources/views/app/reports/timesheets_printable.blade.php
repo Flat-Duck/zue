@@ -11,12 +11,11 @@
         <div class="page-header d-print-none text-white">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">Timesheet Detailed Report</h2>
+                    <h2 class="page-title">@lang('reports.timesheet_detailed_report')</h2>
                 </div>
                 <div class="col-auto ms-auto">
                     <button onclick="window.print()" class="btn btn-primary btn-print">
-                        <i class="ti ti-printer me-2"></i> Print Report
-                    </button>
+                        <i class="ti ti-printer me-2"></i> @lang('reports.print_report') </button>
                 </div>
             </div>
         </div>
@@ -32,12 +31,12 @@
                                 <img src="/img/zue-logo.png" style="height: 80px" class="d-block">
                             </div>
                             <div class="col-6 text-center">
-                                <h2 class="mb-1">ZUEITINA OIL COMPANY</h2>
-                                <h3 class="mb-1">Timesheet Records Report</h3>
-                                <p class="text-muted">Generated on {{ now()->format('Y-m-d H:i') }}</p>
+                                <h2 class="mb-1">@lang('reports.zueitina_oil_company')</h2>
+                                <h3 class="mb-1">@lang('reports.timesheet_records_report')</h3>
+                                <p class="text-muted">@lang('ui.generated_on', ['time' => now()->format('Y-m-d H:i')])</p>
                             </div>
                             <div class="col-3 text-end">
-                                <strong>Status: Detailed</strong>
+                                <strong>@lang('reports.status_detailed')</strong>
                             </div>
                         </div>
                     </div>
@@ -46,13 +45,13 @@
                         <table class="table table-vcenter table-bordered text-nowrap">
                             <thead>
                                 <tr class="bg-light">
-                                    <th>Date</th>
-                                    <th>Emp #</th>
-                                    <th>Name</th>
-                                    <th>Job</th>
-                                    <th>Value</th>
-                                    <th>OT</th>
-                                    <th>Location</th>
+                                    <th>@lang('reports.date')</th>
+                                    <th>@lang('reports.emp')</th>
+                                    <th>@lang('reports.name')</th>
+                                    <th>@lang('reports.job')</th>
+                                    <th>@lang('reports.value')</th>
+                                    <th>@lang('reports.ot')</th>
+                                    <th>@lang('reports.location')</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,8 +67,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-4">No records found for the selected criteria.
-                                        </td>
+                                        <td colspan="7" class="text-center py-4">@lang('reports.no_records_found_for_the_selected_criteria') </td>
                                     </tr>
                                 @endforelse
                             </tbody>

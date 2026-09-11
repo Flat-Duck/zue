@@ -204,6 +204,24 @@ class Employee extends Model
     }
 
     /**
+     * The two initials a directory card shows in place of a photograph. Arabic names
+     * fall back to the English spelling, because two Arabic initials on their own are
+     * not recognisable the way Latin ones are.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $name = trim((string) ($this->english_name ?: $this->arabic_name));
+
+        if ($name === '') {
+            return '—';
+        }
+
+        $words = preg_split('/\s+/u', $name) ?: [];
+
+        return mb_strtoupper(mb_substr($words[0], 0, 1).mb_substr($words[1] ?? '', 0, 1));
+    }
+
+    /**
      * Reading a profile field through the employee still works, so a view that wants
      * someone's phone number does not have to know where it is kept. Writing one does
      * not: use {@see saveProfile()}, so that it is always obvious when the profile is

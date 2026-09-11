@@ -11,10 +11,6 @@
                         {{ session('status') }}
                     </div>
                 @endif
-                <# <div class="mb-4">
-                    {{-- <span class="avatar avatar-xl mb-3" style="background-image: url(./static/avatars/000m.jpg)"></span>
-                    <h3>Paweł Kuna</h3> --}}
-                </div> #>
                 <div class="mb-3">
                     <label class="form-label required">{{ __('Password') }}
                         @if (Route::has('password.request'))
@@ -26,9 +22,9 @@
                         @endif
                     </label>
                     <div class="input-group input-group-flat @error('password') is-invalid @enderror">
-                        <input type="password" placeholder="Enter password" id="password"  class="form-control @error('password') is-invalid @enderror" name="password" value="{{ old('password') }}" required autocomplete="current-password" autofocus>
+                        <input type="password" placeholder="@lang('auth.enter_password')" id="password"  class="form-control @error('password') is-invalid @enderror" name="password" value="{{ old('password') }}" required autocomplete="current-password" autofocus>
                         <span class="input-group-text">
-                            <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                            <a href="#" class="link-secondary" title="@lang('auth.show_password')" data-bs-toggle="tooltip">
                                 <i class="ti ti-eye"></i>
                             </a>
                         </span>
@@ -45,7 +41,6 @@
             </form>
         </div>
     </div>
-    <div class="text-center text-secondary mt-3">
-        Forget it, send me back to the sign in screen. <a href="{{ route('login') }}">Login</a>
+    <div class="text-center text-secondary mt-3"> @lang('auth.forget_it_send_me_back_to_the_sign_in_screen') <a href="{{ route('login') }}">@lang('auth.login')</a>
     </div>
 @endsection

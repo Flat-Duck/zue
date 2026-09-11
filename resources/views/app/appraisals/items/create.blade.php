@@ -3,7 +3,7 @@
 @section('content')
     <div class="container-xl">
         <div class="page-header d-print-none">
-            <h2 class="page-title">Create Item</h2>
+            <h2 class="page-title">@lang('appraisals.create_item')</h2>
         </div>
 
         <div class="card">
@@ -13,22 +13,22 @@
 
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label class="form-label">Key (unique)</label>
+                            <label class="form-label">@lang('appraisals.key_unique')</label>
                             <input name="key" class="form-control" value="{{ old('key') }}"
-                                placeholder="attendance, teamwork..." required>
-                            <div class="form-hint">يفضل slug بالإنجليزي</div>
+                                placeholder="@lang('appraisals.attendance_teamwork')" required>
+                            <div class="form-hint">@lang('appraisals.prefer_english_slug')</div>
                         </div>
 
                         <div class="col-md-2">
-                            <label class="form-label">Type</label>
+                            <label class="form-label">@lang('appraisals.type')</label>
                             <select name="type" class="form-select" required>
-                                <option value="score" {{ old('type') === 'score' ? 'selected' : '' }}>Score (Numeric)</option>
-                                <option value="text" {{ old('type') === 'text' ? 'selected' : '' }}>Text (Comment)</option>
+                                <option value="score" {{ old('type') === 'score' ? 'selected' : '' }}>@lang('appraisals.score_numeric')</option>
+                                <option value="text" {{ old('type') === 'text' ? 'selected' : '' }}>@lang('appraisals.text_comment')</option>
                             </select>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Default Section</label>
+                            <label class="form-label">@lang('appraisals.default_section')</label>
                             <select name="default_section" class="form-select" required>
                                 @foreach(['job_performance' => 'الأداء', 'personal_traits' => 'الصفات', 'initiative' => 'المبادرة'] as $k => $v)
                                     <option value="{{ $k }}" {{ old('default_section') === $k ? 'selected' : '' }}>{{ $k }} -
@@ -39,14 +39,14 @@
                         </div>
 
                         <div class="col-md-12">
-                            <label class="form-label">Default Label (Arabic)</label>
+                            <label class="form-label">@lang('appraisals.default_label_arabic')</label>
                             <input name="default_label" class="form-control" value="{{ old('default_label') }}" required>
                         </div>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button class="btn btn-primary">Save</button>
-                        <a href="{{ route('appraisals.items.index') }}" class="btn btn-outline-secondary">Back</a>
+                        <button class="btn btn-primary">@lang('appraisals.save')</button>
+                        <a href="{{ route('appraisals.items.index') }}" class="btn btn-outline-secondary">@lang('appraisals.back')</a>
                     </div>
                 </form>
             </div>

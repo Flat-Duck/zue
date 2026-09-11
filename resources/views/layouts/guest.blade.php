@@ -16,7 +16,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @yield('meta_tags')
     
-    <title>zue</title>
+    <title>@yield('title', config('app.name'))</title>
 
     {{-- Styles first: the guest layout previously loaded only the script, so
          every page using it rendered as unstyled HTML. --}}
@@ -30,7 +30,7 @@
       <div class="container container-tight py-4">
         <div class="text-center mb-4">
           <a href="." class="navbar-brand navbar-brand-autodark">
-            <img src="{{ asset('img/zue-logo.png') }}" height="32" alt="zue" class="navbar-brand-image">
+            <img src="{{ asset('img/zue-logo.png') }}" height="32" alt="{{ config('app.name') }}" class="navbar-brand-image">
           </a>
         </div>
         @yield('content')

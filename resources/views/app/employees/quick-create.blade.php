@@ -7,7 +7,7 @@
             <a href="{{ route('employees.index') }}" class="mr-4">
                 <i class="ti ti-arrow-back"></i>
             </a>
-            <h3 class="card-title">Quick Create Employee</h3>
+            <h3 class="card-title">@lang('ui.quick_create_employee')</h3>
         </div>
 
         <div class="card-body">
@@ -17,12 +17,12 @@
 
             <div class="row">
                 <x-inputs.group class="col-sm-6">
-                    <x-inputs.text name="english_name" label="Name" :value="old('english_name')" placeholder="Name"
+                    <x-inputs.text name="english_name" label="Name" :value="old('english_name')" placeholder="@lang('ui.name')"
                         required></x-inputs.text>
                 </x-inputs.group>
 
                 <x-inputs.group class="col-sm-6">
-                    <x-inputs.number name="number" label="Number" :value="old('number')" placeholder="Number"
+                    <x-inputs.number name="number" label="Number" :value="old('number')" placeholder="@lang('ui.number')"
                         required></x-inputs.number>
                 </x-inputs.group>
 
@@ -34,7 +34,7 @@
                 <x-inputs.group class="col-sm-6">
                     <x-inputs.select name="location_id" label="Location" required>
                         @php $selected = old('location_id') @endphp
-                        <option disabled {{ empty($selected) ? 'selected' : '' }}>Please select the Location</option>
+                        <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_location')</option>
                         @foreach($locations as $value => $label)
                             <option value="{{ $value }}" {{ (string) $selected === (string) $value ? 'selected' : '' }}>
                                 {{ $label }}
@@ -46,7 +46,7 @@
                 <x-inputs.group class="col-sm-6">
                     <x-inputs.select name="center_id" label="Centre" required>
                         @php $selected = old('center_id') @endphp
-                        <option disabled {{ empty($selected) ? 'selected' : '' }}>Please select the Centre</option>
+                        <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_centre')</option>
                         @foreach($centers as $value => $label)
                             <option value="{{ $value }}" {{ (string) $selected === (string) $value ? 'selected' : '' }}>
                                 {{ $label }}

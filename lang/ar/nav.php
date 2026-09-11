@@ -1,0 +1,60 @@
+<?php
+
+/*
+ * The navigation: the sidebar, its dropdowns and the user menu.
+ *
+ * These are the labels a person reads to find their way around, so they are the
+ * first thing that has to speak their language.
+ */
+
+return [
+    'dashboard' => 'لوحة المعلومات',
+    'dispatcher_management' => 'إدارة التسيير',
+    'flights' => 'الرحلات',
+    'passengers' => 'الركاب',
+    'planes' => 'الطائرات',
+    'routes' => 'المسارات',
+    'stations' => 'المحطات',
+    'management' => 'الإدارة',
+    'administrations' => 'الإدارات',
+    'centers' => 'مراكز التكلفة',
+    'departments' => 'الأقسام',
+    'locations' => 'المواقع',
+    'camp_boss' => 'مسؤول المعسكر',
+    'residences' => 'المساكن',
+    'rooms' => 'الغرف',
+    'stocks' => 'المخزون',
+    'time_sheets' => 'بطاقات ضبط الوقت',
+    'management_scopes' => 'نطاقات الإشراف',
+    'operations' => 'العمليات',
+    'maintenance' => 'الصيانة',
+    'reports' => 'التقارير',
+    'appraisals' => 'التقييمات',
+    'items' => 'البنود',
+    'create_item' => 'إنشاء بند',
+    'forms' => 'النماذج',
+    'create_form' => 'إنشاء نموذج',
+    'periods' => 'الفترات',
+    'reviews' => 'المراجعات',
+    'create_review' => 'إنشاء مراجعة',
+    'assign_employee_form' => 'إسناد نموذج للموظف (من صفحة الموظف)',
+    'official_result' => 'النتيجة الرسمية (من الموظف/الفترة)',
+    'access_management' => 'إدارة الصلاحيات',
+    'users' => 'المستخدمون',
+    'roles' => 'الأدوار',
+    'permissions' => 'الصلاحيات',
+    'clinic' => 'العيادة',
+    'injury_reports' => 'تقارير الإصابات',
+    'profile' => 'الملف الشخصي',
+    'signature' => 'التوقيع',
+    'logout' => 'تسجيل الخروج',
+    'login' => 'تسجيل الدخول',
+    'my_signature' => 'توقيعي',
+    'return_to' => 'العودة إلى :name',
+    'open_user_menu' => 'فتح قائمة المستخدم',
+    'toggle_navigation' => 'إظهار القائمة',
+    'all_rights_reserved' => 'جميع الحقوق محفوظة.',
+    'builder' => 'البناء',
+    'process' => 'العملية',
+    'employee' => 'الموظف',
+];

@@ -73,7 +73,7 @@
                             @else
                                 <select id="{{ $name }}" class="form-select"
                                         x-on:change="administration = $event.target.value">
-                                    <option value="">All administrations</option>
+                                    <option value="">@lang('ui.all_administrations')</option>
                                     @foreach (($administrations ?? collect()) as $administrationId => $administrationName)
                                         <option value="{{ $administrationId }}"
                                             @selected((string) ($model?->department?->administration_id) === (string) $administrationId)>
@@ -81,7 +81,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <small class="text-muted">Filters the department list. The department decides the administration.</small>
+                                <small class="text-muted">@lang('ui.filters_the_department_list_the_department')</small>
                             @endif
 
                         @elseif (str_starts_with($type, 'select:'))
@@ -96,7 +96,7 @@
                             @else
                                 <select id="{{ $name }}" name="{{ $name }}"
                                         class="form-select @error($name) is-invalid @enderror">
-                                    <option value="">Select…</option>
+                                    <option value="">@lang('ui.select')</option>
                                     @foreach ($source as $optionValue => $optionLabel)
                                         <option value="{{ $optionValue }}"
                                             @if ($isDepartment) data-administration="{{ $departmentAdministrations[$optionValue] ?? '' }}"
@@ -117,7 +117,7 @@
                             @else
                                 <select id="{{ $name }}" name="{{ $name }}"
                                         class="form-select @error($name) is-invalid @enderror">
-                                    <option value="">Select…</option>
+                                    <option value="">@lang('ui.select')</option>
                                     @foreach ($options as $optionValue => $optionLabel)
                                         <option value="{{ $optionValue }}" @selected((string) $value === (string) $optionValue)>
                                             {{ $optionLabel }}

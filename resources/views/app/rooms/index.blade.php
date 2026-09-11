@@ -15,8 +15,8 @@
                             type="text"
                             value=""
                             class="form-control"
-                            placeholder="Search…"
-                            aria-label="Search..."
+                            placeholder="@lang('ui.search_3')"
+                            aria-label="@lang('ui.search_2')"
                             spellcheck="false"
                             data-ms-editor="true"
                             autocomplete="off"
@@ -25,7 +25,7 @@
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
-                            aria-label="Button"
+                            aria-label="@lang('ui.button')"
                         >
                             <i class="ti ti-search"></i>
                         </button>
@@ -35,7 +35,7 @@
             <div class="col-auto ms-auto d-print-none">
                 @can('create', App\Models\Room::class)
                 <a
-                    data-bs-original-title="إنشاء"
+                    data-bs-original-title="@lang('ui.create')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-primary"
@@ -69,7 +69,13 @@
                     <td>{{ $room->number ?? '-' }}</td>
                     <td>{{ $room->beds ?? '-' }}</td>
                     <td>{{ optional($room->residence)->type ?? '-' }} - {{ optional($room->residence)->name ?? '-' }}</td>
-                    <td>{!! $room->available? '<span class="badge bg-green text-green-fg">Avalible</span>' :'<span class="badge bg-red text-red-fg">Not Avalible</span>' !!}</td>
+                    <td>
+                        @if ($room->available)
+                            <span class="badge bg-green text-green-fg">@lang('ui.available')</span>
+                        @else
+                            <span class="badge bg-red text-red-fg">@lang('ui.not_available')</span>
+                        @endif
+                    </td>
                     <td>
                         @foreach ($room->employees as $employee )
                         <span class="tag  {{ $employee->pivot->is_owner? 'bg-lime-lt':'' }}">
@@ -87,7 +93,7 @@
                     <td class="text-center table-actions">
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('ui.row_actions')"
                             class="btn-group"
                         >
                             @can('update', $room)

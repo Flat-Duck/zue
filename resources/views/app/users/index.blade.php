@@ -4,20 +4,20 @@
         <div class="card-body border-bottom py-3">
             @error('signature_file')
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Upload Failed:</strong> {{ $message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>@lang('ui.upload_failed')</strong> {{ $message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@lang('ui.close')"></button>
                 </div>
             @enderror
             @error('file')
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Import Failed:</strong> {{ $message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>@lang('ui.import_failed')</strong> {{ $message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@lang('ui.close')"></button>
                 </div>
             @enderror
             @error('impersonation')
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Impersonation Failed:</strong> {{ $message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>@lang('ui.impersonation_failed')</strong> {{ $message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="@lang('ui.close')"></button>
                 </div>
             @enderror
             <div class="d-flex">
@@ -28,11 +28,11 @@
                                 <i class="ti ti-search"></i>
                             </span>
                             <input id="indexSearch" name="search" type="text" value="" class="form-control"
-                                placeholder="Search…" aria-label="Search..." spellcheck="false" data-ms-editor="true"
+                                placeholder="@lang('ui.search_3')" aria-label="@lang('ui.search_2')" spellcheck="false" data-ms-editor="true"
                                 autocomplete="off" />
                         </div>
                         <div class="col-auto">
-                            <button class="btn btn-icon btn-primary" aria-label="Button">
+                            <button class="btn btn-icon btn-primary" aria-label="@lang('ui.button')">
                                 <i class="ti ti-search"></i>
                             </button>
                         </div>
@@ -42,9 +42,8 @@
                     @can('create', App\Models\User::class)
                         <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal"
                             data-bs-target="#importUsersModal">
-                            <i class="ti ti-file-import"></i> Import
-                        </button>
-                        <a data-bs-original-title="إنشاء" data-bs-placement="top" data-bs-toggle="tooltip"
+                            <i class="ti ti-file-import"></i> @lang('ui.import') </button>
+                        <a data-bs-original-title="@lang('ui.create')" data-bs-placement="top" data-bs-toggle="tooltip"
                             class="pull-right btn btn-primary" href="{{ route('users.create') }}">
                             <i class="ti ti-plus"></i>
                             @lang('crud.common.create')
@@ -73,19 +72,16 @@
                                 @if($user->signature)
                                     <span class="badge bg-success cursor-pointer" data-bs-toggle="popover"
                                         data-bs-trigger="hover focus" data-bs-html="true"
-                                        data-bs-content="<img src='{{ asset('storage/' . $user->signature->image_path) }}' style='max-width:200px;' />">
-                                        Has Signature
-                                    </span>
+                                        data-bs-content="<img src='{{ asset('storage/' . $user->signature->image_path) }}' style='max-width:200px;' />"> @lang('ui.has_signature') </span>
                                 @else
                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                                         data-bs-target="#uploadSignatureModal"
                                         onclick="setSignatureUploadAction('{{ $user->id }}', '{{ $user->name }}')">
-                                        <i class="ti ti-upload"></i> Upload
-                                    </button>
+                                        <i class="ti ti-upload"></i> @lang('ui.upload') </button>
                                 @endif
                             </td>
                             <td class="text-center">
-                                <div role="group" aria-label="Row Actions" class="btn-group">
+                                <div role="group" aria-label="@lang('ui.row_actions')" class="btn-group">
                                     @can('update', $user)
                                         <a href="{{ route('users.edit', $user) }}" class="btn btn-icon btn-outline-warinig ms-1">
                                             <i class="ti ti-edit"></i>
@@ -105,9 +101,9 @@
                                     @endcan
                                     @if(auth()->user()->hasRole('super-admin') && !session()->has('impersonator_id') && auth()->id() !== $user->id)
                                         <form action="{{ route('users.impersonate', $user) }}" method="POST" class="inline pointer ms-1"
-                                            onsubmit="return confirm('Sign in as {{ addslashes($user->name) }}?')">
+                                            onsubmit="return confirm({{ Js::from(__('ui.confirm_sign_in_as', ['name' => $user->name])) }})">
                                             @csrf
-                                            <button type="submit" class="btn btn-icon btn-outline-primary" title="Sign in as user">
+                                            <button type="submit" class="btn btn-icon btn-outline-primary" title="@lang('ui.sign_in_as_user')">
                                                 <i class="ti ti-user-share"></i>
                                             </button>
                                         </form>
@@ -136,19 +132,19 @@
                 <form id="uploadSignatureForm" action="" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Upload Signature for <span id="modalUserName"></span></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">@lang('ui.upload_signature_for') <span id="modalUserName"></span></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@lang('ui.close')"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Select Signature Image</label>
+                            <label class="form-label">@lang('ui.select_signature_image')</label>
                             <input type="file" name="signature_file" class="form-control"
                                 accept="image/png, image/jpeg, image/webp" required>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('ui.close')</button>
+                        <button type="submit" class="btn btn-primary">@lang('ui.upload')</button>
                     </div>
                 </form>
             </div>
@@ -164,25 +160,24 @@
                 <form action="{{ route('users.import') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Users</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">@lang('ui.import_users')</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@lang('ui.close')"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Select Excel/CSV File</label>
+                            <label class="form-label">@lang('ui.select_excel_csv_file')</label>
                             <input type="file" name="file" class="form-control"
                                 accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                 required>
                         </div>
                         <div class="mt-3">
                             <a href="{{ route('users.template') }}" class="text-decoration-underline">
-                                <i class="ti ti-download"></i> Download Template
-                            </a>
+                                <i class="ti ti-download"></i> @lang('ui.download_template') </a>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Import</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('ui.close')</button>
+                        <button type="submit" class="btn btn-primary">@lang('ui.import')</button>
                     </div>
                 </form>
             </div>

@@ -33,7 +33,7 @@
                         {{ $message }}
                     </div>
                   </div>
-                <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                <a class="btn-close" data-bs-dismiss="alert" aria-label="@lang('auth.close')"></a>
             </div>
             @endif
 

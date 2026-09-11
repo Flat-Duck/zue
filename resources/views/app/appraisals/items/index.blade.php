@@ -5,11 +5,11 @@
         <div class="page-header d-print-none">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">Appraisal Items</h2>
-                    <div class="text-muted">مكتبة البنود المشتركة بين النماذج</div>
+                    <h2 class="page-title">@lang('appraisals.appraisal_items')</h2>
+                    <div class="text-muted">@lang('appraisals.shared_items_library')</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
-                    <a href="{{ route('appraisals.items.create') }}" class="btn btn-primary">+ Item</a>
+                    <a href="{{ route('appraisals.items.create') }}" class="btn btn-primary">@lang('appraisals.item')</a>
                 </div>
             </div>
         </div>
@@ -22,10 +22,10 @@
                 <form class="row g-2" method="GET">
                     <div class="col">
                         <input type="text" name="q" value="{{ $q }}" class="form-control"
-                            placeholder="بحث بالـ key أو الاسم...">
+                            placeholder="@lang('appraisals.search_by_key_or_name')">
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-outline-primary">بحث</button>
+                        <button class="btn btn-outline-primary">@lang('appraisals.search')</button>
                     </div>
                 </form>
             </div>
@@ -36,9 +36,9 @@
                 <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
-                            <th>Section</th>
-                            <th>Key</th>
-                            <th>Label</th>
+                            <th>@lang('appraisals.section')</th>
+                            <th>@lang('appraisals.key')</th>
+                            <th>@lang('appraisals.label')</th>
                             <th class="w-1"></th>
                         </tr>
                     </thead>
@@ -50,7 +50,7 @@
                                 <td>{{ $i->default_label }}</td>
                                 <td>
                                     <a class="btn btn-sm btn-outline-primary"
-                                        href="{{ route('appraisals.items.edit', $i->id) }}">Edit</a>
+                                        href="{{ route('appraisals.items.edit', $i->id) }}">@lang('appraisals.edit')</a>
                                 </td>
                             </tr>
                         @endforeach

@@ -1,24 +1,24 @@
 <header class="navbar navbar-expand-md d-print-none" >
     <div class="container-xl">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="@lang('nav.toggle_navigation')">
             <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
             <a href="{{ url('/') }}">
-                <img src="{{ asset('img/logo.svg') }}" width="110" height="32" alt="zue" class="navbar-brand-image">
+                <img src="{{ asset('img/logo.svg') }}" width="110" height="32" alt="{{ config('app.name') }}" class="navbar-brand-image">
             </a>
         </h1>
         <div class="navbar-nav flex-row order-md-last">
             @if(auth()->check() && session()->has('impersonator_id'))
                 <div class="nav-item d-none d-md-flex me-3 align-items-center">
                     <span class="badge bg-orange-lt text-orange me-2">
-                        Signed in as {{ auth()->user()->name }}
+                        @lang('ui.signed_in_as', ['name' => auth()->user()->name])
                     </span>
                     <form action="{{ route('users.impersonate.stop') }}" method="POST" class="m-0">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-outline-danger">
-                            Return to {{ session('impersonator_name', 'Super Admin') }}
+                            @lang('nav.return_to', ['name' => session('impersonator_name', 'Super Admin')])
                         </button>
                     </form>
                 </div>
@@ -57,7 +57,7 @@
             </a>
             <livewire:notification-bell />
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+                <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="@lang('nav.open_user_menu')">
                     {{-- <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)"></span> --}}
                     <div class="d-none d-xl-block ps-2">
                         <div>{{ auth()->user()->name ?? null }}</div>
@@ -66,7 +66,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     @guest
-                        <a href="{{ route('login') }}" class="dropdown-item">Login</a>
+                        <a href="{{ route('login') }}" class="dropdown-item">@lang('nav.login')</a>
                     @endguest
                     @auth
                         @if(session()->has('impersonator_id'))
@@ -78,7 +78,7 @@
                                         <i class="ti ti-arrow-back-up"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Return to {{ session('impersonator_name', 'Super Admin') }}
+                                        @lang('nav.return_to', ['name' => session('impersonator_name', 'Super Admin')])
                                     </span>
                                 </button>
                             </form>
@@ -88,7 +88,7 @@
                                 <i class="ti ti-user-circle"></i>
                             </span>
                             <span class="nav-link-title">
-                                {{ __('Profile') }}
+                                @lang('nav.profile')
                             </span>
                         </a>
                         <a class="dropdown-item" href="{{ route('signature.show') }}" rel="noopener">
@@ -96,7 +96,7 @@
                                 <i class="ti ti-signature"></i>
                             </span>
                             <span class="nav-link-title">
-                                {{ __('My Signature') }}
+                                @lang('nav.my_signature')
                             </span>
                         </a>
                         <a class="dropdown-item" href="{{ route('logout') }}" rel="noopener" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -104,7 +104,7 @@
                                 <i class="ti ti-logout-2"></i>
                             </span>
                             <span class="nav-link-title">
-                                {{ __('Logout') }}
+                                @lang('nav.logout')
                             </span>
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>

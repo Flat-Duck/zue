@@ -17,7 +17,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- @yield('meta_tags') --}}
 
-    <title>zue</title>
+    <title>@yield('title', config('app.name'))</title>
 
     @vite($direction === 'rtl' ? 'resources/sass/app-rtl.scss' : 'resources/sass/app.scss')
 

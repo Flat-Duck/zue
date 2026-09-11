@@ -13,8 +13,7 @@
 
             <div class="col-auto ms-auto d-print-none">
                 <a href="{{ route('employees.show', $employee) }}" class="btn btn-outline-secondary">
-                    <i class="ti ti-eye"></i> View
-                </a>
+                    <i class="ti ti-eye"></i> @lang('ui.view') </a>
             </div>
         </div>
     </div>

@@ -4,8 +4,8 @@
     <x-inputs.group class="col-sm-12">
         <x-inputs.select name="type" label="Type">
             @php $selected = old('type', ($editing ? $flight->type : '')) @endphp
-            <option value="Air" {{ $selected == 'Air' ? 'selected' : '' }}>Air</option>
-            <option value="Ground" {{ $selected == 'Ground' ? 'selected' : '' }}>Ground</option>
+            <option value="Air" {{ $selected == 'Air' ? 'selected' : '' }}>@lang('flights.air')</option>
+            <option value="Ground" {{ $selected == 'Ground' ? 'selected' : '' }}>@lang('flights.ground')</option>
         </x-inputs.select>
     </x-inputs.group>
 
@@ -17,7 +17,7 @@
 
     <x-inputs.group class="col-sm-12">
         <x-inputs.time name="time" label="Time" :value="old('time', ($editing ? $flight->time : ''))"
-            placeholder="Time"></x-inputs.time>
+            placeholder="@lang('flights.time')"></x-inputs.time>
     </x-inputs.group>
 
     {{-- The plane sets the seat limit for every leg of this flight. --}}
@@ -48,9 +48,7 @@
 
     @if ($editing && $flight->legs()->whereHas('bookings')->exists())
         <div class="col-sm-12">
-            <div class="alert alert-info mb-0">
-                This flight already has booked travellers, so its route can no longer be changed.
-            </div>
+            <div class="alert alert-info mb-0"> @lang('flights.this_flight_already_has_booked_travellers_so') </div>
         </div>
     @endif
 </div>

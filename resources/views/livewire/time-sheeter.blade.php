@@ -8,61 +8,61 @@
             <div class="row row-cards">
                 <div class="col-2 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">ZOC No :</label>
+                        <label class="form-label">@lang('timesheets.zoc_no')</label>
                         <input value="{{ $employee->number}}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-6 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Full Name :</label>
+                        <label class="form-label">@lang('timesheets.full_name')</label>
                         <input value="{{ $employee->english_name}}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Start Date :</label>
+                        <label class="form-label">@lang('timesheets.start_date')</label>
                         <input value="{{ $employee->id_card_issue_date}}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Administration :</label>
+                        <label class="form-label">@lang('timesheets.administration')</label>
                         <input value="{{ $employee->administration_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Department :</label>
+                        <label class="form-label">@lang('timesheets.department')</label>
                         <input value="{{ $employee->department_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Cost Center :</label>
+                        <label class="form-label">@lang('timesheets.cost_center')</label>
                         <input value="{{ $employee->center_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Location :</label>
+                        <label class="form-label">@lang('timesheets.location')</label>
                         <input value="{{ $employee->location_name }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Schedule :</label>
+                        <label class="form-label">@lang('timesheets.schedule')</label>
                         <input value="{{ $employee->schedule }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Total Balance : </label>
+                        <label class="form-label">@lang('timesheets.total_balance') </label>
                         <input value="{{ $employee->balance }}" type="text" class="form-control {{ ($employee->balance > 0)? 'bg-red-lt' : 'bg-green-lt' }} " disabled >
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">To Date :</label>
+                        <label class="form-label">@lang('timesheets.to_date')</label>
                         <input value="{{ $employee->last_date }}" type="text" class="form-control" disabled >
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                         @endforeach
                         <label class="form-selectgroup-item">
                             <input type="radio" wire:confirm="ok?" wire:click="destroy" class="form-selectgroup-input">
-                            <span class="form-selectgroup-label">Delete</span>
+                            <span class="form-selectgroup-label">@lang('timesheets.delete')</span>
                         </label>
                     </div>
                 </div>

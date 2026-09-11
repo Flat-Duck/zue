@@ -36,9 +36,7 @@
 <div class="row">
     {{-- Managers --}}
     <x-inputs.group class="col-sm-12">
-        <label for="manager_ids" class="form-label">
-            Managers (One or More)
-        </label>
+        <label for="manager_ids" class="form-label"> @lang('ui.managers_one_or_more') </label>
         <select
             name="manager_ids[]"
             id="manager_ids"
@@ -56,30 +54,24 @@
                 </option>
             @endforeach
         </select>
-        <small class="form-hint">
-            You can assign multiple managers to the same scope.
-        </small>
+        <small class="form-hint"> @lang('ui.you_can_assign_multiple_managers_to_the_same') </small>
     </x-inputs.group>
 
     {{-- Name --}}
     <x-inputs.group class="col-sm-12">
-        <label for="name" class="form-label">
-            Scope Name (Optional)
-        </label>
+        <label for="name" class="form-label"> @lang('ui.scope_name_optional') </label>
         <x-inputs.text
             name="name"
             id="name"
             :value="old('name', ($editing ? $managementScope->name : ''))"
             
-            placeholder="e.g. My Custom Scope"
+            placeholder="@lang('ui.e_g_my_custom_scope')"
         ></x-inputs.text>
     </x-inputs.group>
 
     {{-- Template --}}
     <x-inputs.group class="col-sm-12">
-        <label for="template" class="form-label">
-            Template Identifier
-        </label>
+        <label for="template" class="form-label"> @lang('ui.template_identifier') </label>
         <select
             name="template"
             id="template"
@@ -102,9 +94,7 @@
 
     {{-- Context --}}
     <x-inputs.group class="col-sm-12">
-        <label for="context" class="form-label">
-            Context
-        </label>
+        <label for="context" class="form-label"> @lang('ui.context') </label>
         <select
             name="context"
             id="context"
@@ -193,9 +183,7 @@
                 </option>
             @endforeach
         </select>
-        <small class="form-hint">
-            For <strong>employee</strong> scope type, this is used as print header context only.
-        </small>
+        <small class="form-hint"> @lang('ui.for') <strong>@lang('ui.employee_2')</strong> @lang('ui.scope_type_this_is_used_as_print_header') </small>
     </x-inputs.group>
 
     {{-- Center --}}
@@ -220,9 +208,7 @@
                 </option>
             @endforeach
         </select>
-        <small class="form-hint">
-            For <strong>employee</strong> scope type, this is used as print header context only.
-        </small>
+        <small class="form-hint"> @lang('ui.for') <strong>@lang('ui.employee_2')</strong> @lang('ui.scope_type_this_is_used_as_print_header') </small>
     </x-inputs.group>
 
     {{-- Specific employees (multi-select) --}}
@@ -244,26 +230,21 @@
                 </option>
             @endforeach
         </select>
-        <small class="form-hint">
-            Select one or more employees when scope type is <strong>employee</strong>.
+        <small class="form-hint"> @lang('ui.select_one_or_more_employees_when_scope_type') <strong>@lang('ui.employee_2')</strong>.
         </small>
     </div>
 
     {{-- Settings: Job Title Filter --}}
     <x-inputs.group class="col-sm-12">
-        <label for="settings_job_title" class="form-label">
-            Job Title Filter (Optional)
-        </label>
+        <label for="settings_job_title" class="form-label"> @lang('ui.job_title_filter_optional') </label>
         <input
             type="text"
             name="settings[job_title]"
             id="settings_job_title"
             class="form-control"
             value="{{ old('settings.job_title', $editing ? ($managementScope->settings['job_title'] ?? '') : '') }}"
-            placeholder="e.g. Nurse"
+            placeholder="@lang('ui.e_g_nurse')"
         >
-        <small class="form-hint">
-            Apply this scope only to employees with this job title.
-        </small>
+        <small class="form-hint"> @lang('ui.apply_this_scope_only_to_employees_with_this') </small>
     </x-inputs.group>
 </div>

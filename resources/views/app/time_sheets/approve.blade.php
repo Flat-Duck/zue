@@ -9,7 +9,7 @@
                 <form action="{{ route('time-sheets.approve') }}" method="get" class="d-print-none mb-3">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-4">
-                            <label class="form-label">Management Scope</label>
+                            <label class="form-label">@lang('timesheets.management_scope')</label>
                             <select name="scope_policy_id" class="form-select">
                                 @foreach($scopeOptions as $scopeOption)
                                     <option value="{{ $scopeOption['id'] }}" @selected((int) ($selectedScopePolicyId ?? 0) === (int) $scopeOption['id'])>
@@ -19,15 +19,15 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Month</label>
+                            <label class="form-label">@lang('timesheets.month')</label>
                             <input type="number" min="1" max="12" name="selected_month" class="form-control" value="{{ $selected_month }}">
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Year</label>
+                            <label class="form-label">@lang('timesheets.year')</label>
                             <input type="number" min="2000" max="2100" name="selected_year" class="form-control" value="{{ $selected_year }}">
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary">Apply</button>
+                            <button type="submit" class="btn btn-primary">@lang('timesheets.apply')</button>
                         </div>
                     </div>
                 </form>
@@ -42,12 +42,8 @@
                             <img src="{{ asset('/img/zue-logo.png') }}" class="print-logo" class="mx-auto d-block">
                         </div>
                         <div class="col-6">
-                            <h2 class="h2 text-center">
-                                حقول الانتصار 103
-                            </h2>
-                            <h3 class="h3 text-center">
-                                بطاقة ضبط الوقت
-                            </h3>
+                            <h2 class="h2 text-center"> @lang('timesheets.intisar_fields') </h2>
+                            <h3 class="h3 text-center"> @lang('timesheets.time_control_card') </h3>
                         </div>
                         <div class="col-3">
                             <img src="{{ asset('/img/noc-logo.png') }}" class="print-logo" class="mx-auto d-block">
@@ -56,45 +52,35 @@
                     <div class="row mt-2">
                         <div class="col-1"></div>
                         <div class="col-2 box">
-                            <h6 class="text-center">
-                                السنة
-                            </h6>
+                            <h6 class="text-center"> @lang('timesheets.year') </h6>
                             <hr class="divider">
                             <h6 class="text-center">
                                 {{ $selected_year }}
                             </h6>
                         </div>
                         <div class="col-2 box">
-                            <h6 class="text-center">
-                                الشهر
-                            </h6>
+                            <h6 class="text-center"> @lang('timesheets.month') </h6>
                             <hr class="divider">
                             <h6 class="text-center">
                                 {{ $month_name }}
                             </h6>
                         </div>
                         <div class="col-2 box">
-                            <h6 class="text-center">
-                                مركز التكلفة
-                            </h6>
+                            <h6 class="text-center"> @lang('timesheets.cost_center') </h6>
                             <hr class="divider">
                             <h6 class="text-center">
                                 {{ $center ?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
-                            <h6 class="text-center">
-                                القسم
-                            </h6>
+                            <h6 class="text-center"> @lang('timesheets.department') </h6>
                             <hr class="divider">
                             <h6 class="text-center">
                                 {{ $department ?? '' }}
                             </h6>
                         </div>
                         <div class="col-2 box">
-                            <h6 class="text-center">
-                                الادارة
-                            </h6>
+                            <h6 class="text-center"> @lang('timesheets.administration') </h6>
                             <hr class="divider">
                             <h6 class="text-center">
                                 {{ $administration ?? '' }}
@@ -109,13 +95,13 @@
                             <tr>
                                 <th class="p-1">#</th>
                                 <th class="p-0 m-0">Z-N</th>
-                                <th class="p-0 ">Employee Name</th>
+                                <th class="p-0 ">@lang('timesheets.employee_name')</th>
                                 @for ($i = 1; $i < $month_days; $i++)
                                     <th rowspan="2" class="p-1">
                                         <h5 class="p-0 m-0"> {{ $x = $i >= 10 ? $i : '0' . $i }}</h5>
                                     </th>
                                 @endfor
-                                <th class="p-0">OT</th>
+                                <th class="p-0">@lang('timesheets.ot')</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -193,7 +179,7 @@
                                             @if(!is_null($selectedScopePolicyId ?? null))
                                                 <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
                                             @endif
-                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            <button type="submit" data-bs-original-title="@lang('timesheets.approve')" data-bs-placement="top" data-bs-toggle="tooltip"
                                                 class="pull-right btn btn-yellow">
                                                 <i class="ti ti-check"></i>
                                                 @lang('crud.common.time_sheet_approve')
@@ -217,7 +203,7 @@
 
                         <div class="row gx-2">
                             <div class="col box text-center">
-                                <h6>حافظ الوقت</h6>
+                                <h6>@lang('timesheets.timekeeper')</h6>
                                 <hr class="divider">
                                 @if($timekeeperSigned)
                                     <div>
@@ -236,7 +222,7 @@
                                         @if(!is_null($selectedScopePolicyId ?? null))
                                             <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
                                         @endif
-                                        <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                        <button type="submit" data-bs-original-title="@lang('timesheets.approve')" data-bs-placement="top" data-bs-toggle="tooltip"
                                             class="pull-right btn btn-yellow">
                                             <i class="ti ti-check"></i>
                                             @lang('crud.common.time_sheet_approve')
@@ -247,7 +233,7 @@
 
                             @if($showSupervisorStage)
                                 <div class="col box text-center">
-                                    <h6>مشرف القسم</h6>
+                                    <h6>@lang('timesheets.department_supervisor')</h6>
                                     <hr class="divider">
                                     @if($supervisorSigned)
                                         <div>
@@ -266,7 +252,7 @@
                                             @if(!is_null($selectedScopePolicyId ?? null))
                                                 <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
                                             @endif
-                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            <button type="submit" data-bs-original-title="@lang('timesheets.approve')" data-bs-placement="top" data-bs-toggle="tooltip"
                                                 class="pull-right btn btn-yellow">
                                                 <i class="ti ti-check"></i>
                                                 @lang('crud.common.time_sheet_approve')
@@ -278,7 +264,7 @@
 
                             @if($showFieldCoordinatorStage)
                                 <div class="col box text-center">
-                                    <h6>منسق الحقول</h6>
+                                    <h6>@lang('timesheets.field_coordinator')</h6>
                                     <hr class="divider">
                                     @if($fieldCoordinatorSigned)
                                         <div>
@@ -297,7 +283,7 @@
                                             @if(!is_null($selectedScopePolicyId ?? null))
                                                 <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
                                             @endif
-                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            <button type="submit" data-bs-original-title="@lang('timesheets.approve')" data-bs-placement="top" data-bs-toggle="tooltip"
                                                 class="pull-right btn btn-yellow">
                                                 <i class="ti ti-check"></i>
                                                 @lang('crud.common.time_sheet_approve')
@@ -309,7 +295,7 @@
 
                             @if($showSuperintendentStage)
                                 <div class="col box text-center">
-                                    <h6>مراقب الحقول</h6>
+                                    <h6>@lang('timesheets.field_superintendent')</h6>
                                     <hr class="divider">
                                     @if($superintendentSigned)
                                         <div>
@@ -328,7 +314,7 @@
                                             @if(!is_null($selectedScopePolicyId ?? null))
                                                 <input type="hidden" name="scope_policy_id" value="{{ $selectedScopePolicyId }}">
                                             @endif
-                                            <button type="submit" data-bs-original-title="إعتماد" data-bs-placement="top" data-bs-toggle="tooltip"
+                                            <button type="submit" data-bs-original-title="@lang('timesheets.approve')" data-bs-placement="top" data-bs-toggle="tooltip"
                                                 class="pull-right btn btn-yellow">
                                                 <i class="ti ti-check"></i>
                                                 @lang('crud.common.time_sheet_approve')

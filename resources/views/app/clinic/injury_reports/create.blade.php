@@ -6,8 +6,8 @@
   @csrf
   @include('app.clinic.injury_reports.form-inputs')
   <div class="mt-3">
-    <button class="btn btn-primary">حفظ</button>
-    <a href="{{ route('injury-reports.index') }}" class="btn btn-light">رجوع</a>
+    <button class="btn btn-primary">@lang('clinic.save')</button>
+    <a href="{{ route('injury-reports.index') }}" class="btn btn-light">@lang('clinic.back')</a>
   </div>
 </form>
 @endsection

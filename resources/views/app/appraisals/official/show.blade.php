@@ -13,13 +13,8 @@
                 <!-- Header -->
                 <table class="t hdr">
                     <tr>
-                        <td class="center bold mid" style="width: 30%;">
-                            المؤسسة الوطنية للنفط<br>
-                            إدارة شئون العاملين
-                        </td>
-                        <td class="center mid" style="width: 46%;">
-                            نموذج تقييم الأداء للوظائف الادارية والمالية
-                        </td>
+                        <td class="center bold mid" style="width: 30%;"> @lang('appraisals.national_oil_corporation')<br> @lang('appraisals.personnel_administration') </td>
+                        <td class="center mid" style="width: 46%;"> @lang('appraisals.admin_fin_appraisal_form') </td>
                         <td class="center" style="width: 24%;">
                             <img src="{{ asset('/img/noc-logo.png') }}" style="height: 76px" class="mx-auto d-block">
                         </td>
@@ -27,79 +22,75 @@
                 </table>
 
                 <div class="center bold mt-1" style="font-size:10pt;">
-                    خلال الفترة من <span class="bold">{{ $period->window_open_from->format('d/m/Y') }} </span> م إلى <span
-                        class="bold">{{ $period->window_open_to->format('d/m/Y') }} </span>م
+                    {!! __('appraisals.period_range', [
+                        'from' => '<span class="bold">'.e($period->window_open_from->format('d/m/Y')).'</span>',
+                        'to' => '<span class="bold">'.e($period->window_open_to->format('d/m/Y')).'</span>',
+                    ]) !!}
                 </div>
-                <div class="tableTitle mt-1">
-                    1 بيانات أساسية
-
-                </div>
+                <div class="tableTitle mt-1"> @lang('appraisals.section_1_basic_data') </div>
                 <!-- (1) بيانات أساسية -->
                 <table class="t mt-1">
                     <tr>
-                        <td>اسم المستخدم</td>
+                        <td>@lang('appraisals.username')</td>
                         <td colspan="2">{{ $employee->full_name ?? $employee->first_name }}</td>
 
-                        <td>شارة تعريف رقم</td>
+                        <td>@lang('appraisals.badge_number')</td>
                         <td style="width: 7%;">{{ $employee->id }}</td>
 
-                        <td colspan="2">الادارة</td>
+                        <td colspan="2">@lang('appraisals.administration_alt')</td>
                         <td colspan="2">{{ $employee->administrationName ?? '-' }}</td>
 
 
 
-                        {{-- <td class="col-10pc">العمليات</td>
+                        {{-- <td class="col-10pc">@lang('appraisals.operations')</td>
                         <td class="col-12pc">{{ $employee->department->name ?? '-' }}</td> --}}
 
 
                     </tr>
 
                     <tr>
-                        <td>تاريخ التعيين</td>
+                        <td>@lang('appraisals.hire_date')</td>
                         <td>{{ $employee->start_date ?? '-' }}</td>
 
-                        <td>الوظيفة</td>
+                        <td>@lang('appraisals.job')</td>
                         <td colspan="2">{{ $employee->job_title ?? '-' }}</td>
 
-                        <td>الفئة</td>
+                        <td>@lang('appraisals.category')</td>
                         <td>{{ $employee->job_level ?? '-' }}</td>
 
-                        <td>المستوى</td>
+                        <td>@lang('appraisals.level')</td>
                         <td><input type="text" value=""></td>
                     </tr>
 
                     <tr>
-                        <td>مؤهل العلمي</td>
+                        <td>@lang('appraisals.education')</td>
                         <td colspan="8"><input type="text" value=""></td>
                     </tr>
                 </table>
-                <div class="tableTitle mt-1">
-                    (2) بيانات إضافية
-
-                </div>
+                <div class="tableTitle mt-1"> @lang('appraisals.section_2_additional_data') </div>
                 <!-- (2) بيانات إضافية -->
                 <table class="t mt-1">
                     <tr>
-                        <td class="col-16pc">الإجازات المرضية</td>
+                        <td class="col-16pc">@lang('appraisals.sick_leaves')</td>
                         <td class="col-14pc">{{ $employee->sick_leaves() ?? 0 }}</td>
 
-                        <td class="col-12pc">أيام الغياب</td>
+                        <td class="col-12pc">@lang('appraisals.absence_days')</td>
                         <td class="col-14pc">{{ $employee->sick_leaves() ?? 0 }}</td>
 
-                        <td class="col-16pc">إجازة بدون مرتب</td>
+                        <td class="col-16pc">@lang('appraisals.unpaid_leave')</td>
                         <td class="col-14pc">{{ $employee->sick_leaves() ?? 0 }}</td>
 
-                        <td class="col-16pc">أيام المرتب الأساسي</td>
+                        <td class="col-16pc">@lang('appraisals.basic_salary_days')</td>
                         <td class="col-14pc">{{ $employee->sick_leaves() ?? 0 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="2">الجزاءات الموقعة خلال الفترة</td>
+                        <td colspan="2">@lang('appraisals.penalties_during_period')</td>
                         <td><input type="text" value=""></td>
 
-                        <td colspan="2">أيام الندب أو الإعارة</td>
+                        <td colspan="2">@lang('appraisals.secondment_days')</td>
                         <td><input type="text" value=""></td>
 
-                        <td>أيام التدريب</td>
+                        <td>@lang('appraisals.training_days')</td>
                         <td><input type="text" value=""></td>
                     </tr>
                 </table>
@@ -107,18 +98,18 @@
                 <!-- تصديق البيانات -->
                 <table class="t mt-1">
                     <tr>
-                        <td class="grey center bold col-12pc">تصديق البيانات</td>
+                        <td class="grey center bold col-12pc">@lang('appraisals.certify_data')</td>
 
-                        <td class="col-10pc">الاسم</td>
+                        <td class="col-10pc">@lang('appraisals.name')</td>
                         <td class="col-20pc"><input type="text" value=""></td>
 
-                        <td class="col-10pc">الوظيفة</td>
+                        <td class="col-10pc">@lang('appraisals.job')</td>
                         <td style="width: 18%;"><input type="text" value=""></td>
 
-                        <td class="col-20pc">رئيس قسم شؤون العاملين</td>
+                        <td class="col-20pc">@lang('appraisals.head_of_personnel')</td>
                         <td class="col-20pc"><input type="text" value=""></td>
 
-                        <td class="col-10pc">التوقيع</td>
+                        <td class="col-10pc">@lang('appraisals.signature')</td>
                         <td class="col-20pc"><input type="text" value=""></td>
                     </tr>
                 </table>
@@ -147,10 +138,10 @@
                             <div class="tableTitle mt-1">({{ $counter++ }}) {{ $sectionTitle }}</div>
                             <table class="t">
                                 <tr class="center bold">
-                                    <td style="width: 64%;">العنصر</td>
-                                    <td class="col-12pc">الحد الأعلى</td>
-                                    <td class="col-12pc">الرئيس المباشر</td>
-                                    <td class="col-12pc">الرئيس الأعلى</td>
+                                    <td style="width: 64%;">@lang('appraisals.element')</td>
+                                    <td class="col-12pc">@lang('appraisals.max_limit')</td>
+                                    <td class="col-12pc">@lang('appraisals.direct_manager')</td>
+                                    <td class="col-12pc">@lang('appraisals.senior_manager')</td>
                                 </tr>
                                 @foreach($scores as $score)
                                     @php
@@ -176,7 +167,7 @@
                                     </tr>
                                 @endforeach
                                 <tr class="bold center">
-                                    <td>المجموع</td>
+                                    <td>@lang('appraisals.total')</td>
                                     <td>{{ $sectionMax }}</td>
                                     <td>{{ $sectionTotal }}</td> <!-- This sums the effective scores -->
                                     <td>{{ $scores->sum('score_override') > 0 ? $scores->sum('score_override') : '' }}</td>
@@ -190,9 +181,7 @@
                     </div>
                     <!-- LEFT: summaries + comments + rec -->
                     <div>
-                        <div class="tableTitle mt-1">
-                            (7) مجموع الدرجات والتقدير
-                        </div>
+                        <div class="tableTitle mt-1"> @lang('appraisals.section_7_total_and_grade') </div>
                         <table class="t">
                             <tr>
                                 @foreach($groupedScores as $sectionKey => $scores)
@@ -211,14 +200,14 @@
 
                         <table class="t mt-1">
                             <tr>
-                                <td class="center bold col-55pc">المجموع الكلي</td>
+                                <td class="center bold col-55pc">@lang('appraisals.grand_total')</td>
                                 <td class="center bold col-45pc">{{ $grandTotal }}</td>
                             </tr>
                         </table>
 
                         <table class="t mt-1">
                             <tr>
-                                <td class="center bold col-55pc">التقدير</td>
+                                <td class="center bold col-55pc">@lang('appraisals.grade')</td>
                                 <td class="center bold col-45pc">
                                     {{ $grandMax > 0 ? round(($grandTotal / $grandMax) * 100) : 0 }}%
                                 </td>
@@ -227,46 +216,40 @@
 
                         <table class="t mt-1">
                             <tr>
-                                <td class="center bold">ممتاز<br><span class="xs">(90-100)</span></td>
-                                <td class="center bold">جيد جداً<br><span class="xs">(75-89)</span></td>
-                                <td class="center bold">جيد<br><span class="xs">(60-74)</span></td>
-                                <td class="center bold">متوسط<br><span class="xs">(45-59)</span></td>
-                                <td class="center bold">ضعيف<br><span class="xs">أقل من 45</span></td>
+                                <td class="center bold">@lang('appraisals.excellent')<br><span class="xs">(90-100)</span></td>
+                                <td class="center bold">@lang('appraisals.very_good')<br><span class="xs">(75-89)</span></td>
+                                <td class="center bold">@lang('appraisals.good')<br><span class="xs">(60-74)</span></td>
+                                <td class="center bold">@lang('appraisals.average')<br><span class="xs">(45-59)</span></td>
+                                <td class="center bold">@lang('appraisals.weak')<br><span class="xs">@lang('appraisals.less_than_45')</span></td>
                             </tr>
                         </table>
 
 
                         <div class="box mt-1">
-                            <div class="tableTitle ">
-                                (8) نقاط القوة للصفات الإيجابية الأخرى التي يتميز بها ولم تشملها العناصر
-                                السابقة
-                            </div>
+                            <div class="tableTitle "> @lang('appraisals.section_8_strengths') </div>
                             <div class="body" style="height: 30mm;">
                                 <textarea></textarea>
                             </div>
                         </div>
 
                         <div class="box mt-1">
-                            <div class="tableTitle">(9) نقاط الضعف للصفات السلبية الأخرى التي يتصف بها ولم تشملها
-                                العناصر
-                                السابقة
-                            </div>
+                            <div class="tableTitle">@lang('appraisals.section_9_weaknesses') </div>
                             <div class="body" style="height: 30mm;">
                                 <textarea></textarea>
                             </div>
                         </div>
 
                         <div class="box mt-1">
-                            <div class="tableTitle ">(10) توصيات</div>
+                            <div class="tableTitle ">@lang('appraisals.section_10_recommendations')</div>
                             <div class="body" style="padding: 2.2mm;">
                                 <div class="optRow">
                                     <label><input type="radio" name="rec"></label>
-                                    <span>يحتاج إلى تدريب في مجال:</span>
+                                    <span>@lang('appraisals.needs_training_in')</span>
                                     <span class="dots"></span>
                                 </div>
                                 <div class="optRow">
                                     <label><input type="radio" name="rec"></label>
-                                    <span>النقل الى وظيفة أخرى</span>
+                                    <span>@lang('appraisals.transfer_to_another_job')</span>
                                     <span class="dots"></span>
                                 </div>
                             </div>
@@ -277,14 +260,12 @@
 
                 <!-- (6) رأي الرئيس الأعلى -->
                 <div class="box mt-1">
-                    <div class="tableTitle mt-1">(6) رأي الرئيس الأعلى</div>
+                    <div class="tableTitle mt-1">@lang('appraisals.section_6_senior_manager_opinion')</div>
                     <div class="body" style="padding: 2mm;">
-                        <div class=" bold small">مبررات تقدير درجة الكفاءة (ضعيف – متوسط – ممتاز)</div>
+                        <div class=" bold small">@lang('appraisals.rating_justification')</div>
                         <div style="height: 10mm; border-bottom: 2px dotted #000; margin-top: 1mm;"></div>
 
-                        <div class=" bold small" style="margin-top: 2mm;">
-                            أسباب اختلاف تقرير الكفاءة بين الرئيس المباشر والرئيس الأعلى
-                        </div>
+                        <div class=" bold small" style="margin-top: 2mm;"> @lang('appraisals.reasons_for_rating_difference') </div>
                         <div style="height: 10mm; border-bottom: 2px dotted #000; margin-top: 1mm;"></div>
                     </div>
                 </div>
@@ -293,36 +274,36 @@
                 <div class="mt-1" style="display:grid; grid-template-columns: 1fr 1fr; gap: 5mm;">
                     <table class="t">
                         <tr>
-                            <td class="center bold" colspan="2">توقيع الرئيس المباشر</td>
+                            <td class="center bold" colspan="2">@lang('appraisals.direct_manager_signature')</td>
                         </tr>
                         <tr>
-                            <td class="col-25pc">الاسم:</td>
+                            <td class="col-25pc">@lang('appraisals.name_label')</td>
                             <td><input type="text" value="عمر جمعة دحيم"></td>
                         </tr>
                         <tr>
-                            <td>الصفة:</td>
+                            <td>@lang('appraisals.trait_label')</td>
                             <td><input type="text" value="رئيس قسم (الشئون الإدارية) 103"></td>
                         </tr>
                         <tr>
-                            <td>التوقيع:</td>
+                            <td>@lang('appraisals.signature_label')</td>
                             <td><input type="text" value=""></td>
                         </tr>
                     </table>
 
                     <table class="t">
                         <tr>
-                            <td class="center bold" colspan="2">توقيع الرئيس الأعلى</td>
+                            <td class="center bold" colspan="2">@lang('appraisals.senior_manager_signature')</td>
                         </tr>
                         <tr>
-                            <td class="col-25pc">الاسم:</td>
+                            <td class="col-25pc">@lang('appraisals.name_label')</td>
                             <td><input type="text" value="ناجي محمد المبروك"></td>
                         </tr>
                         <tr>
-                            <td>الصفة:</td>
+                            <td>@lang('appraisals.trait_label')</td>
                             <td><input type="text" value="مراقب حقول 103"></td>
                         </tr>
                         <tr>
-                            <td>التوقيع:</td>
+                            <td>@lang('appraisals.signature_label')</td>
                             <td><input type="text" value=""></td>
                         </tr>
                     </table>

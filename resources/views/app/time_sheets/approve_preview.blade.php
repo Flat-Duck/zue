@@ -24,18 +24,18 @@
                     @endif
                     <x-inputs.group class="col-sm-4">
                         <x-inputs.select name="selected_month" label="Select Month">
-                            <option value="1 ">January</option>
-                            <option value="2 ">February</option>
-                            <option value="3 ">March</option>
-                            <option value="4 ">April</option>
-                            <option value="5 ">May</option>
-                            <option value="6 ">June</option>
-                            <option value="7 ">July</option>
-                            <option value="8 ">August</option>
-                            <option value="9 ">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">Decembe</option>
+                            <option value="1 ">@lang('timesheets.january')</option>
+                            <option value="2 ">@lang('timesheets.february')</option>
+                            <option value="3 ">@lang('timesheets.march')</option>
+                            <option value="4 ">@lang('timesheets.april')</option>
+                            <option value="5 ">@lang('timesheets.may')</option>
+                            <option value="6 ">@lang('timesheets.june')</option>
+                            <option value="7 ">@lang('timesheets.july')</option>
+                            <option value="8 ">@lang('timesheets.august')</option>
+                            <option value="9 ">@lang('timesheets.september')</option>
+                            <option value="10">@lang('timesheets.october')</option>
+                            <option value="11">@lang('timesheets.november')</option>
+                            <option value="12">@lang('timesheets.december')</option>
                         </x-inputs.select>
                     </x-inputs.group>
                     <x-inputs.group class="col-sm-4">

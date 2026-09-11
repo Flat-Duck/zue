@@ -13,7 +13,7 @@
                 @endif
                 <div class="mb-3">
                     <label class="form-label required">{{ __('Email Address') }}</label>
-                    <input type="email" placeholder="Enter email" id="email"  class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+                    <input type="email" placeholder="@lang('auth.enter_email')" id="email"  class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
                     @error('email')
                         <span class="invalid-feedback" >
                             <strong>{{ $message }}</strong>
@@ -24,9 +24,9 @@
                     <label class="form-label required">{{ __('Password') }}
                     </label>
                     <div class="input-group input-group-flat @error('password') is-invalid @enderror">
-                        <input type="password" placeholder="Enter password" id="password"  class="form-control @error('password') is-invalid @enderror" name="password" value="{{ old('password') }}" required autocomplete="new-password" autofocus>
+                        <input type="password" placeholder="@lang('auth.enter_password')" id="password"  class="form-control @error('password') is-invalid @enderror" name="password" value="{{ old('password') }}" required autocomplete="new-password" autofocus>
                         <span class="input-group-text">
-                            <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                            <a href="#" class="link-secondary" title="@lang('auth.show_password')" data-bs-toggle="tooltip">
                                 <i class="ti ti-eye"></i>
                             </a>
                         </span>
@@ -41,9 +41,9 @@
                     <label class="form-label required">{{ __('Confirm Password') }}
                     </label>
                     <div class="input-group input-group-flat">
-                        <input type="password" placeholder="Confirm password" id="password-confirm" class="form-control" name="password_confirmation" value="{{ old('password-confirm') }}" required autocomplete="new-password" autofocus>
+                        <input type="password" placeholder="@lang('auth.confirm_password')" id="password-confirm" class="form-control" name="password_confirmation" value="{{ old('password-confirm') }}" required autocomplete="new-password" autofocus>
                         <span class="input-group-text">
-                            <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                            <a href="#" class="link-secondary" title="@lang('auth.show_password')" data-bs-toggle="tooltip">
                                 <i class="ti ti-eye"></i>
                             </a>
                         </span>

@@ -18,7 +18,7 @@
                     {{-- <div class="list-group-item m-0 ps-1 p-0"> --}}
                         <div class="row align-items-center m-1">
                             <div class="col-auto m-0 p-0">
-                                <span class="avatar avatar-xs rounded me-2">JL</span>
+                                <span class="avatar avatar-xs rounded me-2">@lang('timesheets.jl')</span>
                             </div>
                             <div class="col-auto text-truncate ps-0">
                                 <a href="{{ route('time-sheets.fill', $id) }}" class="text-reset d-block">{{$number}}</a>
@@ -36,62 +36,62 @@
             <div class="row row-cards">
                 <div class="col-2 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">ZOC No :</label>
+                        <label class="form-label">@lang('timesheets.zoc_no')</label>
                         <input value="{{ $employee->number}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-6 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Full Name :</label>
+                        <label class="form-label">@lang('timesheets.full_name')</label>
                         <input value="{{ $employee->english_name}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Start Date :</label>
+                        <label class="form-label">@lang('timesheets.start_date')</label>
                         <input value="{{ $employee->start_date}}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Administration :</label>
+                        <label class="form-label">@lang('timesheets.administration')</label>
                         <input value="{{ $employee->administration_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Department :</label>
+                        <label class="form-label">@lang('timesheets.department')</label>
                         <input value="{{ $employee->department_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Cost Center :</label>
+                        <label class="form-label">@lang('timesheets.cost_center')</label>
                         <input value="{{ $employee->center_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-3 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Location :</label>
+                        <label class="form-label">@lang('timesheets.location')</label>
                         <input value="{{ $employee->location_name }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Schedule :</label>
+                        <label class="form-label">@lang('timesheets.schedule')</label>
                         <input value="{{ $employee->schedule }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">Total Balance : </label>
+                        <label class="form-label">@lang('timesheets.total_balance') </label>
                         <input value="{{ $employee->balance }}" type="text"
                             class="form-control {{ ($employee->balance < 0) ? 'bg-red-lt' : 'bg-green-lt' }} " disabled>
                     </div>
                 </div>
                 <div class="col-4 mt-3">
                     <div class="mb-3">
-                        <label class="form-label">To Date :</label>
+                        <label class="form-label">@lang('timesheets.to_date')</label>
                         <input value="{{ $employee->last_date }}" type="text" class="form-control" disabled>
                     </div>
                 </div>
@@ -116,8 +116,7 @@
                         @endforeach
                         @if($revise)
                             <div class="col-6 col-sm-4 col-md-2 col-xl-auto">
-                                <a class="btn btn-pinterest w-100" wire:confirm="ok?" wire:click="destroy">
-                                    Delete <i class="ti ti-trash-x"> </i>
+                                <a class="btn btn-pinterest w-100" wire:confirm="ok?" wire:click="destroy"> @lang('timesheets.delete') <i class="ti ti-trash-x"> </i>
                                 </a>
                             </div>
                         @endif
@@ -126,7 +125,7 @@
             </div>
         </div>
         <div class="col-1">
-            <label for="ov">Over time</label>
+            <label for="ov">@lang('timesheets.over_time')</label>
             <input type="text" value="2" wire:model="ov" class="form-control">
         </div>
     </div>
@@ -150,13 +149,13 @@
                 <table class="table table-vcenter text-center">
                     <thead>
                         <tr class="bg-dark text-white">
-                            <td class="p-1">Month</td>
+                            <td class="p-1">@lang('timesheets.month')</td>
                             @for ($i = 1; $i < 32; $i++)
                                 <td class="p-1">{{$i}}</td>
                             @endfor
                             {{-- <td class="p-1">W</td>
                             <td class="p-1">F</td> --}}
-                            {{-- <td class="p-1">Balance</td> --}}
+                            {{-- <td class="p-1">@lang('timesheets.balance')</td> --}}
                         </tr>
                     </thead>
                     <tbody>

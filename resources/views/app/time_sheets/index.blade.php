@@ -15,8 +15,8 @@
                             type="text"
                             value="{{ $search }}"
                             class="form-control"
-                            placeholder="Search…"
-                            aria-label="Search..."
+                            placeholder="@lang('timesheets.search_2')"
+                            aria-label="@lang('timesheets.search')"
                             spellcheck="false"
                             data-ms-editor="true"
                             autocomplete="off"
@@ -36,7 +36,7 @@
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
-                            aria-label="Button"
+                            aria-label="@lang('timesheets.button')"
                         >
                             <i class="ti ti-search"></i>
                         </button>
@@ -46,7 +46,7 @@
             <div class="col-auto ms-auto d-print-none">
                 @can('create', App\Models\Employee::class)
                 <a
-                    data-bs-original-title="إنشاء"
+                    data-bs-original-title="@lang('timesheets.create')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-primary"
@@ -56,7 +56,7 @@
                     @lang('crud.common.create')
                 </a>
                  <a
-                    data-bs-original-title="طباعة"
+                    data-bs-original-title="@lang('timesheets.print')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-green"
@@ -65,7 +65,7 @@
                     <i class="ti ti-printer"></i>
                     @lang('crud.common.print_preview')
                 </a>
-                <a data-bs-original-title="إعتماد"
+                <a data-bs-original-title="@lang('timesheets.approve')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-yellow"
@@ -83,9 +83,9 @@
     <div class="card-body border-bottom">
         <div class="row g-3">
             <div class="col-md-4">
-                <h4 class="mb-2">Supervisors</h4>
+                <h4 class="mb-2">@lang('timesheets.supervisors')</h4>
                 @if(($groupedEmployees['supervisors'] ?? collect())->isEmpty())
-                    <p class="text-muted mb-0">No supervisors in current scope.</p>
+                    <p class="text-muted mb-0">@lang('timesheets.no_supervisors_in_current_scope')</p>
                 @else
                     <ul class="mb-0 ps-3">
                         @foreach($groupedEmployees['supervisors'] as $supervisor)
@@ -95,14 +95,14 @@
                 @endif
             </div>
             <div class="col-md-8">
-                <h4 class="mb-2">Normal Employees By Department</h4>
+                <h4 class="mb-2">@lang('timesheets.normal_employees_by_department')</h4>
                 @if(($groupedEmployees['normal_employees_by_department'] ?? collect())->isEmpty())
-                    <p class="text-muted mb-0">No normal employees in current scope.</p>
+                    <p class="text-muted mb-0">@lang('timesheets.no_normal_employees_in_current_scope')</p>
                 @else
                     @foreach($groupedEmployees['normal_employees_by_department'] as $departmentName => $departmentEmployees)
                         <div class="mb-1">
                             <strong>{{ $departmentName }}</strong>:
-                            {{ $departmentEmployees->count() }} employee(s)
+                            @lang('timesheets.employee_count', ['count' => $departmentEmployees->count()])
                         </div>
                     @endforeach
                 @endif
@@ -197,7 +197,7 @@
                     <td class="text-center table-actions">
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('timesheets.row_actions')"
                             class="btn-group"
                         >
                             @can('update', $employee)
@@ -216,7 +216,7 @@
                             </a>
                             @endcan
                             <a href="{{ route('time-sheets.fill', ['employee' => $employee, 'scope_policy_id' => $selectedScopePolicyId ?? null]) }}"
-                                    data-bs-original-title="Fill Time Sheet"
+                                    data-bs-original-title="@lang('timesheets.fill_time_sheet')"
                                     data-bs-placement="top"
                                     data-bs-toggle="tooltip"
                                     class="btn btn-icon btn-outline-success ms-1" >

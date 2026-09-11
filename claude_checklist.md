@@ -497,9 +497,9 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   what the record would look like. `skin_url` and `content_css` are `default` at all seven init
   sites now, and `ClinicEditorTest` fails on any failed request on that page.
 
-- [~] 5.5 **Decided: two languages, Arabic and English. The foundation is in; the documents are
-  not.** Owner's answer overrode my recommendation to leave it, so the interface is genuinely
-  bilingual rather than English-with-Arabic-documents.
+- [x] 5.5 **Decided: two languages, Arabic and English. Both are complete.** Owner's answer
+  overrode my recommendation to leave it, so the interface is genuinely bilingual rather than
+  English-with-Arabic-documents.
 
   Done:
 
@@ -519,12 +519,72 @@ markup totalling 573 lines across 16 views. Prose comments were left intact.
   - Nine tests, one a browser test that switches to Arabic and checks the page actually lays out
     right to left, on the mirrored stylesheet, with no console errors.
 
-  **Not done, and the larger half:** the **286 lines of hard-coded Arabic** across 38 views — the
-  appraisal sheet, the manifest, the injury report, the approval sheet. Those are the printed
-  documents, and making them bilingual means deciding *per document* whether it shows both
-  scripts side by side or follows the interface language. The manifest is carried to the airport
-  and the appraisal form is signed. That is a question about the paper. **Say which and I will do
-  the documents.**
+  **Now done: every view.** 796 keys across twelve catalogues, both languages in sync. The whole
+  interface — every screen, every menu, every confirmation dialog — reads from a lang file.
+
+  - Twelve catalogues: `nav`, `ui`, `auth`, `crud`, `notifications`, `appraisals`, `clinic`,
+    `flights`, `maintenance`, `operations`, `reports`, `timesheets`.
+  - **All 35 sidebar labels**, the user menu, and the footer. The footer was Tabler's own —
+    their documentation link, a sponsor button, "Copyright © 2023 Tabler", and links to
+    `./license.html` and `./changelog.html`, neither of which exists here.
+  - Confirmation dialogs too. They lived in `onsubmit="return confirm('…')"`, so they stayed
+    English no matter the interface. They now read `confirm({{ Js::from(__('…')) }})` — `Js::from`
+    escapes for JavaScript *and* for the attribute, which `addslashes` did not: the one dialog
+    that interpolated a person's name broke on any name containing an apostrophe.
+  - Views written in Arabic got a hand-written key and a real English translation rather than a
+    slug of the Arabic, which would have produced `text_7` and left Arabic in the English file.
+  - Three strings were rewritten while being translated: two were colloquial (`مافيش تقييمات`)
+    and one exposed a column name to the user (`لازم الموظف يكون مربوط بـ appraisal_form_id`).
+
+  **`TranslationCoverageTest` locks it in.** Four assertions: no view carries a readable label, no
+  confirmation dialog is hard-coded, the two catalogues carry identical keys, and no Arabic value
+  is a copy of its English one. It strips Blade before looking, so it sees what a reader sees, and
+  it is mutation-checked both ways — putting back an English label fails it, and so does putting
+  back an Arabic one.
+
+  **The printed documents, and a decision I made rather than guessed at.** The airport manifest is
+  a facsimile of the paper form checked against at the gate: right-to-left, Arabic, company name
+  in Latin capitals. Making it follow the interface language would mean the sheet changes language
+  depending on who pressed print — `FlightManifestPrintTest` caught exactly that. Its labels are
+  now pinned with `__('…', [], 'ar')`, so the strings live in the catalogue but the paper does not
+  move. The report signature blocks keep the side-by-side wording they already had
+  (`حافظ الوقت / Timekeeper`).
+
+  **Still your call:** two other printed forms now *follow the interface language* rather than
+  staying Arabic — `appraisals/official/show.blade.php` (the signed appraisal form) and the
+  printed half of `time_sheets/approve.blade.php` (the monthly control sheet). Your decision 5.5
+  said reports should be bilingual, so that is what I built; but if either of those is a facsimile
+  of a paper original the way the manifest is, say so and I will pin it the same way — the strings
+  are already in the catalogue, so it is a one-line change per label.
+
+- [x] **Four views were dead, and one of the live ones was showing Tabler's demo data as real
+  records.** `employees/directory.blade.php` is routed and rendered every employee in the company
+  with the initials `SA` and the job title `Nuclear Power Engineer`, with mail and phone buttons
+  pointing at `#`. It now shows each person's own job title, initials derived from their name, and
+  `mailto:`/`tel:` links that disable themselves when there is nothing to link to.
+  `EmployeeDirectoryTest` covers it, including the Arabic-name fallback.
+
+  The four dead ones were left in place and excluded rather than translated, since a string nobody
+  can see does not belong in the catalogue: `time_sheets/print.blade.php` (a prototype that queries
+  the database from the template with a hard-coded month, and whose controller action renders
+  `approve` instead), `components/print-header.blade.php` with its `PrintHeader` class,
+  `components/inputs/radio.blade.php` (a checkbox with a stray Excel radio group inside it), and
+  `livewire/time-sheeter.blade.php`, referenced only from commented-out Blade. **Say the word and
+  I will delete them.**
+
+- [x] **Defects found and fixed while reading every view.** None of these were translation work;
+  they were only visible because translating meant reading all 185 views.
+
+  - `December` was spelled `Decembe` in both month selectors.
+  - `Available` was spelled `Avalible` on the rooms screen, `New Appointment` was `New Ppointment`
+    in the clinic.
+  - `auth/passwords/confirm.blade.php` contained a `<# … #>` block — neither Blade nor HTML, so
+    both markers rendered on the page — wrapping Tabler's demo avatar and the author's name.
+  - The login page carried Tabler's GitHub and Twitter sign-in buttons, both pointing at `#`.
+  - Every page's `<title>` was the literal string `zue`, and the logo's `alt` text was too. The
+    title is now `@yield('title', config('app.name'))`.
+  - Three views built a badge as a PHP string inside `{!! … !!}`, which is why the substitution
+    landed inside the expression and broke them — rewritten as ordinary `@if`/`@else` markup.
 
 - [x] **The stylesheet was still fetching a Google font, and my earlier claim was too broad.**
   I said no view loads from another host. True of Blade, not of the build: `app.scss` opened with

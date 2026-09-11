@@ -22,14 +22,14 @@
                 <input type="hidden" name="is_field" value="0">
                 <input class="form-check-input" type="checkbox" name="is_field" value="1"
                     {{ old('is_field', $editing ? $station->is_field : false) ? 'checked' : '' }}>
-                <span class="form-check-label">This is a field site</span>
+                <span class="form-check-label">@lang('flights.this_is_a_field_site')</span>
             </label>
 
             <label class="form-check form-switch">
                 <input type="hidden" name="is_active" value="0">
                 <input class="form-check-input" type="checkbox" name="is_active" value="1"
                     {{ old('is_active', $editing ? $station->is_active : true) ? 'checked' : '' }}>
-                <span class="form-check-label">Active</span>
+                <span class="form-check-label">@lang('flights.active')</span>
             </label>
         </div>
     </div>

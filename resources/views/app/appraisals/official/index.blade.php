@@ -5,8 +5,8 @@
         <div class="page-header d-print-none">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">نتائج التقييم النهائية (Official)</h2>
-                    <div class="text-muted">لعام {{ $year }}</div>
+                    <h2 class="page-title">@lang('appraisals.final_official_results')</h2>
+                    <div class="text-muted">@lang('appraisals.for_year', ['year' => $year])</div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
                     <form method="GET" class="d-flex gap-2">
@@ -15,8 +15,8 @@
                                 <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endforeach
                         </select>
-                        <input type="text" name="q" value="{{ $q }}" class="form-control" placeholder="بحث عن موظف...">
-                        <button class="btn btn-primary">بحث</button>
+                        <input type="text" name="q" value="{{ $q }}" class="form-control" placeholder="@lang('appraisals.search_for_employee')">
+                        <button class="btn btn-primary">@lang('appraisals.search')</button>
                     </form>
                 </div>
             </div>
@@ -27,12 +27,12 @@
                 <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
-                            <th>الموظف</th>
-                            <th>الفترة</th>
-                            <th>النوع</th>
-                            <th>الدرجة</th>
-                            <th>التقدير</th>
-                            <th>التاريخ</th>
+                            <th>@lang('appraisals.employee')</th>
+                            <th>@lang('appraisals.period')</th>
+                            <th>@lang('appraisals.type')</th>
+                            <th>@lang('appraisals.score')</th>
+                            <th>@lang('appraisals.grade')</th>
+                            <th>@lang('appraisals.date')</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -50,9 +50,9 @@
                                                 </td>
                                                 <td>
                                                     @if($appraisal->period->type === 'yearly')
-                                                        <span class="badge bg-purple text-purple-fg">سنوي</span>
+                                                        <span class="badge bg-purple text-purple-fg">@lang('appraisals.yearly')</span>
                                                     @else
-                                                        <span class="badge bg-blue text-blue-fg">ربعي</span>
+                                                        <span class="badge bg-blue text-blue-fg">@lang('appraisals.quarterly')</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -73,15 +73,13 @@
                                                 <td>{{ $appraisal->created_at->format('Y-m-d') }}</td>
                                                 <td class="text-end">
                                                     <a href="{{ route('appraisals.official.show', ['period' => $appraisal->appraisal_period_id, 'employee' => $appraisal->employee_id]) }}"
-                                                        class="btn btn-sm btn-outline-primary">
-                                                        عرض التفاصيل
-                                                    </a>
+                                                        class="btn btn-sm btn-outline-primary"> @lang('appraisals.view_details') </a>
                                                 </td>
                                             </tr>
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center py-4">
-                                    <div class="text-muted">لا توجد نتائج لهذه الفترة</div>
+                                    <div class="text-muted">@lang('appraisals.no_results_for_this_period')</div>
                                 </td>
                             </tr>
                         @endforelse

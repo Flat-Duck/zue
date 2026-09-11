@@ -17,13 +17,13 @@
             <table class="table table-vcenter text-center">
                 <thead>
                     <tr class="bg-dark text-white">
-                        <td class="p-1">Month</td>
+                        <td class="p-1">@lang('ui.month')</td>
                         @for ($i = 1; $i<32; $i++)
                             <td class="p-1">{{$i}}</td>
                         @endfor
                         {{-- <td class="p-1">W</td>
                         <td class="p-1">F</td> --}}
-                        {{-- <td class="p-1">Balance</td> --}}
+                        {{-- <td class="p-1">@lang('ui.balance')</td> --}}
                     </tr>
                 </thead>
                 <tbody>

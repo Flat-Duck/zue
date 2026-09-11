@@ -11,7 +11,7 @@
                                         <i class="ti ti-home"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Dashboard
+                                        @lang('nav.dashboard')
                                     </span>
                                 </a>
                             </li>
@@ -46,7 +46,7 @@
                                         </svg>
                                     </span>
                                     <span class="nav-link-title">
-                                        Dispatcher Management
+                                        @lang('nav.dispatcher_management')
                                     </span>
                                 </a>
                                 <div class="dropdown-menu">
@@ -56,7 +56,7 @@
                                                 <i class="ti ti-plane-departure"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Flights
+                                                @lang('nav.flights')
                                             </span>
                                         </a>
                                     @endcan
@@ -66,7 +66,7 @@
                                                 <i class="ti ti-friends"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Passengers
+                                                @lang('nav.passengers')
                                             </span>
                                         </a>
                                     @endcan
@@ -76,7 +76,7 @@
                                                 <i class="ti ti-plane"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Planes
+                                                @lang('nav.planes')
                                             </span>
                                         </a>
                                     @endcan
@@ -86,7 +86,7 @@
                                                 <i class="ti ti-route"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Routes
+                                                @lang('nav.routes')
                                             </span>
                                         </a>
                                     @endcan
@@ -96,7 +96,7 @@
                                                 <i class="ti ti-map-pin"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Stations
+                                                @lang('nav.stations')
                                             </span>
                                         </a>
                                     @endcan
@@ -118,7 +118,7 @@
                                         <i class="ti ti-lock-access"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Management
+                                        @lang('nav.management')
                                     </span>
                                 </a>
                                 <div class="dropdown-menu">
@@ -128,7 +128,7 @@
                                                 <i class="ti ti-user-check"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Administrations
+                                                @lang('nav.administrations')
                                             </span>
                                         </a>
                                     @endcan
@@ -138,7 +138,7 @@
                                                 <i class="ti ti-key"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Centers
+                                                @lang('nav.centers')
                                             </span>
                                         </a>
                                     @endcan
@@ -148,7 +148,7 @@
                                                 <i class="ti ti-key"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Departments
+                                                @lang('nav.departments')
                                             </span>
                                         </a>
                                     @endcan
@@ -158,7 +158,7 @@
                                                 <i class="ti ti-key"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Locations
+                                                @lang('nav.locations')
                                             </span>
                                         </a>
                                     @endcan
@@ -177,7 +177,7 @@
                                         <i class="ti ti-lock-access"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Camp Boss
+                                        @lang('nav.camp_boss')
                                     </span>
                                 </a>
                                 <div class="dropdown-menu">
@@ -187,7 +187,7 @@
                                                 <i class="ti ti-user-check"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Residences
+                                                @lang('nav.residences')
                                             </span>
                                         </a>
                                     @endcan
@@ -197,7 +197,7 @@
                                                 <i class="ti ti-key"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Rooms
+                                                @lang('nav.rooms')
                                             </span>
                                         </a>
                                     @endcan
@@ -213,7 +213,7 @@
                                         <!-- Stocks Icon -->
                                     </span>
                                     <span class="nav-link-title">
-                                        Stocks
+                                        @lang('nav.stocks')
                                     </span>
                                 </a>
                             </li>
@@ -225,7 +225,7 @@
                                         <i class="ti ti-calendar-time"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Time Sheets
+                                        @lang('nav.time_sheets')
                                     </span>
                                 </a>
                             </li>
@@ -237,7 +237,7 @@
                                         <i class="ti ti-adjustments-horizontal"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Management Scopes
+                                        @lang('nav.management_scopes')
                                     </span>
                                 </a>
                             </li>
@@ -249,7 +249,7 @@
                                         <i class="ti ti-settings-automation"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Operations
+                                        @lang('nav.operations')
                                     </span>
                                 </a>
                             </li>
@@ -261,7 +261,7 @@
                                         <i class="ti ti-database"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Maintenance
+                                        @lang('nav.maintenance')
                                     </span>
                                 </a>
                             </li>
@@ -273,7 +273,7 @@
                                         <i class="ti ti-report-analytics"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Reports
+                                        @lang('nav.reports')
                                     </span>
                                 </a>
                             </li>
@@ -286,37 +286,37 @@
                                     <i class="ti ti-clipboard-check"></i>
                                 </span>
                                 <span class="nav-link-title">
-                                    Appraisals
+                                    @lang('nav.appraisals')
                                 </span>
                             </a>
 
                             <div class="dropdown-menu">
 
                                 {{-- ========= Builder: Items / Forms / Versions ========= --}}
-                                <div class="dropdown-header">Builder</div>
+                                <div class="dropdown-header">@lang('nav.builder')</div>
 
                                 <a class="dropdown-item" href="{{ route('appraisals.items.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-list-details"></i></span>
-                                    <span class="nav-link-title">Items</span>
+                                    <span class="nav-link-title">@lang('nav.items')</span>
                                 </a>
 
                                 <a class="dropdown-item" href="{{ route('appraisals.items.create') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-square-plus"></i></span>
-                                    <span class="nav-link-title">Create Item</span>
+                                    <span class="nav-link-title">@lang('nav.create_item')</span>
                                 </a>
 
                                 <a class="dropdown-item" href="{{ route('appraisals.forms.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-layout"></i></span>
-                                    <span class="nav-link-title">Forms</span>
+                                    <span class="nav-link-title">@lang('nav.forms')</span>
                                 </a>
 
                                 <a class="dropdown-item" href="{{ route('appraisals.forms.create') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-square-plus"></i></span>
-                                    <span class="nav-link-title">Create Form</span>
+                                    <span class="nav-link-title">@lang('nav.create_form')</span>
                                 </a>
 
                                 {{-- NOTE: versions/form edit تحتاج ID، هذي روابط “مثال” حطها في صفحات الforms نفسها --}}
@@ -327,7 +327,7 @@
                                 <div class="dropdown-divider"></div>
 
                                 {{-- ========= Appraisal Process ========= --}}
-                                <div class="dropdown-header">Process</div>
+                                <div class="dropdown-header">@lang('nav.process')</div>
 
                                 {{-- ⚠️ حسب web.php اللي عندك ممكن الاسم يكون مكرر appraisals.appraisals.* --}}
                                 {{-- إذا شغّال عندك الاسم هذا استخدمه بدل اللي تحت --}}
@@ -335,41 +335,41 @@
                                 <a class="dropdown-item" href="{{ route('appraisals.periods.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-calendar"></i></span>
-                                    <span class="nav-link-title">Periods</span>
+                                    <span class="nav-link-title">@lang('nav.periods')</span>
                                 </a>
 
                                 {{-- href="{{ route('appraisals.appraisals.reviews.index') }}" --}}
                                 <a class="dropdown-item" href="{{ route('appraisals.reviews.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-file-text"></i></span>
-                                    <span class="nav-link-title">Reviews</span>
+                                    <span class="nav-link-title">@lang('nav.reviews')</span>
                                 </a>
 
                                 {{-- href="{{ route('appraisals.appraisals.reviews.create') }}" --}}
                                 <a class="dropdown-item" href="{{ route('appraisals.reviews.create') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-square-plus"></i></span>
-                                    <span class="nav-link-title">Create Review</span>
+                                    <span class="nav-link-title">@lang('nav.create_review')</span>
                                 </a>
 
                                 <div class="dropdown-divider"></div>
 
                                 {{-- ========= Employee form assignment ========= --}}
-                                <div class="dropdown-header">Employee</div>
+                                <div class="dropdown-header">@lang('nav.employee')</div>
 
                                 {{-- هذا يحتاج employee id: حطه عادة في صفحة الموظف --}}
                                 {{-- href="{{ route('appraisals.employees.appraisal-form.edit', $employee->id) }}" --}}
                                 <span class="dropdown-item text-muted">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-user"></i></span>
-                                    <span class="nav-link-title">Assign employee form (from employee page)</span>
+                                    <span class="nav-link-title">@lang('nav.assign_employee_form')</span>
                                 </span>
 
                                 {{-- Official show/finalize يحتاج period + employee: حطه في صفحة الموظف/التقارير --}}
                                 <span class="dropdown-item text-muted">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><i
                                             class="ti ti-chart-bar"></i></span>
-                                    <span class="nav-link-title">Official result (from employee/period)</span>
+                                    <span class="nav-link-title">@lang('nav.official_result')</span>
                                 </span>
 
                             </div>
@@ -386,7 +386,7 @@
                                         <i class="ti ti-lock-access"></i>
                                     </span>
                                     <span class="nav-link-title">
-                                        Access Management
+                                        @lang('nav.access_management')
                                     </span>
                                 </a>
 
@@ -397,7 +397,7 @@
                                                 <i class="ti ti-user-check"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Users
+                                                @lang('nav.users')
                                             </span>
                                         </a>
                                     @endcan
@@ -407,7 +407,7 @@
                                                 <i class="ti ti-user-check"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Roles
+                                                @lang('nav.roles')
                                             </span>
                                         </a>
                                     @endcan
@@ -417,7 +417,7 @@
                                                 <i class="ti ti-key"></i>
                                             </span>
                                             <span class="nav-link-title">
-                                                Permissions
+                                                @lang('nav.permissions')
                                             </span>
                                         </a>
                                     @endcan

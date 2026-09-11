@@ -16,7 +16,7 @@
                     type="button"
                     class="btn-close"
                     data-dismiss="modal"
-                    aria-label="Close"
+                    aria-label="@lang('ui.close')"
                     data-bs-dismiss="modal"
                 >
                     <span aria-hidden="true">&times;</span>
@@ -31,7 +31,7 @@
                             label="Employee"
                             wire:model.live="employee_id"
                         >
-                            <option value="null" disabled>Please select the Employee</option>
+                            <option value="null" disabled>@lang('ui.please_select_the_employee')</option>
                             @foreach($employeesForSelect as $value => $label)
                             <option value="{{ $value }}"  >{{ $label }}</option>
                             @endforeach
@@ -45,7 +45,7 @@
                     type="button"
                     
                     data-dismiss="modal"
-                    aria-label="Close"
+                    aria-label="@lang('ui.close')"
                     data-bs-dismiss="modal"
                     class="btn me-auto"
                     wire:click="$toggle('showingModal')"
@@ -81,13 +81,13 @@
                     <td>
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('ui.row_actions')"
                             class="relative inline-flex align-middle"
                         >
                             @can('delete-any', App\Models\Employee::class)
                             <button
                                 class="btn btn-danger"
-                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                onclick="confirm({{ Js::from(__('ui.confirm_generic')) }}) || event.stopImmediatePropagation()"
                                 wire:click="detach({{ $employee->id }})"
                             >
                                 <i class="ti ti-trash"></i>

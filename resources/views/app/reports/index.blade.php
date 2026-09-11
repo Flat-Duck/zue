@@ -8,10 +8,8 @@
         <div class="page-header d-print-none text-white">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">
-                        Reports Center
-                    </h2>
-                    <div class="text-muted mt-1">Generate and export system reports</div>
+                    <h2 class="page-title"> @lang('reports.reports_center') </h2>
+                    <div class="text-muted mt-1">@lang('reports.generate_and_export_system_reports')</div>
                 </div>
             </div>
         </div>
@@ -26,15 +24,15 @@
                     <div class="card">
                         <div class="card-status-top bg-blue"></div>
                         <div class="card-header">
-                            <h3 class="card-title">Timesheet Reports</h3>
+                            <h3 class="card-title">@lang('reports.timesheet_reports')</h3>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('reports.timesheets') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label class="form-label">Employee (Optional)</label>
+                                    <label class="form-label">@lang('reports.employee_optional')</label>
                                     <select name="employee_id" class="form-select">
-                                        <option value="">All Employees</option>
+                                        <option value="">@lang('reports.all_employees')</option>
                                         @foreach($employees as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
                                         @endforeach
@@ -44,9 +42,9 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Department</label>
+                                            <label class="form-label">@lang('reports.department')</label>
                                             <select name="department_id" class="form-select">
-                                                <option value="">All Departments</option>
+                                                <option value="">@lang('reports.all_departments')</option>
                                                 @foreach($departments as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
                                                 @endforeach
@@ -55,9 +53,9 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Center</label>
+                                            <label class="form-label">@lang('reports.center')</label>
                                             <select name="center_id" class="form-select">
-                                                <option value="">All Centers</option>
+                                                <option value="">@lang('reports.all_centers')</option>
                                                 @foreach($centers as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
                                                 @endforeach
@@ -69,22 +67,20 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Start Date</label>
+                                            <label class="form-label">@lang('reports.start_date')</label>
                                             <input type="date" name="start_date" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">End Date</label>
+                                            <label class="form-label">@lang('reports.end_date')</label>
                                             <input type="date" name="end_date" class="form-control">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="form-footer">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        Generate Timesheet Report
-                                    </button>
+                                    <button type="submit" class="btn btn-primary w-100"> @lang('reports.generate_timesheet_report') </button>
                                 </div>
                             </form>
                         </div>
@@ -96,41 +92,41 @@
                     <div class="card">
                         <div class="card-status-top bg-green"></div>
                         <div class="card-header">
-                            <h3 class="card-title">Balance Reports</h3>
+                            <h3 class="card-title">@lang('reports.balance_reports')</h3>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('reports.balances') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label class="form-label">Report Type</label>
+                                    <label class="form-label">@lang('reports.report_type')</label>
                                     <select name="report_type" class="form-select" id="report_type_selector">
-                                        <option value="all">All Employees Balance</option>
-                                        <option value="minus">Negative (Minus) Balance Only</option>
-                                        <option value="threshold">Balance Threshold (More/Less than X)</option>
+                                        <option value="all">@lang('reports.all_employees_balance')</option>
+                                        <option value="minus">@lang('reports.negative_minus_balance_only')</option>
+                                        <option value="threshold">@lang('reports.balance_threshold_more_less_than_x')</option>
                                     </select>
                                 </div>
 
                                 <div id="threshold_options" class="d-none">
                                     <div class="row mb-3">
                                         <div class="col-6">
-                                            <label class="form-label">Condition</label>
+                                            <label class="form-label">@lang('reports.condition')</label>
                                             <select name="threshold_type" class="form-select">
-                                                <option value="more">More than</option>
-                                                <option value="less">Less than</option>
+                                                <option value="more">@lang('reports.more_than')</option>
+                                                <option value="less">@lang('reports.less_than')</option>
                                             </select>
                                         </div>
                                         <div class="col-6">
-                                            <label class="form-label">Days</label>
+                                            <label class="form-label">@lang('reports.days')</label>
                                             <input type="number" name="threshold_value" class="form-control"
-                                                placeholder="X days">
+                                                placeholder="@lang('reports.x_days')">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Filter by Location</label>
+                                    <label class="form-label">@lang('reports.filter_by_location')</label>
                                     <select name="location_id" class="form-select">
-                                        <option value="">All Locations</option>
+                                        <option value="">@lang('reports.all_locations')</option>
                                         @foreach($locations as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
                                         @endforeach
@@ -138,25 +134,23 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Export Format</label>
+                                    <label class="form-label">@lang('reports.export_format')</label>
                                     <div class="form-selectgroup">
                                         <label class="form-selectgroup-item">
                                             <input type="radio" name="print_type" value="pdf" class="form-selectgroup-input"
                                                 checked>
-                                            <span class="form-selectgroup-label">PDF / Print</span>
+                                            <span class="form-selectgroup-label">@lang('reports.pdf_print')</span>
                                         </label>
                                         <label class="form-selectgroup-item">
                                             <input type="radio" name="print_type" value="excel"
                                                 class="form-selectgroup-input">
-                                            <span class="form-selectgroup-label">Excel</span>
+                                            <span class="form-selectgroup-label">@lang('reports.excel')</span>
                                         </label>
                                     </div>
                                 </div>
 
                                 <div class="form-footer">
-                                    <button type="submit" class="btn btn-success w-100">
-                                        Generate Balance Report
-                                    </button>
+                                    <button type="submit" class="btn btn-success w-100"> @lang('reports.generate_balance_report') </button>
                                 </div>
                             </form>
                         </div>
@@ -168,7 +162,7 @@
                     <div class="card">
                         <div class="card-status-top bg-yellow"></div>
                         <div class="card-header">
-                            <h3 class="card-title">Time Control Sheet (Official Monthly)</h3>
+                            <h3 class="card-title">@lang('reports.time_control_sheet_official_monthly')</h3>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('reports.monthly-attendance') }}" method="POST">
@@ -176,7 +170,7 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Select Month</label>
+                                            <label class="form-label">@lang('reports.select_month')</label>
                                             <select name="month" class="form-select" required>
                                                 @foreach(range(1, 12) as $m)
                                                     <option value="{{ $m }}" {{ now()->month == $m ? 'selected' : '' }}>
@@ -188,7 +182,7 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Select Year</label>
+                                            <label class="form-label">@lang('reports.select_year')</label>
                                             <select name="year" class="form-select" required>
                                                 @php
                                                     $currentYear = now()->year;
@@ -203,13 +197,10 @@
                                     </div>
                                 </div>
                                 <div class="text-muted mb-3">
-                                    <small>This generates the official monthly attendance grid with approval signatures for
-                                        the selected month and year.</small>
+                                    <small>@lang('reports.this_generates_the_official_monthly')</small>
                                 </div>
                                 <div class="form-footer">
-                                    <button type="submit" class="btn btn-yellow w-100">
-                                        Generate Official Sheet
-                                    </button>
+                                    <button type="submit" class="btn btn-yellow w-100"> @lang('reports.generate_official_sheet') </button>
                                 </div>
                             </form>
                         </div>
@@ -221,15 +212,15 @@
                     <div class="card">
                         <div class="card-status-top bg-azure"></div>
                         <div class="card-header">
-                            <h3 class="card-title">Run Report (Employee Balances)</h3>
+                            <h3 class="card-title">@lang('reports.run_report_employee_balances')</h3>
                         </div>
                         <div class="card-body">
                             <form action="{{ route('reports.run') }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label class="form-label">Department</label>
+                                    <label class="form-label">@lang('reports.department')</label>
                                     <select name="department_id" class="form-select">
-                                        <option value="">All Departments</option>
+                                        <option value="">@lang('reports.all_departments')</option>
                                         @foreach($departments as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
                                         @endforeach
@@ -238,9 +229,9 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Center</label>
+                                            <label class="form-label">@lang('reports.center')</label>
                                             <select name="center_id" class="form-select">
-                                                <option value="">All Centers</option>
+                                                <option value="">@lang('reports.all_centers')</option>
                                                 @foreach($centers as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
                                                 @endforeach
@@ -249,9 +240,9 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Location</label>
+                                            <label class="form-label">@lang('reports.location')</label>
                                             <select name="location_id" class="form-select">
-                                                <option value="">All Locations</option>
+                                                <option value="">@lang('reports.all_locations')</option>
                                                 @foreach($locations as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
                                                 @endforeach
@@ -260,9 +251,7 @@
                                     </div>
                                 </div>
                                 <div class="form-footer">
-                                    <button type="submit" class="btn btn-azure w-100">
-                                        Generate Filtered Run Report
-                                    </button>
+                                    <button type="submit" class="btn btn-azure w-100"> @lang('reports.generate_filtered_run_report') </button>
                                 </div>
                             </form>
                         </div>

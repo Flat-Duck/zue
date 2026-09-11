@@ -10,7 +10,7 @@
     </x-inputs.group>
 
     <div class="form-group col-sm-12 mt-4">
-        <h4>Assign @lang('crud.permissions.name')</h4>
+        <h4>@lang('ui.assign', ['thing' => __('crud.permissions.name')])</h4>
 
         @foreach ($permissions as $permission)
         <div>

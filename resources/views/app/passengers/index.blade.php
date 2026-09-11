@@ -15,8 +15,8 @@
                             type="text"
                             value=""
                             class="form-control"
-                            placeholder="Search…"
-                            aria-label="Search..."
+                            placeholder="@lang('flights.search_2')"
+                            aria-label="@lang('flights.search')"
                             spellcheck="false"
                             data-ms-editor="true"
                             autocomplete="off"
@@ -25,7 +25,7 @@
                     <div class="col-auto">
                         <button
                             class="btn btn-icon btn-primary"
-                            aria-label="Button"
+                            aria-label="@lang('flights.button')"
                         >
                             <i class="ti ti-search"></i>
                         </button>
@@ -35,7 +35,7 @@
             <div class="col-auto ms-auto d-print-none">
                 @can('create', App\Models\Passenger::class)
                 <a
-                    data-bs-original-title="إنشاء"
+                    data-bs-original-title="@lang('flights.create')"
                     data-bs-placement="top"
                     data-bs-toggle="tooltip"
                     class="pull-right btn btn-primary"
@@ -78,7 +78,7 @@
                     <td class="text-center table-actions">
                         <div
                             role="group"
-                            aria-label="Row Actions"
+                            aria-label="@lang('flights.row_actions')"
                             class="btn-group"
                         >
                             @can('update', $passenger)

@@ -2,12 +2,11 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Flight routes</h3>
+        <h3 class="card-title">@lang('flights.flight_routes')</h3>
         <div class="col-auto ms-auto d-print-none">
             @can('create', App\Models\FlightRoute::class)
                 <a href="{{ route('flight-routes.create') }}" class="btn btn-primary">
-                    <i class="ti ti-plus"></i> New route
-                </a>
+                    <i class="ti ti-plus"></i> @lang('flights.new_route') </a>
             @endcan
         </div>
     </div>
@@ -16,11 +15,11 @@
         <table class="table card-table table-vcenter">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Legs</th>
-                    <th>Flights</th>
-                    <th>Status</th>
-                    <th class="text-end">Actions</th>
+                    <th>@lang('flights.name')</th>
+                    <th>@lang('flights.legs')</th>
+                    <th>@lang('flights.flights')</th>
+                    <th>@lang('flights.status')</th>
+                    <th class="text-end">@lang('flights.actions')</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,7 +54,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-muted">No routes yet.</td></tr>
+                    <tr><td colspan="5" class="text-muted">@lang('flights.no_routes_yet')</td></tr>
                 @endforelse
             </tbody>
         </table>

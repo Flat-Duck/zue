@@ -9,10 +9,13 @@
         <div class="page-header d-print-none">
             <div class="row align-items-center">
                 <div class="col">
-                    <h2 class="page-title">تقييم: {{ $review->employee->name ?? ('#' . $review->employee_id) }}</h2>
+                    <h2 class="page-title">@lang('appraisals.appraisal_of', ['name' => $review->employee->name ?? '#'.$review->employee_id])</h2>
                     <div class="text-muted">
-                        الفترة: {{ $review->period->label }} —
-                        النموذج: {{ $review->formVersion->form->name_ar }} (v{{ $review->formVersion->version }})
+                        @lang('appraisals.period_line', ['period' => $review->period->label]) —
+                        @lang('appraisals.form_line', [
+                            'form' => $review->formVersion->form->name_ar,
+                            'version' => $review->formVersion->version,
+                        ])
                     </div>
                 </div>
                 <div class="col-auto ms-auto d-print-none">
@@ -31,7 +34,7 @@
         {{-- Progress Bar --}}
         <div class="progress-container mb-3">
             <div class="d-flex justify-content-between mb-1">
-                <span>نسبة الإكمال</span>
+                <span>@lang('appraisals.completion_rate')</span>
                 <span id="progress-text">0%</span>
             </div>
             <div class="progress">
@@ -44,21 +47,21 @@
         <div class="card mb-3">
             <div class="card-status-top bg-lime"></div>
             <div class="card-header">
-                <h3 class="card-title">بيانات الحضور (محسوبة تلقائياً)</h3>
+                <h3 class="card-title">@lang('appraisals.attendance_data_calculated')</h3>
             </div>
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col">
                         <div class="h1 mb-0">{{ $attendanceStats['sick_leaves'] }}</div>
-                        <div class="text-muted">أجازات مرضية (S)</div>
+                        <div class="text-muted">@lang('appraisals.sick_leave_days_s')</div>
                     </div>
                     <div class="col">
                         <div class="h1 mb-0">{{ $attendanceStats['absence_days'] }}</div>
-                        <div class="text-muted">أيام الغياب (X)</div>
+                        <div class="text-muted">@lang('appraisals.absence_days_x')</div>
                     </div>
                     <div class="col">
                         <div class="h1 mb-0">{{ $attendanceStats['unpaid_leaves'] }}</div>
-                        <div class="text-muted">بدون مرتب (Z)</div>
+                        <div class="text-muted">@lang('appraisals.unpaid_z')</div>
                     </div>
                 </div>
             </div>
@@ -68,32 +71,32 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <div class="form-label">القسم</div>
+                        <div class="form-label">@lang('appraisals.department')</div>
                         <div class="fw-bold">{{ $review->employee->department->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">الإدارة</div>
+                        <div class="form-label">@lang('appraisals.administration')</div>
                         <div class="fw-bold">{{ $review->employee->administration->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">الموقع</div>
+                        <div class="form-label">@lang('appraisals.location')</div>
                         <div class="fw-bold">{{ $review->employee->location->name ?? '-' }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="form-label">مركز التكلفة</div>
+                        <div class="form-label">@lang('appraisals.cost_center')</div>
                         <div class="fw-bold">{{ $review->employee->costCenter->name ?? '-' }}</div>
                     </div>
                 </div>
 
-                <div class="hr-text">النتيجة</div>
+                <div class="hr-text">@lang('appraisals.result')</div>
 
                 <div class="row">
                     <div class="col-md-4">
-                        <div class="text-muted">المجموع</div>
+                        <div class="text-muted">@lang('appraisals.total')</div>
                         <div class="h3">{{ $review->total_score ?? 0 }} / {{ $review->max_score ?? 0 }}</div>
                     </div>
                     <div class="col-md-4">
-                        <div class="text-muted">النسبة</div>
+                        <div class="text-muted">@lang('appraisals.percentage')</div>
                         <div class="h3">{{ $review->percentage ?? 0 }}%</div>
                     </div>
                 </div>
@@ -121,9 +124,9 @@
                             <table class="table table-vcenter card-table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>البند</th>
-                                        <th class="text-center">الحد الأعلى</th>
-                                        <th class="text-center" style="width: 250px;">التقييم</th>
+                                        <th>@lang('appraisals.item')</th>
+                                        <th class="text-center">@lang('appraisals.max_limit')</th>
+                                        <th class="text-center" style="width: 250px;">@lang('appraisals.appraisal')</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -139,7 +142,7 @@
                                                 @if(!$isText)
                                                     <span class="badge bg-azure-lt">{{ $vi->resolved_max_score }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary-lt">نصي</span>
+                                                    <span class="badge bg-secondary-lt">@lang('appraisals.textual')</span>
                                                 @endif
                                             </td>
                                             <td class="text-center">
@@ -147,7 +150,7 @@
                                                     <textarea class="form-control score-input"
                                                               name="scores[{{ $vi->id }}]"
                                                               rows="2"
-                                                              placeholder="أدخل النص هنا..."
+                                                              placeholder="@lang('appraisals.enter_text_here')"
                                                               {{ $review->status !== 'draft' ? 'disabled' : '' }}>{{ old('scores.' . $vi->id, $val) }}</textarea>
                                                 @else
                                                     <input type="number"
@@ -158,7 +161,7 @@
                                                            max="{{ $vi->resolved_max_score }}"
                                                            value="{{ old('scores.' . $vi->id, $val) }}"
                                                            {{ $review->status !== 'draft' ? 'disabled' : '' }} />
-                                                    <div class="invalid-feedback" style="display:none;">تجاوز الحد</div>
+                                                    <div class="invalid-feedback" style="display:none;">@lang('appraisals.over_limit')</div>
                                                 @endif
                                             </td>
                                         </tr>
@@ -170,17 +173,14 @@
             @endforeach
 
             <div class="sticky-footer d-flex gap-2 justify-content-end">
-                <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary me-auto">رجوع</a>
+                <a href="{{ route('appraisals.reviews.index') }}" class="btn btn-outline-secondary me-auto">@lang('appraisals.back')</a>
 
-                <button class="btn btn-primary" id="save-btn" {{ $review->status !== 'draft' ? 'disabled' : '' }}>حفظ
-                    التغييرات</button>
+                <button class="btn btn-primary" id="save-btn" {{ $review->status !== 'draft' ? 'disabled' : '' }}>@lang('appraisals.save_changes')</button>
 
                 @if($review->status === 'draft')
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitModal">
-                        إرسال (Submit)
-                    </button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#submitModal"> @lang('appraisals.submit') </button>
                 @else
-                    <button class="btn btn-success" disabled>تم الإرسال</button>
+                    <button class="btn btn-success" disabled>@lang('appraisals.submitted')</button>
                 @endif
             </div>
 
@@ -189,14 +189,14 @@
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="modal-title">هل أنت متأكد؟</div>
-                            <div>بعد الإرسال لن تتمكن من تعديل التقييم مرة أخرى.</div>
+                            <div class="modal-title">@lang('appraisals.confirm_generic')</div>
+                            <div>@lang('appraisals.cannot_edit_after_submit')</div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-link link-secondary me-auto"
-                                data-bs-dismiss="modal">إلغاء</button>
+                                data-bs-dismiss="modal">@lang('appraisals.cancel')</button>
                             <button type="button" class="btn btn-success"
-                                onclick="document.getElementById('submit-form').submit()">نعم، إرسال</button>
+                                onclick="document.getElementById('submit-form').submit()">@lang('appraisals.yes_submit')</button>
                         </div>
                     </div>
                 </div>
@@ -213,10 +213,8 @@
     <div class="toast-container position-fixed bottom-0 start-0 p-3" style="z-index: 1055">
         <div id="autosave-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
-                <div class="toast-body">
-                    تم الحفظ تلقائياً
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <div class="toast-body"> @lang('appraisals.saved_automatically') </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="@lang('appraisals.close')"></button>
             </div>
         </div>
     </div>

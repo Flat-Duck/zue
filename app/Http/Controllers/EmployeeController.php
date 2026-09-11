@@ -52,7 +52,7 @@ class EmployeeController extends Controller
         $this->authorize('view-any', Employee::class);
 
         $employees = Employee::latest()
-            ->with(['user', 'location', 'department', 'center'])
+            ->with(['user', 'location', 'department', 'center', 'details'])
             ->paginate(30)
             ->withQueryString();
 

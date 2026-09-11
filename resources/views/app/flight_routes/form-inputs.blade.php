@@ -18,7 +18,7 @@
     <x-inputs.group class="col-sm-8">
         <x-inputs.text name="name" label="Route name" required
             :value="old('name', $editing ? $route->name : '')"
-            placeholder="Tripoli - 103A - Benghazi - 103A - Tripoli"></x-inputs.text>
+            placeholder="@lang('flights.tripoli_103a_benghazi_103a_tripoli')"></x-inputs.text>
     </x-inputs.group>
 
     <div class="col-sm-4">
@@ -27,7 +27,7 @@
                 <input type="hidden" name="is_active" value="0">
                 <input class="form-check-input" type="checkbox" name="is_active" value="1"
                     {{ old('is_active', $editing ? $route->is_active : true) ? 'checked' : '' }}>
-                <span class="form-check-label">Available to dispatchers</span>
+                <span class="form-check-label">@lang('flights.available_to_dispatchers')</span>
             </label>
         </div>
     </div>
@@ -38,16 +38,11 @@
 <div x-data="routeLegs(@js($existingLegs))">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h4 class="mb-0">Legs</h4>
-            <div class="text-muted small">
-                In order of travel. <strong>Coming</strong> means the aircraft is arriving at a field;
-                <strong>leaving</strong> means it is flying away from one. Each leg carries its own
-                passenger list and its own seat count.
-            </div>
+            <h4 class="mb-0">@lang('flights.legs')</h4>
+            <div class="text-muted small"> @lang('flights.in_order_of_travel') <strong>@lang('flights.coming')</strong> @lang('flights.means_the_aircraft_is_arriving_at_a_field') <strong>@lang('flights.leaving')</strong> @lang('flights.means_it_is_flying_away_from_one_each_leg') </div>
         </div>
         <button type="button" class="btn btn-outline-primary btn-sm" @click="addLeg()">
-            <i class="ti ti-plus"></i> Add leg
-        </button>
+            <i class="ti ti-plus"></i> @lang('flights.add_leg') </button>
     </div>
 
     @error('legs')
@@ -59,9 +54,9 @@
             <thead>
                 <tr>
                     <th style="width:8%">#</th>
-                    <th style="width:30%">From</th>
-                    <th style="width:30%">To</th>
-                    <th style="width:22%">Direction</th>
+                    <th style="width:30%">@lang('flights.from')</th>
+                    <th style="width:30%">@lang('flights.to')</th>
+                    <th style="width:22%">@lang('flights.direction')</th>
                     <th style="width:10%"></th>
                 </tr>
             </thead>
@@ -71,7 +66,7 @@
                         <td x-text="index + 1"></td>
                         <td>
                             <select class="form-select" :name="`legs[${index}][from_station_id]`" x-model="leg.from_station_id">
-                                <option value="">Select…</option>
+                                <option value="">@lang('flights.select')</option>
                                 @foreach ($stations as $station)
                                     <option value="{{ $station->id }}">
                                         {{ $station->name }} ({{ $station->code }}){{ $station->is_field ? ' — field' : '' }}
@@ -81,7 +76,7 @@
                         </td>
                         <td>
                             <select class="form-select" :name="`legs[${index}][to_station_id]`" x-model="leg.to_station_id">
-                                <option value="">Select…</option>
+                                <option value="">@lang('flights.select')</option>
                                 @foreach ($stations as $station)
                                     <option value="{{ $station->id }}">
                                         {{ $station->name }} ({{ $station->code }}){{ $station->is_field ? ' — field' : '' }}
@@ -91,8 +86,8 @@
                         </td>
                         <td>
                             <select class="form-select" :name="`legs[${index}][direction]`" x-model="leg.direction">
-                                <option value="coming">Coming (arriving at a field)</option>
-                                <option value="leaving">Leaving (away from a field)</option>
+                                <option value="coming">@lang('flights.coming_arriving_at_a_field')</option>
+                                <option value="leaving">@lang('flights.leaving_away_from_a_field')</option>
                             </select>
                         </td>
                         <td class="text-end">
