@@ -49,6 +49,9 @@ class LegacyImporter
     /** @var array<string, array<int, int>> "table.column" => [employee id => rows] */
     private array $orphanedReferences = [];
 
+    /** @var array<string, list<string>> */
+    private array $schemaColumns = [];
+
     private int $timeSheetsWithReviser = 0;
 
     /** @var (callable(string, int): void)|null */
@@ -68,6 +71,9 @@ class LegacyImporter
      */
     public function run(?callable $progress = null): LegacyImportReport
     {
+        DB::connection()->disableQueryLog();
+        DB::connection()->flushQueryLog();
+
         $this->progress = $progress;
 
         $this->copy('locations', 'locations');
@@ -75,6 +81,10 @@ class LegacyImporter
         $this->copy('centers', 'centers');
         $this->copy('departments', 'departments');
 
+        $this->copy('appraisal_forms', 'appraisal_forms');
+        $this->copy('appraisal_items', 'appraisal_items');
+        $this->copy('appraisal_form_versions', 'appraisal_form_versions');
+        $this->copy('appraisal_form_version_items', 'appraisal_form_version_items');
         $this->copy('appraisal_periods', 'appraisal_periods');
         $this->copy('approval_flows', 'approval_flows');
         $this->copy('approval_flow_steps', 'approval_flow_steps');
@@ -84,10 +94,12 @@ class LegacyImporter
         $this->importSignatures();
         $this->importRoleAssignments();
 
-        $this->copy('management_scopes', 'management_scopes', requiredEmployees: ['manager_id'], optionalEmployees: ['subordinate_employee_id']);
-        $this->copy('management_scope_manager', 'management_scope_manager', uniqueBy: [], requiredEmployees: ['manager_id']);
-        $this->copy('scope_policies', 'scope_policies');
-        $this->copy('scope_policy_actors', 'scope_policy_actors', requiredEmployees: ['actor_employee_id']);
+        $this->importScopePolicies();
+        $this->importScopePolicyActors();
+        $this->copy('appraisal_reviews', 'appraisal_reviews', requiredEmployees: ['employee_id', 'appraiser_id']);
+        $this->copy('appraisal_review_scores', 'appraisal_review_scores');
+        $this->copy('appraisals_official', 'appraisals_official', requiredEmployees: ['employee_id'], optionalEmployees: ['finalized_by']);
+        $this->copy('appraisal_official_scores', 'appraisal_official_scores');
         $this->copy('timesheet_approval_steps', 'timesheet_approval_steps', requiredEmployees: ['employee_id'], optionalEmployees: ['approved_by_employee_id']);
 
         $this->importTimeSheets();
@@ -167,6 +179,14 @@ class LegacyImporter
         $batch = [];
 
         foreach ($profiles as $profile) {
+            $employeeId = $this->intOrNull(isset($profile['employee_id']) ? (string) $profile['employee_id'] : null);
+
+            if ($employeeId !== null && ! $this->dryRun && ! DB::table('employees')->where('id', $employeeId)->exists()) {
+                $this->recordOrphan('employee_details', 'employee_id', $employeeId, $this->stringifyRow($profile));
+
+                continue;
+            }
+
             $batch[] = $profile;
             $imported++;
 
@@ -326,6 +346,225 @@ class LegacyImporter
     }
 
     /**
+     * Legacy backups may carry the pre-context scope shape. The current design
+     * stores match values in scope_policy_criteria, so the importer reshapes each
+     * old row while preserving policy ids and writing every old filter as a
+     * criterion. If a dump already has the current columns, it is copied as-is.
+     */
+    private function importScopePolicies(): void
+    {
+        $criteria = [];
+        $contexts = DB::table('scope_contexts')->pluck('id', 'key')->all();
+
+        if ($this->files('scope_policies') !== []) {
+            $this->copy('scope_policies', 'scope_policies', transform: function (array $row) use (&$criteria, $contexts): array {
+                if (array_key_exists('context_id', $row)) {
+                    return $row;
+                }
+
+                $policyId = (int) $row['id'];
+                $context = (string) ($row['context'] ?? 'general');
+                $matchType = (string) ($row['match_type'] ?? 'global');
+
+                $this->appendScopeCriteria($criteria, $policyId, $matchType, $row);
+
+                return [
+                    'id' => $row['id'],
+                    'name' => $row['name'] ?? null,
+                    'context_id' => (string) ($contexts[$context] ?? $contexts['general']),
+                    'covers_everyone' => $matchType === 'global' ? '1' : '0',
+                    'carves_out_managers' => $context === 'time_sheet' ? '1' : '0',
+                    'print_location_id' => $row['location_id'] ?? null,
+                    'print_department_id' => $row['department_id'] ?? null,
+                    'print_center_id' => $row['center_id'] ?? null,
+                    'priority' => $row['priority'] ?? '0',
+                    'is_active' => $row['is_active'] ?? '1',
+                    'settings' => $row['settings'] ?? null,
+                    'created_at' => $row['created_at'] ?? null,
+                    'updated_at' => $row['updated_at'] ?? null,
+                ];
+            });
+        } else {
+            $this->importPoliciesFromLegacyManagementScopes($criteria, $contexts);
+        }
+
+        $this->importScopeCriteria($criteria);
+    }
+
+    /**
+     * @param  list<array<string, string|int|null>>  $criteria
+     * @param  array<string, int>  $contexts
+     */
+    private function importPoliciesFromLegacyManagementScopes(array &$criteria, array $contexts): void
+    {
+        $this->copy('management_scopes', 'scope_policies', transform: function (array $row) use (&$criteria, $contexts): array {
+            $policyId = (int) $row['id'];
+            $context = (string) ($row['context'] ?? 'general');
+            $matchType = $this->scopeTypeToMatchType((string) ($row['scope_type'] ?? 'global'));
+
+            $legacyRow = $row + [
+                'match_type' => $matchType,
+                'target_employee_ids' => $this->targetEmployeesFromManagementScope($row),
+            ];
+
+            $this->appendScopeCriteria($criteria, $policyId, $matchType, $legacyRow);
+
+            return [
+                'id' => $row['id'],
+                'name' => $row['name'] ?? null,
+                'context_id' => (string) ($contexts[$context] ?? $contexts['general']),
+                'covers_everyone' => $matchType === 'global' ? '1' : '0',
+                'carves_out_managers' => $context === 'time_sheet' ? '1' : '0',
+                'print_location_id' => $row['location_id'] ?? null,
+                'print_department_id' => $row['department_id'] ?? null,
+                'print_center_id' => $row['center_id'] ?? null,
+                'priority' => '0',
+                'is_active' => '1',
+                'settings' => $row['settings'] ?? null,
+                'created_at' => $row['created_at'] ?? null,
+                'updated_at' => $row['updated_at'] ?? null,
+            ];
+        }, requiredEmployees: [], optionalEmployees: []);
+    }
+
+    private function importScopePolicyActors(): void
+    {
+        if ($this->files('scope_policy_actors') !== []) {
+            $this->copy('scope_policy_actors', 'scope_policy_actors', requiredEmployees: ['actor_employee_id']);
+
+            return;
+        }
+
+        $this->copy('management_scope_manager', 'scope_policy_actors', uniqueBy: ['policy_id', 'actor_employee_id'], transform: fn (array $row): array => [
+            'policy_id' => $row['management_scope_id'],
+            'actor_employee_id' => $row['manager_id'],
+            'can_fill' => '1',
+            'can_approve' => '1',
+            'can_revise' => '1',
+            'role_hint' => 'legacy-manager',
+            'created_at' => null,
+            'updated_at' => null,
+        ], requiredEmployees: ['actor_employee_id']);
+    }
+
+    /**
+     * @param  list<array<string, string|int|null>>  $criteria
+     * @param  array<string, string|null>  $row
+     */
+    private function appendScopeCriteria(array &$criteria, int $policyId, string $matchType, array $row): void
+    {
+        $add = function (string $dimension, string|int|null $valueId) use (&$criteria, $policyId, $row): void {
+            $id = $this->intOrNull($valueId === null ? null : (string) $valueId);
+
+            if ($id === null || $id <= 0) {
+                return;
+            }
+
+            $criteria[] = [
+                'policy_id' => $policyId,
+                'dimension' => $dimension,
+                'value_id' => $id,
+                'created_at' => $row['created_at'] ?? null,
+                'updated_at' => $row['updated_at'] ?? null,
+            ];
+        };
+
+        if (in_array($matchType, ['location', 'department'], true)) {
+            $add('field', $row['location_id'] ?? null);
+        }
+
+        if ($matchType === 'department') {
+            $add('department', $row['department_id'] ?? null);
+        }
+
+        if ($matchType === 'center') {
+            $add('center', $row['center_id'] ?? null);
+        }
+
+        foreach ($this->decodeEmployeeIds($row['target_employee_ids'] ?? null) as $employeeId) {
+            $add('employee', $employeeId);
+        }
+    }
+
+    /**
+     * @param  list<array<string, string|int|null>>  $criteria
+     */
+    private function importScopeCriteria(array $criteria): void
+    {
+        $imported = 0;
+        $batch = [];
+
+        foreach ($criteria as $criterion) {
+            $batch[] = $criterion;
+            $imported++;
+
+            if (count($batch) >= $this->chunkSize) {
+                $this->flush('scope_policy_criteria', $batch, ['policy_id', 'dimension', 'value_id'], null);
+                $batch = [];
+                $this->reportProgress('scope_policy_criteria', $imported);
+            }
+        }
+
+        if ($batch !== []) {
+            $this->flush('scope_policy_criteria', $batch, ['policy_id', 'dimension', 'value_id'], null);
+        }
+
+        $this->record('scope_policy_criteria', $imported);
+    }
+
+    private function scopeTypeToMatchType(string $scopeType): string
+    {
+        return match ($scopeType) {
+            'field', 'location' => 'location',
+            'department' => 'department',
+            'center' => 'center',
+            'employee' => 'employee',
+            default => 'global',
+        };
+    }
+
+    /**
+     * @param  array<string, string|null>  $row
+     */
+    private function targetEmployeesFromManagementScope(array $row): ?string
+    {
+        if (($row['subordinate_employee_id'] ?? null) !== null) {
+            return '['.$row['subordinate_employee_id'].']';
+        }
+
+        $settings = json_decode((string) ($row['settings'] ?? ''), true);
+
+        if (is_array($settings) && isset($settings['target_employee_ids'])) {
+            return json_encode($settings['target_employee_ids']);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function decodeEmployeeIds(string|int|null $encoded): array
+    {
+        if ($encoded === null || $encoded === '') {
+            return [];
+        }
+
+        $decoded = json_decode((string) $encoded, true);
+
+        if (! is_array($decoded)) {
+            return [];
+        }
+
+        return collect($decoded)
+            ->filter(fn (mixed $value): bool => is_numeric($value))
+            ->map(fn (mixed $value): int => (int) $value)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
      * The one thing the office actually needs out of the old data: who revised a
      * day. `admin_id` held an employee number, and the new foreign key wants an
      * employee id, so every value is translated and anything that fails to
@@ -347,8 +586,34 @@ class LegacyImporter
                 $row['admin_id'] = $employeeId === null ? null : (string) $employeeId;
             }
 
+            $legacyUserId = $this->intOrNull($row['user_id'] ?? null);
+
+            if ($legacyUserId !== null) {
+                $newUserId = $this->identity->newUserId($legacyUserId);
+
+                if ($newUserId === null) {
+                    $this->recordOrphan('time_sheets', 'user_id', $legacyUserId, $row);
+                }
+
+                $row['user_id'] = $newUserId === null ? null : (string) $newUserId;
+            }
+
             return $row;
-        }, update: ['value', 'day', 'employee_id', 'revised_at', 'admin_id'], requiredEmployees: ['employee_id']);
+        }, update: [
+            'value',
+            'day',
+            'employee_id',
+            'revised_at',
+            'old_value',
+            'user_id',
+            'timekeeper_id',
+            'supervisor_id',
+            'superintendent_id',
+            'admin_id',
+            'over_time',
+            'created_at',
+            'updated_at',
+        ], requiredEmployees: ['employee_id'], optionalEmployees: ['timekeeper_id', 'supervisor_id', 'superintendent_id', 'admin_id']);
     }
 
     /**
@@ -400,6 +665,12 @@ class LegacyImporter
                     continue;
                 }
 
+                $row = $this->onlyCurrentColumns($table, $row);
+
+                if ($row === []) {
+                    continue;
+                }
+
                 $batch[] = $row;
                 $imported++;
 
@@ -434,8 +705,8 @@ class LegacyImporter
         foreach ($required as $column) {
             $employeeId = $this->intOrNull($row[$column] ?? null);
 
-            if ($employeeId !== null && ! $this->identity->hasEmployee($employeeId)) {
-                $this->recordOrphan($table, $column, $employeeId);
+            if ($employeeId !== null && ! $this->employeeExists($employeeId)) {
+                $this->recordOrphan($table, $column, $employeeId, $row);
 
                 return null;
             }
@@ -444,8 +715,8 @@ class LegacyImporter
         foreach ($optional as $column) {
             $employeeId = $this->intOrNull($row[$column] ?? null);
 
-            if ($employeeId !== null && ! $this->identity->hasEmployee($employeeId)) {
-                $this->recordOrphan($table, $column, $employeeId);
+            if ($employeeId !== null && ! $this->employeeExists($employeeId)) {
+                $this->recordOrphan($table, $column, $employeeId, $row);
                 $row[$column] = null;
             }
         }
@@ -453,10 +724,50 @@ class LegacyImporter
         return $row;
     }
 
-    private function recordOrphan(string $table, string $column, int $employeeId): void
+    /**
+     * @param  array<string, string|int|null>  $row
+     * @return array<string, string|null>
+     */
+    private function stringifyRow(array $row): array
+    {
+        return collect($row)
+            ->map(fn (string|int|null $value): ?string => $value === null ? null : (string) $value)
+            ->all();
+    }
+
+    private function employeeExists(int $employeeId): bool
+    {
+        if ($this->dryRun) {
+            return $this->identity->hasEmployee($employeeId);
+        }
+
+        return DB::table('employees')->where('id', $employeeId)->exists();
+    }
+
+    /**
+     * @param  array<string, string|null>  $row
+     */
+    private function recordOrphan(string $table, string $column, int $employeeId, array $row): void
     {
         $key = $table.'.'.$column;
         $this->orphanedReferences[$key][$employeeId] = ($this->orphanedReferences[$key][$employeeId] ?? 0) + 1;
+
+        if ($this->dryRun || ! Schema::hasTable('legacy_import_orphans')) {
+            return;
+        }
+
+        $payload = json_encode($row, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        DB::table('legacy_import_orphans')->insertOrIgnore([
+            'source_table' => $table,
+            'source_column' => $column,
+            'missing_employee_id' => $employeeId,
+            'legacy_key' => isset($row['id']) ? (string) $row['id'] : null,
+            'row_hash' => hash('sha256', $table.'|'.$column.'|'.$employeeId.'|'.($payload ?: '')),
+            'row_payload' => $payload ?: '{}',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
@@ -472,6 +783,8 @@ class LegacyImporter
 
         if ($uniqueBy === []) {
             DB::table($table)->insertOrIgnore($batch);
+            DB::connection()->flushQueryLog();
+            gc_collect_cycles();
 
             return;
         }
@@ -479,6 +792,8 @@ class LegacyImporter
         $update ??= array_values(array_diff(array_keys($batch[0]), $uniqueBy));
 
         DB::table($table)->upsert($batch, $uniqueBy, $update);
+        DB::connection()->flushQueryLog();
+        gc_collect_cycles();
     }
 
     /**
@@ -496,6 +811,19 @@ class LegacyImporter
         sort($matches, SORT_NATURAL);
 
         return $matches;
+    }
+
+    /**
+     * @param  array<string, string|null>  $row
+     * @return array<string, string|null>
+     */
+    private function onlyCurrentColumns(string $table, array $row): array
+    {
+        if (! isset($this->schemaColumns[$table])) {
+            $this->schemaColumns[$table] = Schema::getColumnListing($table);
+        }
+
+        return array_intersect_key($row, array_flip($this->schemaColumns[$table]));
     }
 
     private function emailTakenByAnotherEmployee(string $email, int $employeeId): bool

@@ -129,6 +129,26 @@ class LegacyImportTest extends TestCase
         $this->assertSame(3, $report->rowCounts['time_sheets'], 'A dropped row must not be counted as imported.');
     }
 
+    public function test_it_preserves_unimportable_legacy_rows_as_orphans(): void
+    {
+        $this->import();
+
+        $orphan = DB::table('legacy_import_orphans')
+            ->where('source_table', 'time_sheets')
+            ->where('source_column', 'employee_id')
+            ->where('missing_employee_id', 99999)
+            ->first();
+
+        $this->assertNotNull($orphan);
+        $this->assertSame('4', $orphan->legacy_key);
+
+        $payload = json_decode($orphan->row_payload, true);
+
+        $this->assertSame('4', $payload['id']);
+        $this->assertSame('99999', $payload['employee_id']);
+        $this->assertSame('Y', $payload['value']);
+    }
+
     /**
      * Losing the approver's name is not a reason to lose the fact that the step was
      * approved, so an optional reference is cleared rather than taking the row with it.
@@ -152,6 +172,38 @@ class LegacyImportTest extends TestCase
 
         $this->assertTrue($mahidwei->hasRole('super-admin'));
         $this->assertSame(0, DB::table('model_has_roles')->where('model_id', 9094)->count());
+    }
+
+    public function test_it_converts_old_scope_policies_into_current_scope_criteria(): void
+    {
+        $report = $this->import();
+
+        $policy = DB::table('scope_policies')->where('id', 10)->first();
+
+        $this->assertNotNull($policy);
+        $this->assertSame('Legacy Production Scope', $policy->name);
+        $this->assertSame(1, (int) $policy->print_location_id);
+        $this->assertSame(1, (int) $policy->print_department_id);
+        $this->assertSame(0, (int) $policy->covers_everyone);
+        $this->assertSame(1, (int) $policy->carves_out_managers);
+
+        $criteria = DB::table('scope_policy_criteria')
+            ->where('policy_id', 10)
+            ->orderBy('dimension')
+            ->pluck('value_id', 'dimension')
+            ->all();
+
+        $this->assertSame(1, $criteria['field']);
+        $this->assertSame(1, $criteria['department']);
+        $this->assertDatabaseHas('scope_policy_actors', [
+            'policy_id' => 10,
+            'actor_employee_id' => 9094,
+            'can_fill' => 1,
+            'can_approve' => 1,
+            'can_revise' => 1,
+        ]);
+        $this->assertSame(1, $report->rowCounts['scope_policies']);
+        $this->assertSame(2, $report->rowCounts['scope_policy_criteria']);
     }
 
     public function test_it_remaps_signatures_onto_the_new_user_ids(): void
@@ -309,6 +361,12 @@ class LegacyImportTest extends TestCase
 
             '000020_signatures.sql' => "INSERT INTO `signatures` (`id`, `user_id`, `image_path`, `created_at`, `updated_at`) VALUES\n"
                 ."  (1, 9094, 'signatures/9094.png', NULL, NULL)\n;\n",
+
+            '000018_scope_policies.sql' => "INSERT INTO `scope_policies` (`id`, `name`, `context`, `match_type`, `location_id`, `department_id`, `center_id`, `target_employee_ids`, `priority`, `is_active`, `settings`, `created_at`, `updated_at`) VALUES\n"
+                ."  (10, 'Legacy Production Scope', 'time_sheet', 'department', 1, 1, NULL, NULL, 5, 1, NULL, NULL, NULL)\n;\n",
+
+            '000019_scope_policy_actors.sql' => "INSERT INTO `scope_policy_actors` (`id`, `policy_id`, `actor_employee_id`, `can_fill`, `can_approve`, `can_revise`, `role_hint`, `created_at`, `updated_at`) VALUES\n"
+                ."  (1, 10, 9094, 1, 1, 1, 'legacy-manager', NULL, NULL)\n;\n",
 
             // admin_id holds an employee *number*: 9094 is also an id, 6716 is not.
             '000001_time_sheets.sql' => "INSERT INTO `time_sheets` (`id`, `employee_id`, `value`, `day`, `revised_at`, `admin_id`) VALUES\n"
