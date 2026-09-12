@@ -32,6 +32,7 @@ class PerformBackupJob implements ShouldQueue
      */
     public function __construct(string $type = 'both', array $selectedTables = [], ?int $logId = null)
     {
+        $this->onQueue('backups');
         $this->type = $type;
         $this->selectedTables = $selectedTables;
         $this->logId = $logId;

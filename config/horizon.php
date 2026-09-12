@@ -211,15 +211,18 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default'],
+            'queue' => array_values(array_filter(array_unique(array_merge(
+                ['high', 'default', 'backups', 'low'],
+                explode(',', (string) env('HORIZON_QUEUES', ''))
+            )))),
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
+            'maxProcesses' => 3,
             'maxTime' => 0,
             'maxJobs' => 0,
-            'memory' => 128,
+            'memory' => 1024,
             'tries' => 1,
-            'timeout' => 60,
+            'timeout' => 1800,
             'nice' => 0,
         ],
     ],
@@ -235,7 +238,7 @@ return [
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 3,
+                'maxProcesses' => 5,
             ],
         ],
     ],
