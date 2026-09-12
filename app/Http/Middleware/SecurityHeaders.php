@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Str;
+use Laravel\Horizon\Horizon;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -27,6 +28,10 @@ class SecurityHeaders
         $nonce = Str::random(32);
 
         Vite::useCspNonce($nonce);
+
+        if (class_exists(Horizon::class)) {
+            Horizon::cspNonce($nonce);
+        }
 
         /** @var Response $response */
         $response = $next($request);

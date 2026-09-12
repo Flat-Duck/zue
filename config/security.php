@@ -52,9 +52,9 @@ return [
         'directives' => [
             'default-src' => ["'self'"],
             'script-src' => ["'self'", "'nonce'", "'unsafe-eval'"],
-            'style-src' => ["'self'", "'unsafe-inline'"],
+            'style-src' => ["'self'", "'unsafe-inline'", 'https://fonts.bunny.net'],
             'img-src' => ["'self'", 'data:', 'blob:'],
-            'font-src' => ["'self'", 'data:'],
+            'font-src' => ["'self'", 'data:', 'https://fonts.bunny.net'],
             'connect-src' => ["'self'", 'ws:', 'wss:'],
             'frame-src' => ["'none'"],
             'frame-ancestors' => ["'none'"],

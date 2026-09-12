@@ -59,4 +59,17 @@ class HorizonTest extends TestCase
         $this->assertFalse(Gate::forUser($regularUser)->check('viewHorizon'));
         $this->assertTrue(Gate::forUser($opsUser)->check('viewHorizon'));
     }
+
+    #[Test]
+    public function horizon_dashboard_includes_csp_nonce_on_scripts_and_styles(): void
+    {
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole('super-admin');
+
+        $response = $this->actingAs($superAdmin)->get('/horizon');
+
+        $response->assertOk();
+        $this->assertMatchesRegularExpression('/<script type="module" nonce="[a-zA-Z0-9]{32}">/', $response->getContent());
+        $this->assertMatchesRegularExpression('/<style[^>]*nonce="[a-zA-Z0-9]{32}"/', $response->getContent());
+    }
 }
