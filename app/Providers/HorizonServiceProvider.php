@@ -27,10 +27,14 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', function ($user = null) {
-            return in_array(optional($user)->email, [
-                //
-            ]);
+        Gate::define('viewHorizon', function ($user = null): bool {
+            if (! $user) {
+                return false;
+            }
+
+            return (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin())
+                || (method_exists($user, 'hasAnyRole') && $user->hasAnyRole(['admin', 'super-admin']))
+                || in_array($user->email, (array) config('horizon.allowed_emails', []));
         });
     }
 }

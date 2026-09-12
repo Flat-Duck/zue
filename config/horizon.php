@@ -45,6 +45,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Allowed Emails
+    |--------------------------------------------------------------------------
+    |
+    | When running Horizon in non-local environments, these email addresses
+    | will be allowed access through the default Horizon authorization gate.
+    |
+    */
+
+    'allowed_emails' => array_filter(explode(',', (string) env('HORIZON_ALLOWED_EMAILS', ''))),
+
+    /*
+    |--------------------------------------------------------------------------
     | Horizon Redis Connection
     |--------------------------------------------------------------------------
     |
