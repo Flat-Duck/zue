@@ -33,7 +33,9 @@ class PerformanceBudgetTest extends TestCase
             // home1 sits closest to its budget of any page here, which makes it the
             // likeliest source of the intermittent suite failure recorded in the
             // checklist. If that is what it is, the message below will say so.
-            'home1' => 22,
+            // The DB-driven sidebar adds a bounded navigation lookup and keeps
+            // authorization checks centralized instead of hard-coded in Blade.
+            'home1' => 24,
             'employees.index' => 10,
             'time-sheets.index' => 10,
             'reports.index' => 6,

@@ -58,5 +58,6 @@ return [
     'process' => 'العملية',
     'employee' => 'الموظف',
     'scope_contexts' => 'سياقات النطاقات',
+    'navigation_builder' => 'بناء القائمة',
     'system_status' => 'حالة النظام',
 ];

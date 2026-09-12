@@ -117,6 +117,7 @@ class PermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage maintenance']);
         Permission::create(['name' => 'manage operations']);
         Permission::create(['name' => 'manage clinic']);
+        Permission::findOrCreate('manage navigation', 'web');
 
         // Seating travellers on a flight is a separate job from editing the
         // flight itself: a dispatcher fills manifests without being able to

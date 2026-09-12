@@ -14,6 +14,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ManagementScopeController;
+use App\Http\Controllers\NavigationBuilderController;
 use App\Http\Controllers\OccupationalInjuryReportController;
 use App\Http\Controllers\OperationsController;
 use App\Http\Controllers\PassengerController;
@@ -118,6 +119,9 @@ Route::prefix('/')
 
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
+        Route::get('navigation-builder', NavigationBuilderController::class)
+            ->middleware('can:manage-navigation')
+            ->name('navigation.builder');
         Route::resource('management-scopes', ManagementScopeController::class);
         Route::resource('scope-contexts', ScopeContextController::class)->except(['show']);
 

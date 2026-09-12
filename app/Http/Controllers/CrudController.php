@@ -155,7 +155,7 @@ abstract class CrudController extends Controller
     }
 
     /**
-     * @return Builder<Model>
+     * @return Builder<TModel>
      */
     protected function newQuery(): Builder
     {

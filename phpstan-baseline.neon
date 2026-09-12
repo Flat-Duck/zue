@@ -781,12 +781,6 @@ parameters:
 			path: app/Models/Employee.php
 
 		-
-			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Eloquent\\Model\:\:setKeysForSaveQuery\(\) expects Illuminate\\Database\\Eloquent\\Builder\<static\(App\\Models\\Employee\)\>, Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Employee\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Models/Employee.php
-
-		-
 			message: '#^Property App\\Models\\Employee\:\:\$searchableFields has no type specified\.$#'
 			identifier: missingType.property
 			count: 1

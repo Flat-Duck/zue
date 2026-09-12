@@ -24,5 +24,7 @@ class DatabaseSeeder extends Seeder
         // Without these a time sheet has no chain to be signed through, so every
         // sheet stalls at the first step with nothing to explain why.
         $this->call(ApprovalFlowSeeder::class);
+
+        $this->call(NavigationSeeder::class);
     }
 }

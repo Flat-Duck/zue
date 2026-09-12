@@ -58,5 +58,6 @@ return [
     'process' => 'Process',
     'employee' => 'Employee',
     'scope_contexts' => 'Scope contexts',
+    'navigation_builder' => 'Navigation builder',
     'system_status' => 'System status',
 ];

@@ -49,6 +49,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasAnyRole(['hr', 'admin', 'super-admin']);
         });
 
+        Gate::define('manage-navigation', function ($user): bool {
+            return $user->checkPermissionTo('manage navigation');
+        });
+
         // Implicitly grant "Super Admin" role all permission checks using can()
         Gate::before(function ($user, $ability) {
             if ($user->isSuperAdmin()) {
