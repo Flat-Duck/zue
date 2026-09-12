@@ -60,4 +60,5 @@ return [
     'scope_contexts' => 'سياقات النطاقات',
     'navigation_builder' => 'بناء القائمة',
     'system_status' => 'حالة النظام',
+    'current_routes' => 'مسارات GET الحالية',
 ];

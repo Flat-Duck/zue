@@ -60,4 +60,5 @@ return [
     'scope_contexts' => 'Scope contexts',
     'navigation_builder' => 'Navigation builder',
     'system_status' => 'System status',
+    'current_routes' => 'Current GET routes',
 ];

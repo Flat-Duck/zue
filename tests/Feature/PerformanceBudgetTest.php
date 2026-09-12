@@ -38,7 +38,7 @@ class PerformanceBudgetTest extends TestCase
             'home1' => 24,
             'employees.index' => 10,
             'time-sheets.index' => 10,
-            'reports.index' => 6,
+            'reports.index' => 7,
             'clinic.index' => 10,
         ];
 

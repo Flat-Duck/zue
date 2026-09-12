@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\NavigationBuilder;
+use App\Models\Employee;
 use App\Models\NavigationItem;
 use App\Models\User;
 use App\Services\Navigation\NavigationRouteRegistry;
@@ -59,6 +60,33 @@ class NavigationBuilderTest extends TestCase
         $employeeShow = $routes->firstWhere('name', 'employees.show');
         $this->assertIsArray($employeeShow);
         $this->assertFalse($employeeShow['navigable']);
+    }
+
+    #[Test]
+    public function navigation_seeder_adds_current_safe_get_routes_as_disabled_builder_items(): void
+    {
+        $this->seed(NavigationSeeder::class);
+
+        $routeGroup = NavigationItem::query()
+            ->where('label_key', 'nav.current_routes')
+            ->firstOrFail();
+
+        $this->assertFalse($routeGroup->is_active);
+
+        $employeeCreate = NavigationItem::query()
+            ->where('parent_id', $routeGroup->id)
+            ->where('route_name', 'employees.create')
+            ->firstOrFail();
+
+        $this->assertSame('employees.create', $employeeCreate->label);
+        $this->assertFalse($employeeCreate->is_active);
+        $this->assertSame(NavigationItem::AUTH_POLICY, $employeeCreate->authorization_type);
+        $this->assertSame('view-any', $employeeCreate->policy_ability);
+        $this->assertSame(Employee::class, $employeeCreate->policy_model);
+
+        $this->assertDatabaseMissing('navigation_items', ['route_name' => 'employees.show']);
+        $this->assertDatabaseMissing('navigation_items', ['route_name' => 'users.import']);
+        $this->assertDatabaseMissing('navigation_items', ['route_name' => 'login']);
     }
 
     #[Test]
