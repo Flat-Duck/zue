@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3e29d775e277f370ec9242f617aad5d",
+    "content-hash": "e2be3009eb95f0ffd2d4bbbe9b9d6876",
     "packages": [
         {
             "name": "brick/math",
@@ -1681,6 +1681,86 @@
             "time": "2026-09-08T14:22:55+00:00"
         },
         {
+            "name": "laravel/horizon",
+            "version": "v5.49.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/horizon.git",
+                "reference": "6dce8a97b426be5305adad537ad4b6a99de61b31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/6dce8a97b426be5305adad537ad4b6a99de61b31",
+                "reference": "6dce8a97b426be5305adad537ad4b6a99de61b31",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-pcntl": "*",
+                "ext-posix": "*",
+                "illuminate/contracts": "^9.21|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/queue": "^9.21|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^9.21|^10.0|^11.0|^12.0|^13.0",
+                "laravel/sentinel": "^1.0",
+                "nesbot/carbon": "^2.17|^3.0",
+                "php": "^8.0",
+                "ramsey/uuid": "^4.0",
+                "symfony/console": "^6.0|^7.0|^8.0",
+                "symfony/error-handler": "^6.0|^7.0|^8.0",
+                "symfony/polyfill-php83": "^1.28",
+                "symfony/process": "^6.0|^7.0|^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "orchestra/testbench": "^7.56|^8.37|^9.16|^10.9|^11.0",
+                "phpstan/phpstan": "^1.10|^2.0",
+                "predis/predis": "^1.1|^2.0|^3.0"
+            },
+            "suggest": {
+                "ext-redis": "Required to use the Redis PHP driver.",
+                "predis/predis": "Required when not using the Redis PHP driver (^1.1|^2.0|^3.0)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Horizon": "Laravel\\Horizon\\Horizon"
+                    },
+                    "providers": [
+                        "Laravel\\Horizon\\HorizonServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "6.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Horizon\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "Dashboard and code-driven configuration for Laravel queues.",
+            "keywords": [
+                "laravel",
+                "queue"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/horizon/issues",
+                "source": "https://github.com/laravel/horizon/tree/v5.49.0"
+            },
+            "time": "2026-09-07T12:00:27+00:00"
+        },
+        {
             "name": "laravel/prompts",
             "version": "v0.3.24",
             "source": {
@@ -1817,6 +1897,62 @@
                 "source": "https://github.com/laravel/reverb/tree/v1.11.1"
             },
             "time": "2026-08-06T14:48:58+00:00"
+        },
+        {
+            "name": "laravel/sentinel",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/sentinel.git",
+                "reference": "972d9885d9d14312a118e9565c4e6ecc5e751ea1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/sentinel/zipball/972d9885d9d14312a118e9565c4e6ecc5e751ea1",
+                "reference": "972d9885d9d14312a118e9565c4e6ecc5e751ea1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/container": "^8.37|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.27",
+                "orchestra/testbench": "^6.47.1|^7.56|^8.37|^9.16|^10.9|^11.0",
+                "phpstan/phpstan": "^2.1.33"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Sentinel\\SentinelServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Sentinel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                },
+                {
+                    "name": "Mior Muhammad Zaki",
+                    "email": "mior@laravel.com"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/laravel/sentinel/tree/v1.1.0"
+            },
+            "time": "2026-03-24T14:03:38+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -2914,16 +3050,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "3.11.0",
+            "version": "3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "147f303310f06334f03f409e49d7ad1e275ff05a"
+                "reference": "72c534fc0ab181ef52d92a68382318631e301608"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/147f303310f06334f03f409e49d7ad1e275ff05a",
-                "reference": "147f303310f06334f03f409e49d7ad1e275ff05a",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/72c534fc0ab181ef52d92a68382318631e301608",
+                "reference": "72c534fc0ab181ef52d92a68382318631e301608",
                 "shasum": ""
             },
             "require": {
@@ -2949,6 +3085,7 @@
                 "phpstan/phpstan-strict-rules": "^2",
                 "phpunit/phpunit": "^10.5.17 || ^11.0.7",
                 "predis/predis": "^1.1 || ^2",
+                "psr/clock": "^1.0",
                 "rollbar/rollbar": "^4.0",
                 "ruflin/elastica": "^7 || ^8",
                 "symfony/mailer": "^5.4 || ^6",
@@ -2967,6 +3104,7 @@
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
                 "mongodb/mongodb": "Allow sending log messages to a MongoDB server (via library)",
                 "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
+                "psr/clock": "Required to pass a clock to the Logger and control the timestamp of log records",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
                 "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
             },
@@ -3001,7 +3139,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/3.11.0"
+                "source": "https://github.com/Seldaek/monolog/tree/3.12.0"
             },
             "funding": [
                 {
@@ -3013,7 +3151,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-02T12:39:56+00:00"
+            "time": "2026-09-09T08:34:20+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -6526,6 +6664,86 @@
             "time": "2026-04-10T16:19:22+00:00"
         },
         {
+            "name": "symfony/polyfill-php83",
+            "version": "v1.41.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php83.git",
+                "reference": "5ea99087fb99c273a9b9236ed4c31e78b16103c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php83/zipball/5ea99087fb99c273a9b9236ed4c31e78b16103c6",
+                "reference": "5ea99087fb99c273a9b9236ed4c31e78b16103c6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php83\\": ""
+                },
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 8.3+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php83/tree/v1.41.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-07-01T12:47:55+00:00"
+        },
+        {
             "name": "symfony/polyfill-php84",
             "version": "v1.38.1",
             "source": {
@@ -7957,16 +8175,16 @@
         },
         {
             "name": "larastan/larastan",
-            "version": "v3.11.0",
+            "version": "v3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/larastan/larastan.git",
-                "reference": "9baa74074f17cc70feaef31616a06ea0faeebba5"
+                "reference": "ab26fdf90d84877061388109e1e251f67ca3ff7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/larastan/larastan/zipball/9baa74074f17cc70feaef31616a06ea0faeebba5",
-                "reference": "9baa74074f17cc70feaef31616a06ea0faeebba5",
+                "url": "https://api.github.com/repos/larastan/larastan/zipball/ab26fdf90d84877061388109e1e251f67ca3ff7a",
+                "reference": "ab26fdf90d84877061388109e1e251f67ca3ff7a",
                 "shasum": ""
             },
             "require": {
@@ -8034,7 +8252,7 @@
             ],
             "support": {
                 "issues": "https://github.com/larastan/larastan/issues",
-                "source": "https://github.com/larastan/larastan/tree/v3.11.0"
+                "source": "https://github.com/larastan/larastan/tree/v3.12.0"
             },
             "funding": [
                 {
@@ -8042,20 +8260,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-01T16:35:48+00:00"
+            "time": "2026-09-10T09:06:54+00:00"
         },
         {
             "name": "laravel/boost",
-            "version": "v2.8.0",
+            "version": "v2.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "ac0b51fbaf3cc19453aef7a1b188bce19a1ec049"
+                "reference": "820bc93b7826c456ca591cfecca463b4dc794a72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/ac0b51fbaf3cc19453aef7a1b188bce19a1ec049",
-                "reference": "ac0b51fbaf3cc19453aef7a1b188bce19a1ec049",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/820bc93b7826c456ca591cfecca463b4dc794a72",
+                "reference": "820bc93b7826c456ca591cfecca463b4dc794a72",
                 "shasum": ""
             },
             "require": {
@@ -8108,7 +8326,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-09-08T17:07:40+00:00"
+            "time": "2026-09-10T15:25:39+00:00"
         },
         {
             "name": "laravel/dusk",
@@ -8186,16 +8404,16 @@
         },
         {
             "name": "laravel/mcp",
-            "version": "v0.9.4",
+            "version": "v0.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/mcp.git",
-                "reference": "7ca5b923630118696602d14348cd0466a5e853ec"
+                "reference": "923d8d8cd9ed46766d1a8b5269f8b4afc4c91c53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/mcp/zipball/7ca5b923630118696602d14348cd0466a5e853ec",
-                "reference": "7ca5b923630118696602d14348cd0466a5e853ec",
+                "url": "https://api.github.com/repos/laravel/mcp/zipball/923d8d8cd9ed46766d1a8b5269f8b4afc4c91c53",
+                "reference": "923d8d8cd9ed46766d1a8b5269f8b4afc4c91c53",
                 "shasum": ""
             },
             "require": {
@@ -8256,20 +8474,20 @@
                 "issues": "https://github.com/laravel/mcp/issues",
                 "source": "https://github.com/laravel/mcp"
             },
-            "time": "2026-08-13T15:01:07+00:00"
+            "time": "2026-09-09T12:56:57+00:00"
         },
         {
             "name": "laravel/pint",
-            "version": "v1.31.1",
+            "version": "v1.32.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/pint.git",
-                "reference": "b136cebaf0b3f7d288bdafad5088858d082580aa"
+                "reference": "006bd7825eb01daf92959d060b89cd9514fe4253"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/b136cebaf0b3f7d288bdafad5088858d082580aa",
-                "reference": "b136cebaf0b3f7d288bdafad5088858d082580aa",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/006bd7825eb01daf92959d060b89cd9514fe4253",
+                "reference": "006bd7825eb01daf92959d060b89cd9514fe4253",
                 "shasum": ""
             },
             "require": {
@@ -8326,7 +8544,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-            "time": "2026-09-08T17:10:00+00:00"
+            "time": "2026-09-10T10:47:55+00:00"
         },
         {
             "name": "laravel/roster",
