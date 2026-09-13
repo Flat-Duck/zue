@@ -54,6 +54,14 @@ class FlightPolicy
     }
 
     /**
+     * Determine whether a department user can register employees from their own department.
+     */
+    public function registerDepartmentEmployees(User $user, Flight $model): bool
+    {
+        return $user->checkPermissionTo('view flights') && $user->employee?->department_id !== null;
+    }
+
+    /**
      * Determine whether the flight can delete the model.
      */
     public function delete(User $user, Flight $model): bool

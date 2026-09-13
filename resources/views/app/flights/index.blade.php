@@ -63,8 +63,8 @@
                 @forelse($flights as $flight)
                 <tr>
                     <td>{{ $flight->type ?? '-' }}</td>
-                    <td>{{ $flight->date->format('d/m/Y') ?? '-' }}</td>
-                    <td>{{ $flight->time->format('H:i') ?? '-' }}</td>
+                    <td>{{ $flight->date?->format('d/m/Y') ?? '-' }}</td>
+                    <td>{{ $flight->time?->format('H:i') ?? '-' }}</td>
                     <td class="text-center table-actions">
                         <div
                             role="group"

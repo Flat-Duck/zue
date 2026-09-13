@@ -32,7 +32,7 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.select name="employee_id" label="Employee" required>
+        <x-inputs.select name="employee_id" label="Employee" data-tomselect="select" required>
             @php $selected = old('employee_id', ($editing ? $timeSheet->employee_id : '')) @endphp
             <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('timesheets.please_select_the_employee')</option>
             @foreach($employees as $value => $label)
@@ -61,7 +61,7 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.select name="user_id" label="Revised By">
+        <x-inputs.select name="user_id" label="Revised By" data-tomselect="select">
             @php $selected = old('user_id', ($editing ? $timeSheet->user_id : '')) @endphp
             <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('timesheets.please_select_the_user')</option>
             @foreach($users as $value => $label)

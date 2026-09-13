@@ -31,7 +31,7 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">@lang('reports.employee_optional')</label>
-                                    <select name="employee_id" class="form-select">
+                                    <select name="employee_id" class="form-select" data-tomselect="select">
                                         <option value="">@lang('reports.all_employees')</option>
                                         @foreach($employees as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
@@ -43,7 +43,7 @@
                                     <div class="col-6">
                                         <div class="mb-3">
                                             <label class="form-label">@lang('reports.department')</label>
-                                            <select name="department_id" class="form-select">
+                                            <select name="department_id" class="form-select" data-tomselect="select">
                                                 <option value="">@lang('reports.all_departments')</option>
                                                 @foreach($departments as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
@@ -54,7 +54,7 @@
                                     <div class="col-6">
                                         <div class="mb-3">
                                             <label class="form-label">@lang('reports.center')</label>
-                                            <select name="center_id" class="form-select">
+                                            <select name="center_id" class="form-select" data-tomselect="select">
                                                 <option value="">@lang('reports.all_centers')</option>
                                                 @foreach($centers as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
@@ -125,7 +125,7 @@
 
                                 <div class="mb-3">
                                     <label class="form-label">@lang('reports.filter_by_location')</label>
-                                    <select name="location_id" class="form-select">
+                                    <select name="location_id" class="form-select" data-tomselect="select">
                                         <option value="">@lang('reports.all_locations')</option>
                                         @foreach($locations as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
@@ -219,7 +219,7 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">@lang('reports.department')</label>
-                                    <select name="department_id" class="form-select">
+                                    <select name="department_id" class="form-select" data-tomselect="select">
                                         <option value="">@lang('reports.all_departments')</option>
                                         @foreach($departments as $id => $name)
                                             <option value="{{ $id }}">{{ $name }}</option>
@@ -230,7 +230,7 @@
                                     <div class="col-6">
                                         <div class="mb-3">
                                             <label class="form-label">@lang('reports.center')</label>
-                                            <select name="center_id" class="form-select">
+                                            <select name="center_id" class="form-select" data-tomselect="select">
                                                 <option value="">@lang('reports.all_centers')</option>
                                                 @foreach($centers as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>
@@ -241,7 +241,7 @@
                                     <div class="col-6">
                                         <div class="mb-3">
                                             <label class="form-label">@lang('reports.location')</label>
-                                            <select name="location_id" class="form-select">
+                                            <select name="location_id" class="form-select" data-tomselect="select">
                                                 <option value="">@lang('reports.all_locations')</option>
                                                 @foreach($locations as $id => $name)
                                                     <option value="{{ $id }}">{{ $name }}</option>

@@ -19,7 +19,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">@lang('appraisals.period_open_only')</label>
-                            <select name="appraisal_period_id" class="form-select" required>
+                            <select name="appraisal_period_id" class="form-select" data-tomselect="select" required>
                                 <option value="">@lang('appraisals.choose_placeholder')</option>
                                 @foreach($periods as $p)
                                     <option value="{{ $p->id }}">{{ $p->label }}
@@ -31,10 +31,10 @@
 
                         <div class="col-md-6">
                             <label class="form-label">@lang('appraisals.employee')</label>
-                            <select name="employee_id" class="form-select" required>
+                            <select name="employee_id" class="form-select" data-tomselect="select" required>
                                 <option value="">@lang('appraisals.choose_placeholder')</option>
                                 @foreach($employees as $e)
-                                    <option value="{{ $e->id }}">{{ $e->name ?? ('#' . $e->id) }}</option>
+                                    <option value="{{ $e->id }}">{{ $e->number }} — {{ $e->name ?? $e->english_name ?? ('#' . $e->id) }}</option>
                                 @endforeach
                             </select>
                             <div class="form-hint">@lang('appraisals.employee_needs_a_form')</div>

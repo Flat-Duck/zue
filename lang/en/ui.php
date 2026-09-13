@@ -156,4 +156,12 @@ return [
     'waiting_list_count' => 'Waiting list (:count)',
     'seats_free' => ':free of :total seats free',
     'no_dispatcher_scope' => 'No employees are in your dispatcher scope, so there is nobody to book. Ask an administrator to give you a scope in the Dispatcher context.',
+    'department_timesheet_status' => 'Department timesheet status',
+    'departments_complete' => 'Departments complete',
+    'departments_with_no_missing_timesheets' => 'Departments with no missing timesheets',
+    'filled' => 'Filled',
+    'no_department_timesheet_data' => 'No department timesheet data is available.',
+    'not_filled' => 'Not filled',
+    'total' => 'Total',
+    'apply' => 'Apply',
 ];

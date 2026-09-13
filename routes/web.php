@@ -6,6 +6,7 @@ use App\Http\Controllers\ClinicApointmentController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FlightController;
+use App\Http\Controllers\FlightDepartmentRegistrationController;
 use App\Http\Controllers\FlightRouteController;
 use App\Http\Controllers\FlightStationController;
 use App\Http\Controllers\HealthController;
@@ -140,6 +141,9 @@ Route::prefix('/')
         Route::delete('flights/{flight}/approve', [FlightController::class, 'approve'])->name('flights.approve');
         // Printable manifest for one leg: the sheet carried to the airport.
         Route::get('flights/{flight}/legs/{leg}/manifest', [FlightController::class, 'manifest'])->name('flights.manifest');
+        Route::get('flights/{flight}/department-registration', [FlightDepartmentRegistrationController::class, 'show'])->name('flights.department-registration.show');
+        Route::post('flights/{flight}/department-registration', [FlightDepartmentRegistrationController::class, 'store'])->name('flights.department-registration.store');
+        Route::delete('flights/{flight}/department-registration/{booking}', [FlightDepartmentRegistrationController::class, 'destroy'])->name('flights.department-registration.destroy');
 
         // Dispatcher reference data: the places flights call at and the
         // itineraries built from them.

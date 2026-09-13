@@ -66,11 +66,16 @@ class RoomController extends CrudController
     {
         $options = [
             'residences' => Residence::query()->select(['id', 'type', 'name'])->orderBy('name')->get(),
-            'employees' => Employee::pluck('number', 'id'),
+            'employees' => Employee::query()
+                ->orderBy('number')
+                ->get(['id', 'number', 'english_name', 'arabic_name'])
+                ->mapWithKeys(fn (Employee $employee): array => [
+                    $employee->id => trim((string) $employee->number).' — '.($employee->english_name ?: $employee->arabic_name),
+                ]),
         ];
 
         if ($record !== null) {
-            $options['residents'] = $record->employees()->pluck('number', 'id')->toArray();
+            $options['residents'] = $record->employees()->pluck('employees.id')->all();
         }
 
         return $options;

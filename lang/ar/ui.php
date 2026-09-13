@@ -156,4 +156,12 @@ return [
     'waiting_list_count' => 'قائمة الانتظار (:count)',
     'seats_free' => ':free من :total مقعداً متاح',
     'no_dispatcher_scope' => 'لا يوجد موظفون ضمن نطاق الترحيل الخاص بك، لذا لا يمكن حجز أحد. اطلب من المسؤول منحك نطاقاً في سياق الترحيل.',
+    'department_timesheet_status' => 'حالة الجداول الزمنية حسب القسم',
+    'departments_complete' => 'الأقسام المكتملة',
+    'departments_with_no_missing_timesheets' => 'الأقسام التي لا ينقصها أي جدول زمني',
+    'filled' => 'معبأ',
+    'no_department_timesheet_data' => 'لا توجد بيانات للجداول الزمنية حسب القسم.',
+    'not_filled' => 'غير معبأ',
+    'total' => 'الإجمالي',
+    'apply' => 'تطبيق',
 ];

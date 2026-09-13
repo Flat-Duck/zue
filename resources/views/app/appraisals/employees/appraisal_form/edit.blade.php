@@ -57,7 +57,7 @@
                     <div class="row g-3">
                         <div class="col-md-8">
                             <label class="form-label">@lang('appraisals.appraisal_form')</label>
-                            <select name="appraisal_form_id" class="form-select">
+                            <select name="appraisal_form_id" class="form-select" data-tomselect="select">
                                 <option value="">@lang('appraisals.none_unassigned')</option>
                                 @foreach($forms as $f)
                                     <option value="{{ $f->id }}" {{ (string) $employee->appraisal_form_id === (string) $f->id ? 'selected' : '' }}>

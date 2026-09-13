@@ -46,6 +46,15 @@
                                 disabled=""
                             />
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">@lang('flights.registration_window')</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ $flight->registration_opens_at?->format('Y-m-d H:i') ?? '-' }} → {{ $flight->registration_closes_at?->format('Y-m-d H:i') ?? '-' }}"
+                                disabled=""
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -59,8 +68,14 @@
                 >@lang('crud.common.back')</a
             >
 
+            @can('registerDepartmentEmployees', $flight)
+            <a href="{{ route('flights.department-registration.show', $flight) }}" class="btn btn-outline-primary ms-auto">
+                @lang('flights.department_registration')
+            </a>
+            @endcan
+
             @can('create', App\Models\Flight::class)
-            <a href="{{ route('flights.create') }}" class="btn btn-primary">
+            <a href="{{ route('flights.create') }}" class="btn btn-primary ms-2">
                 @lang('crud.common.create')
             </a>
             @endcan

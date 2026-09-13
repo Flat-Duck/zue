@@ -27,6 +27,8 @@ class FlightUpdateRequest extends FormRequest
             'time' => ['nullable', 'date_format:H:i'],
             'plane_id' => ['sometimes', 'exists:planes,id'],
             'flight_route_id' => ['sometimes', 'exists:flight_routes,id'],
+            'registration_opens_at' => ['nullable', 'date'],
+            'registration_closes_at' => ['nullable', 'date', 'after:registration_opens_at'],
         ];
     }
 }

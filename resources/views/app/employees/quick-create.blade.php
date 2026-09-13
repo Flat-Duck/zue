@@ -32,7 +32,7 @@
                 </x-inputs.group>
 
                 <x-inputs.group class="col-sm-6">
-                    <x-inputs.select name="location_id" label="Location" required>
+                    <x-inputs.select name="location_id" label="Location" data-tomselect="select" required>
                         @php $selected = old('location_id') @endphp
                         <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_location')</option>
                         @foreach($locations as $value => $label)
@@ -44,7 +44,7 @@
                 </x-inputs.group>
 
                 <x-inputs.group class="col-sm-6">
-                    <x-inputs.select name="center_id" label="Centre" required>
+                    <x-inputs.select name="center_id" label="Centre" data-tomselect="select" required>
                         @php $selected = old('center_id') @endphp
                         <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_centre')</option>
                         @foreach($centers as $value => $label)

@@ -45,6 +45,19 @@ class FlightControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_displays_index_view_when_a_flight_has_no_date_or_time(): void
+    {
+        Flight::factory()->create([
+            'date' => null,
+            'time' => null,
+        ]);
+
+        $this->get(route('flights.index'))
+            ->assertOk()
+            ->assertSee('-');
+    }
+
+    #[Test]
     public function it_displays_create_view_for_flight(): void
     {
         $response = $this->get(route('flights.create'));
@@ -61,6 +74,8 @@ class FlightControllerTest extends TestCase
         $data = Flight::factory()->make()->getAttributes();
         $data['time'] = $this->faker->time('H:i');
         $data['flight_route_id'] = $route->id;
+        $data['registration_opens_at'] = '2026-09-13 12:12:00';
+        $data['registration_closes_at'] = '2026-09-13 12:20:00';
 
         $response = $this->post(route('flights.store'), $data);
 

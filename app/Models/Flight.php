@@ -9,12 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property-read Plane $plane
  * @property-read FlightRoute|null $route
  * @property-read Collection<int, FlightLeg> $legs
  * @property-read Collection<int, FlightLeg> $comingLegs
+ * @property Carbon|null $registration_opens_at
+ * @property Carbon|null $registration_closes_at
  * @property-read Collection<int, FlightLeg> $leavingLegs
  */
 class Flight extends Model
@@ -22,14 +25,42 @@ class Flight extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['type', 'date', 'time', 'plane_id', 'flight_route_id'];
+    protected $fillable = [
+        'type',
+        'date',
+        'time',
+        'plane_id',
+        'flight_route_id',
+        'registration_opens_at',
+        'registration_closes_at',
+    ];
 
     protected $searchableFields = ['*'];
 
     protected $casts = [
         'date' => 'date',
         'time' => 'datetime',
+        'registration_opens_at' => 'datetime',
+        'registration_closes_at' => 'datetime',
     ];
+
+    public function registrationIsOpen(?Carbon $at = null): bool
+    {
+        $at ??= now();
+
+        if ($this->registration_opens_at === null || $this->registration_closes_at === null) {
+            return false;
+        }
+
+        return $at->betweenIncluded($this->registration_opens_at, $this->registration_closes_at);
+    }
+
+    public function registrationHasClosed(?Carbon $at = null): bool
+    {
+        $at ??= now();
+
+        return $this->registration_closes_at !== null && $at->greaterThan($this->registration_closes_at);
+    }
 
     /**
      * @return BelongsToMany<Passenger, $this>

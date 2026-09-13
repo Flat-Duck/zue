@@ -7,7 +7,7 @@
     </x-inputs.group>
 
     <x-inputs.group class="col-sm-12">
-        <x-inputs.select name="administration_id" label="Administration" required>
+        <x-inputs.select name="administration_id" label="Administration" data-tomselect="select" required>
             @php $selected = old('administration_id', ($editing ? $department->administration_id : '')) @endphp
             <option disabled {{ empty($selected) ? 'selected' : '' }}>@lang('ui.please_select_the_administration')</option>
             @foreach($administrations as $value => $label)

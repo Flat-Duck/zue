@@ -37,7 +37,7 @@
 
                     <div class="col-md-5">
                         <label class="form-label">@lang('appraisals.item')</label>
-                        <select name="item_id" class="form-select" required>
+                        <select name="item_id" class="form-select" data-tomselect="select" required>
                             <option value="">@lang('appraisals.choose_placeholder')</option>
                             @foreach($items as $i)
                                 <option value="{{ $i->id }}">{{ $i->default_section }} | {{ $i->key }} | {{ $i->default_label }}

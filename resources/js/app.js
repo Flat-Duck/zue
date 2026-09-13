@@ -43,6 +43,8 @@ function initialiseAdvancedSelects(root = document) {
             plugins: ['remove_button'],
             persist: false,
             create: false,
+            maxItems: el.dataset.maxItems ? Number(el.dataset.maxItems) : null,
+            placeholder: el.dataset.placeholder || undefined,
         });
     });
 
@@ -52,6 +54,8 @@ function initialiseAdvancedSelects(root = document) {
         new TomSelect(el, {
             persist: false,
             create: false,
+            maxOptions: null,
+            placeholder: el.dataset.placeholder || undefined,
         });
     });
 }

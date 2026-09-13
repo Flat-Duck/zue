@@ -33,7 +33,12 @@ class ReportController extends Controller
         $departments = Department::orderBy('name')->pluck('name', 'id');
         $centers = Center::orderBy('name')->pluck('name', 'id');
         $locations = Location::orderBy('name')->pluck('name', 'id');
-        $employees = Employee::orderBy('english_name')->pluck('english_name', 'id');
+        $employees = Employee::query()
+            ->orderBy('english_name')
+            ->get(['id', 'number', 'english_name', 'arabic_name'])
+            ->mapWithKeys(fn (Employee $employee): array => [
+                $employee->id => trim((string) $employee->number).' — '.($employee->english_name ?: $employee->arabic_name),
+            ]);
 
         return view('app.reports.index', compact('departments', 'centers', 'locations', 'employees'));
     }
